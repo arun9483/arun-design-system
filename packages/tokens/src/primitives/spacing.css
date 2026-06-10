@@ -1,0 +1,29 @@
+:root {
+  --space-px: 0.0625rem; /*  1px — hairlines, sr-only clip, single-pixel borders */
+  --space-2px: 0.125rem; /*  2px — fine borders, focus-ring outline, underline indicators */
+  --space-3xs: 0.25rem; /*  4px */
+  --space-2xs: 0.5rem; /*  8px */
+  --space-xs: 0.75rem; /* 12px */
+  --space-sm: 1rem; /* 16px */
+  --space-md: 1.5rem; /* 24px */
+  --space-lg: 2rem; /* 32px */
+  --space-xl: 2.5rem; /* 40px */
+  --space-2xl: 3rem; /* 48px */
+  --space-3xl: 4rem; /* 64px */
+  --space-4xl: 5rem; /* 80px */
+  --space-5xl: 10rem; /* 160px */
+  --space-6xl: 14rem; /* 224px */
+  --space-7xl: 18rem; /* 288px */
+
+  /* Named content widths */
+  --size-container-sm: 42rem;
+  --size-container-md: 56rem;
+  --size-container-lg: 66rem;
+
+  /* Named structural heights */
+  --size-header: 3.5rem; /* sticky header height — used in calc() for sticky sidebar offset */
+
+  /* Named component sizes */
+  --size-sidebar-toc: 13rem; /* article ToC sidebar fixed width */
+  --size-toc-indent: 0.875rem; /* 14px — per-level indent for nested ToC headings */
+}

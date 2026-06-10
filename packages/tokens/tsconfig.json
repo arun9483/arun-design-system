@@ -1,0 +1,16 @@
+{
+  "extends": "@arun-dev/config/typescript/base",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "incremental": false
+  },
+  "include": ["src"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.unit.spec.ts",
+    "vitest.config.ts",
+    "vitest.unit.config.ts"
+  ]
+}

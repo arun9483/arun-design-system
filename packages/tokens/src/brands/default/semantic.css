@@ -1,0 +1,162 @@
+/* Semantic tokens — derived from default palette.
+   Consumer contract: all variables listed here must be defined for @arun-dev/ui to render correctly.
+   Consumers may import this file and override individual variables, or replace it entirely.
+
+   Source of truth for createBrand()'s deriveLight()/deriveDark() (src/createBrand.ts) — if you
+   change a value here, change it there too. Guarded by createBrand.unit.spec.ts. */
+
+:root {
+  /* ── Backgrounds ── */
+  --color-bg-primary: var(--color-neutral-0);
+  --color-bg-secondary: var(--color-neutral-50);
+  --color-bg-surface: var(--color-neutral-100);
+  --color-bg-accent: var(--color-brand-50);
+  --color-bg-inverse: var(--color-neutral-900);
+
+  /* ── Text ── */
+  --color-text-primary: var(--color-neutral-900);
+  --color-text-secondary: var(--color-neutral-700); /* 10.34:1 on white (AAA) */
+  --color-text-muted: var(--color-neutral-600); /*  7.58:1 on white (AAA) */
+  --color-text-accent: var(--color-brand-700); /*  7.89:1 on white (AAA) */
+  --color-text-inverse: var(--color-neutral-50);
+  --color-text-on-accent: var(--color-neutral-0);
+
+  /* ── Borders ── */
+  --color-border-default: var(--color-neutral-200);
+  --color-border-subtle: var(--color-neutral-100);
+  --color-border-strong: var(--color-neutral-300);
+  --color-border-accent: var(--color-brand-300);
+
+  /* ── Status ── */
+  --color-status-success: #15803d;
+  --color-status-success-bg: #f0fdf4;
+  --color-status-error: #b91c1c;
+  --color-status-error-bg: #fef2f2;
+  --color-status-warning: #b45309;
+  --color-status-warning-bg: #fffbeb;
+  --color-status-info: var(--color-brand-500);
+  --color-status-info-bg: var(--color-brand-50);
+}
+
+/* ── Dark mode — system preference ── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg-primary: var(--color-neutral-900);
+    --color-bg-secondary: var(--color-neutral-800);
+    --color-bg-surface: var(--color-neutral-700);
+    --color-bg-accent: var(--color-brand-950);
+    --color-bg-inverse: var(--color-neutral-50);
+
+    --color-text-primary: var(--color-neutral-100);
+    --color-text-secondary: var(--color-neutral-300); /* 12.03:1 on neutral-900 (AAA) */
+    --color-text-muted: var(--color-neutral-400); /*  7.13:1 on neutral-900 (AAA, palette nudged) */
+    --color-text-accent: var(--color-brand-300); /*  8.97:1 on neutral-900 (AAA) */
+    --color-text-inverse: var(--color-neutral-900);
+    --color-text-on-accent: var(--color-neutral-0);
+
+    --color-border-default: var(--color-neutral-700);
+    --color-border-subtle: var(--color-neutral-800);
+    --color-border-strong: var(--color-neutral-600);
+    --color-border-accent: var(--color-brand-700);
+
+    --color-status-success: #4ade80;
+    --color-status-success-bg: #052e16;
+    --color-status-error: #f87171;
+    --color-status-error-bg: #450a0a;
+    --color-status-warning: #fbbf24;
+    --color-status-warning-bg: #451a03;
+    --color-status-info: var(--color-brand-300);
+    --color-status-info-bg: var(--color-brand-950);
+  }
+}
+
+/* ── Dark mode — explicit override ── */
+[data-theme='dark'] {
+  --color-bg-primary: var(--color-neutral-900);
+  --color-bg-secondary: var(--color-neutral-800);
+  --color-bg-surface: var(--color-neutral-700);
+  --color-bg-accent: var(--color-brand-950);
+  --color-bg-inverse: var(--color-neutral-50);
+
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-300); /* 12.03:1 on neutral-900 (AAA) */
+  --color-text-muted: var(--color-neutral-400); /*  7.13:1 on neutral-900 (AAA, palette nudged) */
+  --color-text-accent: var(--color-brand-300); /*  8.97:1 on neutral-900 (AAA) */
+  --color-text-inverse: var(--color-neutral-900);
+  --color-text-on-accent: var(--color-neutral-0);
+
+  --color-border-default: var(--color-neutral-700);
+  --color-border-subtle: var(--color-neutral-800);
+  --color-border-strong: var(--color-neutral-600);
+  --color-border-accent: var(--color-brand-700);
+
+  --color-status-success: #4ade80;
+  --color-status-success-bg: #052e16;
+  --color-status-error: #f87171;
+  --color-status-error-bg: #450a0a;
+  --color-status-warning: #fbbf24;
+  --color-status-warning-bg: #451a03;
+  --color-status-info: var(--color-brand-300);
+  --color-status-info-bg: var(--color-brand-950);
+}
+
+/* ── Light mode — explicit override ── */
+[data-theme='light'] {
+  --color-bg-primary: var(--color-neutral-0);
+  --color-bg-secondary: var(--color-neutral-50);
+  --color-bg-surface: var(--color-neutral-100);
+  --color-bg-accent: var(--color-brand-50);
+  --color-bg-inverse: var(--color-neutral-900);
+
+  --color-text-primary: var(--color-neutral-900);
+  --color-text-secondary: var(--color-neutral-700); /* 10.34:1 on white (AAA) */
+  --color-text-muted: var(--color-neutral-600); /*  7.58:1 on white (AAA) */
+  --color-text-accent: var(--color-brand-700); /*  7.89:1 on white (AAA) */
+  --color-text-inverse: var(--color-neutral-50);
+  --color-text-on-accent: var(--color-neutral-0);
+
+  --color-border-default: var(--color-neutral-200);
+  --color-border-subtle: var(--color-neutral-100);
+  --color-border-strong: var(--color-neutral-300);
+  --color-border-accent: var(--color-brand-300);
+
+  --color-status-success: #15803d;
+  --color-status-success-bg: #f0fdf4;
+  --color-status-error: #b91c1c;
+  --color-status-error-bg: #fef2f2;
+  --color-status-warning: #b45309;
+  --color-status-warning-bg: #fffbeb;
+  --color-status-info: var(--color-brand-500);
+  --color-status-info-bg: var(--color-brand-50);
+}
+
+/* ── Code block — always dark, theme-independent ── */
+:root {
+  --code-bg: #0d1117;
+  --code-header-bg: #161b22;
+  --code-border: #21262d;
+  --code-text-dim: #8b949e;
+  --code-copy-bg: rgba(255, 255, 255, 0.05);
+  --code-copied-bg: rgba(74, 222, 128, 0.1);
+  --code-copied-color: #4ade80;
+  --code-copied-border: rgba(74, 222, 128, 0.3);
+  --code-border-dim: #30363d;
+
+  /* sugar-high syntax tokens (applied via inline style="color:var(--sh-*)") */
+  --sh-keyword: #c792ea;
+  --sh-string: #c3e88d;
+  --sh-comment: #546e7a;
+  --sh-jsxliterals: #89ddff;
+  --sh-identifier: #e2e8f0;
+  --sh-sign: #89ddff;
+  --sh-class: #ffcb6b;
+  --sh-property: #80cbc4;
+  --sh-entity: #82aaff;
+  --sh-space: inherit;
+
+  /* ── Overlay — dark translucent surfaces (Cover hero, image overlays) ── */
+  --color-overlay-gradient: rgba(0, 0, 0, 0.45);
+  --color-overlay-text: rgb(255 255 255 / 0.85);
+  --color-overlay-orb: rgb(255 255 255 / 0.05);
+  --color-overlay-orb-dim: rgb(255 255 255 / 0.03);
+}

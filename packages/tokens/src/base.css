@@ -1,0 +1,10 @@
+/* Brand-agnostic primitives — import once as the structural token layer */
+/* fonts.css omitted: @font-face loading is a consumer concern.
+   Next.js consumers use next/font/local in layout.tsx; others import fonts.css directly. */
+@import './primitives/typography.css';
+@import './primitives/spacing.css';
+@import './primitives/radius.css';
+@import './primitives/shadow.css';
+@import './primitives/motion.css';
+@import './primitives/elevation.css';
+@import './primitives/breakpoints.css';

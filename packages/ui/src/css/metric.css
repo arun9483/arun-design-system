@@ -1,0 +1,10 @@
+@layer metric {
+  /* Metric — accent-tinted stat card for impact metrics */
+  .metric {
+    padding: var(--space-xs);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    background-color: var(--color-bg-accent);
+    border: var(--space-px) solid var(--color-border-accent);
+  }
+}

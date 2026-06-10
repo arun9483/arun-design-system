@@ -1,0 +1,19 @@
+@layer card {
+  .card {
+    background-color: var(--color-bg-primary);
+    border: var(--space-px) solid var(--color-border-default);
+    box-shadow: var(--shadow-sm);
+    transition:
+      box-shadow var(--duration-normal) var(--ease-smooth),
+      transform var(--duration-fast) var(--ease-smooth);
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Lifts the card upward on hover — use for interactive list cards */
+  .card-lift:hover {
+    transform: translateY(calc(-1 * var(--space-px)));
+  }
+}

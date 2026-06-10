@@ -1,0 +1,40 @@
+@layer btn {
+  .btn {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    padding-inline: var(--space-sm);
+    padding-block: var(--space-2xs);
+    border-radius: var(--radius-full);
+    transition: opacity var(--duration-fast) var(--ease-smooth);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+
+  /* Ghost — outline, secondary action */
+  .btn-ghost {
+    background-color: var(--color-bg-surface);
+    color: var(--color-text-primary);
+    border: var(--space-px) solid var(--color-border-default);
+  }
+
+  /* Primary — filled, main CTA */
+  .btn-primary {
+    background-color: var(--color-text-accent);
+    color: var(--color-text-on-accent);
+  }
+
+  .btn:hover {
+    opacity: 0.75;
+  }
+
+  .btn:focus-visible {
+    outline: var(--space-2px) solid var(--color-text-accent);
+    outline-offset: var(--space-2px);
+    border-radius: var(--radius-sm);
+  }
+}

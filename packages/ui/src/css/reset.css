@@ -1,0 +1,108 @@
+@layer reset {
+  /* Global resets and cross-cutting accessibility utilities */
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  /* ── Minimal preflight — remove browser default margins/font overrides ──
+     Explicit spacing classes are the only source of truth.
+     Without this, browser UA styles add margins on top of gap/margin tokens, doubling spacing. */
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit;
+    font-weight: inherit;
+    margin: 0;
+  }
+
+  p,
+  blockquote,
+  figure,
+  dl,
+  dd,
+  address {
+    margin: 0;
+  }
+
+  ul,
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  fieldset {
+    margin: 0;
+    padding: 0;
+  }
+
+  img,
+  video,
+  canvas,
+  audio,
+  iframe,
+  embed,
+  object {
+    display: block;
+    max-width: 100%;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  optgroup,
+  select,
+  textarea {
+    font-family: inherit;
+    font-size: 100%;
+    font-weight: inherit;
+    line-height: inherit;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: var(--space-px);
+    height: var(--space-px);
+    padding: 0;
+    margin: calc(-1 * var(--space-px));
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}

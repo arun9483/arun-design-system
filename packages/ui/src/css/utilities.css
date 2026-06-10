@@ -1,0 +1,138 @@
+@layer utilities {
+  /* ── Text size — mirrors --text-{scale} tokens ── */
+  .text-size-xs {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs-leading);
+  }
+  .text-size-sm {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm-leading);
+  }
+  .text-size-base {
+    font-size: var(--text-base);
+    line-height: var(--text-base-leading);
+  }
+  .text-size-lg {
+    font-size: var(--text-lg);
+    line-height: var(--text-lg-leading);
+  }
+  .text-size-xl {
+    font-size: var(--text-xl);
+    line-height: var(--text-xl-leading);
+  }
+  .text-size-2xl {
+    font-size: var(--text-2xl);
+    line-height: var(--text-2xl-leading);
+  }
+  .text-size-3xl {
+    font-size: var(--text-3xl);
+    line-height: var(--text-3xl-leading);
+  }
+  .text-size-4xl {
+    font-size: var(--text-4xl);
+    line-height: var(--text-4xl-leading);
+  }
+  .text-size-5xl {
+    font-size: var(--text-5xl);
+    line-height: var(--text-5xl-leading);
+  }
+
+  /* ── Font weight — mirrors --font-weight-{name} tokens ── */
+  .font-weight-medium {
+    font-weight: var(--font-weight-medium);
+  }
+  .font-weight-semibold {
+    font-weight: var(--font-weight-semibold);
+  }
+  .font-weight-bold {
+    font-weight: var(--font-weight-bold);
+  }
+
+  /* ── Line height — mirrors --line-height-{name} tokens ── */
+  .line-height-tight {
+    line-height: var(--line-height-tight);
+  }
+  .line-height-snug {
+    line-height: var(--line-height-snug);
+  }
+  .line-height-relaxed {
+    line-height: var(--line-height-relaxed);
+  }
+
+  /* ── Letter spacing — mirrors --letter-spacing-{name} tokens ── */
+  .letter-spacing-wider {
+    letter-spacing: var(--letter-spacing-wider);
+  }
+
+  /* ── Text color — mirrors --color-text-{role} tokens ── */
+  .text-color-primary {
+    color: var(--color-text-primary);
+  }
+  .text-color-secondary {
+    color: var(--color-text-secondary);
+  }
+  .text-color-muted {
+    color: var(--color-text-muted);
+  }
+  .text-color-accent {
+    color: var(--color-text-accent);
+  }
+
+  /* ── Decoration / transform ── */
+  .underline {
+    text-decoration: underline;
+  }
+  .uppercase {
+    text-transform: uppercase;
+  }
+
+  /* ── Flex stack layout — gap mirrors --space-{scale} tokens ── */
+  .stack {
+    display: flex;
+    flex-direction: column;
+  }
+  .space-2xs {
+    gap: var(--space-2xs);
+  }
+  .space-xs {
+    gap: var(--space-xs);
+  }
+  .space-sm {
+    gap: var(--space-sm);
+  }
+  .space-md {
+    gap: var(--space-md);
+  }
+  .space-lg {
+    gap: var(--space-lg);
+  }
+  .space-xl {
+    gap: var(--space-xl);
+  }
+  .space-2xl {
+    gap: var(--space-2xl);
+  }
+
+  /* ── Composite typography — named patterns spanning multiple token categories ── */
+  .type-display {
+    color: var(--color-text-primary);
+    letter-spacing: var(--letter-spacing-tight);
+  }
+
+  .type-overline {
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wider);
+    color: var(--color-text-muted);
+  }
+
+  /* ── Brand accent bar — used across ProjectDetail, ArticleDetail, ProfileCard ── */
+  .bar-accent {
+    width: var(--space-xl);
+    height: var(--space-3xs);
+    border-radius: var(--radius-full);
+    background-color: var(--color-text-accent);
+    flex-shrink: 0;
+  }
+}

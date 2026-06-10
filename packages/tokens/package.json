@@ -1,0 +1,70 @@
+{
+  "name": "@arun-dev/tokens",
+  "version": "0.1.0",
+  "description": "Pure-CSS design tokens with white-label brand generation — primitives, brand palettes, semantic layers, and the createBrand() generator",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arun9483/arun-design-system.git",
+    "directory": "packages/tokens"
+  },
+  "keywords": [
+    "design-tokens",
+    "css",
+    "design-system",
+    "theming",
+    "white-label"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.unit.spec.ts"
+  ],
+  "exports": {
+    "./base": "./src/base.css",
+    "./brands/default": "./src/brands/default.css",
+    "./brands/default/palette": "./src/brands/default/palette.css",
+    "./brands/default/semantic": "./src/brands/default/semantic.css",
+    "./primitives/typography": "./src/primitives/typography.css",
+    "./primitives/spacing": "./src/primitives/spacing.css",
+    "./primitives/radius": "./src/primitives/radius.css",
+    "./primitives/shadow": "./src/primitives/shadow.css",
+    "./primitives/motion": "./src/primitives/motion.css",
+    "./primitives/elevation": "./src/primitives/elevation.css",
+    "./primitives/breakpoints": "./src/primitives/breakpoints.css",
+    "./primitives/fonts": "./src/primitives/fonts.css",
+    "./createBrand": {
+      "import": {
+        "types": "./dist/createBrand.d.ts",
+        "default": "./dist/createBrand.js"
+      },
+      "require": {
+        "types": "./dist/createBrand.d.cts",
+        "default": "./dist/createBrand.cjs"
+      }
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist .turbo",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "pnpm run test:unit",
+    "test:unit": "vitest run --passWithNoTests --config vitest.unit.config.ts"
+  },
+  "devDependencies": {
+    "@arun-dev/config": "workspace:*",
+    "eslint": "9.39.4",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3",
+    "vitest": "3.2.4"
+  }
+}

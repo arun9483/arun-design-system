@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Turbo
+.turbo/
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+coverage/
+*.lcov
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Claude — ignore personal/local state but allow committable skills and shared project config
+.claude/*
+!.claude/skills/
+!.claude/settings.json
+
+# Package manager
+.pnp.*
+.yarn/*
+!.yarn/patches

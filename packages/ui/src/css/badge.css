@@ -1,0 +1,23 @@
+@layer badge {
+  /* Badge — status or difficulty label. Pair with .chip for shape.
+     e.g. <span class="chip badge difficulty-beginner"> */
+  .badge {
+    background-color: var(--badge-bg, var(--color-bg-surface));
+    color: var(--badge-color, var(--color-text-secondary));
+  }
+
+  .difficulty-beginner {
+    --badge-bg: var(--color-difficulty-beginner-bg);
+    --badge-color: var(--color-difficulty-beginner);
+  }
+
+  .difficulty-intermediate {
+    --badge-bg: var(--color-difficulty-intermediate-bg);
+    --badge-color: var(--color-difficulty-intermediate);
+  }
+
+  .difficulty-advanced {
+    --badge-bg: var(--color-difficulty-advanced-bg);
+    --badge-color: var(--color-difficulty-advanced);
+  }
+}

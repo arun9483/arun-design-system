@@ -1,0 +1,10 @@
+:root {
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 50; /* sticky headers and floating navs — above page content, below modals */
+  --z-overlay: 100;
+  --z-modal: 200;
+  --z-toast: 300;
+  --z-tooltip: 400;
+  --z-skip: 999; /* skip-to-content link — must float above all UI layers */
+}

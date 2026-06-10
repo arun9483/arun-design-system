@@ -1,0 +1,11 @@
+/* Layer order declaration — must come before any @layer blocks */
+/* reset is lowest priority so component layers can override it */
+@layer reset, chip, card, btn, badge, metric, utilities;
+
+@import './reset.css';
+@import './chip.css';
+@import './card.css';
+@import './btn.css';
+@import './badge.css';
+@import './metric.css';
+@import './utilities.css';
