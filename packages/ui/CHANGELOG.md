@@ -1,6 +1,6 @@
 # @arun-dev/ui
 
-## 0.2.0
+## 0.1.0
 
 ### Minor Changes
 
@@ -14,4 +14,4 @@
 ### Patch Changes
 
 - Updated dependencies [ab6f9d3]
-  - @arun-dev/tokens@0.2.0
+  - @arun-dev/tokens@0.1.0

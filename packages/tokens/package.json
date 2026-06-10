@@ -1,6 +1,6 @@
 {
   "name": "@arun-dev/tokens",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "Pure-CSS design tokens with white-label brand generation — primitives, brand palettes, semantic layers, and the createBrand() generator",
   "license": "MIT",
   "type": "module",
