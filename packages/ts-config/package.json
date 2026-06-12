@@ -1,0 +1,22 @@
+{
+  "name": "@arun-dev/ts-config",
+  "version": "0.0.0",
+  "description": "Shared strict TypeScript configs for arun-dev frontend repos — base and Next.js variants.",
+  "license": "MIT",
+  "files": [
+    "base.json",
+    "nextjs.json"
+  ],
+  "exports": {
+    "./base": "./base.json",
+    "./nextjs": "./nextjs.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arun9483/arun-design-system.git",
+    "directory": "packages/ts-config"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

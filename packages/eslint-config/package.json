@@ -1,0 +1,41 @@
+{
+  "name": "@arun-dev/eslint-config",
+  "version": "0.0.0",
+  "description": "Shared ESLint flat config for arun-dev frontend repos — typescript-eslint strict, react, react-hooks, jsx-a11y, and security plugins with one canonical rule set.",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.mjs",
+  "files": [
+    "index.mjs"
+  ],
+  "exports": {
+    ".": "./index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arun9483/arun-design-system.git",
+    "directory": "packages/eslint-config"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "lint": "eslint index.mjs",
+    "lint:fix": "eslint index.mjs --fix"
+  },
+  "dependencies": {
+    "@eslint/js": "9.39.4",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "5.2.0",
+    "eslint-plugin-security": "4.0.1",
+    "typescript-eslint": "8.57.1"
+  },
+  "peerDependencies": {
+    "eslint": ">=9"
+  },
+  "devDependencies": {
+    "eslint": "9.39.4",
+    "typescript": "5.9.3"
+  }
+}

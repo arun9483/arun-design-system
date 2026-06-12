@@ -1,0 +1,18 @@
+# Nightly osv-scanner rescan — catches CVEs disclosed for unchanged dependencies.
+# Findings become GitHub issues labeled sev:<level>. Library-only repo: no e2e.
+
+name: Nightly
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  nightly:
+    uses: arun9483/frontend-platform-kit/.github/workflows/nightly-audit.yml@v1
+    permissions:
+      issues: write
+    with:
+      run-e2e: false
+    secrets: inherit

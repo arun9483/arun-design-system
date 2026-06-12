@@ -1,2 +1,8 @@
 pnpm exec lint-staged --config lint-staged.config.mjs
-pnpm run test:unit
+
+# Secret scanning gate. Unit tests run at pre-push (and CI) — keeping commits < 5s.
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --redact --no-banner
+else
+  echo "warning: gitleaks not installed (brew install gitleaks) — staged secret scan skipped; CI full-history scan still applies." >&2
+fi

@@ -1,3 +1,7 @@
+# PR + main gate — thin consumer of frontend-platform-kit reusable workflows.
+# Always pin to a tag (@v1), never @main. Library-only repo: no lighthouse/e2e;
+# release publishing stays in release.yml (changesets).
+
 name: CI
 
 on:
@@ -5,33 +9,14 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  quality:
+    uses: arun9483/frontend-platform-kit/.github/workflows/quality.yml@v1
+    secrets: inherit
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build
-        run: pnpm turbo run build
-
-      - name: Typecheck
-        run: pnpm turbo run typecheck
-
-      - name: Lint
-        run: pnpm turbo run lint
-
-      - name: Format check
-        run: pnpm format:check
-
-      - name: Unit tests
-        run: pnpm turbo run test:unit
+  security:
+    uses: arun9483/frontend-platform-kit/.github/workflows/security.yml@v1
