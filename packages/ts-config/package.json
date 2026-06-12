@@ -1,6 +1,6 @@
 {
   "name": "@arun-dev/ts-config",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Shared strict TypeScript configs for arun-dev frontend repos — base and Next.js variants.",
   "license": "MIT",
   "files": [
