@@ -12,6 +12,9 @@ jobs:
   nightly:
     uses: arun9483/frontend-platform-kit/.github/workflows/nightly-audit.yml@v1
     permissions:
+      # contents: write is required by the reusable workflow's (skipped) e2e job —
+      # GitHub validates permissions for all jobs in a called workflow at startup.
+      contents: write
       issues: write
     with:
       run-e2e: false
