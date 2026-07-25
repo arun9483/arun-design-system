@@ -1,6 +1,6 @@
 {
   "name": "@arun-dev/eslint-config",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Shared ESLint flat config for arun-dev frontend repos — typescript-eslint strict, react, react-hooks, jsx-a11y, and security plugins with one canonical rule set.",
   "license": "MIT",
   "type": "module",
