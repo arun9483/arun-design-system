@@ -1,0 +1,18 @@
+# Temporary: one-shot NPM_TOKEN validity check before merging the release PR.
+# Delete after use.
+
+name: Verify npm token
+
+on:
+  workflow_dispatch:
+
+jobs:
+  whoami:
+    runs-on: ubuntu-latest
+    steps:
+      - name: npm whoami with NPM_TOKEN
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm config set //registry.npmjs.org/:_authToken "$NODE_AUTH_TOKEN"
+          npm whoami
