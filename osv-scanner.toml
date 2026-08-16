@@ -1,6 +1,8 @@
 # Vulnerability waivers for the osv-scanner CI gate (frontend-platform-kit
-# security.yml). Each entry needs a justification and should be revisited.
-
-[[IgnoredVulns]]
-id = "GHSA-mh99-v99m-4gvg"
-reason = "brace-expansion OOM DoS is only fixed in 5.0.8; the 1.x/2.x lines used by minimatch consumers have no backport yet (latest maintenance releases 1.1.16/2.1.2 are pinned via pnpm overrides, which fix the companion ReDoS GHSA-3jxr-9vmj-r5cp). Dev-time tooling exposure only. Remove once 1.x/2.x backports ship."
+# security.yml). Each entry needs a justification, an owner, and an expiry
+# date <= 90 days out. No permanent exceptions.
+#
+# Currently empty: every known advisory is cleared by a real version bump.
+# Prefer bumping the pinned `pnpm.overrides` entry over adding a waiver here —
+# an override pinned to a version that later becomes vulnerable is the failure
+# mode this file exists to avoid, not to paper over.
