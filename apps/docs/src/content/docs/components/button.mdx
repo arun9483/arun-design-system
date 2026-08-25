@@ -1,0 +1,38 @@
+---
+title: Button
+description: An action. Renders a button by default, an anchor with href, or anything via render.
+---
+
+import Example from '@/components/Example.astro';
+import ButtonVariants from '@/examples/button-variants';
+import ButtonAsLink from '@/examples/button-as-link';
+import PropTable from '@/components/PropTable.astro';
+import { ButtonPlayground } from '@/components/playgrounds';
+
+<Example name="button-variants">
+  <ButtonVariants client:load />
+</Example>
+
+## Playground
+
+<ButtonPlayground client:load />
+
+## Links
+
+A bare `Button` renders `<button type="button">` — the explicit type means it never submits a
+form by accident. Give it `href` for an anchor, or `render` for anything else.
+
+<Example name="button-as-link">
+  <ButtonAsLink client:load />
+</Example>
+
+## Props
+
+<PropTable component="Button" />
+
+## Notes
+
+- `type` applies only to the plain button form. It is not forwarded to an anchor or to an
+  element supplied through `render`.
+- The `render` element owns its own attributes: `<Button render={<a href="…" />}>` needs the
+  `href` on the anchor, not on `Button`.

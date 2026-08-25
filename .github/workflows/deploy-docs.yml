@@ -1,0 +1,60 @@
+name: Deploy docs
+
+on:
+  push:
+    branches: [main]
+  # Manual redeploy, e.g. after enabling Pages or changing repository settings.
+  workflow_dispatch:
+
+# Pages deploys from an artifact, so nothing built is ever committed.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race. In-progress runs finish so a deploy is not left
+# half-applied, unlike the cancel-in-progress used for PR checks.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build docs
+        # The site is served from a repository subpath; astro.config.mjs reads this.
+        env:
+          DOCS_BASE: /${{ github.event.repository.name }}
+        # Builds @arun-dev/tokens and @arun-dev/ui first via the turbo task graph,
+        # so the docs always reflect the source in this commit rather than npm.
+        run: pnpm turbo run build --filter=@arun-dev/docs
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/docs/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

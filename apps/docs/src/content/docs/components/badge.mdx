@@ -1,0 +1,38 @@
+---
+title: Badge
+description: A status label with generic tones.
+---
+
+import Example from '@/components/Example.astro';
+import BadgeTones from '@/examples/badge-tones';
+import BadgeDomainMapping from '@/examples/badge-domain-mapping';
+import PropTable from '@/components/PropTable.astro';
+import { BadgePlayground } from '@/components/playgrounds';
+
+<Example name="badge-tones">
+  <BadgeTones client:load />
+</Example>
+
+## Playground
+
+<BadgePlayground client:load />
+
+## Domain vocabulary belongs to your app
+
+The design system ships only generic tones. Anything narrower — an article's difficulty, an
+order's status, a build result — is your vocabulary, and mapping it at the call site keeps it
+type-checked and keeps the library reusable.
+
+<Example name="badge-domain-mapping">
+  <BadgeDomainMapping client:load />
+</Example>
+
+## Props
+
+<PropTable component="Badge" />
+
+## Notes
+
+- Tones are backed by the `--color-status-*` semantic tokens, so they move with the brand.
+  Override `--badge-success-bg` to restyle only success badges.
+- `neutral` adds no tone class, so `.badge` alone is the neutral appearance.

@@ -1,0 +1,38 @@
+---
+title: Chip
+description: A compact label for tags, filters and metadata.
+---
+
+import Example from '@/components/Example.astro';
+import ChipVariants from '@/examples/chip-variants';
+import ChipElements from '@/examples/chip-elements';
+import PropTable from '@/components/PropTable.astro';
+import { ChipPlayground } from '@/components/playgrounds';
+
+<Example name="chip-variants">
+  <ChipVariants client:load />
+</Example>
+
+## Playground
+
+<ChipPlayground client:load />
+
+## Semantics matter more than styling
+
+A chip is a shape, not an element. In a list it must be an `li`; when it is clickable it must
+be a real `button`, or it is invisible to keyboards and screen readers. `render` supplies the
+styling while you keep the right element.
+
+<Example name="chip-elements" layout="stack">
+  <ChipElements client:load />
+</Example>
+
+## Props
+
+<PropTable component="Chip" />
+
+## Notes
+
+- `<Chip render={<button />}>` needs `type="button"` on the element, or it defaults to
+  `type="submit"` and will submit an enclosing form.
+- `Badge` builds on `Chip`'s shape — a badge carries both `chip` and `badge` classes.

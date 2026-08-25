@@ -1,13 +1,33 @@
-import { resolve } from 'path';
+import { existsSync, readdirSync } from 'fs';
+import { join, resolve } from 'path';
 
 const rootDir = resolve(import.meta.dirname);
 const prettierIgnorePath = resolve(rootDir, '.prettierignore');
 
-const workspaceConfigs = [
-  { dir: 'packages/tokens', config: 'packages/tokens/eslint.config.mjs' },
-  { dir: 'packages/ui', config: 'packages/ui/eslint.config.mjs' },
-  { dir: 'packages/config', config: 'packages/config/eslint.config.mjs' },
-];
+/**
+ * Every workspace that ships its own eslint.config.mjs, discovered rather than
+ * listed — a hardcoded list silently lints new workspaces against the root config,
+ * so their local overrides are ignored.
+ */
+function discoverWorkspaceConfigs() {
+  const found = [];
+
+  for (const group of ['packages', 'apps']) {
+    const groupDir = resolve(rootDir, group);
+    if (!existsSync(groupDir)) continue;
+
+    for (const entry of readdirSync(groupDir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const dir = join(group, entry.name);
+      const config = join(dir, 'eslint.config.mjs');
+      if (existsSync(resolve(rootDir, config))) found.push({ dir, config });
+    }
+  }
+
+  return found;
+}
+
+const workspaceConfigs = discoverWorkspaceConfigs();
 
 function getEslintCommand(files) {
   const commands = [];

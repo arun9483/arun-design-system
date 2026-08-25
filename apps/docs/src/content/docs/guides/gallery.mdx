@@ -1,0 +1,17 @@
+---
+title: Gallery
+description: Every component and variant on one page, for checking the token layer at a glance.
+---
+
+import Example from '@/components/Example.astro';
+import Gallery from '@/examples/gallery';
+
+Every component and variant on one surface. Change the **theme** or the **brand** in the header
+and watch: no component renders differently, only what the tokens beneath them resolve to.
+
+That separation is the whole architecture, and this page is where a break in it shows up
+immediately.
+
+<Example name="gallery" layout="stack">
+  <Gallery client:load />
+</Example>

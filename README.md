@@ -11,6 +11,28 @@ generation, and a brand-agnostic React component library built on top of them.
 | [`@arun-dev/ui`](packages/ui)         | React components (`Button`, `Card`, `Chip`, `Badge`) styled entirely via semantic tokens                | ✅         |
 | [`@arun-dev/config`](packages/config) | Internal ESLint and TypeScript base configs                                                             | ❌ private |
 
+## Documentation
+
+**<https://arun9483.github.io/arun-design-system/>**
+
+Live examples, interactive playgrounds and a prop reference — an Astro Starlight site in
+[`apps/docs`](apps/docs), deployed from `main`. Run it locally with
+`pnpm --filter @arun-dev/docs dev`.
+
+| Home                             | A component page                     |
+| -------------------------------- | ------------------------------------ |
+| ![Docs home](docs/docs-home.png) | ![Button page](docs/docs-button.png) |
+
+Two controls in the header demonstrate the architecture rather than the components:
+
+- **Theme** is Starlight's own toggle. It sets `data-theme` on `<html>` — the same hook
+  `@arun-dev/tokens` uses — so it drives the token layer with no glue code.
+- **Brand** swaps the token layer. `sky`, `forest` and `plum` are generated from a single seed
+  colour by `createBrand()` at build time; no component knows a brand exists.
+
+Every example is a real file under `apps/docs/src/examples/`, rendered live and shown as source
+from that same file — there is no second copy to drift.
+
 ## Quick start (consumers)
 
 ```bash

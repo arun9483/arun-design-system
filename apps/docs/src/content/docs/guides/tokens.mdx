@@ -1,0 +1,56 @@
+---
+title: Design tokens
+description: The four tiers, and which one to override.
+---
+
+`@arun-dev/tokens` is pure CSS — no JavaScript at runtime. `createBrand()` is a build-time
+generator and never ships to the browser.
+
+## The four tiers
+
+| Tier          | Example                                          | Brand-specific?     |
+| ------------- | ------------------------------------------------ | ------------------- |
+| primitives    | `--space-sm`, `--radius-full`, `--duration-fast` | no                  |
+| brand palette | `--color-brand-700: #4338ca`                     | yes                 |
+| semantic      | `--color-text-accent: var(--color-brand-700)`    | yes, and per theme  |
+| component     | `--chip-bg: var(--color-bg-surface)`             | no — a mapping only |
+
+Component CSS reads the **component** tier where one exists and the **semantic** tier
+otherwise. It never reads the palette directly.
+
+## Which tier to override
+
+```css
+:root {
+  --color-brand-700: #7c3aed; /* the brand — everything derived from it moves */
+  --color-text-accent: #7c3aed; /* every accent surface, regardless of brand */
+  --chip-accent-bg: #f5f3ff; /* only accent chips */
+}
+```
+
+## Semantic tokens
+
+`--color-bg-primary` `--color-bg-secondary` `--color-bg-surface` `--color-bg-accent`
+`--color-bg-inverse` · `--color-text-primary` `--color-text-secondary` `--color-text-muted`
+`--color-text-accent` `--color-text-inverse` `--color-text-on-accent` ·
+`--color-border-default` `--color-border-subtle` `--color-border-strong`
+`--color-border-accent` · `--color-status-{success,error,warning,info}` and their `-bg` pairs.
+
+Each has light, dark and system variants defined in one place.
+
+## The contract
+
+`@arun-dev/ui` must not read a custom property `@arun-dev/tokens` does not define. That failure
+is silent — the `var()` resolves as invalid, a fallback or the initial value quietly takes
+over, and nothing warns. A build-time test diffs every `var(--…)` in the shipped CSS against
+every property the token package defines, and fails if the diff is non-empty.
+
+The one escape hatch is an explicit fallback, `var(--x, <fallback>)`, which declares the
+property optional and names what happens without it.
+
+## CSS-only classes
+
+`@arun-dev/ui/components.css` also ships utilities for elements the components do not render:
+`stack` · `space-*` · `text-size-*` · `font-weight-*` · `line-height-*` · `type-display` ·
+`type-overline` · `text-color-*` · `truncate` · `line-clamp-2` · `line-clamp-3` · `uppercase` ·
+`capitalize` · `underline` · `sr-only` · `metric` · `bar-accent`.
