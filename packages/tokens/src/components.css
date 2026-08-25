@@ -1,0 +1,6 @@
+/* Component tokens — the mapping tier between semantic tokens and component CSS.
+   Brand-agnostic: these only remap semantic tokens onto per-component names, so a
+   consumer can restyle one component without moving the whole system.
+   Imported by base.css; also exported standalone as @arun-dev/tokens/components. */
+@import './components/chip.css';
+@import './components/badge.css';

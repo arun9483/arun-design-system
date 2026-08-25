@@ -8,3 +8,6 @@
 @import './primitives/motion.css';
 @import './primitives/elevation.css';
 @import './primitives/breakpoints.css';
+/* Component tokens — remap semantic tokens onto per-component names.
+   Resolved at computed-value time, so loading before the brand layer is fine. */
+@import './components.css';
