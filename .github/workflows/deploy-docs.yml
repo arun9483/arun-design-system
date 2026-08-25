@@ -39,11 +39,24 @@ jobs:
 
       - name: Build docs
         # The site is served from a repository subpath; astro.config.mjs reads this.
+        # DOCS_BASE must also be declared in turbo.json's build task — turbo filters
+        # the task environment, and an undeclared variable is silently dropped.
         env:
           DOCS_BASE: /${{ github.event.repository.name }}
         # Builds @arun-dev/tokens and @arun-dev/ui first via the turbo task graph,
         # so the docs always reflect the source in this commit rather than npm.
         run: pnpm turbo run build --filter=@arun-dev/docs
+
+      # A base-path regression produces a site that loads but has no CSS or JS,
+      # which CI would otherwise report as a successful deploy.
+      - name: Verify the base path was applied
+        run: |
+          if ! grep -q 'href="/arun-design-system/_astro/' apps/docs/dist/index.html; then
+            echo "::error::Built assets are missing the /arun-design-system base path."
+            grep -oE '(href|src)="/[^"]*\.(css|js)"' apps/docs/dist/index.html | sort -u || true
+            exit 1
+          fi
+          echo "Base path applied to $(grep -oc 'href="/arun-design-system/' apps/docs/dist/index.html) references."
 
       - uses: actions/upload-pages-artifact@v3
         with:
