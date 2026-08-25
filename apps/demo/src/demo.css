@@ -1,0 +1,105 @@
+/* Page scaffolding only. Everything visual comes from @arun-dev/tokens and
+   @arun-dev/ui — this file adds layout, and no colours of its own beyond tokens. */
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.demo-bar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-raised);
+  background-color: var(--color-bg-surface);
+  border-block-end: var(--space-px) solid var(--color-border-default);
+  padding-block: var(--space-sm);
+  padding-inline: var(--space-md);
+}
+
+.demo-bar-inner,
+.demo-page {
+  margin-inline: auto;
+  max-width: 60rem;
+}
+
+.demo-bar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.demo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.demo-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs);
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.demo-group legend {
+  float: inline-start;
+  padding-inline-end: var(--space-2xs);
+}
+
+.demo-page {
+  padding-block: var(--space-2xl);
+  padding-inline: var(--space-md);
+}
+
+.demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.demo-reset-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--space-sm);
+}
+
+.demo-card {
+  padding: var(--space-sm);
+  border-radius: var(--radius-lg);
+}
+
+.demo-metric {
+  min-width: 8rem;
+  margin: 0;
+}
+
+.demo-truncate {
+  max-width: 28rem;
+}
+
+.demo-token {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.demo-swatch {
+  inline-size: var(--space-sm);
+  block-size: var(--space-sm);
+  border-radius: var(--radius-sm);
+  border: var(--space-px) solid var(--color-border-default);
+  flex-shrink: 0;
+}

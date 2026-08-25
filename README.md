@@ -11,6 +11,26 @@ generation, and a brand-agnostic React component library built on top of them.
 | [`@arun-dev/ui`](packages/ui)         | React components (`Button`, `Card`, `Chip`, `Badge`) styled entirely via semantic tokens                | ✅         |
 | [`@arun-dev/config`](packages/config) | Internal ESLint and TypeScript base configs                                                             | ❌ private |
 
+## Demo
+
+`apps/demo` is a single-page gallery of every component and variant, with live theme and brand
+switching. Run it with `pnpm --filter @arun-dev/demo dev`.
+
+| Light                               | Dark                              |
+| ----------------------------------- | --------------------------------- |
+| ![Light theme](docs/demo-light.png) | ![Dark theme](docs/demo-dark.png) |
+
+The two controls in the header demonstrate the architecture rather than the components:
+
+- **Theme** sets `data-theme` on `<html>`. Nothing else changes — the same `.btn-primary` rule
+  resolves to a different colour because the semantic layer re-points beneath it.
+- **Brand** swaps the token layer. `sky`, `forest` and `plum` are generated from a single seed
+  colour by `createBrand()` at build time (see `apps/demo/scripts/generate-brands.mjs`); no
+  component knows a brand exists.
+
+The Chip section is worth a look: the same component renders as a `span`, a `button`, an `a` and an
+`li` on one page, via the `render` prop.
+
 ## Quick start (consumers)
 
 ```bash
