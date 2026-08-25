@@ -1,0 +1,47 @@
+---
+import { COMMON, PROPS } from '../data/props';
+
+interface Props {
+  component: keyof typeof PROPS | string;
+}
+
+const { component } = Astro.props;
+const own = PROPS[component];
+
+if (!own) throw new Error(`<PropTable component="${component}"> — no prop data`);
+
+/**
+ * Descriptions are prose with `backtick` spans. Escape first — several of them name
+ * HTML elements like `<a>`, which would otherwise be injected as live markup.
+ */
+function format(description: string): string {
+  const escaped = description
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  return escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+const rows = [...own, ...COMMON];
+---
+
+<div class="ds-props">
+  <table>
+    <thead>
+      <tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((prop) => (
+          <tr>
+            <td><code>{prop.name}</code></td>
+            <td><code>{prop.type}</code></td>
+            <td>{prop.default ? <code>{prop.default}</code> : <span aria-hidden="true">—</span>}</td>
+            <td set:html={format(prop.description)} />
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

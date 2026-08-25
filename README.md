@@ -11,25 +11,24 @@ generation, and a brand-agnostic React component library built on top of them.
 | [`@arun-dev/ui`](packages/ui)         | React components (`Button`, `Card`, `Chip`, `Badge`) styled entirely via semantic tokens                | ✅         |
 | [`@arun-dev/config`](packages/config) | Internal ESLint and TypeScript base configs                                                             | ❌ private |
 
-## Demo
+## Documentation
 
-`apps/demo` is a single-page gallery of every component and variant, with live theme and brand
-switching. Run it with `pnpm --filter @arun-dev/demo dev`.
+Full docs with live examples, interactive playgrounds and a prop reference live in
+[`apps/docs`](apps/docs) — an Astro Starlight site. Run it with `pnpm --filter @arun-dev/docs dev`.
 
-| Light                               | Dark                              |
-| ----------------------------------- | --------------------------------- |
-| ![Light theme](docs/demo-light.png) | ![Dark theme](docs/demo-dark.png) |
+| Home                             | A component page                     |
+| -------------------------------- | ------------------------------------ |
+| ![Docs home](docs/docs-home.png) | ![Button page](docs/docs-button.png) |
 
-The two controls in the header demonstrate the architecture rather than the components:
+Two controls in the header demonstrate the architecture rather than the components:
 
-- **Theme** sets `data-theme` on `<html>`. Nothing else changes — the same `.btn-primary` rule
-  resolves to a different colour because the semantic layer re-points beneath it.
+- **Theme** is Starlight's own toggle. It sets `data-theme` on `<html>` — the same hook
+  `@arun-dev/tokens` uses — so it drives the token layer with no glue code.
 - **Brand** swaps the token layer. `sky`, `forest` and `plum` are generated from a single seed
-  colour by `createBrand()` at build time (see `apps/demo/scripts/generate-brands.mjs`); no
-  component knows a brand exists.
+  colour by `createBrand()` at build time; no component knows a brand exists.
 
-The Chip section is worth a look: the same component renders as a `span`, a `button`, an `a` and an
-`li` on one page, via the `render` prop.
+Every example is a real file under `apps/docs/src/examples/`, rendered live and shown as source
+from that same file — there is no second copy to drift.
 
 ## Quick start (consumers)
 

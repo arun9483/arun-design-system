@@ -1,0 +1,40 @@
+---
+/**
+ * A live example plus its exact source.
+ *
+ * The example element is passed as a slot so its `client:load` directive sits at the
+ * MDX call site, where Astro can statically trace the import — a component resolved
+ * from a glob cannot be hydrated.
+ *
+ * The source is read from the same file with ?raw, so there is no second copy to drift.
+ */
+import { Code } from '@astrojs/starlight/components';
+
+interface Props {
+  /** Basename of the file in src/examples, without extension. */
+  name: string;
+  /** Stack the preview vertically instead of laying it out in a row. */
+  layout?: 'row' | 'stack';
+}
+
+const { name, layout = 'row' } = Astro.props;
+
+const sources = import.meta.glob<string>('../examples/*.tsx', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+});
+
+const source = sources[`../examples/${name}.tsx`];
+
+if (source === undefined) {
+  throw new Error(`<Example name="${name}"> — src/examples/${name}.tsx not found`);
+}
+---
+
+<div class="ds-example not-content">
+  <div class="ds-example-preview" data-layout={layout}>
+    <slot />
+  </div>
+  <Code code={source.trimEnd()} lang="tsx" />
+</div>

@@ -1,0 +1,60 @@
+---
+title: The render prop
+description: One prop that replaces polymorphic unions, and why it exists.
+---
+
+Every component takes `render`. It replaces the component's default element with whatever you
+pass, merging the component's props, classes, handlers and ref onto it.
+
+```tsx
+<Chip render={<li />}>React</Chip>
+<Button render={<NextLink href="/docs" />}>Docs</Button>
+<Card render={<article />} lift>…</Card>
+```
+
+## Why not `as`
+
+`Chip` used to take `as?: 'span' | 'button'`. A closed union can only ever list the elements
+its author happened to think of, and the moment a consumer needs something else the component
+is useless to them. In this project's own consumer that happened three times — the class names
+were copied out by hand, and the component was abandoned at those call sites.
+
+`render` has no such ceiling: any element, any component, including ones that do not exist yet.
+
+## How merging works
+
+| Prop            | Behaviour                                                      |
+| --------------- | -------------------------------------------------------------- |
+| event handlers  | **chained** — yours runs, then the render element's            |
+| `className`     | **concatenated** — both apply                                  |
+| `style`         | **shallow-merged**                                             |
+| `ref`           | **merged** — both the component and your ref receive the node  |
+| everything else | later wins, so you can override `aria-label`, `id`, `tabIndex` |
+
+`undefined` values are skipped, so an absent prop never clobbers one the component set.
+
+## The element owns its own attributes
+
+```tsx
+{
+  /* correct — href belongs to the anchor */
+}
+<Button render={<a href="/docs" />}>Docs</Button>;
+
+{
+  /* wrong — Button's href shorthand renders its own anchor, so this nests badly */
+}
+<Button href="/docs" render={<a />}>
+  Docs
+</Button>;
+```
+
+The same applies to `type` on a button: `<Chip render={<button type="button" />}>`, or it
+defaults to `type="submit"`.
+
+## Accessibility is the point
+
+`render` exists so styling never costs you semantics. A chip inside a list stays an `li`; a
+clickable chip stays a focusable `button`; a card wrapping navigation stays a labelled `nav`.
+If you find yourself copying class names to get the right element, that is the bug `render`
+was added to fix.

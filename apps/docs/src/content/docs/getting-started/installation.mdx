@@ -1,0 +1,76 @@
+---
+title: Installation
+description: Install the packages and load the three stylesheets in the right order.
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+<Tabs syncKey="pkg">
+<TabItem label="npm">
+
+```bash
+npm install @arun-dev/tokens @arun-dev/ui
+```
+
+</TabItem>
+<TabItem label="pnpm">
+
+```bash
+pnpm add @arun-dev/tokens @arun-dev/ui
+```
+
+</TabItem>
+<TabItem label="yarn">
+
+```bash
+yarn add @arun-dev/tokens @arun-dev/ui
+```
+
+</TabItem>
+</Tabs>
+
+## Load the styles
+
+```ts
+// 1. Structural primitives and component tokens
+import '@arun-dev/tokens/base';
+// 2. A brand — palette and semantic colours
+import '@arun-dev/tokens/brands/default';
+// 3. Component styles
+import '@arun-dev/ui/components.css';
+```
+
+<Aside type="caution" title="All three are required">
+  `@arun-dev/tokens/base` provides only the brand-independent primitives — it does **not** include a
+  brand. Without step 2 every `--color-*` token is undefined, and components render with transparent
+  backgrounds and inherited text colour.
+</Aside>
+
+## Use a component
+
+```tsx
+import { Button, Card, Chip, Badge } from '@arun-dev/ui';
+
+export function Example() {
+  return (
+    <Card lift>
+      <Badge tone="success">Shipped</Badge>
+      <Button variant="primary">Continue</Button>
+    </Card>
+  );
+}
+```
+
+## Requirements
+
+|          |                                                                                  |
+| -------- | -------------------------------------------------------------------------------- |
+| React    | 19 or newer (`react` and `react-dom` are peer dependencies)                      |
+| Bundler  | anything that resolves `exports` and imports CSS — Vite, webpack, Next.js, Astro |
+| Browsers | anything supporting CSS custom properties and `@layer`                           |
+
+## Fonts
+
+`@arun-dev/tokens/base` deliberately omits `@font-face` — font loading is a consumer concern.
+Next.js apps should use `next/font/local` in `layout.tsx`; everyone else can import
+`@arun-dev/tokens/primitives/fonts` directly.

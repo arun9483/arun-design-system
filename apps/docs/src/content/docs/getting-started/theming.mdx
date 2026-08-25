@@ -1,0 +1,77 @@
+---
+title: Theming and brands
+description: How light, dark and custom brands work without any component knowing about them.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Everything visual resolves through a four-tier chain of CSS custom properties. Components read
+the top of the chain and know nothing about what is beneath.
+
+```
+primitives      --space-sm, --radius-full, --duration-fast     brand-independent
+brand palette   --color-brand-700: #4338ca                     per brand
+semantic        --color-text-accent: var(--color-brand-700)     per brand, per theme
+component       --btn-bg: var(--color-text-accent)              per component
+```
+
+So a single rule in `btn.css` —
+
+```css
+.btn-primary {
+  background-color: var(--btn-bg);
+}
+```
+
+— produces a different colour in dark mode, and a different colour again under another brand,
+without that rule or `Button.tsx` changing at all.
+
+## Light, dark and system
+
+Themes live on `:root`. Set `data-theme` on `<html>`:
+
+| Mode   | How                                                |
+| ------ | -------------------------------------------------- |
+| system | default — follows `prefers-color-scheme`           |
+| dark   | `document.documentElement.dataset.theme = 'dark'`  |
+| light  | `document.documentElement.dataset.theme = 'light'` |
+
+<Aside title="Why :root and not a wrapper">
+Custom properties inherit through the DOM tree, and React portals move nodes out of it. A
+popup portaled into `<body>` would not inherit tokens scoped to a wrapper element. Declaring
+at `:root` means portaled content inherits correctly with no extra machinery.
+</Aside>
+
+## Custom brands
+
+`createBrand()` generates a full palette and semantic layer from one seed colour, at build time:
+
+```ts
+// scripts/generate-brand.mjs
+import { writeFile } from 'node:fs/promises';
+import { createBrand } from '@arun-dev/tokens/createBrand';
+
+await writeFile('src/brand.css', createBrand({ name: 'acme', seed: '#0ea5e9' }));
+```
+
+Then import `src/brand.css` in place of `@arun-dev/tokens/brands/default`. It emits the light,
+dark and system variants together, so theming keeps working.
+
+You can also pass a full palette instead of a seed if you already have one:
+
+```ts
+createBrand({ name: 'acme', palette: { 50: '#…', 100: '#…', /* … */ 950: '#…' } });
+```
+
+The brand selector in this site's header does exactly this — try it on any page.
+
+## Restyling one component
+
+Override at the tier that matches the blast radius you want:
+
+```css
+:root {
+  --color-text-accent: #7c3aed; /* every accent surface in the system */
+  --chip-accent-bg: #f5f3ff; /* only accent chips */
+}
+```

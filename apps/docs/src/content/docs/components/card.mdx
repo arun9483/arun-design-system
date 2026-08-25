@@ -1,0 +1,29 @@
+---
+title: Card
+description: A surface. Renders a div by default; any tag via as, any element via render.
+---
+
+import Example from '@/components/Example.astro';
+import CardBasics from '@/examples/card-basics';
+import PropTable from '@/components/PropTable.astro';
+import { CardPlayground } from '@/components/playgrounds';
+
+<Example name="card-basics" layout="stack">
+  <CardBasics client:load />
+</Example>
+
+## Playground
+
+<CardPlayground client:load />
+
+## Props
+
+<PropTable component="Card" />
+
+## Notes
+
+- `as` takes a **tag name**. For a component — a router link, say — use `render`.
+- Unrecognised props reach the DOM, so `<Card as="nav" aria-label="…">` produces a properly
+  labelled landmark. Before `0.3.0` that `aria-label` was silently dropped.
+- `Card` supplies background, border and shadow but no padding, so it composes with whatever
+  spacing the surrounding layout uses.

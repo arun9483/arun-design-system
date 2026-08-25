@@ -1,0 +1,130 @@
+/* The design system itself. Loaded into every docs page so live examples render
+   exactly as they would in a consumer app.
+
+   Starlight sets data-theme="dark" | "light" on <html>, which is the same hook
+   @arun-dev/tokens uses — its theme toggle drives the token layer with no glue. */
+@import '@arun-dev/tokens/base';
+@import '@arun-dev/tokens/brands/default';
+@import '@arun-dev/ui/components.css';
+
+/* Live example surface — deliberately neutral so the component is what you notice. */
+.ds-example {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  /* No overflow:hidden — it would clip the code block's own horizontal scroll. */
+}
+
+.ds-example > :first-child {
+  border-start-start-radius: 0.5rem;
+  border-start-end-radius: 0.5rem;
+}
+
+.ds-example-preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+.ds-example-preview[data-layout='stack'] {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.ds-example .expressive-code,
+.ds-example pre {
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Brand switcher in the header */
+.ds-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ds-brand select {
+  font-size: var(--sl-text-xs);
+  padding: 0.25rem 0.4rem;
+  border-radius: 0.35rem;
+  border: 1px solid var(--sl-color-gray-5);
+  background-color: var(--sl-color-black);
+  color: var(--sl-color-white);
+}
+
+.ds-swatch {
+  inline-size: 0.85rem;
+  block-size: 0.85rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--sl-color-gray-5);
+  flex-shrink: 0;
+}
+
+/* Playground */
+.ds-playground-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-block-start: 1px solid var(--sl-color-gray-5);
+  background-color: var(--sl-color-gray-7, transparent);
+}
+
+.ds-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: var(--sl-text-xs);
+}
+
+.ds-control > span {
+  color: var(--sl-color-gray-2);
+  font-family: var(--sl-font-mono);
+}
+
+.ds-control select,
+.ds-control input[type='text'] {
+  font-size: var(--sl-text-xs);
+  padding: 0.3rem 0.4rem;
+  border-radius: 0.35rem;
+  border: 1px solid var(--sl-color-gray-5);
+  background-color: var(--sl-color-black);
+  color: var(--sl-color-white);
+}
+
+.ds-control-inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Prop tables */
+.ds-props table {
+  width: 100%;
+  table-layout: auto;
+}
+
+/* Only the short cells stay on one line. Union types and prose must wrap, or the
+   table grows wider than the content column and pushes the descriptions off-screen. */
+.ds-props td:first-child code,
+.ds-props td:nth-child(3) code {
+  white-space: nowrap;
+}
+
+.ds-props td:nth-child(2) {
+  min-width: 10rem;
+}
+
+/* Union types wrap at the separators rather than mid-token. */
+.ds-props td:nth-child(2) code {
+  white-space: normal;
+  overflow-wrap: normal;
+}
+
+.ds-props td:last-child {
+  min-width: 16rem;
+}
