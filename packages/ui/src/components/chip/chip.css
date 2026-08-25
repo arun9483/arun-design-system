@@ -1,0 +1,25 @@
+@layer chip {
+  .chip {
+    font-size: var(--chip-font-size);
+    padding-inline: var(--chip-padding-inline);
+    padding-block: var(--chip-padding-block);
+    border-radius: var(--chip-radius);
+    font-weight: var(--chip-font-weight);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Neutral — tech tags, nav chips */
+  .chip-default {
+    background-color: var(--chip-bg);
+    color: var(--chip-color);
+    border: var(--chip-border-width) solid var(--chip-border-color);
+  }
+
+  /* Accent — featured, skills, labels */
+  .chip-accent {
+    background-color: var(--chip-accent-bg);
+    color: var(--chip-accent-color);
+    border: var(--chip-border-width) solid var(--chip-accent-border-color);
+  }
+}

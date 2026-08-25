@@ -1,0 +1,21 @@
+/* Chip component tokens — map semantic tokens onto the chip's styleable surfaces.
+   Override any of these to restyle chips without moving other components. */
+:root {
+  /* Shape */
+  --chip-font-size: var(--text-xs);
+  --chip-font-weight: var(--font-weight-medium);
+  --chip-padding-inline: 0.625rem; /* 10px — sits between space-2xs (8px) and space-xs (12px) */
+  --chip-padding-block: var(--space-3xs);
+  --chip-radius: var(--radius-full);
+  --chip-border-width: var(--space-px);
+
+  /* Default variant — neutral: tech tags, nav chips */
+  --chip-bg: var(--color-bg-surface);
+  --chip-color: var(--color-text-secondary);
+  --chip-border-color: var(--color-border-default);
+
+  /* Accent variant — featured, skills, labels */
+  --chip-accent-bg: var(--color-bg-accent);
+  --chip-accent-color: var(--color-text-accent);
+  --chip-accent-border-color: var(--color-border-accent);
+}

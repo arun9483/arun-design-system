@@ -1,0 +1,18 @@
+/* Badge component tokens — map semantic tokens onto the badge's styleable surfaces.
+   Badge borrows its shape from .chip; only colour is tokenised here.
+   Override any of these to restyle badges without moving other components. */
+:root {
+  /* Neutral — the default tone */
+  --badge-bg: var(--color-bg-surface);
+  --badge-color: var(--color-text-secondary);
+
+  /* Tones — map onto the semantic status tokens, so a brand change moves them too */
+  --badge-success-bg: var(--color-status-success-bg);
+  --badge-success-color: var(--color-status-success);
+  --badge-warning-bg: var(--color-status-warning-bg);
+  --badge-warning-color: var(--color-status-warning);
+  --badge-error-bg: var(--color-status-error-bg);
+  --badge-error-color: var(--color-status-error);
+  --badge-info-bg: var(--color-status-info-bg);
+  --badge-info-color: var(--color-status-info);
+}

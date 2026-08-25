@@ -85,6 +85,9 @@
   .uppercase {
     text-transform: uppercase;
   }
+  .capitalize {
+    text-transform: capitalize;
+  }
 
   /* ── Flex stack layout — gap mirrors --space-{scale} tokens ── */
   .stack {
