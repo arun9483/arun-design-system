@@ -36,14 +36,27 @@ Individual stylesheets are also exported if you prefer à la carte loading:
 import { Button, Card, Chip, Badge } from '@arun-dev/ui';
 ```
 
-| Component | Props                                                                                                                      |
-| --------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `Button`  | `variant: 'ghost' \| 'primary'` — renders `<a>` when `href` is given, otherwise `<button>` (`onClick`, `type`, `disabled`) |
-| `Card`    | `as` (element type, default `div`), `lift` (hover elevation)                                                               |
-| `Chip`    | `variant: 'default' \| 'accent'`, `as: 'span' \| 'button'` (with `onClick`)                                                |
-| `Badge`   | `variant: 'default' \| 'difficulty-beginner' \| 'difficulty-intermediate' \| 'difficulty-advanced'`                        |
+| Component | Props                                                                                  |
+| --------- | -------------------------------------------------------------------------------------- |
+| `Button`  | `variant: 'ghost' \| 'primary'`, `href` (renders `<a>`), `type`, `disabled`, `onClick` |
+| `Card`    | `as` (tag name, default `div`), `lift` (hover elevation)                               |
+| `Chip`    | `variant: 'default' \| 'accent'`                                                       |
+| `Badge`   | `tone: 'neutral' \| 'success' \| 'warning' \| 'error' \| 'info'`                       |
 
-All components accept `className` for composition.
+Every component also accepts:
+
+- **`className`** — concatenated with the component's own classes, never replacing them.
+- **`render`** — an element or component to render instead of the default. Props, `className`,
+  event handlers and `ref` are merged onto it.
+- **`ref`** — merged with any ref on the `render` element.
+- **any other prop** — spread onto the rendered element, so `id`, `aria-*`, `data-*` and event
+  handlers all reach the DOM.
+
+```tsx
+<Chip render={<li />}>React</Chip>
+<Button render={<NextLink href="/docs" />}>Docs</Button>
+<Card render={<article />} lift>…</Card>
+```
 
 ## Theming
 

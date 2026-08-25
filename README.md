@@ -88,7 +88,8 @@ Components render a sensible default element, and accept a `render` prop to chan
 
 ```tsx
 <Chip render={<li />}>React</Chip>
-<Chip render={<a href="/tags/react" />}>React</Chip>
+<Button render={<NextLink href="/docs" />}>Docs</Button>
+<Card render={<article />} lift>…</Card>
 ```
 
 `Badge` ships generic tones — `neutral` (default), `success`, `warning`, `error`, `info`. Domain

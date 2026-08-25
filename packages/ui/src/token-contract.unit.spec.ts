@@ -84,15 +84,9 @@ describe('token contract', () => {
       .map(([name]) => name)
       .sort();
 
-    // Deprecated difficulty-* variants — removed in the next minor, at which point
-    // this expectation becomes an empty array.
-    expect(consumerSupplied).toEqual([
-      '--color-difficulty-advanced',
-      '--color-difficulty-advanced-bg',
-      '--color-difficulty-beginner',
-      '--color-difficulty-beginner-bg',
-      '--color-difficulty-intermediate',
-      '--color-difficulty-intermediate-bg',
-    ]);
+    // Nothing is consumer-supplied any more: the deprecated difficulty-* variants,
+    // which required six --color-difficulty-* tokens this package never shipped, were
+    // removed in 0.3.0. This list must stay empty.
+    expect(consumerSupplied).toEqual([]);
   });
 });

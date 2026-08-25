@@ -14,16 +14,6 @@ describe('Badge', () => {
     expect(el).toHaveClass('chip', 'badge');
   });
 
-  it('applies difficulty-beginner class', () => {
-    render(<Badge variant="difficulty-beginner">Beginner</Badge>);
-    expect(screen.getByText('Beginner')).toHaveClass('difficulty-beginner');
-  });
-
-  it('applies difficulty-advanced class', () => {
-    render(<Badge variant="difficulty-advanced">Advanced</Badge>);
-    expect(screen.getByText('Advanced')).toHaveClass('difficulty-advanced');
-  });
-
   it('renders the element given to `render`', () => {
     render(
       <ul>
