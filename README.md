@@ -13,8 +13,11 @@ generation, and a brand-agnostic React component library built on top of them.
 
 ## Documentation
 
-Full docs with live examples, interactive playgrounds and a prop reference live in
-[`apps/docs`](apps/docs) — an Astro Starlight site. Run it with `pnpm --filter @arun-dev/docs dev`.
+**<https://arun9483.github.io/arun-design-system/>**
+
+Live examples, interactive playgrounds and a prop reference — an Astro Starlight site in
+[`apps/docs`](apps/docs), deployed from `main`. Run it locally with
+`pnpm --filter @arun-dev/docs dev`.
 
 | Home                             | A component page                     |
 | -------------------------------- | ------------------------------------ |
