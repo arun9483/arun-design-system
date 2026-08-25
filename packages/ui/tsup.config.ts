@@ -13,8 +13,8 @@ import { defineConfig } from 'tsup';
 const CSS_LAYERS = [
   { layer: 'reset', src: 'src/css/reset.css' },
   { layer: 'chip', src: 'src/components/chip/chip.css' },
-  { layer: 'card', src: 'src/css/card.css' },
-  { layer: 'btn', src: 'src/css/btn.css' },
+  { layer: 'card', src: 'src/components/card/card.css' },
+  { layer: 'btn', src: 'src/components/button/button.css' },
   { layer: 'badge', src: 'src/components/badge/badge.css' },
   { layer: 'metric', src: 'src/css/metric.css' },
   { layer: 'utilities', src: 'src/css/utilities.css' },

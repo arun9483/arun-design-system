@@ -79,11 +79,4 @@ describe('Chip', () => {
     screen.getByText('Tag').click();
     expect(calls).toEqual(['own', 'render']);
   });
-
-  it('still supports the deprecated `as` prop', () => {
-    render(<Chip as="button">Tag</Chip>);
-    const el = screen.getByText('Tag');
-    expect(el.tagName).toBe('BUTTON');
-    expect(el).toHaveAttribute('type', 'button');
-  });
 });

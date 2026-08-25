@@ -27,24 +27,4 @@
     --badge-bg: var(--badge-info-bg);
     --badge-color: var(--badge-info-color);
   }
-
-  /* DEPRECATED — the difficulty-* variants read --color-difficulty-* tokens that
-     @arun-dev/tokens does not define, so the consuming app must supply them. Domain
-     vocabulary does not belong in a brand-agnostic library; map it onto a tone at the
-     call site instead. The fallbacks keep such a badge neutral rather than transparent
-     when the tokens are absent. Removed in the next minor. */
-  .difficulty-beginner {
-    --badge-bg: var(--color-difficulty-beginner-bg, var(--badge-success-bg));
-    --badge-color: var(--color-difficulty-beginner, var(--badge-success-color));
-  }
-
-  .difficulty-intermediate {
-    --badge-bg: var(--color-difficulty-intermediate-bg, var(--badge-warning-bg));
-    --badge-color: var(--color-difficulty-intermediate, var(--badge-warning-color));
-  }
-
-  .difficulty-advanced {
-    --badge-bg: var(--color-difficulty-advanced-bg, var(--badge-error-bg));
-    --badge-color: var(--color-difficulty-advanced, var(--badge-error-color));
-  }
 }

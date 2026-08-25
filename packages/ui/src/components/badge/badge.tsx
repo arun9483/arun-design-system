@@ -4,12 +4,6 @@ import { useRender } from '../../internal/useRender';
 /** Generic status tones. Map your own domain vocabulary onto these at the call site. */
 export type BadgeTone = 'neutral' | 'success' | 'warning' | 'error' | 'info';
 
-type BadgeVariant =
-  | 'default'
-  | 'difficulty-beginner'
-  | 'difficulty-intermediate'
-  | 'difficulty-advanced';
-
 type BadgeOwnProps = {
   /**
    * Visual tone. Defaults to `"neutral"`.
@@ -19,12 +13,6 @@ type BadgeOwnProps = {
    * <Badge tone={TONE[difficulty]}>{label}</Badge>
    */
   tone?: BadgeTone;
-  /**
-   * @deprecated Use `tone` instead. The `difficulty-*` values require the consuming app
-   * to define `--color-difficulty-*` tokens that `@arun-dev/tokens` does not ship.
-   * Removed in the next minor.
-   */
-  variant?: BadgeVariant;
   className?: string;
   children: React.ReactNode;
   /**
@@ -41,22 +29,12 @@ type BadgeOwnProps = {
 type BadgeProps = BadgeOwnProps &
   Omit<React.HTMLAttributes<HTMLElement>, keyof BadgeOwnProps | 'children'>;
 
-export function Badge({
-  tone = 'neutral',
-  variant,
-  className,
-  children,
-  render,
-  ...rest
-}: BadgeProps) {
-  const classes = ['chip', 'badge'];
-  if (tone !== 'neutral') classes.push(`badge-${tone}`);
-  // Deprecated path — kept until consumers migrate to `tone`.
-  if (variant !== undefined && variant !== 'default') classes.push(variant);
+export function Badge({ tone = 'neutral', className, children, render, ...rest }: BadgeProps) {
+  const classes = tone === 'neutral' ? 'chip badge' : `chip badge badge-${tone}`;
 
   return useRender({
     render,
     defaultTagName: 'span',
-    props: [{ className: classes.join(' ') }, rest, { className, children }],
+    props: [{ className: classes }, rest, { className, children }],
   });
 }
