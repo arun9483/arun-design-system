@@ -1,18 +1,10 @@
-import { cloneElement, createElement, isValidElement } from 'react';
-import type { ReactElement } from 'react';
-
 /**
- * Internal render engine for @arun-dev/ui.
+ * Prop merging for headless components.
  *
- * Not part of the public API. This will move to @arun-dev/headless once the first
- * component with real behaviour lands; keeping it unexported means that move will
- * not affect consumers.
- *
- * Currently a plain function — it uses no hooks yet. The `use` prefix matches the
- * API it will grow into (memoised prop merging, state -> data-* attribute mapping)
- * so call sites do not have to change.
+ * A component and its consumer both want to put things on the same element. Naive
+ * spreading lets whichever runs last silently destroy the other's behaviour, so each
+ * kind of prop is combined rather than replaced.
  */
-
 export type UnknownProps = Record<string, unknown>;
 
 type Ref = ((node: unknown) => unknown) | { current: unknown } | null | undefined;
@@ -93,23 +85,4 @@ export function mergeProps(...objects: (UnknownProps | undefined)[]): UnknownPro
   }
 
   return merged;
-}
-
-export interface UseRenderParams {
-  /** Element to render instead of the default. Props, className and ref are merged onto it. */
-  render?: ReactElement | undefined;
-  /** Tag rendered when `render` is not supplied. */
-  defaultTagName: string;
-  /** Prop objects to merge, in precedence order (later wins). */
-  props: (UnknownProps | undefined)[];
-}
-
-export function useRender({ render, defaultTagName, props }: UseRenderParams): ReactElement {
-  const merged = mergeProps(...props);
-
-  if (isValidElement(render)) {
-    return cloneElement(render, mergeProps(merged, render.props as UnknownProps));
-  }
-
-  return createElement(defaultTagName, merged);
 }

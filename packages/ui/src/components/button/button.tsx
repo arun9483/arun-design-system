@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useRender } from '../../internal/useRender';
+import { useRender } from '@arun-dev/headless';
 
 type ButtonVariant = 'ghost' | 'primary';
 

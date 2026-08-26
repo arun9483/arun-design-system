@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useRender } from '../../internal/useRender';
+import { useRender } from '@arun-dev/headless';
 
 /** Generic status tones. Map your own domain vocabulary onto these at the call site. */
 export type BadgeTone = 'neutral' | 'success' | 'warning' | 'error' | 'info';

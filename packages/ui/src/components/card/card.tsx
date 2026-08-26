@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useRender } from '../../internal/useRender';
+import { useRender } from '@arun-dev/headless';
 
 type CardOwnProps = {
   /** Tag to render. Prefer `render` when you need a component rather than a tag name. */

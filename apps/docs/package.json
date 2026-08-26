@@ -15,6 +15,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@arun-dev/headless": "workspace:*",
     "@arun-dev/tokens": "workspace:*",
     "@arun-dev/ui": "workspace:*",
     "@astrojs/react": "6.0.4",
