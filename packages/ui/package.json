@@ -42,7 +42,8 @@
     "./css/chip": "./dist/css/chip.css",
     "./css/badge": "./dist/css/badge.css",
     "./css/metric": "./dist/css/metric.css",
-    "./css/utilities": "./dist/css/utilities.css"
+    "./css/utilities": "./dist/css/utilities.css",
+    "./css/switch": "./dist/css/switch.css"
   },
   "publishConfig": {
     "access": "public"
@@ -64,12 +65,12 @@
     "@arun-dev/headless": "workspace:*",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.3.0",
-    "@types/react": "19.1.8",
-    "@types/react-dom": "19.1.6",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "eslint": "9.39.4",
     "jsdom": "29.0.1",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "tsup": "8.5.1",
     "typescript": "5.9.3",
     "vitest": "3.2.6"

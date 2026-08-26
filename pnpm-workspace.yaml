@@ -1,3 +1,12 @@
 packages:
   - 'packages/*'
   - 'apps/*'
+
+# React is a peer dependency of both published packages and must be one copy in the
+# workspace: two copies give each its own hook dispatcher, and hooks throw. Declaring
+# the versions once removes the possibility of drift between packages.
+catalog:
+  react: 19.2.8
+  react-dom: 19.2.8
+  '@types/react': 19.2.18
+  '@types/react-dom': 19.2.5

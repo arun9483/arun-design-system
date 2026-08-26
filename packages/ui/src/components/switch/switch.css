@@ -1,0 +1,62 @@
+@layer switch {
+  /* State comes from data-* attributes emitted by @arun-dev/headless, so the CSS
+     never needs to know how the component decides it is checked. */
+  .switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    inline-size: var(--switch-track-inline-size);
+    block-size: var(--switch-track-block-size);
+    padding: 0;
+    border: var(--switch-track-border-width) solid var(--switch-track-border-color);
+    border-radius: var(--switch-track-radius);
+    background-color: var(--switch-track-bg);
+    cursor: pointer;
+    transition: background-color var(--switch-duration) var(--ease-smooth);
+  }
+
+  .switch[data-checked] {
+    background-color: var(--switch-track-bg-checked);
+    border-color: var(--switch-track-bg-checked);
+  }
+
+  .switch[data-disabled] {
+    opacity: var(--switch-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  .switch:focus-visible {
+    outline: var(--space-2px) solid var(--color-text-accent);
+    outline-offset: var(--space-2px);
+  }
+
+  .switch-thumb {
+    position: absolute;
+    inset-inline-start: var(--switch-thumb-inset);
+    inline-size: var(--switch-thumb-size);
+    block-size: var(--switch-thumb-size);
+    border-radius: var(--radius-full);
+    background-color: var(--switch-thumb-bg);
+    box-shadow: var(--switch-thumb-shadow);
+    /* Translated rather than repositioned so the movement can be animated. */
+    transform: translateX(0);
+    transition: transform var(--switch-duration) var(--ease-smooth);
+  }
+
+  .switch[data-checked] .switch-thumb {
+    transform: translateX(
+      calc(
+        var(--switch-track-inline-size) - var(--switch-thumb-size) -
+          (var(--switch-thumb-inset) * 2) - (var(--switch-track-border-width) * 2)
+      )
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .switch,
+    .switch-thumb {
+      transition-duration: 0ms;
+    }
+  }
+}

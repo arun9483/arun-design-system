@@ -21,14 +21,14 @@
     "@astrojs/react": "6.0.4",
     "@astrojs/starlight": "0.41.9",
     "astro": "7.2.6",
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@arun-dev/config": "workspace:*",
     "@astrojs/check": "0.9.10",
-    "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.5",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "eslint": "9.39.4",
     "typescript": "5.9.3"
   }

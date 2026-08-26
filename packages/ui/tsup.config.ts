@@ -16,6 +16,7 @@ const CSS_LAYERS = [
   { layer: 'card', src: 'src/components/card/card.css' },
   { layer: 'btn', src: 'src/components/button/button.css' },
   { layer: 'badge', src: 'src/components/badge/badge.css' },
+  { layer: 'switch', src: 'src/components/switch/switch.css' },
   { layer: 'metric', src: 'src/css/metric.css' },
   { layer: 'utilities', src: 'src/css/utilities.css' },
 ] as const;

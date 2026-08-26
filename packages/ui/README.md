@@ -36,12 +36,13 @@ Individual stylesheets are also exported if you prefer à la carte loading:
 import { Button, Card, Chip, Badge } from '@arun-dev/ui';
 ```
 
-| Component | Props                                                                                  |
-| --------- | -------------------------------------------------------------------------------------- |
-| `Button`  | `variant: 'ghost' \| 'primary'`, `href` (renders `<a>`), `type`, `disabled`, `onClick` |
-| `Card`    | `as` (tag name, default `div`), `lift` (hover elevation)                               |
-| `Chip`    | `variant: 'default' \| 'accent'`                                                       |
-| `Badge`   | `tone: 'neutral' \| 'success' \| 'warning' \| 'error' \| 'info'`                       |
+| Component | Props                                                                                               |
+| --------- | --------------------------------------------------------------------------------------------------- |
+| `Button`  | `variant: 'ghost' \| 'primary'`, `href` (renders `<a>`), `type`, `disabled`, `onClick`              |
+| `Card`    | `as` (tag name, default `div`), `lift` (hover elevation)                                            |
+| `Chip`    | `variant: 'default' \| 'accent'`                                                                    |
+| `Badge`   | `tone: 'neutral' \| 'success' \| 'warning' \| 'error' \| 'info'`                                    |
+| `Switch`  | `Switch.Root` / `Switch.Thumb` — `checked`, `defaultChecked`, `onCheckedChange`, `disabled`, `name` |
 
 Every component also accepts:
 
