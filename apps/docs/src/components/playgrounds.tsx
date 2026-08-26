@@ -3,7 +3,7 @@
  * consistent, and so each MDX page needs a single import.
  */
 import type { ComponentProps } from 'react';
-import { Badge, Button, Card, Chip } from '@arun-dev/ui';
+import { Badge, Button, Card, Chip, Switch } from '@arun-dev/ui';
 import { Playground, type Control } from './Playground';
 
 const BUTTON_CONTROLS: Control[] = [
@@ -72,6 +72,26 @@ export function BadgePlayground() {
       controls={BADGE_CONTROLS}
       children="Status"
       render={(props: ComponentProps<typeof Badge>) => <Badge {...props} />}
+    />
+  );
+}
+
+const SWITCH_CONTROLS: Control[] = [
+  { name: 'defaultChecked', type: 'boolean', initial: false },
+  { name: 'disabled', type: 'boolean', initial: false },
+];
+
+export function SwitchPlayground() {
+  return (
+    <Playground
+      component="Switch.Root"
+      controls={SWITCH_CONTROLS}
+      children="<Switch.Thumb />"
+      render={(props: ComponentProps<typeof Switch.Root>) => (
+        <Switch.Root {...props}>
+          <Switch.Thumb />
+        </Switch.Root>
+      )}
     />
   );
 }

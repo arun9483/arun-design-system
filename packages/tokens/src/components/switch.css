@@ -1,0 +1,21 @@
+/* Switch component tokens — map semantic tokens onto the switch's styleable surfaces.
+   Override any of these to restyle switches without moving other components. */
+:root {
+  /* Track */
+  --switch-track-inline-size: 2.25rem;
+  --switch-track-block-size: 1.25rem;
+  --switch-track-radius: var(--radius-full);
+  --switch-track-bg: var(--color-bg-secondary);
+  --switch-track-bg-checked: var(--color-text-accent);
+  --switch-track-border-color: var(--color-border-default);
+  --switch-track-border-width: var(--space-px);
+
+  /* Thumb */
+  --switch-thumb-size: 0.875rem;
+  --switch-thumb-bg: var(--color-bg-primary);
+  --switch-thumb-inset: var(--space-2px);
+  --switch-thumb-shadow: var(--shadow-sm);
+
+  --switch-disabled-opacity: 0.5;
+  --switch-duration: var(--duration-fast);
+}

@@ -1,0 +1,85 @@
+---
+title: Switch
+description: An immediate on/off control, built on @arun-dev/headless.
+---
+
+import Example from '@/components/Example.astro';
+import SwitchBasics from '@/examples/switch-basics';
+import SwitchControlled from '@/examples/switch-controlled';
+import PropTable from '@/components/PropTable.astro';
+import { SwitchPlayground } from '@/components/playgrounds';
+import { Aside } from '@astrojs/starlight/components';
+
+A switch takes effect immediately. Use a checkbox instead when the change applies on submit.
+
+<Example name="switch-basics" layout="stack">
+  <SwitchBasics client:load />
+</Example>
+
+<Aside title="It needs a name">
+`Switch.Root` has no accessible name of its own. Wrap it in a `<label>`, or pass `aria-label`
+or `aria-labelledby`. A headless component should not guess at your copy.
+</Aside>
+
+## Playground
+
+<SwitchPlayground client:load />
+
+## Controlled
+
+Pass `checked` with `onCheckedChange` and the parent owns the value — the switch will not move
+on its own. `onCheckedChange` reports the value being moved to in both modes, so the same
+handler works either way.
+
+<Example name="switch-controlled" layout="stack">
+  <SwitchControlled client:load />
+</Example>
+
+## Anatomy
+
+```tsx
+import { Switch } from '@arun-dev/ui';
+
+<Switch.Root>
+  <Switch.Thumb />
+</Switch.Root>;
+```
+
+`Switch.Thumb` reads its state from `Switch.Root`, so the two cannot get out of step.
+
+## Props
+
+### `Switch.Root`
+
+<PropTable component="Switch.Root" />
+
+## Behaviour
+
+- Renders a native `<button>`, so focus, `Space`, `Enter` and disabled semantics come from the
+  platform rather than from JavaScript. Carries `role="switch"` and `aria-checked` per the
+  [WAI-ARIA switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/).
+- `type="button"`, so it never submits an enclosing form by accident.
+- Both parts emit `data-checked` / `data-unchecked` / `data-disabled`. Styling reads those
+  rather than knowing how the component decides its state:
+
+  ```css
+  .switch[data-checked] {
+    background: var(--switch-track-bg-checked);
+  }
+  .switch-thumb[data-checked] {
+    transform: translateX(100%);
+  }
+  ```
+
+- `Switch.Thumb` is `aria-hidden` — the Root already announces the state.
+- The thumb transition is disabled under `prefers-reduced-motion`.
+
+## Unstyled
+
+`@arun-dev/ui` is a thin styling layer. For your own styles, take the behaviour directly:
+
+```tsx
+import { Switch } from '@arun-dev/headless/switch';
+```
+
+Same API, no CSS and no class names.

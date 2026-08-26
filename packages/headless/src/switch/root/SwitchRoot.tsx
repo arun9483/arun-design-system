@@ -1,0 +1,96 @@
+import { useMemo } from 'react';
+import type { ReactElement, ReactNode, Ref } from 'react';
+import { useControlled } from '../../core/useControlled';
+import { useRender } from '../../core/useRender';
+import { SwitchRootContext, type SwitchState } from '../SwitchRootContext';
+import { switchStateAttributes } from '../stateAttributes';
+
+export interface SwitchRootProps {
+  /** Controlled state. Provide `onCheckedChange` alongside it. */
+  checked?: boolean;
+  /** Initial state when uncontrolled. Read once, at mount. */
+  defaultChecked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  disabled?: boolean;
+  /**
+   * Submits with the enclosing form when checked, mirroring a native checkbox:
+   * an unchecked control contributes nothing.
+   */
+  name?: string;
+  /** Value submitted when checked. Defaults to `"on"`, as a native checkbox does. */
+  value?: string;
+  className?: string;
+  children?: ReactNode;
+  /**
+   * Element to render instead of the default `<button>`. Props, className, event
+   * handlers and ref are merged onto it.
+   */
+  render?: ReactElement;
+  ref?: Ref<HTMLElement>;
+}
+
+/**
+ * A switch — an immediate on/off control, distinct from a checkbox in that it takes
+ * effect at once rather than on submit.
+ *
+ * Renders a native `<button>`, which supplies focusability, Space and Enter
+ * activation, and the disabled semantics for free. Per the WAI-ARIA switch pattern
+ * it carries `role="switch"` and `aria-checked`.
+ *
+ * It has no accessible name of its own — wrap it in a `<label>`, or pass `aria-label`
+ * or `aria-labelledby`. That is the consumer's decision, not something a headless
+ * component should guess.
+ */
+export function SwitchRoot({
+  checked: checkedProp,
+  defaultChecked,
+  onCheckedChange,
+  disabled = false,
+  name,
+  value = 'on',
+  className,
+  children,
+  render,
+  ...rest
+}: SwitchRootProps & Record<string, unknown>) {
+  const [checked, setChecked] = useControlled({
+    controlled: checkedProp,
+    default: defaultChecked ?? false,
+    name: 'Switch.Root',
+    state: 'checked',
+  });
+
+  const state: SwitchState = useMemo(() => ({ checked, disabled }), [checked, disabled]);
+
+  const element = useRender<SwitchState>({
+    render,
+    defaultTagName: 'button',
+    state,
+    stateAttributes: switchStateAttributes,
+    props: [
+      {
+        type: 'button',
+        role: 'switch',
+        'aria-checked': checked,
+        disabled,
+        className,
+        children,
+        onClick() {
+          const next = !checked;
+          setChecked(next);
+          onCheckedChange?.(next);
+        },
+      },
+      rest,
+    ],
+  });
+
+  return (
+    <SwitchRootContext.Provider value={state}>
+      {element}
+      {/* Native checkboxes submit only when checked; an unchecked switch contributes
+          nothing, so a form sees the same shape it would from a checkbox. */}
+      {name !== undefined && checked ? <input type="hidden" name={name} value={value} /> : null}
+    </SwitchRootContext.Provider>
+  );
+}

@@ -1,3 +1,6 @@
+/* eslint-disable security/detect-non-literal-fs-filename --
+   The output path is derived from import.meta.url and a literal filename; nothing
+   comes from user input, so the path-traversal heuristic does not apply. */
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
