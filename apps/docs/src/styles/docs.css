@@ -9,7 +9,7 @@
    Starlight sets data-theme="dark" | "light" on <html>, the same hook the generated
    brand's variants use, so its theme toggle drives the token layer with no glue. */
 @import '@arun-dev/tokens/base';
-@import '../generated/brand.css';
+@import '../generated/brand-arun-docs.css';
 @import '@arun-dev/ui/components.css';
 
 /* Live example surface — deliberately neutral so the component is what you notice. */
