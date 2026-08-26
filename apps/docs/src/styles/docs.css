@@ -44,20 +44,40 @@
   border-radius: 0 !important;
 }
 
-/* Brand switcher in the header */
+/* Brand switcher in the header, beside Starlight's own theme select.
+
+   Styles are scoped to .ds-brand-control, never `.ds-brand select`: Starlight's
+   theme select sets its own padding-inline-start to clear an icon, and overriding
+   that makes its label sit on top of the glyph. */
 .ds-brand {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  /* Generous, because Starlight's select overflows its wrapper on the inline-start
+     side — the icons are overlaid on top of it — so the visible gap is smaller than
+     the declared one. */
+  gap: 1rem;
 }
 
-.ds-brand select {
+/* astro-island is an inline custom element with no box of its own, so it would
+   otherwise collapse and swallow the flex gap. */
+.ds-brand astro-island {
+  display: contents;
+}
+
+.ds-brand-control {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ds-brand-control select {
   font-size: var(--sl-text-xs);
-  padding: 0.25rem 0.4rem;
+  padding: 0.3rem 0.45rem;
   border-radius: 0.35rem;
   border: 1px solid var(--sl-color-gray-5);
   background-color: var(--sl-color-black);
   color: var(--sl-color-white);
+  cursor: pointer;
 }
 
 .ds-swatch {

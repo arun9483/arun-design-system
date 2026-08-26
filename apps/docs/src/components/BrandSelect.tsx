@@ -26,7 +26,7 @@ export function BrandSelect() {
   }, []);
 
   return (
-    <label className="ds-control ds-control-inline">
+    <label className="ds-brand-control">
       {/* Reads the active brand's own token, so it is correct before hydration and
           cannot drift from the generated palettes. */}
       <span className="ds-swatch" aria-hidden="true" />
