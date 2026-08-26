@@ -1,23 +1,22 @@
 {
-  "name": "@arun-dev/ui",
-  "version": "0.3.0",
-  "description": "Brand-agnostic React component library styled entirely via @arun-dev/tokens semantic CSS custom properties",
+  "name": "@arun-dev/headless",
+  "version": "0.0.0",
+  "description": "Unstyled React behaviour primitives — the render engine and state plumbing @arun-dev/ui is built on. Ships no CSS and no class names.",
   "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/arun9483/arun-design-system.git",
-    "directory": "packages/ui"
+    "directory": "packages/headless"
   },
   "keywords": [
     "react",
-    "components",
+    "headless",
+    "unstyled",
     "design-system",
-    "css-custom-properties"
+    "primitives"
   ],
-  "sideEffects": [
-    "**/*.css"
-  ],
+  "sideEffects": false,
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -34,15 +33,7 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
-    },
-    "./components.css": "./dist/css/components.css",
-    "./css/reset": "./dist/css/reset.css",
-    "./css/btn": "./dist/css/btn.css",
-    "./css/card": "./dist/css/card.css",
-    "./css/chip": "./dist/css/chip.css",
-    "./css/badge": "./dist/css/badge.css",
-    "./css/metric": "./dist/css/metric.css",
-    "./css/utilities": "./dist/css/utilities.css"
+    }
   },
   "publishConfig": {
     "access": "public"
@@ -56,27 +47,28 @@
     "test": "pnpm run test:unit",
     "test:unit": "vitest run --passWithNoTests --config vitest.unit.config.ts"
   },
-  "dependencies": {
-    "@arun-dev/tokens": "workspace:*"
+  "peerDependencies": {
+    "@types/react": ">=19.0.0",
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@arun-dev/config": "workspace:*",
-    "@arun-dev/headless": "workspace:*",
-    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.0",
-    "@types/react": "19.1.8",
-    "@types/react-dom": "19.1.6",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5",
     "eslint": "9.39.4",
-    "jsdom": "29.0.1",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "jsdom": "27.0.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "tsup": "8.5.1",
     "typescript": "5.9.3",
     "vitest": "3.2.6"
-  },
-  "peerDependencies": {
-    "@arun-dev/headless": ">=0.1.0",
-    "react": ">=19.0.0",
-    "react-dom": ">=19.0.0"
   }
 }
