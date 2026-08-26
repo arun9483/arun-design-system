@@ -74,6 +74,18 @@ writeFileSync(
 );
 ```
 
+### Output stability
+
+`createBrand()` is pure and deterministic: the same `seed` (or the same `palette`) always
+produces byte-identical CSS. It uses no randomness, no clock and nothing from the environment,
+and `name` affects only a comment in the output.
+
+That is a contract, not an implementation detail. Brand generation is normally a one-time
+step whose result is committed, so **a change to the palette algorithm restyles every consumer
+the moment they upgrade** — even though nothing in their code changed. Treat such a change as
+breaking regardless of what the version number would otherwise suggest, and say so in the
+changeset.
+
 ## `BrandSemanticContract`
 
 The TypeScript type `BrandSemanticContract` (exported from `./createBrand`) lists every semantic

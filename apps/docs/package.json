@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "predev": "node scripts/generate-brands.mjs",
+    "predev": "node scripts/generate-brand.mjs",
     "dev": "astro dev",
-    "prebuild": "node scripts/generate-brands.mjs",
+    "prebuild": "node scripts/generate-brand.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "clean": "rm -rf dist .astro .turbo src/generated",

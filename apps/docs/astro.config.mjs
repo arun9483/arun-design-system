@@ -13,23 +13,9 @@ export default defineConfig({
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/arun9483/arun-design-system' },
       ],
-      // Starlight sets data-theme="dark"|"light" on <html> — the same attribute
-      // @arun-dev/tokens keys off, so its theme toggle drives the token layer directly.
+      // Starlight sets data-theme="dark"|"light" on <html> — the same attribute the
+      // generated brand's variants key off, so its theme toggle needs no glue code.
       customCss: ['./src/styles/docs.css'],
-      head: [
-        {
-          // Restore the stored brand before first paint. Applying it after
-          // hydration instead showed the default brand briefly on every
-          // navigation, which read as the selection being lost.
-          tag: 'script',
-          content:
-            "try{var b=localStorage.getItem('ds-brand');if(b&&b!=='default')document.documentElement.dataset.brand=b}catch(e){}",
-        },
-      ],
-      components: {
-        // Brand switcher sits beside Starlight's own theme select.
-        ThemeSelect: './src/components/ThemeAndBrand.astro',
-      },
       sidebar: [
         {
           label: 'Getting started',

@@ -1,15 +1,16 @@
-/* The design system itself. Loaded into every docs page so live examples render
-   exactly as they would in a consumer app.
+/* The design system itself, loaded exactly as a consumer would load it:
+   primitives and component tokens, then a brand, then component styles.
 
-   Starlight sets data-theme="dark" | "light" on <html>, which is the same hook
-   @arun-dev/tokens uses — its theme toggle drives the token layer with no glue. */
+   The brand is this site's own — generated from a single seed colour by
+   createBrand() and imported in place of @arun-dev/tokens/brands/default, which is
+   the documented procedure in full. One brand per document, declared at :root; see
+   docs/architecture.md §3.
+
+   Starlight sets data-theme="dark" | "light" on <html>, the same hook the generated
+   brand's variants use, so its theme toggle drives the token layer with no glue. */
 @import '@arun-dev/tokens/base';
-@import '@arun-dev/tokens/brands/default';
+@import '../generated/brand-arun-docs.css';
 @import '@arun-dev/ui/components.css';
-/* Alternate brands, each scoped under [data-brand]. Generated — see
-   scripts/generate-brands.mjs. Loaded as a normal stylesheet so switching is an
-   attribute flip with no flash. */
-@import '../generated/brands.css';
 
 /* Live example surface — deliberately neutral so the component is what you notice. */
 .ds-example {
@@ -42,51 +43,6 @@
 .ds-example pre {
   margin: 0 !important;
   border-radius: 0 !important;
-}
-
-/* Brand switcher in the header, beside Starlight's own theme select.
-
-   Styles are scoped to .ds-brand-control, never `.ds-brand select`: Starlight's
-   theme select sets its own padding-inline-start to clear an icon, and overriding
-   that makes its label sit on top of the glyph. */
-.ds-brand {
-  display: flex;
-  align-items: center;
-  /* Generous, because Starlight's select overflows its wrapper on the inline-start
-     side — the icons are overlaid on top of it — so the visible gap is smaller than
-     the declared one. */
-  gap: 1rem;
-}
-
-/* astro-island is an inline custom element with no box of its own, so it would
-   otherwise collapse and swallow the flex gap. */
-.ds-brand astro-island {
-  display: contents;
-}
-
-.ds-brand-control {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.ds-brand-control select {
-  font-size: var(--sl-text-xs);
-  padding: 0.3rem 0.45rem;
-  border-radius: 0.35rem;
-  border: 1px solid var(--sl-color-gray-5);
-  background-color: var(--sl-color-black);
-  color: var(--sl-color-white);
-  cursor: pointer;
-}
-
-.ds-swatch {
-  background: var(--color-brand-500);
-  inline-size: 0.85rem;
-  block-size: 0.85rem;
-  border-radius: 0.25rem;
-  border: 1px solid var(--sl-color-gray-5);
-  flex-shrink: 0;
 }
 
 /* Playground */
