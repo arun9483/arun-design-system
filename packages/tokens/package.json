@@ -22,8 +22,7 @@
   "files": [
     "dist",
     "src",
-    "!src/**/*.unit.spec.ts",
-    "!src/**/__snapshots__/**"
+    "!src/**/*.unit.spec.ts"
   ],
   "exports": {
     "./base": "./src/base.css",

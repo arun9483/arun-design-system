@@ -15,9 +15,9 @@ import { createBrand } from '@arun-dev/tokens/createBrand';
  * output is not post-processed or rescoped: what this writes is byte-for-byte what
  * a consumer would ship.
  *
- * The result is committed, not gitignored. A change to createBrand()'s logic then
- * shows up as a reviewable diff in this file — the generator's effect on a real
- * consumer, visible in the pull request that causes it.
+ * The result is committed, not gitignored. That is deliberate: a change to
+ * createBrand()'s logic then shows up as a diff in this file, so the generator's
+ * effect on a real consumer is visible in the pull request that causes it.
  */
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'generated');
 

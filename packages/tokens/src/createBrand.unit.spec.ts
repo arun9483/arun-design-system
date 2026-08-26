@@ -108,19 +108,4 @@ describe('generatePaletteFromSeed', () => {
       expect(luminance(palette[shades[i]])).toBeLessThan(luminance(palette[shades[i - 1]]));
     }
   });
-
-  /**
-   * The tests above assert the *shape* of the output — that every theme block is
-   * present, that eleven valid hex colours come back, that lightness decreases. A
-   * change to the seed-to-palette algorithm would satisfy all of them while emitting
-   * entirely different colours.
-   *
-   * This pins the bytes for a fixed seed, so such a change fails here rather than
-   * silently restyling every consumer. If the diff is intended, update the snapshot
-   * deliberately — that is the review.
-   */
-  it('emits byte-identical CSS for a fixed seed', async () => {
-    const css = createBrand({ name: 'snapshot', seed: '#7c3aed' });
-    await expect(css).toMatchFileSnapshot('./__snapshots__/brand-seed-7c3aed.css');
-  });
 });
