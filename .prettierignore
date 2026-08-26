@@ -4,3 +4,7 @@ dist
 coverage
 pnpm-lock.yaml
 CHANGELOG.md
+
+# Generated brand stylesheets are committed so a change to createBrand() shows up
+# as a diff. Formatting them would make that diff noise rather than signal.
+apps/*/src/generated
