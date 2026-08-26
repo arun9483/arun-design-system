@@ -63,7 +63,23 @@ You can also pass a full palette instead of a seed if you already have one:
 createBrand({ name: 'acme', palette: { 50: '#…', 100: '#…', /* … */ 950: '#…' } });
 ```
 
-The brand selector in this site's header does exactly this — try it on any page.
+:::note[This site is that consumer]
+Everything you see here renders in a brand generated exactly this way — one
+`createBrand()` call from the seed `#7c3aed`, written to a file, imported in place of
+`@arun-dev/tokens/brands/default`. See `apps/docs/scripts/generate-brand.mjs`.
+
+So the component examples are **not** the default indigo brand. That is the point: no
+component knows a brand exists, and swapping the token layer is the only change needed.
+:::
+
+## One brand per document
+
+Brand and theme tokens are declared at `:root`, never scoped to a subtree, so a document
+has exactly one brand. Rendering two brands on one page is deliberately not supported —
+custom properties inherit through the DOM tree, and a React portal moves nodes out of it,
+so a popup portaled into `<body>` would not inherit tokens scoped to a wrapper element.
+
+To show a different brand, load a different brand stylesheet.
 
 ## Restyling one component
 

@@ -25,10 +25,13 @@ Live examples, interactive playgrounds and a prop reference — an Astro Starlig
 
 Two controls in the header demonstrate the architecture rather than the components:
 
-- **Theme** is Starlight's own toggle. It sets `data-theme` on `<html>` — the same hook
-  `@arun-dev/tokens` uses — so it drives the token layer with no glue code.
-- **Brand** swaps the token layer. `sky`, `forest` and `plum` are generated from a single seed
-  colour by `createBrand()` at build time; no component knows a brand exists.
+The site is itself a consumer, following the documented path exactly: one `createBrand()` call
+from a single seed colour, written to a file, imported in place of
+`@arun-dev/tokens/brands/default`. So every example renders in the docs' own brand rather than
+the default indigo — no component knows a brand exists.
+
+Theme switching is Starlight's own toggle. It sets `data-theme` on `<html>`, the same hook the
+generated brand's variants use, so it drives the token layer with no glue code.
 
 Every example is a real file under `apps/docs/src/examples/`, rendered live and shown as source
 from that same file — there is no second copy to drift.
