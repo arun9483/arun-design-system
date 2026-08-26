@@ -32,10 +32,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Still v1: v2 requires github-token as an explicit input rather than the
-      # GITHUB_TOKEN environment variable, and renames several inputs. That migration
-      # touches the publish path and cannot be rehearsed without cutting a real
-      # release, so it belongs in its own change rather than an action-version bump.
+      # Still v1, and v1 already targets node24 — this pin costs no deprecation
+      # warning. v2 requires github-token as an explicit input rather than the
+      # GITHUB_TOKEN environment variable and renames several inputs, a migration
+      # that touches the publish path and cannot be rehearsed without cutting a real
+      # release. Worth doing deliberately, not as part of a runtime bump.
       - name: Create release PR or publish to npm
         uses: changesets/action@v1
         with:
