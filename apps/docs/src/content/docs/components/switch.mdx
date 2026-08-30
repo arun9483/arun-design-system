@@ -1,6 +1,6 @@
 ---
 title: Switch
-description: An immediate on/off control, built on @arun-dev/headless.
+description: An immediate on/off control. Behaviour from @arun-dev/headless, styling from @arun-dev/ui.
 ---
 
 import Example from '@/components/Example.astro';
@@ -34,6 +34,21 @@ handler works either way.
 <Example name="switch-controlled" layout="stack">
   <SwitchControlled client:load />
 </Example>
+
+<Aside type="caution" title="Never pass an undefined checked">
+The mode is decided once, at mount, and never re-evaluated. A `checked` of `undefined` on the
+first render makes the switch **uncontrolled for the rest of its life** — it starts tracking its
+own state and ignores every value you pass afterwards. This bites when the value loads
+asynchronously. Coalesce at the call site:
+
+```tsx
+<Switch.Root checked={x ?? false} onCheckedChange={setX} />
+```
+
+`defaultChecked` does not guard against this. It is ignored in controlled mode, and only makes
+the first render look correct while the switch has already taken ownership.
+
+</Aside>
 
 ## Anatomy
 
@@ -74,12 +89,14 @@ import { Switch } from '@arun-dev/ui';
 - `Switch.Thumb` is `aria-hidden` — the Root already announces the state.
 - The thumb transition is disabled under `prefers-reduced-motion`.
 
-## Unstyled
+## Styling it yourself
 
-`@arun-dev/ui` is a thin styling layer. For your own styles, take the behaviour directly:
+The behaviour, keyboard handling and accessibility all come from
+[`@arun-dev/headless`](/headless/), which ships no CSS and no class names. `@arun-dev/ui` adds a
+stylesheet on top. To bring your own instead, take the same API from the package underneath:
 
 ```tsx
 import { Switch } from '@arun-dev/headless/switch';
 ```
 
-Same API, no CSS and no class names.
+Identical props and parts, styled entirely by you.

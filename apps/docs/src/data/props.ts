@@ -89,7 +89,8 @@ export const PROPS: Record<string, PropDoc[]> = {
     {
       name: 'checked',
       type: 'boolean',
-      description: 'Controlled state. Provide `onCheckedChange` alongside it.',
+      description:
+        'Controlled state. Provide `onCheckedChange` alongside it. Never pass `undefined` — the mode is fixed at mount, so write `checked={x ?? false}`.',
     },
     {
       name: 'defaultChecked',

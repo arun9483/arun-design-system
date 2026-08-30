@@ -9,7 +9,7 @@ export default defineConfig({
     starlight({
       title: 'arun-design-system',
       description:
-        'Pure-CSS design tokens with white-label brand generation, and a brand-agnostic React component library built on top of them.',
+        'Three independent packages — pure-CSS design tokens with white-label brand generation, unstyled React behaviour primitives, and a brand-agnostic component library built on both.',
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/arun9483/arun-design-system' },
       ],
@@ -24,6 +24,7 @@ export default defineConfig({
             { label: 'Theming and brands', slug: 'getting-started/theming' },
           ],
         },
+        { label: 'Headless', slug: 'headless' },
         {
           label: 'Components',
           items: [

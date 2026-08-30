@@ -1,0 +1,106 @@
+---
+title: Headless
+description: Unstyled React behaviour primitives — behaviour, keyboard handling and accessibility, with no CSS and no class names.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`@arun-dev/headless` ships behaviour, keyboard handling and accessibility, and nothing else — no
+CSS, no class names, no colour. Components project their state onto the DOM as `data-*`
+attributes, so any styling approach reads them: plain CSS, CSS modules, utility classes, or a
+component library of your own.
+
+```bash
+npm install @arun-dev/headless
+```
+
+Peer dependencies: `react >= 19`, `react-dom >= 19`. Nothing else — it has no runtime
+dependencies and loads no stylesheet.
+
+## Usage
+
+```tsx
+import { Switch } from '@arun-dev/headless/switch';
+
+<Switch.Root className="my-switch" onCheckedChange={save} aria-label="Notifications">
+  <Switch.Thumb className="my-switch-thumb" />
+</Switch.Root>;
+```
+
+`Switch.Root` renders a native `<button>`, so focus, `Space`, `Enter` and disabled semantics come
+from the platform. It carries `role="switch"` and `aria-checked`, but no accessible name of its
+own — wrap it in a `<label>` or pass `aria-label`.
+
+## State reaches CSS through `data-*`
+
+A headless component owns no class names, so the attribute name is the entire contract between
+behaviour and styling:
+
+```css
+.my-switch[data-checked] {
+  background: rebeccapurple;
+}
+.my-switch[data-checked] .my-switch-thumb {
+  transform: translateX(100%);
+}
+```
+
+Both parts emit `data-checked` / `data-unchecked` / `data-disabled`. The negative form is emitted
+deliberately: `:not([data-checked])` would also match any third state added later, so matching the
+state you mean keeps future states additive.
+
+## Controlled and uncontrolled
+
+Pass `checked` with `onCheckedChange` and the parent owns the value — the switch will not move on
+its own. Pass `defaultChecked` and the component owns it. `onCheckedChange` fires in both modes,
+so the same handler works either way.
+
+<Aside type="caution" title="Never pass an undefined checked">
+The mode is decided once, at mount, and never re-evaluated. A `checked` of `undefined` on the
+first render makes the component **uncontrolled for the rest of its life** — it starts tracking
+its own state and ignores every value passed afterwards. When the value loads asynchronously,
+coalesce at the call site:
+
+```tsx
+<Switch.Root checked={enabled ?? false} onCheckedChange={setEnabled} />
+```
+
+</Aside>
+
+Mixing the modes, or changing the default after mount, logs a development-only warning.
+
+## Composition
+
+Every part takes a `render` prop to change the element, and spreads unrecognised props onto it.
+`className` is concatenated, event handlers are chained rather than replaced, `style` is merged,
+and refs are merged — so a `ref` on the `render` element and a `ref` on the component both receive
+the node.
+
+```tsx
+<Switch.Root render={<Tooltip.Trigger />} />
+```
+
+See [The render prop](/guides/render-prop/) for how the merging works.
+
+## Engine
+
+The primitives the components are built from are exported from the root, for building your own:
+
+```ts
+import { useRender, useControlled, mergeProps, getStateAttributes } from '@arun-dev/headless';
+```
+
+| Export               | Purpose                                                                       |
+| -------------------- | ----------------------------------------------------------------------------- |
+| `useRender`          | Resolves what a part renders — merges props, projects state, applies `render` |
+| `useControlled`      | One value, controlled or uncontrolled, decided at mount                       |
+| `mergeProps`         | Merges prop objects: handlers chain, `className` concatenates, refs merge     |
+| `getStateAttributes` | Projects a state object onto `data-*` attributes via a declared mapping       |
+| `booleanAttribute`   | The common mapping — one attribute when true, another when false              |
+
+## Already-styled components
+
+[`@arun-dev/ui`](/components/switch/) is one styling layer built on these primitives, using
+[`@arun-dev/tokens`](/guides/tokens/) for its colours. The two packages are independent — take
+whichever fits, and use both if you want the styled components in most places and raw behaviour
+where you need something custom.

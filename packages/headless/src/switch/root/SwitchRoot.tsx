@@ -6,7 +6,13 @@ import { SwitchRootContext, type SwitchState } from '../SwitchRootContext';
 import { switchStateAttributes } from '../stateAttributes';
 
 export interface SwitchRootProps {
-  /** Controlled state. Provide `onCheckedChange` alongside it. */
+  /**
+   * Controlled state. Provide `onCheckedChange` alongside it.
+   *
+   * Never `undefined` once mounted. The mode is latched at mount, so an `undefined`
+   * first render makes the switch uncontrolled for good and every value passed later
+   * is ignored. Coalesce at the call site — `checked={x ?? false}`.
+   */
   checked?: boolean;
   /** Initial state when uncontrolled. Read once, at mount. */
   defaultChecked?: boolean;
