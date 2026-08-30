@@ -18,7 +18,7 @@ type CardOwnProps = {
   ref?: React.Ref<HTMLElement>;
 };
 
-type CardProps = CardOwnProps &
+export type CardProps = CardOwnProps &
   Omit<React.HTMLAttributes<HTMLElement>, keyof CardOwnProps | 'children'>;
 
 export function Card({ as = 'div', lift, className, children, render, ...rest }: CardProps) {

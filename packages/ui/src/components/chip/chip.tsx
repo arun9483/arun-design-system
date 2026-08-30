@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useRender } from '@arun-dev/headless';
 
-type ChipVariant = 'default' | 'accent';
+export type ChipVariant = 'default' | 'accent';
 
 type ChipOwnProps = {
   variant?: ChipVariant;
@@ -19,7 +19,7 @@ type ChipOwnProps = {
   ref?: React.Ref<HTMLElement>;
 };
 
-type ChipProps = ChipOwnProps &
+export type ChipProps = ChipOwnProps &
   Omit<React.HTMLAttributes<HTMLElement>, keyof ChipOwnProps | 'children'>;
 
 export function Chip({ variant = 'default', className, children, render, ...rest }: ChipProps) {

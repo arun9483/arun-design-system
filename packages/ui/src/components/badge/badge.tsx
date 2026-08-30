@@ -26,7 +26,7 @@ type BadgeOwnProps = {
   ref?: React.Ref<HTMLElement>;
 };
 
-type BadgeProps = BadgeOwnProps &
+export type BadgeProps = BadgeOwnProps &
   Omit<React.HTMLAttributes<HTMLElement>, keyof BadgeOwnProps | 'children'>;
 
 export function Badge({ tone = 'neutral', className, children, render, ...rest }: BadgeProps) {
