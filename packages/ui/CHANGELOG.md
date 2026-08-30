@@ -1,5 +1,39 @@
 # @arun-dev/ui
 
+## 1.1.0
+
+### Minor Changes
+
+- 1231632: Export the props types for the components this package defines — `ButtonProps`, `CardProps`,
+  `ChipProps`, `BadgeProps` — along with the `ButtonVariant` and `ChipVariant` value unions that
+  already had an exported counterpart in `BadgeTone`. Naming a wrapper's props no longer needs
+  `ComponentProps<typeof Button>`.
+
+  `Switch` is unchanged: its props types are defined by `@arun-dev/headless`, and re-exporting them
+  would freeze a relationship that is allowed to change. Derive them with
+  `ComponentProps<typeof Switch.Root>`. See `docs/architecture.md` decision 6.
+
+### Patch Changes
+
+- 1231632: **Fix: a disabled `Button` with `href` was still a working link.** `disabled` was spread
+  straight onto the rendered element, and the attribute is inert on an `<a>` — the link stayed
+  focusable, still fired `onClick`, and still navigated. It also had no disabled styling at all.
+
+  `@arun-dev/headless` gains `useButton`, which synthesises the disabled state for any element the
+  platform will not do it for: `aria-disabled`, removal from the tab order, the navigation target
+  dropped, and activation handlers suppressed. Hover and focus handlers are kept, so a tooltip
+  explaining why a control is disabled still works. `retractActivationProps` covers the same ground
+  for a consumer-supplied `render` element. Both emit `data-disabled`, so one selector styles every
+  disabled control regardless of the element underneath.
+
+  Also adds `disabledAttribute` — the shared spelling of `data-disabled`, now used by both Switch and
+  `useButton` so a typo cannot split the CSS contract.
+
+  `@arun-dev/tokens` adds `--btn-disabled-opacity`, and `@arun-dev/ui` styles `.btn[data-disabled]`.
+
+- Updated dependencies [1231632]
+  - @arun-dev/tokens@0.4.0
+
 ## 1.0.0
 
 ### Minor Changes
