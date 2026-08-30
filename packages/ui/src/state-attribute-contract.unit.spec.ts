@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -20,9 +20,10 @@ import { describe, expect, it } from 'vitest';
  *
  * This is the `data-*` counterpart to the token contract: same failure mode, other seam.
  *
- * Attribute names are read from each component's `stateAttributes.ts`, which is the one
- * place a component declares what it projects onto the DOM. `core/stateAttributes.ts` is
- * excluded — it is the mechanism, and the `data-*` names in its docs are examples.
+ * Attribute names are read from every source file in @arun-dev/headless, with comments
+ * stripped first — several docstrings show example selectors that are not emissions.
+ * Scanning all sources rather than the `stateAttributes.ts` mappings alone matters:
+ * `useButton` emits `data-disabled` directly, without going through a mapping.
  */
 
 const EMISSION = /'(data-[a-z0-9-]+)'/g;
@@ -47,18 +48,21 @@ function filesIn(dir: string, extension: string): string[] {
   });
 }
 
-/** Every component's state-attribute mapping, keyed by the attribute it declares. */
+/** Comments hold example selectors and sample mappings, which are not emissions. */
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+}
+
+/** Every `data-*` attribute @arun-dev/headless emits, keyed to the file declaring it. */
 function emittedBy(headlessSrc: string): Map<string, string> {
   const attributes = new Map<string, string>();
 
-  for (const entry of readdirSync(headlessSrc, { withFileTypes: true })) {
-    if (!entry.isDirectory() || entry.name === 'core') continue;
+  for (const file of filesIn(headlessSrc, '.ts').concat(filesIn(headlessSrc, '.tsx'))) {
+    if (file.includes('.spec.')) continue;
 
-    const mapping = join(headlessSrc, entry.name, 'stateAttributes.ts');
-    if (!existsSync(mapping)) continue;
-
-    for (const [, name] of readFileSync(mapping, 'utf8').matchAll(EMISSION)) {
-      if (name && !attributes.has(name)) attributes.set(name, entry.name);
+    const relative = file.slice(file.indexOf('src'));
+    for (const [, name] of stripComments(readFileSync(file, 'utf8')).matchAll(EMISSION)) {
+      if (name && !attributes.has(name)) attributes.set(name, relative);
     }
   }
   return attributes;

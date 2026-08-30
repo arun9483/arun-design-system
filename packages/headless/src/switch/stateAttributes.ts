@@ -1,4 +1,8 @@
-import { booleanAttribute, type StateAttributeMapping } from '../core/stateAttributes';
+import {
+  booleanAttribute,
+  disabledAttribute,
+  type StateAttributeMapping,
+} from '../core/stateAttributes';
 import type { SwitchState } from './SwitchRootContext';
 
 /**
@@ -13,5 +17,5 @@ import type { SwitchState } from './SwitchRootContext';
  */
 export const switchStateAttributes: StateAttributeMapping<SwitchState> = {
   checked: booleanAttribute('data-checked', 'data-unchecked'),
-  disabled: booleanAttribute('data-disabled'),
+  disabled: disabledAttribute,
 };

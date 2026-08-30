@@ -32,6 +32,7 @@
     "./components": "./src/components.css",
     "./components/chip": "./src/components/chip.css",
     "./components/badge": "./src/components/badge.css",
+    "./components/button": "./src/components/button.css",
     "./primitives/typography": "./src/primitives/typography.css",
     "./primitives/spacing": "./src/primitives/spacing.css",
     "./primitives/radius": "./src/primitives/radius.css",

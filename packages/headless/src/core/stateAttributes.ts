@@ -56,3 +56,10 @@ export function booleanAttribute(whenTrue: string, whenFalse?: string) {
     return whenFalse ? { [whenFalse]: '' } : null;
   };
 }
+
+/**
+ * The shared spelling of the disabled state. Every component uses this rather than
+ * writing the string again, so `[data-disabled]` means the same thing system-wide and
+ * a typo cannot silently split the CSS contract.
+ */
+export const disabledAttribute = booleanAttribute('data-disabled');

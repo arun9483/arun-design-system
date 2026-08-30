@@ -8,17 +8,33 @@ it rules out.
 ## 1. Layering
 
 ```
-@arun-dev/tokens    CSS custom properties only. Zero runtime JS.
-        |             primitives -> brand palette -> semantic -> component
-        v
-@arun-dev/ui        Class names + component CSS + React components.
+@arun-dev/tokens        @arun-dev/headless
+CSS custom properties   React behaviour, state and a11y
+only. Zero runtime JS.  No CSS, no class names.
+        |                       |
+        |  token names          |  data-* attributes
+        +-----------+-----------+
+                    v
+              @arun-dev/ui
+              Class names + component CSS + styled components.
 ```
 
-`@arun-dev/ui` never imports from `@arun-dev/tokens` in JS or CSS. It references custom properties
-by name and relies on the consumer having loaded a token layer. The token names are the contract
-between the two packages.
+The two arrows are the only couplings, and both are **name contracts** rather than
+imports:
 
-**Rules out:** a JS theme object, CSS-in-JS, or any runtime style generation.
+| Seam                | Contract                 | Enforced by                             |
+| ------------------- | ------------------------ | --------------------------------------- |
+| tokens → ui         | custom property names    | `token-contract.unit.spec.ts`           |
+| headless → ui's CSS | `data-*` attribute names | `state-attribute-contract.unit.spec.ts` |
+
+`@arun-dev/ui` never imports from `@arun-dev/tokens` in JS or CSS — it references custom properties
+by name and relies on the consumer having loaded a token layer. It _does_ import from
+`@arun-dev/headless` in JS (a peer dependency), but its **CSS** knows headless only through
+attribute names. Both packages stand alone: `@arun-dev/tokens` needs no React, and
+`@arun-dev/headless` needs no stylesheet.
+
+**Rules out:** a JS theme object, CSS-in-JS, or any runtime style generation. Also rules out
+`@arun-dev/headless` depending on `@arun-dev/ui` in any direction, including in its prose.
 
 ---
 
@@ -99,15 +115,121 @@ All components also spread unrecognised props onto the rendered element, so `id`
 
 ---
 
-## 6. Deferred, with reasons
+## 6. Props types follow ownership
+
+A package exports the props types it **defines**, and never re-exports one it merely borrows.
+
+| Component                         | Props type defined in | Exported from `ui`? |
+| --------------------------------- | --------------------- | ------------------- |
+| `Button`, `Card`, `Chip`, `Badge` | `@arun-dev/ui`        | yes                 |
+| `Switch.Root`, `Switch.Thumb`     | `@arun-dev/headless`  | no                  |
+
+Prop _value_ types are exported the same way — `BadgeTone`, `ButtonVariant`, `ChipVariant` — since
+a consumer must be able to construct those values and map their own vocabulary onto them, per
+decision 4.
+
+For `Switch`, consumers derive the type instead:
+
+```tsx
+function MySwitch(props: ComponentProps<typeof Switch.Root>) { … }
+```
+
+**Why not re-export the headless types:** an exported alias records where a type comes from
+_today_. `@arun-dev/ui`'s Switch is currently a pure pass-through, but it is allowed to stop being
+one. The moment it adds a prop of its own, a re-exported `SwitchRootProps` is wrong — and wrong
+silently, because it still compiles and merely under-reports. `ComponentProps<typeof X>` is a
+reference to the component rather than a snapshot of its type's origin, so it stays correct
+through that change. Re-exporting would also give one type two import paths and two version
+timelines.
+
+That risk does not exist for types `@arun-dev/ui` defines itself: they cannot fall out of step with
+components in the same package, so they are exported by name.
+
+**Rules out:** `export type { SwitchRootProps } from '@arun-dev/headless/switch'` in `ui`. If
+`@arun-dev/ui`'s Switch ever needs props of its own, it defines its own type — and at that point
+owns it, and exports it.
+
+---
+
+## 7. Behaviour originates in `@arun-dev/headless`
+
+The test is not "does it have a state-like prop" but **does it require JavaScript?**
+
+| Originates in `@arun-dev/headless`                   | Originates in `@arun-dev/ui`   |
+| ---------------------------------------------------- | ------------------------------ |
+| state that changes over time                         | class names and tokens         |
+| keyboard handling beyond the platform's              | element choice and convenience |
+| focus management                                     | variants                       |
+| ARIA that has to be computed                         |                                |
+| making a non-native element behave like a native one |                                |
+
+**Worked example — `disabled` on Button.** A native `<button disabled>` needs no
+JavaScript: the platform removes it from the tab order, suppresses activation and
+exposes `:disabled`. An `<a href>` gets none of that, and a `disabled` attribute on it
+is inert — the link stays focusable, still fires handlers and still navigates.
+
+So the _prop_ is not what belongs in `@arun-dev/headless`; the "make a non-button
+element behave as disabled" logic is. It ships as `useButton`, a hook rather than a
+component, because Button's value in `@arun-dev/ui` is its variants and its `href`
+convenience — neither is behaviour. A `Button.Root` in headless would have inverted
+that, leaving the interesting half in the wrapper.
+
+**Rules out:** a pass-through wrapper for every headless component. When a component is
+mostly styling with a little behaviour, the behaviour is extracted as a primitive and
+the component stays in `@arun-dev/ui`. Switch went the other way — nearly all of it is
+behaviour — and earns its 7-line wrapper.
+
+**Consequence:** `useButton` returns consumer props _sanitised_ rather than merged over,
+and `retractActivationProps` exists for `render` elements, because neither case can be
+expressed through `mergeProps` today. See decision 8.
+
+---
+
+## 8. `mergeProps` cannot retract or replace
+
+Two properties of `mergeProps` are load-bearing for ordinary composition and get in the
+way of "switch this element off":
+
+| Behaviour                                  | Why it exists                                       | What it costs                                                                                                           |
+| ------------------------------------------ | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `undefined` values are skipped             | an absent prop must not clobber a present one       | nothing can **retract** a prop — `href: undefined` is a no-op                                                           |
+| event handlers are chained, never replaced | a consumer's `onClick` runs alongside internal ones | a handler cannot be **suppressed**; `preventDefault()` in an internal handler does not stop the consumer's from running |
+
+Measured, not assumed: a prototype `useButton` returning `href: undefined` and an
+`onClick` calling `preventDefault()` produced an anchor that still carried `href` and
+still ran the consumer's handler.
+
+**Current answer:** the affected component sanitises props before they reach
+`mergeProps` — which is what `useButton` and `retractActivationProps` do. No change to
+the engine.
+
+**Deferred:** giving `mergeProps` a `defaultPrevented` short-circuit, so a chained
+handler stops when an earlier one prevented default. It would solve suppression for
+every component at once, but it changes merge semantics for Switch, Chip, Card and
+Badge to serve one case. Revisit at the second component that needs to disable a
+non-native element — Checkbox, MenuItem or Tab, whichever lands first. A sentinel for
+retracting props in `useRender` is the same decision and should be taken with it.
+
+---
+
+## 9. Deferred, with reasons
+
+Shipped since this list was written:
+
+| Was deferred                    | Landed in                                                                        |
+| ------------------------------- | -------------------------------------------------------------------------------- |
+| `@arun-dev/headless` package    | `0.1.0` — the render engine and state plumbing                                   |
+| `data-*` state attributes       | `0.2.0`, with Switch — the first component with state                            |
+| `useRender` moved out of `ui`   | `0.1.0` — now `@arun-dev/headless` `core/`, exported                             |
+| Shared `data-disabled` spelling | `disabledAttribute` in `core/stateAttributes.ts`, used by Switch and `useButton` |
+
+Still deferred:
 
 | Deferred                              | Revisit when                                             |
 | ------------------------------------- | -------------------------------------------------------- |
-| `@arun-dev/headless` package          | the first component with real behaviour (Switch) lands   |
-| `data-*` state attributes             | same — static components have no state to project        |
 | Runtime layout vars + `--hl-*` prefix | the first anchored/positioned component (Popover)        |
 | Vitest browser mode                   | focus trapping or scroll locking needs testing           |
 | Positioning engine, Floating UI       | Popover; the engine is a port so it can be swapped later |
+| `mergeProps` handler suppression      | the second component disabling a non-native element      |
 
-`useRender` currently lives in `@arun-dev/ui/src/internal/` and is **not exported publicly**, so it
-can move into `@arun-dev/headless` later without affecting consumers.
+Popover triggers the first three at once, so its decisions belong here before its code exists.
