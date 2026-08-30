@@ -1,5 +1,13 @@
 # @arun-dev/docs
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies [c25b098]
+  - @arun-dev/headless@0.2.1
+  - @arun-dev/ui@1.0.0
+
 ## 0.0.2
 
 ### Patch Changes

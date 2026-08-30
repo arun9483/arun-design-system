@@ -1,5 +1,14 @@
 # @arun-dev/headless
 
+## 0.2.1
+
+### Patch Changes
+
+- c25b098: Document the package on its own terms: add a README, and rewrite the npm description so it no
+  longer defines the package by the styling layer built on it. Expand the `checked` JSDoc to warn
+  that the controlled/uncontrolled mode is latched at mount, so an `undefined` first render makes
+  the component uncontrolled for good.
+
 ## 0.2.0
 
 ### Minor Changes
