@@ -4,5 +4,6 @@ export { useControlled } from './useControlled';
 export {
   getStateAttributes,
   booleanAttribute,
+  disabledAttribute,
   type StateAttributeMapping,
 } from './stateAttributes';

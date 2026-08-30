@@ -9,3 +9,4 @@
  * subpaths (`@arun-dev/headless/switch`) as they are built.
  */
 export * from './core';
+export { useButton, retractActivationProps, type UseButtonParams } from './useButton';

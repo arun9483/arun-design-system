@@ -32,6 +32,17 @@
     opacity: 0.75;
   }
 
+  /* One selector covers every element the button can render as — @arun-dev/headless
+     emits data-disabled for the native and synthesised cases alike. */
+  .btn[data-disabled] {
+    opacity: var(--btn-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  .btn[data-disabled]:hover {
+    opacity: var(--btn-disabled-opacity);
+  }
+
   .btn:focus-visible {
     outline: var(--space-2px) solid var(--color-text-accent);
     outline-offset: var(--space-2px);

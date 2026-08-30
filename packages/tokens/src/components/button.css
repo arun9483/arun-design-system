@@ -1,0 +1,5 @@
+/* Button component tokens — map semantic tokens onto the button's styleable surfaces.
+   Override any of these to restyle buttons without moving other components. */
+:root {
+  --btn-disabled-opacity: 0.5;
+}

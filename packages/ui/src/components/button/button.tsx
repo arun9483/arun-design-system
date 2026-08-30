@@ -1,7 +1,8 @@
 import type React from 'react';
-import { useRender } from '@arun-dev/headless';
+import { cloneElement } from 'react';
+import { retractActivationProps, useButton, useRender } from '@arun-dev/headless';
 
-type ButtonVariant = 'ghost' | 'primary';
+export type ButtonVariant = 'ghost' | 'primary';
 
 type ButtonOwnProps = {
   variant?: ButtonVariant;
@@ -23,7 +24,7 @@ type ButtonOwnProps = {
   ref?: React.Ref<HTMLElement>;
 };
 
-type ButtonProps = ButtonOwnProps &
+export type ButtonProps = ButtonOwnProps &
   Omit<React.AllHTMLAttributes<HTMLElement>, keyof ButtonOwnProps | 'children' | 'type'> & {
     type?: 'button' | 'submit' | 'reset';
   };
@@ -35,6 +36,7 @@ export function Button({
   href,
   render,
   type,
+  disabled,
   ...rest
 }: ButtonProps) {
   const variantClass = variant === 'primary' ? 'btn btn-primary' : 'btn btn-ghost';
@@ -50,9 +52,25 @@ export function Button({
         ? { type }
         : undefined;
 
+  // Only a real <button> gets disabled semantics from the platform. Anything else —
+  // an anchor, or whatever `render` supplies — needs them synthesised.
+  const isNativeButton = href === undefined && (render === undefined || render.type === 'button');
+  const elementProps = useButton({
+    disabled,
+    native: isNativeButton,
+    props: { ...ownProps, ...rest },
+  });
+
+  // A `render` element's own props merge last, so an href written directly on it
+  // outranks anything useButton returns. Retract it on the element instead.
+  const safeRender =
+    disabled && !isNativeButton && render !== undefined
+      ? cloneElement(render, retractActivationProps(render.props as Record<string, unknown>))
+      : render;
+
   return useRender({
-    render,
+    render: safeRender,
     defaultTagName: href !== undefined ? 'a' : 'button',
-    props: [{ className: variantClass }, ownProps, rest, { className, children }],
+    props: [{ className: variantClass }, elementProps, { className, children }],
   });
 }
