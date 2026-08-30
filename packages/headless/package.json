@@ -1,7 +1,7 @@
 {
   "name": "@arun-dev/headless",
   "version": "0.2.0",
-  "description": "Unstyled React behaviour primitives — the render engine and state plumbing @arun-dev/ui is built on. Ships no CSS and no class names.",
+  "description": "Unstyled React behaviour primitives — render engine, controlled/uncontrolled state, and data-* state projection. Ships no CSS and no class names.",
   "license": "MIT",
   "type": "module",
   "repository": {

@@ -1,9 +1,9 @@
 ---
 title: arun-design-system
-description: Pure-CSS design tokens with white-label brand generation, and a brand-agnostic React component library built on top of them.
+description: Three independent packages — pure-CSS design tokens with white-label brand generation, unstyled React behaviour primitives, and a brand-agnostic component library built on both.
 template: splash
 hero:
-  tagline: Pure-CSS design tokens with white-label brand generation, and a brand-agnostic React component library built on top of them.
+  tagline: Three independent packages — pure-CSS design tokens with white-label brand generation, unstyled React behaviour primitives, and a brand-agnostic component library built on both.
   actions:
     - text: Get started
       link: getting-started/installation/
@@ -28,6 +28,10 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   <Card title="Render anything">
     Every component takes a `render` prop, so a chip can be an `li`, a button can be a router link,
     and a card can be a labelled `nav`.
+  </Card>
+  <Card title="Behaviour without styling">
+    `@arun-dev/headless` ships the behaviour, keyboard handling and accessibility with no CSS and no
+    class names. State reaches your stylesheet as `data-*` attributes.
   </Card>
   <Card title="Owns its contract">
     A build-time test fails if the library reads a custom property the token package does not
