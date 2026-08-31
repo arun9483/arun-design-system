@@ -34,6 +34,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./button": {
+      "import": {
+        "types": "./dist/button/index.d.ts",
+        "default": "./dist/button/index.js"
+      },
+      "require": {
+        "types": "./dist/button/index.d.cts",
+        "default": "./dist/button/index.cjs"
+      }
+    },
     "./switch": {
       "import": {
         "types": "./dist/switch/index.d.ts",

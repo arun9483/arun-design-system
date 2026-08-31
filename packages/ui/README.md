@@ -44,6 +44,12 @@ import { Button, Card, Chip, Badge } from '@arun-dev/ui';
 | `Badge`   | `tone: 'neutral' \| 'success' \| 'warning' \| 'error' \| 'info'`                                    |
 | `Switch`  | `Switch.Root` / `Switch.Thumb` — `checked`, `defaultChecked`, `onCheckedChange`, `disabled`, `name` |
 
+Props types are exported for the components this package defines — `ButtonProps`,
+`CardProps`, `ChipProps`, `BadgeProps` — along with the `ButtonVariant`, `ChipVariant` and
+`BadgeTone` value unions. `Switch`'s types belong to
+[`@arun-dev/headless`](https://www.npmjs.com/package/@arun-dev/headless); derive them with
+`ComponentProps<typeof Switch.Root>`.
+
 Every component also accepts:
 
 - **`className`** — concatenated with the component's own classes, never replacing them.

@@ -1,19 +1,22 @@
-import type { UnknownProps } from './core/mergeProps';
+import { useEffect, useRef } from 'react';
+import type { Ref } from 'react';
+import { mergeProps, type UnknownProps } from './core/mergeProps';
 
 /**
- * Makes any element behave as a disabled-capable button.
+ * Internal. Makes any element behave as a native `<button>` does.
  *
- * A native `<button disabled>` needs no JavaScript: the platform removes it from the
- * tab order, suppresses activation, and exposes `:disabled`. Every other element —
- * an `<a href>`, a `<div>`, whatever `render` supplies — gets none of that, and a
- * `disabled` attribute on it is inert. Without this, a "disabled" link stays
- * focusable, still fires handlers, and still navigates.
+ * A `<button>` gets four things from the platform for free: it is focusable, `Enter`
+ * and `Space` activate it, `disabled` removes it from the tab order and suppresses
+ * activation, and it needs an explicit `type` so it does not default to submitting.
+ * Rendered as anything else — an `<a href>`, a `<div>`, whatever `render` supplies —
+ * none of that holds, and a `disabled` attribute on it is inert.
  *
- * Consumer props are returned sanitised rather than merged over, because neither can
- * be undone through `mergeProps`: `undefined` values are skipped, so a prop cannot be
- * retracted, and handlers are chained rather than replaced, so a consumer's `onClick`
- * would still run after an internal one called `preventDefault()`. See decision 8 in
- * docs/architecture.md.
+ * Deliberately does **not** return `role`. The element is a button; what it *means* is
+ * the component's decision — `Switch.Root` is a `<button role="switch">`, and a role
+ * imposed here would have to be overridden by every such component.
+ *
+ * Private to this package: it exists to implement these components, so it stays free to
+ * change. See decision 9 in docs/architecture.md.
  */
 
 /**
@@ -35,20 +38,101 @@ const ACTIVATION_HANDLERS: readonly string[] = [
   'onKeyPress',
 ];
 
+type Keyboardish = {
+  key: string;
+  currentTarget: unknown;
+  target: unknown;
+  defaultPrevented: boolean;
+  preventDefault(): void;
+};
+
+/** Mirrors a native button: `Enter` activates on keydown, `Space` on keyup. */
+function activationHandlers(): UnknownProps {
+  return {
+    onKeyDown(event: Keyboardish) {
+      if (event.target !== event.currentTarget || event.defaultPrevented) return;
+      // Space would scroll the page. Suppress it now and activate on keyup instead.
+      if (event.key === ' ') {
+        event.preventDefault();
+        return;
+      }
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        click(event.currentTarget);
+      }
+    },
+    onKeyUp(event: Keyboardish) {
+      if (event.target !== event.currentTarget || event.defaultPrevented) return;
+      if (event.key === ' ') click(event.currentTarget);
+    },
+  };
+}
+
+function click(element: unknown): void {
+  if (element && typeof (element as { click?: unknown }).click === 'function') {
+    (element as { click(): void }).click();
+  }
+}
+
 export interface UseButtonParams {
   disabled?: boolean;
-  /** Whether the rendered element is a native `<button>`, which the platform disables for us. */
+  /** Whether the rendered element is a native `<button>`, which supplies all of this itself. */
   native: boolean;
-  /** Props destined for the element. Returned unchanged unless `disabled`. */
+  /** Props destined for the element. Returned with the button behaviour merged in. */
   props?: UnknownProps;
 }
 
-export function useButton({ disabled = false, native, props = {} }: UseButtonParams): UnknownProps {
-  if (!disabled) return props;
+export interface UseButtonReturn {
+  props: UnknownProps;
+  /**
+   * Attach to the rendered element. Used only by the development check that `native`
+   * matches what was actually rendered; it holds no runtime behaviour.
+   */
+  ref: Ref<HTMLElement>;
+}
+
+export function useButton({
+  disabled = false,
+  native,
+  props = {},
+}: UseButtonParams): UseButtonReturn {
+  const elementRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') return;
+    const element = elementRef.current;
+    if (!element) return;
+
+    const isButtonTag = element.tagName === 'BUTTON';
+    if (native && !isButtonTag) {
+      console.error(
+        `A component expected a native <button> but rendered <${element.tagName.toLowerCase()}>. ` +
+          'Focus, keyboard activation and `disabled` will not behave natively.',
+      );
+    } else if (!native && isButtonTag) {
+      console.error(
+        'A component rendered a native <button> while treating it as a non-native ' +
+          'element, so it carries synthesised attributes it does not need.',
+      );
+    }
+  }, [native]);
+
+  return { props: buttonProps({ disabled, native, props }), ref: elementRef };
+}
+
+function buttonProps({ disabled, native, props }: Required<UseButtonParams>): UnknownProps {
+  // mergeProps rather than a spread: a consumer's onKeyDown must chain with the
+  // activation handlers, not replace them and silently remove keyboard support.
+  // Ours go first, so a consumer's run before them and can stop them.
+  if (!disabled) {
+    return native
+      ? mergeProps({ type: 'button' }, props)
+      : mergeProps({ tabIndex: 0 }, activationHandlers(), props);
+  }
 
   // The platform handles everything; `data-disabled` is added anyway so one selector
   // styles every disabled control regardless of the element underneath.
-  if (native) return { ...props, disabled: true, 'data-disabled': '' };
+  if (native) return mergeProps({ type: 'button' }, props, { disabled: true, 'data-disabled': '' });
 
   const sanitised: UnknownProps = {};
   for (const key of Object.keys(props)) {

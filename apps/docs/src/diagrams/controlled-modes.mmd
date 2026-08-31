@@ -1,0 +1,21 @@
+stateDiagram-v2
+  [*] --> Deciding: mount
+
+  Deciding --> Controlled: checked is defined
+  Deciding --> Uncontrolled: checked is undefined
+
+  state Controlled {
+    [*] --> ParentOwns
+    ParentOwns --> ParentOwns: setter is a no-op<br/>onChange still fires
+  }
+
+  state Uncontrolled {
+    [*] --> ComponentOwns
+    ComponentOwns --> ComponentOwns: setter updates internal state<br/>defaultChecked ignored after mount
+  }
+
+  note right of Deciding
+    Decided once, never re-evaluated.
+    Passing undefined at mount latches
+    uncontrolled for the component's life.
+  end note

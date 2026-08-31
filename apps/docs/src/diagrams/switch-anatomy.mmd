@@ -1,0 +1,15 @@
+sequenceDiagram
+  actor User
+  participant Root as Switch.Root
+  participant Ctx as SwitchRootContext
+  participant Thumb as Switch.Thumb
+
+  Root->>Ctx: provide { checked, disabled }
+  Ctx->>Thumb: read state
+  Note over Root,Thumb: both project the same data-* attributes
+
+  User->>Root: click
+  Root->>Root: useControlled setter
+  Root-->>User: onCheckedChange(next)
+  Root->>Ctx: new state
+  Ctx->>Thumb: re-render, data-checked flips

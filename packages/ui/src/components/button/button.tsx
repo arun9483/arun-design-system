@@ -1,6 +1,6 @@
 import type React from 'react';
-import { cloneElement } from 'react';
-import { retractActivationProps, useButton, useRender } from '@arun-dev/headless';
+import { Button as Headless } from '@arun-dev/headless/button';
+import { cn } from '../../lib/cn';
 
 export type ButtonVariant = 'ghost' | 'primary';
 
@@ -9,8 +9,11 @@ type ButtonOwnProps = {
   className?: string;
   children: React.ReactNode;
   /**
-   * Convenience for the common case: when set, a `<a href>` is rendered instead of
-   * a `<button>`. For anything else — a router link, a label, a div — use `render`.
+   * Convenience for the common case: when set, an `<a href>` is rendered instead of a
+   * `<button>`. A control that navigates should be an anchor, so that middle-click,
+   * cmd-click, the status bar and "link" in assistive technology all work.
+   *
+   * For anything else — a router link, a label — use `render`.
    */
   href?: string;
   /**
@@ -29,6 +32,10 @@ export type ButtonProps = ButtonOwnProps &
     type?: 'button' | 'submit' | 'reset';
   };
 
+/**
+ * Styling only. Focus, keyboard activation and `disabled` all come from
+ * `@arun-dev/headless`, whatever element ends up being rendered.
+ */
 export function Button({
   variant = 'ghost',
   className,
@@ -36,41 +43,33 @@ export function Button({
   href,
   render,
   type,
-  disabled,
   ...rest
 }: ButtonProps) {
   const variantClass = variant === 'primary' ? 'btn btn-primary' : 'btn btn-ghost';
 
-  // A bare <button> needs an explicit type so it does not default to submit.
-  // An anchor, or any element supplied via `render`, must not receive one.
-  const isPlainButton = render === undefined && href === undefined;
-  const ownProps = isPlainButton
-    ? { type: type ?? 'button' }
-    : href !== undefined
-      ? { href }
-      : type
-        ? { type }
-        : undefined;
+  if (process.env.NODE_ENV !== 'production' && href !== undefined && render !== undefined) {
+    console.error(
+      'Button: `href` and `render` both given. `render` wins, so the `href` is dropped — ' +
+        'put it on the element instead: render={<a href="…" />}.',
+    );
+  }
 
-  // Only a real <button> gets disabled semantics from the platform. Anything else —
-  // an anchor, or whatever `render` supplies — needs them synthesised.
-  const isNativeButton = href === undefined && (render === undefined || render.type === 'button');
-  const elementProps = useButton({
-    disabled,
-    native: isNativeButton,
-    props: { ...ownProps, ...rest },
-  });
+  // `href` is sugar for rendering a real anchor; the headless Button infers from it
+  // that the element is not a native button. The anchor's content is this component's
+  // children, merged onto it by useRender — not something the linter can see here.
+  // eslint-disable-next-line jsx-a11y/anchor-has-content
+  const anchor = <a href={href} />;
+  const element = render ?? (href !== undefined ? anchor : undefined);
 
-  // A `render` element's own props merge last, so an href written directly on it
-  // outranks anything useButton returns. Retract it on the element instead.
-  const safeRender =
-    disabled && !isNativeButton && render !== undefined
-      ? cloneElement(render, retractActivationProps(render.props as Record<string, unknown>))
-      : render;
-
-  return useRender({
-    render: safeRender,
-    defaultTagName: href !== undefined ? 'a' : 'button',
-    props: [{ className: variantClass }, elementProps, { className, children }],
-  });
+  return (
+    <Headless
+      render={element}
+      className={cn(variantClass, className)}
+      // An anchor takes no `type`; it means something else there.
+      type={href === undefined ? type : undefined}
+      {...rest}
+    >
+      {children}
+    </Headless>
+  );
 }

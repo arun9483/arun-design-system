@@ -15,10 +15,11 @@ export interface SwitchThumbProps {
  * The moving part of the switch.
  *
  * Reads state from the Root rather than taking props, so a consumer cannot get the
- * two out of step. Carries the same `data-*` attributes as the Root, which is what
- * lets CSS move it:
+ * two out of step. Carries the same `data-*` attributes as the Root, so it can be
+ * styled from either — on the thumb itself, or by descending from the Root:
  *
- *   .switch-thumb[data-checked] { transform: translateX(100%); }
+ *   .thumb[data-checked] { transform: translateX(100%); }
+ *   .switch[data-checked] .thumb { transform: translateX(100%); }
  *
  * Purely presentational — hidden from assistive technology, since the Root already
  * announces the state.

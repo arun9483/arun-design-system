@@ -1,0 +1,70 @@
+---
+title: Headless
+description: Unstyled React behaviour primitives — behaviour, keyboard handling and accessibility, with no CSS and no class names.
+---
+
+import Diagram from '@/components/Diagram.astro';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+`@arun-dev/headless` ships behaviour, keyboard handling and accessibility, and nothing else — no
+CSS, no class names, no colour. Components project their state onto the DOM as `data-*`
+attributes, so any styling approach reads them: plain CSS, CSS modules, utility classes, or a
+component library of your own.
+
+```bash
+npm install @arun-dev/headless
+```
+
+Peer dependencies: `react >= 19`, `react-dom >= 19`. Nothing else — it has no runtime
+dependencies and loads no stylesheet.
+
+## Where it sits
+
+<Diagram
+  name="packages"
+  caption="Three independent packages. The arrows are name contracts, not imports — each is checked by a test."
+/>
+
+Nothing in `@arun-dev/headless` knows that `@arun-dev/ui` exists. The only thing the two agree on
+is the spelling of the `data-*` attributes, which is why you can put your own styling layer in
+that position instead.
+
+## Two ideas do most of the work
+
+**`render`** lets you replace the element while keeping the behaviour, so a component never has to
+guess which tag or which library you need.
+
+**`data-*` attributes** carry state out to CSS, so styling reacts to `checked` or `disabled`
+without the component owning a single class name.
+
+Everything else on these pages is a consequence of those two.
+
+<CardGrid>
+  <LinkCard
+    title="The render engine"
+    href="/headless/engine/"
+    description="What happens on one render, and the five primitives it is built from."
+  />
+  <LinkCard
+    title="Prop merging"
+    href="/headless/merging/"
+    description="Precedence, handler order, and how to cancel a component's own handler."
+  />
+  <LinkCard
+    title="State"
+    href="/headless/state/"
+    description="Controlled versus uncontrolled, and how state becomes an attribute."
+  />
+  <LinkCard
+    title="Components"
+    href="/headless/components/"
+    description="Button and Switch — what each provides and when you need it."
+  />
+</CardGrid>
+
+## Already-styled components
+
+[`@arun-dev/ui`](/components/switch/) is one styling layer built on these primitives, using
+[`@arun-dev/tokens`](/guides/tokens/) for its colours. The two packages are independent — take
+whichever fits, and use both if you want the styled components in most places and raw behaviour
+where you need something custom.

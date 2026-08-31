@@ -1,0 +1,65 @@
+---
+title: The render engine
+description: What happens on a single render, and the primitives every component is built from.
+---
+
+import Diagram from '@/components/Diagram.astro';
+
+Every part of every component renders through one function, `useRender`. That is what makes the
+library consistent: one place decides how props combine, how state reaches the DOM, and what
+element comes out.
+
+## One render, start to finish
+
+<Diagram
+  name="render-pipeline"
+  caption="A part describes what it wants; useRender decides what is actually rendered."
+/>
+
+A component supplies three things — its state, the props it wants on the element, and a default
+tag. It never calls `createElement` itself, and it never places `data-*` attributes by hand.
+
+That indirection is the point. If each component merged its own props, each would be free to get
+the precedence wrong, and the twelfth component would behave subtly differently from the first.
+
+## The primitives
+
+Exported from the package root, for building your own components:
+
+```ts
+import { useRender, useControlled, mergeProps, getStateAttributes } from '@arun-dev/headless';
+```
+
+| Export               | Purpose                                                                       |
+| -------------------- | ----------------------------------------------------------------------------- |
+| `useRender`          | Resolves what a part renders — merges props, projects state, applies `render` |
+| `useControlled`      | One value, controlled or uncontrolled, decided at mount                       |
+| `mergeProps`         | Merges prop objects: handlers chain, `className` concatenates, refs merge     |
+| `getStateAttributes` | Projects a state object onto `data-*` attributes via a declared mapping       |
+| `booleanAttribute`   | The common mapping — one attribute when true, another when false              |
+| `disabledAttribute`  | The shared spelling of `data-disabled`, so every component agrees on it       |
+| `ComponentEvent`     | Type for a handler that can call `preventComponentHandler()`                  |
+
+Everything this library uses to implement its own components stays private, so it can change
+without breaking anyone. The public surface is the table above plus the components themselves.
+
+## Building a part
+
+```tsx
+import { useRender, booleanAttribute } from '@arun-dev/headless';
+
+const stateAttributes = { open: booleanAttribute('data-open', 'data-closed') };
+
+function Panel({ open, className, children, render, ...rest }) {
+  return useRender({
+    render,
+    defaultTagName: 'section',
+    state: { open },
+    stateAttributes,
+    props: [{ className, children }, rest],
+  });
+}
+```
+
+`<Panel open />` renders `<section data-open class="…">`, accepts a `render` prop, and passes
+`id`, `aria-*` and event handlers through — without that component writing any of it.

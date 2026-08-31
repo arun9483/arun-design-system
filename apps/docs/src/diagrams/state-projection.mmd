@@ -1,0 +1,5 @@
+flowchart LR
+  A["state<br/><small>{ checked: true, disabled: false }</small>"] --> B["stateAttributes<br/><small>one mapper per field</small>"]
+  B --> C["data-checked<br/>(no data-disabled)"]
+  C --> D["&lt;button data-checked&gt;"]
+  D --> E["CSS<br/><small>.switch[data-checked] { … }</small>"]

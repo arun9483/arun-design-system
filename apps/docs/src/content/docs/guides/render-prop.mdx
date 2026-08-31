@@ -23,15 +23,23 @@ were copied out by hand, and the component was abandoned at those call sites.
 
 ## How merging works
 
-| Prop            | Behaviour                                                      |
-| --------------- | -------------------------------------------------------------- |
-| event handlers  | **chained** — yours runs, then the render element's            |
-| `className`     | **concatenated** — both apply                                  |
-| `style`         | **shallow-merged**                                             |
-| `ref`           | **merged** — both the component and your ref receive the node  |
-| everything else | later wins, so you can override `aria-label`, `id`, `tabIndex` |
+| Prop            | Behaviour                                                                                 |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| event handlers  | **chained**, most specific first — the render element's, then yours, then the component's |
+| `className`     | **concatenated** — both apply                                                             |
+| `style`         | **shallow-merged**                                                                        |
+| `ref`           | **merged** — both the component and your ref receive the node                             |
+| everything else | later wins, so you can override `aria-label`, `id`, `tabIndex`                            |
 
 `undefined` values are skipped, so an absent prop never clobbers one the component set.
+
+Because handlers run before the component's own, you can stop it from acting:
+
+```tsx
+<Switch.Root onClick={(event) => event.preventComponentHandler()} />
+```
+
+`preventDefault()` is left alone — it still means only "cancel the browser's default action".
 
 ## The element owns its own attributes
 
@@ -42,7 +50,13 @@ were copied out by hand, and the component was abandoned at those call sites.
 <Button render={<a href="/docs" />}>Docs</Button>;
 
 {
-  /* wrong — Button's href shorthand renders its own anchor, so this nests badly */
+  /* also correct — the href shorthand renders the anchor for you */
+}
+<Button href="/docs">Docs</Button>;
+
+{
+  /* wrong — render wins, so the href is dropped and the link goes nowhere.
+     Button logs a development warning for this. */
 }
 <Button href="/docs" render={<a />}>
   Docs

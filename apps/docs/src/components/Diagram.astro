@@ -1,0 +1,96 @@
+---
+/**
+ * A mermaid diagram, kept in its own .mmd file so it stays editable as text rather
+ * than as coordinates. Same `?raw` glob pattern as <Example>, so there is never a
+ * second copy to drift.
+ *
+ * Rendered in the browser: mermaid needs a DOM, and the build-time alternatives all
+ * want a headless browser in CI. The import is dynamic, so pages without a diagram
+ * pay nothing.
+ */
+interface Props {
+  /** Basename of the file in src/diagrams, without extension. */
+  name: string;
+  /** Sentence under the diagram saying what to take from it. */
+  caption?: string;
+}
+
+const { name, caption } = Astro.props;
+
+const sources = import.meta.glob<string>('../diagrams/*.mmd', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+});
+
+const source = sources[`../diagrams/${name}.mmd`];
+
+if (source === undefined) {
+  throw new Error(`<Diagram name="${name}"> — src/diagrams/${name}.mmd not found`);
+}
+---
+
+<figure class="ds-diagram not-content">
+  <pre class="mermaid" data-diagram={name}>{source.trimEnd()}</pre>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<script>
+  import mermaid from 'mermaid';
+
+  /**
+   * Mermaid cannot read CSS custom properties, so the brand's resolved values are
+   * handed to it. Re-read on every render because the theme toggle changes them.
+   */
+  function themeVariables() {
+    const root = getComputedStyle(document.documentElement);
+    const token = (name: string, fallback: string) => root.getPropertyValue(name).trim() || fallback;
+
+    return {
+      background: token('--color-bg-primary', '#fff'),
+      primaryColor: token('--color-bg-surface', '#f4f4f5'),
+      primaryTextColor: token('--color-text-primary', '#18181b'),
+      primaryBorderColor: token('--color-border-default', '#d4d4d8'),
+      lineColor: token('--color-border-strong', '#a1a1aa'),
+      secondaryColor: token('--color-bg-secondary', '#fafafa'),
+      tertiaryColor: token('--color-bg-primary', '#fff'),
+      fontFamily: root.getPropertyValue('font-family') || 'inherit',
+      fontSize: '14px',
+    };
+  }
+
+  async function renderAll() {
+    const blocks = document.querySelectorAll<HTMLElement>('pre.mermaid');
+    if (blocks.length === 0) return;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'strict',
+      theme: 'base',
+      themeVariables: themeVariables(),
+      flowchart: { curve: 'basis', useMaxWidth: true },
+      sequence: { useMaxWidth: true },
+    });
+
+    for (const block of blocks) {
+      // Keep the original text: re-rendering on a theme change needs the source back.
+      block.dataset.source ??= block.textContent ?? '';
+      const id = `d-${block.dataset.diagram ?? Math.random().toString(36).slice(2)}`;
+      try {
+        const { svg } = await mermaid.render(`${id}-${Date.now()}`, block.dataset.source);
+        block.innerHTML = svg;
+        block.setAttribute('data-rendered', '');
+      } catch (error) {
+        console.error(`Diagram "${block.dataset.diagram}" failed to render`, error);
+      }
+    }
+  }
+
+  void renderAll();
+
+  // Starlight's theme toggle flips data-theme on <html>; the token values move with it.
+  new MutationObserver(() => void renderAll()).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+</script>

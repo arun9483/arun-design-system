@@ -1,0 +1,10 @@
+flowchart TB
+  A["1 · data-* state attributes"] --> B["2 · the component's own props"]
+  B --> C["3 · your props"]
+  C --> D["4 · props on the render element"]
+
+  D -.->|"plain values: last wins"| V["className concatenated<br/>style shallow-merged<br/>refs merged"]
+  D -.->|"handlers: run in reverse"| H["4 → 3 → 2 → 1<br/>stop with preventComponentHandler()"]
+
+  classDef out fill:transparent,stroke-dasharray:4 3
+  class V,H out

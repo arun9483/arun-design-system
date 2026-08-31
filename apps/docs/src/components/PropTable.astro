@@ -1,12 +1,14 @@
 ---
-import { COMMON, PROPS } from '../data/props';
+import { COMMON, PROPS, type PropDoc } from '../data/props';
 
 interface Props {
-  component: keyof typeof PROPS | string;
+  component: keyof typeof PROPS;
 }
 
 const { component } = Astro.props;
-const own = PROPS[component];
+// PROPS is `as const` so props.assert.ts can check the names; that makes the index
+// signature literal, hence the widening here.
+const own = PROPS[component] as readonly PropDoc[] | undefined;
 
 if (!own) throw new Error(`<PropTable component="${component}"> — no prop data`);
 
@@ -23,7 +25,7 @@ function format(description: string): string {
   return escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
 }
 
-const rows = [...own, ...COMMON];
+const rows: readonly PropDoc[] = [...own, ...COMMON];
 ---
 
 <div class="ds-props">
