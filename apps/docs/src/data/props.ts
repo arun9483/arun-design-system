@@ -6,8 +6,8 @@
  * the DOM attribute surface. Only the props the design system itself defines are
  * listed here; the shared ones are documented once in COMMON.
  *
- * apps/docs/src/data/props.unit.spec.ts asserts these names match the exported
- * types, so the table cannot silently drift.
+ * props.assert.ts checks these names against the exported prop types at compile time,
+ * so a renamed or removed prop fails `pnpm typecheck` rather than going stale here.
  */
 export type PropDoc = {
   name: string;
@@ -16,7 +16,7 @@ export type PropDoc = {
   description: string;
 };
 
-export const COMMON: PropDoc[] = [
+export const COMMON = [
   {
     name: 'className',
     type: 'string',
@@ -39,9 +39,9 @@ export const COMMON: PropDoc[] = [
     description:
       'Anything else is spread onto the rendered element, so id, aria-*, data-* and event handlers all reach the DOM.',
   },
-];
+] as const satisfies readonly PropDoc[];
 
-export const PROPS: Record<string, PropDoc[]> = {
+export const PROPS = {
   Button: [
     {
       name: 'variant',
@@ -60,7 +60,14 @@ export const PROPS: Record<string, PropDoc[]> = {
       type: "'button' | 'submit' | 'reset'",
       default: "'button'",
       description:
-        'Only applied to the plain button form. Defaults to `button` so it never submits a form by accident.',
+        'Defaults to `button` so it never submits a form by accident. Not applied when `href` is set — `type` means something else on an anchor.',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Prevents activation. On a native `<button>` the platform handles it; rendered as anything else the state is synthesised, and the navigation target is dropped.',
     },
   ],
   Card: [
@@ -128,4 +135,4 @@ export const PROPS: Record<string, PropDoc[]> = {
         'Generic status tone, backed by the `--color-status-*` semantic tokens. Map your own domain vocabulary onto a tone at the call site.',
     },
   ],
-};
+} as const satisfies Record<string, readonly PropDoc[]>;

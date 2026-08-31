@@ -79,3 +79,20 @@ describe('Button disabled with a render element', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 });
+
+describe('Button href and render together', () => {
+  it('warns, because the href is silently dropped', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    render(
+      // The anchor is deliberately bare: the point is that Button's href does not
+      // reach it. Content comes from children via useRender.
+      // eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid
+      <Button href="/x" render={<a />} data-testid="b">
+        x
+      </Button>,
+    );
+    expect(screen.getByTestId('b')).not.toHaveAttribute('href');
+    expect(error).toHaveBeenCalledWith(expect.stringContaining('`href` and `render` both given'));
+    error.mockRestore();
+  });
+});

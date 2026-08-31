@@ -47,6 +47,13 @@ export function Button({
 }: ButtonProps) {
   const variantClass = variant === 'primary' ? 'btn btn-primary' : 'btn btn-ghost';
 
+  if (process.env.NODE_ENV !== 'production' && href !== undefined && render !== undefined) {
+    console.error(
+      'Button: `href` and `render` both given. `render` wins, so the `href` is dropped — ' +
+        'put it on the element instead: render={<a href="…" />}.',
+    );
+  }
+
   // `href` is sugar for rendering a real anchor; the headless Button infers from it
   // that the element is not a native button. The anchor's content is this component's
   // children, merged onto it by useRender — not something the linter can see here.

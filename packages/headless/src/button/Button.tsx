@@ -52,6 +52,12 @@ export function Button({
 }: ButtonProps & Record<string, unknown>) {
   const native = nativeButton ?? (render === undefined || render.type === 'button');
 
+  // A `<div>` or `<span>` has no role of its own, so a screen reader would announce
+  // nothing. An anchor is left alone: it already carries a role, and one that suits
+  // navigation better than `button` would.
+  const isAnchor = render !== undefined && render.type === 'a';
+  const role = native || isAnchor ? undefined : 'button';
+
   const { props: elementProps, ref: buttonRef } = useButton({ disabled, native, props: rest });
 
   // A `render` element's own props merge last, so an href written directly on it
@@ -64,6 +70,6 @@ export function Button({
   return useRender({
     render: safeRender,
     defaultTagName: 'button',
-    props: [{ className, children }, elementProps, { ref: buttonRef }],
+    props: [{ role, className, children }, elementProps, { ref: buttonRef }],
   });
 }

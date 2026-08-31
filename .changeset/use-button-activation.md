@@ -17,6 +17,11 @@ produced mouse-only controls: not focusable, no `Enter` or `Space`. They now get
   navigable. `Button` already did this.
 - `useButton` warns in development when the element actually rendered disagrees with what the
   component expected, which is what let the two bugs above go unnoticed.
+- A `Button` rendered as a `<div>` or `<span>` now carries `role="button"`. It was focusable and
+  keyboard-operable but announced as nothing. An anchor keeps its own role, which suits navigation
+  better.
+- `@arun-dev/ui`'s `Button` warns when `href` and `render` are both given: `render` wins, so the
+  `href` was silently dropped and the link went nowhere.
 
 **New: `@arun-dev/headless/button`.** A headless `Button` — behaviour only, no styling. It exists
 for the moment `render` points at something that is not a `<button>`, and takes `nativeButton` for

@@ -68,6 +68,32 @@ describe('Button', () => {
     error.mockRestore();
   });
 
+  it('gives an element with no role of its own a button role', () => {
+    const error = silence();
+    render(
+      <Button render={<span />} data-testid="b">
+        go
+      </Button>,
+    );
+    expect(el()).toHaveAttribute('role', 'button');
+    error.mockRestore();
+  });
+
+  it('leaves an anchor its own role, which suits navigation better', () => {
+    render(
+      // eslint-disable-next-line jsx-a11y/anchor-has-content
+      <Button render={<a href="/docs" />} data-testid="b">
+        Docs
+      </Button>,
+    );
+    expect(el()).not.toHaveAttribute('role');
+  });
+
+  it('adds no role to a native button', () => {
+    render(<Button data-testid="b">go</Button>);
+    expect(el()).not.toHaveAttribute('role');
+  });
+
   it('accepts nativeButton for a component render cannot inspect', () => {
     const error = silence();
     function Wrapped(props: Record<string, unknown>) {
