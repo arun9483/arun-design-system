@@ -265,11 +265,15 @@ keep growing — composite widgets will need a `focusableWhenDisabled` parameter
 disabled-focus half may eventually split out the way Base UI's has. None of that should
 be a breaking change, and it is not, as long as only this library calls it.
 
-**The `unstable` subpath.** `@arun-dev/ui` is a separate package, so it cannot reach into
-`@arun-dev/headless`'s internals the way a single-package library would. Those primitives
-are therefore published at `@arun-dev/headless/unstable`, which carries no stability
-guarantee and is documented as such. The alternative — exporting them from the root —
-would freeze them by accident the first time somebody imported one.
+**A separate package cannot reach into internals.** `@arun-dev/ui` is published
+independently, so anything it imports has to be exported. The answer is not to publish
+the primitive with a disclaimer — it is to put the behaviour where it belongs. `Button`
+moved into `@arun-dev/headless` for exactly this reason, which is also what decision 7
+required all along; `@arun-dev/ui`'s Button is now a styling wrapper, and `useButton` is
+private to this package with no way in from outside.
+
+This is Base UI's structure too: a public `Button` component over an internal
+`use-button` hook.
 
 **Rules out:** exporting a primitive "because it might be useful". It becomes useful the
 day someone asks for it, and adding an export later is not a breaking change; removing

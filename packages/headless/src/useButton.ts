@@ -15,8 +15,8 @@ import { mergeProps, type UnknownProps } from './core/mergeProps';
  * the component's decision — `Switch.Root` is a `<button role="switch">`, and a role
  * imposed here would have to be overridden by every such component.
  *
- * Not exported from the package: it exists to implement this library's components, so
- * it stays free to change. See decision 9 in docs/architecture.md.
+ * Private to this package: it exists to implement these components, so it stays free to
+ * change. See decision 9 in docs/architecture.md.
  */
 
 /**

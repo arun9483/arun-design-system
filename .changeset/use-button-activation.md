@@ -18,14 +18,19 @@ produced mouse-only controls: not focusable, no `Enter` or `Space`. They now get
 - `useButton` warns in development when the element actually rendered disagrees with what the
   component expected, which is what let the two bugs above go unnoticed.
 
-**`useButton` and `retractActivationProps` have moved off the root entry point** to
-`@arun-dev/headless/unstable`, which carries no stability guarantee. They implement this
-library's own components rather than serving people building their own, and they will keep
-changing — composite widgets will need a `focusableWhenDisabled` parameter. The supported surface
-is unchanged: `useRender`, `mergeProps`, `useControlled`, and the state-attribute helpers.
+**New: `@arun-dev/headless/button`.** A headless `Button` — behaviour only, no styling. It exists
+for the moment `render` points at something that is not a `<button>`, and takes `nativeButton` for
+the case `render` cannot be inspected. It has no `href`: a control that navigates should be an
+anchor, so pass one in and keep middle-click, cmd-click and "link" in assistive technology.
 
-`@arun-dev/ui` now requires `@arun-dev/headless >= 1.0.0`: it imports the `/unstable` subpath,
-which earlier versions do not publish. Tightening a peer range is breaking for anyone on an older
+`useButton` and `retractActivationProps` are now **private** to the package. They implement these
+components rather than serving people building their own, and they will keep changing — composite
+widgets will need a `focusableWhenDisabled` parameter. The supported surface is `useRender`,
+`mergeProps`, `useControlled`, the state-attribute helpers, and the components themselves.
+
+`@arun-dev/ui`'s `Button` is now a styling wrapper over the headless one, keeping `variant` and
+the `href` convenience. It requires `@arun-dev/headless >= 1.0.0`, which is where
+`@arun-dev/headless/button` first appears. Tightening a peer range is breaking for anyone on an older
 headless, hence the major.
 
 `@arun-dev/tokens` adds the missing `./components/switch` export subpath; `chip`, `badge` and

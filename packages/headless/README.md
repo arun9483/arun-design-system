@@ -28,7 +28,19 @@ import { Switch } from '@arun-dev/headless/switch';
 
 | Component | Parts                   | Props                                                                       |
 | --------- | ----------------------- | --------------------------------------------------------------------------- |
+| `Button`  | —                       | `disabled`, `nativeButton`                                                  |
 | `Switch`  | `Switch.Root`, `.Thumb` | `checked`, `defaultChecked`, `onCheckedChange`, `disabled`, `name`, `value` |
+
+`Button` exists for the moment `render` points at something that is not a `<button>`. It then
+supplies what the platform stops giving you — focus, `Enter` and `Space` activation, and a
+`disabled` state that actually disables. It takes no `href`: a control that navigates should be an
+anchor, so pass one in and keep middle-click, cmd-click and "link" in assistive technology.
+
+```tsx
+import { Button } from '@arun-dev/headless/button';
+
+<Button render={<a href="/docs" target="_blank" rel="noreferrer" />}>Docs</Button>;
+```
 
 `Switch.Root` renders a native `<button>`, so focus, `Space`, `Enter` and disabled semantics come
 from the platform. It carries `role="switch"` and `aria-checked`, but **no accessible name** —
@@ -108,6 +120,6 @@ import {
 | `disabledAttribute`  | The shared spelling of `data-disabled`, so every component agrees on it       |
 | `ComponentEvent`     | Type for a handler that can call `preventComponentHandler()`                  |
 
-`@arun-dev/headless/unstable` also exists. It publishes the primitives `@arun-dev/ui`
-is built from, only because that is a separate package. **Nothing there is stable** —
-build against the root entry point.
+Everything this library uses to implement its own components stays private, so it can
+change without breaking anyone. The public surface is the table above plus the
+components themselves.

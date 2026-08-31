@@ -34,14 +34,14 @@
         "default": "./dist/index.cjs"
       }
     },
-    "./unstable": {
+    "./button": {
       "import": {
-        "types": "./dist/unstable.d.ts",
-        "default": "./dist/unstable.js"
+        "types": "./dist/button/index.d.ts",
+        "default": "./dist/button/index.js"
       },
       "require": {
-        "types": "./dist/unstable.d.cts",
-        "default": "./dist/unstable.cjs"
+        "types": "./dist/button/index.d.cts",
+        "default": "./dist/button/index.cjs"
       }
     },
     "./switch": {
