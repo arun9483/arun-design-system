@@ -105,6 +105,12 @@ import { useRender, useControlled, mergeProps, getStateAttributes } from '@arun-
 | `mergeProps`         | Merges prop objects: handlers chain, `className` concatenates, refs merge     |
 | `getStateAttributes` | Projects a state object onto `data-*` attributes via a declared mapping       |
 | `booleanAttribute`   | The common mapping — one attribute when true, another when false              |
+| `disabledAttribute`  | The shared spelling of `data-disabled`, so every component agrees on it       |
+| `ComponentEvent`     | Type for a handler that can call `preventComponentHandler()`                  |
+
+`@arun-dev/headless/unstable` also exists. It publishes the primitives `@arun-dev/ui`
+is built from, only because that is a separate package. **Nothing there is stable** —
+build against the root entry point.
 
 ## Already-styled components
 

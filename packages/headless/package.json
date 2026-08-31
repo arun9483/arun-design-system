@@ -34,6 +34,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./unstable": {
+      "import": {
+        "types": "./dist/unstable.d.ts",
+        "default": "./dist/unstable.js"
+      },
+      "require": {
+        "types": "./dist/unstable.d.cts",
+        "default": "./dist/unstable.cjs"
+      }
+    },
     "./switch": {
       "import": {
         "types": "./dist/switch/index.d.ts",

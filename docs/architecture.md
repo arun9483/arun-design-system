@@ -248,7 +248,36 @@ to know. Revisit if a third component needs to retract a prop.
 
 ---
 
-## 9. Deferred, with reasons
+## 9. Only export what a consumer building their own component needs
+
+Every exported name is a compatibility promise, and the surface grows by accident. A
+primitive is public only if someone building their own component against
+`@arun-dev/headless` needs it. Anything this library uses to implement itself stays out.
+
+| Public (root entry)                                                | Not public                            |
+| ------------------------------------------------------------------ | ------------------------------------- |
+| `useRender`, `mergeProps`, `useControlled`                         | `useButton`, `retractActivationProps` |
+| `getStateAttributes`, `booleanAttribute`, `disabledAttribute`      |                                       |
+| `ComponentEvent`, `UnknownProps`, and each component's props types |                                       |
+
+`useButton` is the worked example. It is 100 lines of element-kind edge cases that will
+keep growing — composite widgets will need a `focusableWhenDisabled` parameter, and the
+disabled-focus half may eventually split out the way Base UI's has. None of that should
+be a breaking change, and it is not, as long as only this library calls it.
+
+**The `unstable` subpath.** `@arun-dev/ui` is a separate package, so it cannot reach into
+`@arun-dev/headless`'s internals the way a single-package library would. Those primitives
+are therefore published at `@arun-dev/headless/unstable`, which carries no stability
+guarantee and is documented as such. The alternative — exporting them from the root —
+would freeze them by accident the first time somebody imported one.
+
+**Rules out:** exporting a primitive "because it might be useful". It becomes useful the
+day someone asks for it, and adding an export later is not a breaking change; removing
+one is.
+
+---
+
+## 10. Deferred, with reasons
 
 Shipped since this list was written:
 

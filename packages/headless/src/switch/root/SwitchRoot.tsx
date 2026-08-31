@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { cloneElement, useMemo } from 'react';
 import type { ReactElement, ReactNode, Ref } from 'react';
-import { useButton } from '../../useButton';
+import { retractActivationProps, useButton } from '../../useButton';
 import { useControlled } from '../../core/useControlled';
 import { useRender } from '../../core/useRender';
 import { SwitchRootContext, type SwitchState } from '../SwitchRootContext';
@@ -73,16 +73,26 @@ export function SwitchRoot({
   // attribute is inert, so the state has to be synthesised — and the consumer's own
   // props sanitised, since they would otherwise still activate an inert control.
   const isNativeButton = render === undefined || render.type === 'button';
-  const consumerProps = useButton({ disabled, native: isNativeButton, props: rest });
+  const { props: consumerProps, ref: buttonRef } = useButton({
+    disabled,
+    native: isNativeButton,
+    props: rest,
+  });
+
+  // A `render` element's own props merge last, so an href written directly on it
+  // outranks anything useButton returns. Retract it on the element instead.
+  const safeRender =
+    disabled && !isNativeButton && render !== undefined
+      ? cloneElement(render, retractActivationProps(render.props as Record<string, unknown>))
+      : render;
 
   const element = useRender<SwitchState>({
-    render,
+    render: safeRender,
     defaultTagName: 'button',
     state,
     stateAttributes: switchStateAttributes,
     props: [
       {
-        type: 'button',
         role: 'switch',
         'aria-checked': checked,
         className,
@@ -97,6 +107,7 @@ export function SwitchRoot({
         },
       },
       consumerProps,
+      { ref: buttonRef },
     ],
   });
 

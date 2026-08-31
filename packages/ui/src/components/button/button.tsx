@@ -1,6 +1,7 @@
 import type React from 'react';
 import { cloneElement } from 'react';
-import { retractActivationProps, useButton, useRender } from '@arun-dev/headless';
+import { useRender } from '@arun-dev/headless';
+import { retractActivationProps, useButton } from '@arun-dev/headless/unstable';
 
 export type ButtonVariant = 'ghost' | 'primary';
 
@@ -41,21 +42,11 @@ export function Button({
 }: ButtonProps) {
   const variantClass = variant === 'primary' ? 'btn btn-primary' : 'btn btn-ghost';
 
-  // A bare <button> needs an explicit type so it does not default to submit.
-  // An anchor, or any element supplied via `render`, must not receive one.
-  const isPlainButton = render === undefined && href === undefined;
-  const ownProps = isPlainButton
-    ? { type: type ?? 'button' }
-    : href !== undefined
-      ? { href }
-      : type
-        ? { type }
-        : undefined;
-
-  // Only a real <button> gets disabled semantics from the platform. Anything else —
-  // an anchor, or whatever `render` supplies — needs them synthesised.
+  // Only a real <button> gets button semantics from the platform — focus, keyboard
+  // activation, `type`, `disabled`. Anything else needs them synthesised.
   const isNativeButton = href === undefined && (render === undefined || render.type === 'button');
-  const elementProps = useButton({
+  const ownProps = href !== undefined ? { href } : type !== undefined ? { type } : undefined;
+  const { props: elementProps, ref: buttonRef } = useButton({
     disabled,
     native: isNativeButton,
     props: { ...ownProps, ...rest },
@@ -71,6 +62,6 @@ export function Button({
   return useRender({
     render: safeRender,
     defaultTagName: href !== undefined ? 'a' : 'button',
-    props: [{ className: variantClass }, elementProps, { className, children }],
+    props: [{ className: variantClass }, elementProps, { className, children, ref: buttonRef }],
   });
 }
