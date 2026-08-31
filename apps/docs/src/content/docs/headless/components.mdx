@@ -20,8 +20,12 @@ import { Button } from '@arun-dev/headless/button';
 
 |          | native `<button>`           | anything else                                                        |
 | -------- | --------------------------- | -------------------------------------------------------------------- |
-| enabled  | `type="button"`             | `tabIndex`, `Enter` and `Space` activation                           |
+| enabled  | `type="button"`             | `tabIndex`, `Enter` and `Space` activation, `role="button"`          |
 | disabled | `disabled`, `data-disabled` | `aria-disabled`, out of the tab order, no activation, target dropped |
+
+`role="button"` is added only where the element has none of its own. An anchor keeps
+its role — for a link that is the more accurate one, and it is what makes
+`render={<a href />}` still announce as a link.
 
 It takes no `href`. A control that navigates should be an anchor, so that middle-click,
 cmd-click, "open in new tab" and "link" in assistive technology all work — pass one in:

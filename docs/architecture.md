@@ -169,15 +169,21 @@ exposes `:disabled`. An `<a href>` gets none of that, and a `disabled` attribute
 is inert — the link stays focusable, still fires handlers and still navigates.
 
 So the _prop_ is not what belongs in `@arun-dev/headless`; the "make a non-button
-element behave as disabled" logic is. It ships as `useButton`, a hook rather than a
-component, because Button's value in `@arun-dev/ui` is its variants and its `href`
-convenience — neither is behaviour. A `Button.Root` in headless would have inverted
-that, leaving the interesting half in the wrapper.
+element behave like one" logic is — the disabled state, focus, keyboard activation and
+the conditional `type`.
 
-**Rules out:** a pass-through wrapper for every headless component. When a component is
-mostly styling with a little behaviour, the behaviour is extracted as a primitive and
-the component stays in `@arun-dev/ui`. Switch went the other way — nearly all of it is
-behaviour — and earns its 7-line wrapper.
+That started as a hook, `useButton`, on the reasoning that Button's value in
+`@arun-dev/ui` is its variants and its `href` convenience, neither of which is
+behaviour. It did not hold. The logic grew past a hundred lines, and a separate package
+cannot reach into another's internals, so `@arun-dev/ui` had to import it — which is
+precisely the violation this decision forbids. `Button` now lives in
+`@arun-dev/headless`, `@arun-dev/ui`'s is a styling wrapper, and `useButton` is private.
+
+Base UI settled the same way: a public `Button` over an internal `use-button`.
+
+**Rules out:** behaviour in `@arun-dev/ui`. Every component there is class names and
+element choice; if it needs JavaScript to be correct, the JavaScript belongs one layer
+down. The wrapper that costs is worth the invariant it buys.
 
 **Consequence:** `useButton` returns consumer props _sanitised_ rather than merged over,
 and `retractActivationProps` exists for `render` elements, because neither case can be
@@ -285,21 +291,24 @@ one is.
 
 Shipped since this list was written:
 
-| Was deferred                     | Landed in                                                                        |
-| -------------------------------- | -------------------------------------------------------------------------------- |
-| `@arun-dev/headless` package     | `0.1.0` — the render engine and state plumbing                                   |
-| `data-*` state attributes        | `0.2.0`, with Switch — the first component with state                            |
-| `useRender` moved out of `ui`    | `0.1.0` — now `@arun-dev/headless` `core/`, exported                             |
-| Shared `data-disabled` spelling  | `disabledAttribute` in `core/stateAttributes.ts`, used by Switch and `useButton` |
-| `mergeProps` handler suppression | a handler preventing the default stops the chain — decision 8                    |
+| Was deferred                    | Landed in                                                                         |
+| ------------------------------- | --------------------------------------------------------------------------------- |
+| `@arun-dev/headless` package    | `0.1.0` — the render engine and state plumbing                                    |
+| `data-*` state attributes       | `0.2.0`, with Switch — the first component with state                             |
+| `useRender` moved out of `ui`   | `0.1.0` — now `@arun-dev/headless` `core/`, exported                              |
+| Shared `data-disabled` spelling | `disabledAttribute` in `core/stateAttributes.ts`, used by Switch and `useButton`  |
+| `mergeProps` handler order      | consumer first, cancellable with `preventComponentHandler()` — decision 8         |
+| Button's non-native behaviour   | `@arun-dev/headless/button` — focus, keyboard, role, disabled — decisions 7 and 9 |
 
 Still deferred:
 
-| Deferred                                | Revisit when                                             |
-| --------------------------------------- | -------------------------------------------------------- |
-| Runtime layout vars + `--hl-*` prefix   | the first anchored/positioned component (Popover)        |
-| Vitest browser mode                     | focus trapping or scroll locking needs testing           |
-| Positioning engine, Floating UI         | Popover; the engine is a port so it can be swapped later |
-| Prop retraction sentinel in `useRender` | a third component needs to remove a consumer's prop      |
+| Deferred                                 | Revisit when                                             |
+| ---------------------------------------- | -------------------------------------------------------- |
+| Runtime layout vars + `--hl-*` prefix    | the first anchored/positioned component (Popover)        |
+| Vitest browser mode                      | focus trapping or scroll locking needs testing           |
+| Positioning engine, Floating UI          | Popover; the engine is a port so it can be swapped later |
+| Prop retraction sentinel in `useRender`  | a third component needs to remove a consumer's prop      |
+| Memoisation inside `useRender`           | profiling shows the per-render merge costs something     |
+| `focusableWhenDisabled`, roving tabindex | the first composite widget — Toolbar, Menu, Tabs         |
 
 Popover triggers the first three at once, so its decisions belong here before its code exists.
