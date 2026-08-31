@@ -77,6 +77,8 @@ describe('Chip', () => {
       </Chip>,
     );
     screen.getByText('Tag').click();
-    expect(calls).toEqual(['own', 'render']);
+    // Right to left, most specific first: a `render` element's own props are the
+    // highest-precedence object, so its handler runs before the prop-level one.
+    expect(calls).toEqual(['render', 'own']);
   });
 });

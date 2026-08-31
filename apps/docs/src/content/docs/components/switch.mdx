@@ -70,9 +70,12 @@ import { Switch } from '@arun-dev/ui';
 
 ## Behaviour
 
-- Renders a native `<button>`, so focus, `Space`, `Enter` and disabled semantics come from the
-  platform rather than from JavaScript. Carries `role="switch"` and `aria-checked` per the
+- Renders a native `<button>`, so focus, `Space` and `Enter` come from the platform rather than
+  from JavaScript. Carries `role="switch"` and `aria-checked` per the
   [WAI-ARIA switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/).
+- `disabled` uses the platform's own behaviour on a `<button>`. Rendered as anything else the
+  attribute would be inert, so the state is synthesised instead — `aria-disabled`, removal from
+  the tab order, and neither the toggle nor your own handlers firing.
 - `type="button"`, so it never submits an enclosing form by accident.
 - Both parts emit `data-checked` / `data-unchecked` / `data-disabled`. Styling reads those
   rather than knowing how the component decides its state:
