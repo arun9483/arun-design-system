@@ -1,7 +1,7 @@
 ---
-'@arun-dev/headless': minor
+'@arun-dev/headless': major
 '@arun-dev/tokens': minor
-'@arun-dev/ui': minor
+'@arun-dev/ui': major
 ---
 
 **Controls rendered as something other than a `<button>` are now operable.** `useButton` only
@@ -23,6 +23,10 @@ produced mouse-only controls: not focusable, no `Enter` or `Space`. They now get
 library's own components rather than serving people building their own, and they will keep
 changing — composite widgets will need a `focusableWhenDisabled` parameter. The supported surface
 is unchanged: `useRender`, `mergeProps`, `useControlled`, and the state-attribute helpers.
+
+`@arun-dev/ui` now requires `@arun-dev/headless >= 1.0.0`: it imports the `/unstable` subpath,
+which earlier versions do not publish. Tightening a peer range is breaking for anyone on an older
+headless, hence the major.
 
 `@arun-dev/tokens` adds the missing `./components/switch` export subpath; `chip`, `badge` and
 `button` were already exported.
