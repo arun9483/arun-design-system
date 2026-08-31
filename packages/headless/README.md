@@ -72,9 +72,17 @@ Every part takes a `render` prop to change the element, and spreads unrecognised
 <Switch.Root render={<Tooltip.Trigger />} />
 ```
 
-`className` is concatenated, event handlers are chained rather than replaced, `style` is merged,
-and refs are merged — so a `ref` on the `render` element and a `ref` on the component both receive
-the node.
+`className` is concatenated, `style` is merged, and refs are merged — so a `ref` on the `render`
+element and a `ref` on the component both receive the node.
+
+Event handlers are chained rather than replaced, and **your handler runs before the component's**,
+so you can stop it:
+
+```tsx
+<Switch.Root onClick={(event) => event.preventComponentHandler()} />
+```
+
+`preventDefault()` is left alone — it still means only "cancel the browser's default action".
 
 ## Engine
 

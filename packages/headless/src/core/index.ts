@@ -1,4 +1,4 @@
-export { mergeProps, type UnknownProps } from './mergeProps';
+export { mergeProps, type UnknownProps, type ComponentEvent } from './mergeProps';
 export { useRender, type UseRenderParams } from './useRender';
 export { useControlled } from './useControlled';
 export {

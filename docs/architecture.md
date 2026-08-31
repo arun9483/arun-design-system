@@ -190,25 +190,61 @@ expressed through `mergeProps` today. See decision 8.
 Two properties of `mergeProps` are load-bearing for ordinary composition and get in the
 way of "switch this element off":
 
-| Behaviour                                  | Why it exists                                       | What it costs                                                                                                           |
-| ------------------------------------------ | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `undefined` values are skipped             | an absent prop must not clobber a present one       | nothing can **retract** a prop — `href: undefined` is a no-op                                                           |
-| event handlers are chained, never replaced | a consumer's `onClick` runs alongside internal ones | a handler cannot be **suppressed**; `preventDefault()` in an internal handler does not stop the consumer's from running |
+| Behaviour                                  | Why it exists                                       | What it costs                                                 |
+| ------------------------------------------ | --------------------------------------------------- | ------------------------------------------------------------- |
+| `undefined` values are skipped             | an absent prop must not clobber a present one       | nothing can **retract** a prop — `href: undefined` is a no-op |
+| event handlers are chained, never replaced | a consumer's `onClick` runs alongside internal ones | a handler could not be **suppressed** — resolved below        |
 
-Measured, not assumed: a prototype `useButton` returning `href: undefined` and an
-`onClick` calling `preventDefault()` produced an anchor that still carried `href` and
-still ran the consumer's handler.
+Measured, not assumed: a prototype returning `href: undefined` and an `onClick` calling
+`preventDefault()` produced an anchor that still carried `href` and still ran the
+consumer's handler.
 
-**Current answer:** the affected component sanitises props before they reach
-`mergeProps` — which is what `useButton` and `retractActivationProps` do. No change to
-the engine.
+### Handlers run right to left, and the consumer can stop the component's
 
-**Deferred:** giving `mergeProps` a `defaultPrevented` short-circuit, so a chained
-handler stops when an earlier one prevented default. It would solve suppression for
-every component at once, but it changes merge semantics for Switch, Chip, Card and
-Badge to serve one case. Revisit at the second component that needs to disable a
-non-native element — Checkbox, MenuItem or Tab, whichever lands first. A sentinel for
-retracting props in `useRender` is the same decision and should be taken with it.
+Plain values merge left to right — later objects win, so a consumer's props override a
+component's. **Event handlers run the other way**: the last object's handler first, the
+first object's last. A component passes its own props first and the consumer's last, so
+the consumer's handler runs first and can stop the component's:
+
+```tsx
+<Switch.Root onClick={(event) => event.preventComponentHandler()} />
+```
+
+**Why this direction.** The escape hatch belongs to the consumer. A component already
+decides which props reach the element and can simply decline to attach a handler — it
+never needs the chain to suppress anything. The consumer has no other lever, and without
+this cannot adapt a component's behaviour without forking it.
+
+This is the convention in both comparable libraries. Radix's `composeEventHandlers` calls
+the consumer's handler first and skips its own if the default was prevented. Base UI's
+`mergeProps` documents handlers as running "right-to-left (rightmost handler executes
+first)", cancellable by `preventBaseUIHandler()`.
+
+**Why a dedicated signal rather than `preventDefault()`.** `preventDefault()` already
+means "cancel the browser's default action", which is a different statement — a link
+inside a component may want one without the other. Radix overloads it; Base UI
+introduced a separate method, and that is the better call. Ours is
+`event.preventComponentHandler()`.
+
+The signal is only attached to real events, detected by `'nativeEvent' in event`. An
+`on*` prop called with something else — `onCheckedChange(boolean)` — always runs every
+handler, since there is nothing to attach it to.
+
+**Consequence for disabled controls.** A component cannot use the chain to suppress a
+consumer's handler on an inert element. It removes the handler instead, before merging,
+which is what `useButton` does — deterministic, rather than depending on a runtime
+convention the consumer could ignore.
+
+### Retraction: still not possible
+
+`href: undefined` remains a no-op through `mergeProps`. Components that must remove a
+prop do it before merging — `useButton` returns consumer props sanitised, and
+`retractActivationProps` rewrites a `render` element with `cloneElement`, which _can_
+overwrite with `undefined`.
+
+**Deferred:** a sentinel value meaning "delete this key" in `useRender`. It would fold
+both helpers into the engine, at the cost of a new concept every component author has
+to know. Revisit if a third component needs to retract a prop.
 
 ---
 
@@ -216,20 +252,21 @@ retracting props in `useRender` is the same decision and should be taken with it
 
 Shipped since this list was written:
 
-| Was deferred                    | Landed in                                                                        |
-| ------------------------------- | -------------------------------------------------------------------------------- |
-| `@arun-dev/headless` package    | `0.1.0` — the render engine and state plumbing                                   |
-| `data-*` state attributes       | `0.2.0`, with Switch — the first component with state                            |
-| `useRender` moved out of `ui`   | `0.1.0` — now `@arun-dev/headless` `core/`, exported                             |
-| Shared `data-disabled` spelling | `disabledAttribute` in `core/stateAttributes.ts`, used by Switch and `useButton` |
+| Was deferred                     | Landed in                                                                        |
+| -------------------------------- | -------------------------------------------------------------------------------- |
+| `@arun-dev/headless` package     | `0.1.0` — the render engine and state plumbing                                   |
+| `data-*` state attributes        | `0.2.0`, with Switch — the first component with state                            |
+| `useRender` moved out of `ui`    | `0.1.0` — now `@arun-dev/headless` `core/`, exported                             |
+| Shared `data-disabled` spelling  | `disabledAttribute` in `core/stateAttributes.ts`, used by Switch and `useButton` |
+| `mergeProps` handler suppression | a handler preventing the default stops the chain — decision 8                    |
 
 Still deferred:
 
-| Deferred                              | Revisit when                                             |
-| ------------------------------------- | -------------------------------------------------------- |
-| Runtime layout vars + `--hl-*` prefix | the first anchored/positioned component (Popover)        |
-| Vitest browser mode                   | focus trapping or scroll locking needs testing           |
-| Positioning engine, Floating UI       | Popover; the engine is a port so it can be swapped later |
-| `mergeProps` handler suppression      | the second component disabling a non-native element      |
+| Deferred                                | Revisit when                                             |
+| --------------------------------------- | -------------------------------------------------------- |
+| Runtime layout vars + `--hl-*` prefix   | the first anchored/positioned component (Popover)        |
+| Vitest browser mode                     | focus trapping or scroll locking needs testing           |
+| Positioning engine, Floating UI         | Popover; the engine is a port so it can be swapped later |
+| Prop retraction sentinel in `useRender` | a third component needs to remove a consumer's prop      |
 
 Popover triggers the first three at once, so its decisions belong here before its code exists.

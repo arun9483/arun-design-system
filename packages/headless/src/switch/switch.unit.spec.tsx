@@ -177,3 +177,59 @@ describe('Switch — composition', () => {
     error.mockRestore();
   });
 });
+
+describe('disabled', () => {
+  it('relies on the platform when rendered as a button', () => {
+    const onCheckedChange = vi.fn();
+    render(
+      <Switch.Root disabled onCheckedChange={onCheckedChange} aria-label="s" data-testid="s" />,
+    );
+    const el = screen.getByTestId('s');
+
+    expect(el).toBeDisabled();
+    expect(el).toHaveAttribute('data-disabled');
+    fireEvent.click(el);
+    expect(onCheckedChange).not.toHaveBeenCalled();
+  });
+
+  it('synthesises the state when rendered as something the platform will not disable', () => {
+    const onCheckedChange = vi.fn();
+    const onClick = vi.fn();
+    render(
+      <Switch.Root
+        render={<div />}
+        disabled
+        onCheckedChange={onCheckedChange}
+        onClick={onClick}
+        aria-label="s"
+        data-testid="s"
+      />,
+    );
+    const el = screen.getByTestId('s');
+
+    expect(el).toHaveAttribute('aria-disabled', 'true');
+    expect(el).toHaveAttribute('tabindex', '-1');
+    fireEvent.click(el);
+    expect(el).toHaveAttribute('aria-checked', 'false');
+    expect(onCheckedChange).not.toHaveBeenCalled();
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('still toggles, and still calls the consumer, when enabled', () => {
+    const onCheckedChange = vi.fn();
+    const onClick = vi.fn();
+    render(
+      <Switch.Root
+        render={<div />}
+        onCheckedChange={onCheckedChange}
+        onClick={onClick}
+        aria-label="s"
+        data-testid="s"
+      />,
+    );
+    fireEvent.click(screen.getByTestId('s'));
+
+    expect(onCheckedChange).toHaveBeenCalledWith(true);
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+});

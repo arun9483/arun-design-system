@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { ReactElement, ReactNode, Ref } from 'react';
+import { useButton } from '../../useButton';
 import { useControlled } from '../../core/useControlled';
 import { useRender } from '../../core/useRender';
 import { SwitchRootContext, type SwitchState } from '../SwitchRootContext';
@@ -68,6 +69,12 @@ export function SwitchRoot({
 
   const state: SwitchState = useMemo(() => ({ checked, disabled }), [checked, disabled]);
 
+  // Only a real <button> is disabled by the platform. Rendered as anything else the
+  // attribute is inert, so the state has to be synthesised — and the consumer's own
+  // props sanitised, since they would otherwise still activate an inert control.
+  const isNativeButton = render === undefined || render.type === 'button';
+  const consumerProps = useButton({ disabled, native: isNativeButton, props: rest });
+
   const element = useRender<SwitchState>({
     render,
     defaultTagName: 'button',
@@ -78,16 +85,18 @@ export function SwitchRoot({
         type: 'button',
         role: 'switch',
         'aria-checked': checked,
-        disabled,
         className,
         children,
         onClick() {
+          // A consumer's handlers are stripped by useButton when disabled; this guards
+          // the component's own, which useButton does not see.
+          if (disabled) return;
           const next = !checked;
           setChecked(next);
           onCheckedChange?.(next);
         },
       },
-      rest,
+      consumerProps,
     ],
   });
 
