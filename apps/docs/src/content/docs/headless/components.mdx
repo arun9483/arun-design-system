@@ -1,0 +1,74 @@
+---
+title: Components
+description: Button and Switch — what each provides, and when you need them.
+---
+
+import Diagram from '@/components/Diagram.astro';
+
+## Button
+
+A native `<button>` already gets focus, `Enter` and `Space` activation, and a working `disabled`
+from the platform. `Button` earns its place the moment `render` points somewhere else, because
+none of that holds any more — and a `disabled` attribute on a `<div>` or an `<a>` does nothing at
+all.
+
+```tsx
+import { Button } from '@arun-dev/headless/button';
+
+<Button onClick={save}>Save</Button>;
+```
+
+|          | native `<button>`           | anything else                                                        |
+| -------- | --------------------------- | -------------------------------------------------------------------- |
+| enabled  | `type="button"`             | `tabIndex`, `Enter` and `Space` activation                           |
+| disabled | `disabled`, `data-disabled` | `aria-disabled`, out of the tab order, no activation, target dropped |
+
+It takes no `href`. A control that navigates should be an anchor, so that middle-click,
+cmd-click, "open in new tab" and "link" in assistive technology all work — pass one in:
+
+```tsx
+<Button render={<a href="/docs" target="_blank" rel="noreferrer" />}>Docs</Button>
+```
+
+`nativeButton` overrides the inference for a `render` that cannot be inspected, such as
+`render={<MyButton />}`. A mismatch between what you declared and what actually rendered logs a
+development warning.
+
+## Switch
+
+An immediate on/off control, made of two parts.
+
+```tsx
+import { Switch } from '@arun-dev/headless/switch';
+
+<Switch.Root className="my-switch" onCheckedChange={save} aria-label="Notifications">
+  <Switch.Thumb className="my-switch-thumb" />
+</Switch.Root>;
+```
+
+`Switch.Root` renders a native `<button>` carrying `role="switch"` and `aria-checked`. It has no
+accessible name of its own — wrap it in a `<label>` or pass `aria-label`. A headless component
+should not guess at your copy.
+
+<Diagram
+  name="switch-anatomy"
+  caption="The thumb reads state through context rather than props, so the two parts cannot get out of step."
+/>
+
+`Switch.Thumb` takes no state props at all. That is what makes
+`<Switch checked thumbChecked={false} />` impossible to write. Both parts emit the same
+`data-checked` / `data-unchecked` / `data-disabled`, so you can style either one.
+
+### Why two parts
+
+The thumb could be a pseudo-element — but then it could not take a `ref`, could not accept a
+`render` prop, and could not hold children. That last one matters: a thumb often contains an icon
+or a loading spinner.
+
+The cost is that nothing enforces that a thumb exists. `<Switch.Root />` on its own renders a
+valid, empty track.
+
+### Form submission
+
+Give `Switch.Root` a `name` and it submits with the enclosing form, mirroring a native checkbox —
+an unchecked switch contributes nothing.

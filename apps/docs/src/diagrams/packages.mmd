@@ -1,0 +1,18 @@
+flowchart TB
+  subgraph behaviour["@arun-dev/headless"]
+    direction TB
+    B1["Button · Switch"]
+    B2["useRender · mergeProps · useControlled"]
+  end
+
+  subgraph tokens["@arun-dev/tokens"]
+    T1["CSS custom properties"]
+  end
+
+  ui["@arun-dev/ui<br/>class names + component CSS"]
+
+  behaviour -- "data-* attribute names" --> ui
+  tokens -- "custom property names" --> ui
+
+  classDef pkg fill:transparent,stroke-dasharray:4 3
+  class behaviour,tokens pkg

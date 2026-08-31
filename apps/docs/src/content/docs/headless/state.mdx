@@ -1,0 +1,64 @@
+---
+title: State
+description: Controlled and uncontrolled values, and how component state becomes a CSS hook.
+---
+
+import Diagram from '@/components/Diagram.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+## Controlled and uncontrolled
+
+Pass `checked` with `onCheckedChange` and the parent owns the value — the switch will not move on
+its own. Pass `defaultChecked` and the component owns it. `onCheckedChange` fires in both modes,
+so the same handler works either way.
+
+<Diagram
+  name="controlled-modes"
+  caption="The mode is chosen at mount from whether the controlled prop is defined, and never revisited."
+/>
+
+<Aside type="caution" title="Never pass an undefined checked">
+A `checked` of `undefined` on the first render makes the component **uncontrolled for the rest of
+its life** — it starts tracking its own state and ignores every value passed afterwards. When the
+value loads asynchronously, coalesce at the call site:
+
+```tsx
+<Switch.Root checked={enabled ?? false} onCheckedChange={setEnabled} />
+```
+
+</Aside>
+
+Deciding once is deliberate. Re-deriving the mode each render would let a parent that briefly
+passes `undefined` flip the component to uncontrolled and hand it state that has been frozen since
+mount — a bug that is very hard to see. Mixing the modes, or changing the default after mount,
+logs a development-only warning instead.
+
+## State reaches CSS through `data-*`
+
+A headless component owns no class names, so the attribute name is the entire contract between
+behaviour and styling.
+
+<Diagram
+  name="state-projection"
+  caption="Each state field runs through a declared mapper, so the attributes stay consistent across components."
+/>
+
+```css
+.my-switch[data-checked] {
+  background: rebeccapurple;
+}
+.my-switch[data-checked] .my-switch-thumb {
+  transform: translateX(100%);
+}
+```
+
+Attributes are matched on **presence**, not value — `data-checked` is always empty. Encoding state
+as a value would be a trap, because `[data-checked]` matches `data-checked="false"` too.
+
+### Why the negative form exists
+
+`checked` emits `data-checked` **or** `data-unchecked`, rather than one attribute and its absence.
+
+`:not([data-checked])` means "everything that is not checked", so it silently absorbs any third
+state added later — a checkbox's `indeterminate` would be styled as unchecked, with no error.
+Matching the state you mean keeps future states additive.

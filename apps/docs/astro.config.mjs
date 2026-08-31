@@ -24,7 +24,16 @@ export default defineConfig({
             { label: 'Theming and brands', slug: 'getting-started/theming' },
           ],
         },
-        { label: 'Headless', slug: 'headless' },
+        {
+          label: 'Headless',
+          items: [
+            { label: 'Overview', slug: 'headless' },
+            { label: 'The render engine', slug: 'headless/engine' },
+            { label: 'Prop merging', slug: 'headless/merging' },
+            { label: 'State', slug: 'headless/state' },
+            { label: 'Components', slug: 'headless/components' },
+          ],
+        },
         {
           label: 'Components',
           items: [

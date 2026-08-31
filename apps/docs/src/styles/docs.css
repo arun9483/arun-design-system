@@ -109,3 +109,39 @@
 .ds-props td:last-child {
   min-width: 16rem;
 }
+
+/* Diagrams — mermaid renders client-side into these, so reserve the space and keep
+   wide diagrams scrollable rather than letting them widen the page. */
+.ds-diagram {
+  margin-block: var(--space-lg);
+}
+
+.ds-diagram .mermaid {
+  margin: 0;
+  padding: var(--space-md);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  background-color: var(--color-bg-primary);
+  overflow-x: auto;
+  /* Before render this holds the mermaid source; hide it rather than flash markup. */
+  color: transparent;
+  min-height: 3rem;
+}
+
+.ds-diagram .mermaid[data-rendered] {
+  color: inherit;
+}
+
+.ds-diagram .mermaid svg {
+  display: block;
+  margin-inline: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.ds-diagram figcaption {
+  margin-block-start: var(--space-2xs);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  text-align: center;
+}

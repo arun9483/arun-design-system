@@ -1,0 +1,9 @@
+flowchart LR
+  A["Component<br/><small>state, own props, consumer props</small>"] --> B["useRender"]
+  B --> C["getStateAttributes<br/><small>state → data-*</small>"]
+  C --> D["mergeProps<br/><small>combine, in precedence order</small>"]
+  D --> E{"render prop<br/>supplied?"}
+  E -- no --> F["createElement<br/><small>default tag</small>"]
+  E -- yes --> G["cloneElement<br/><small>merge onto your element</small>"]
+  F --> H["DOM"]
+  G --> H

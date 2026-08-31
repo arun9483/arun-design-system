@@ -1,0 +1,61 @@
+---
+title: Prop merging
+description: How a component's props, yours, and a render element's props combine into one element.
+---
+
+import Diagram from '@/components/Diagram.astro';
+
+Three parties want to put props on the same element: the component, you, and any element you pass
+to `render`. Naive spreading lets whichever runs last silently destroy the others, so each kind of
+prop is combined rather than replaced.
+
+## Precedence
+
+<Diagram
+  name="merge-precedence"
+  caption="Values resolve top to bottom, last one winning. Handlers run in the opposite direction."
+/>
+
+State attributes sit at the bottom deliberately, so you can override a `data-*` attribute when you
+have a reason to.
+
+| Prop            | How it combines                                              |
+| --------------- | ------------------------------------------------------------ |
+| `className`     | concatenated, never replaced                                 |
+| `style`         | shallow-merged, per property                                 |
+| `ref`           | merged — every ref receives the node, and every cleanup runs |
+| event handlers  | chained, in reverse precedence order                         |
+| everything else | last one wins                                                |
+
+`undefined` is skipped, so an absent prop never clobbers a value someone else set.
+
+## Handlers run in reverse
+
+Values resolve so that yours beat the component's. Handlers do the opposite: **yours runs first**,
+and can stop the component's from running at all.
+
+```tsx
+<Switch.Root onClick={(event) => event.preventComponentHandler()} />
+```
+
+The escape hatch belongs to you. A component already decides which props reach the element, so it
+never needs the chain to suppress anything — it simply declines to attach a handler. Without this
+you could not adapt a component's behaviour without forking it.
+
+`preventDefault()` is deliberately left alone. It already means "cancel the browser's default
+action", which is a different statement — a link inside a component may want one without the
+other.
+
+Only real events carry the signal. An `on*` prop called with something else — `onCheckedChange`
+receives a boolean — always runs every handler, since there is nothing to attach it to.
+
+## Refs
+
+A ref on the component and a ref on the `render` element both receive the node:
+
+```tsx
+<Switch.Root ref={mine} render={<Tooltip.Trigger ref={theirs} />} />
+```
+
+Both are called on attach, and both are cleaned up on detach — whether they use React 19's
+cleanup return or the older `null` call.
