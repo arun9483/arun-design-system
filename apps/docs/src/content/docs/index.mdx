@@ -33,8 +33,8 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     `@arun-dev/headless` ships the behaviour, keyboard handling and accessibility with no CSS and no
     class names. State reaches your stylesheet as `data-*` attributes.
   </Card>
-  <Card title="Owns its contract">
-    A build-time test fails if the library reads a custom property the token package does not
-    define. No silently-unstyled components.
+  <Card title="Owns its contracts">
+    The packages meet by name, not by import — token names, and `data-*` attribute names. A
+    misspelling in either would fail silently, so a test guards each one.
   </Card>
 </CardGrid>

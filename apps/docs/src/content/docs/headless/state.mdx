@@ -55,6 +55,18 @@ behaviour and styling.
 Attributes are matched on **presence**, not value — `data-checked` is always empty. Encoding state
 as a value would be a trap, because `[data-checked]` matches `data-checked="false"` too.
 
+### The name is the whole contract
+
+Nothing links the attribute a component emits to the selector that reads it. They meet for the
+first time in the rendered DOM, which means a rename breaks styling without breaking anything a
+test would normally notice — the component still emits an attribute, the CSS is still valid, and
+the control simply stops looking checked.
+
+`@arun-dev/ui` guards its side with a test that diffs every `[data-*]` selector in its CSS against
+every attribute `@arun-dev/headless` emits. A selector that can never match fails it. If you write
+your own styling layer, the same check is worth having; it has already caught two regressions
+here, one of them a rename that every other test passed.
+
 ### Why the negative form exists
 
 `checked` emits `data-checked` **or** `data-unchecked`, rather than one attribute and its absence.

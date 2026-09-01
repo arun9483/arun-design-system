@@ -42,8 +42,12 @@ Each has light, dark and system variants defined in one place.
 
 `@arun-dev/ui` must not read a custom property `@arun-dev/tokens` does not define. That failure
 is silent — the `var()` resolves as invalid, a fallback or the initial value quietly takes
-over, and nothing warns. A build-time test diffs every `var(--…)` in the shipped CSS against
-every property the token package defines, and fails if the diff is non-empty.
+over, and nothing warns. Nothing else catches it either: TypeScript never sees CSS, and a
+class-name assertion still passes, because the element has the class and merely looks wrong.
+
+So a test diffs every `var(--…)` in the shipped CSS against every property the token package
+defines, and fails if the diff is non-empty. It runs with the unit tests, not as part of the
+build — it guards this library's own source, not your app's.
 
 The one escape hatch is an explicit fallback, `var(--x, <fallback>)`, which declares the
 property optional and names what happens without it.
