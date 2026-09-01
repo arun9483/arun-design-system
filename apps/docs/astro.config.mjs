@@ -1,10 +1,14 @@
 import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
+import { rehypeBaseUrl } from './plugins/rehype-base-url.mjs';
 
 export default defineConfig({
   site: 'https://arun9483.github.io',
   base: process.env.DOCS_BASE ?? '/',
+  // Links written by hand in content are not base-aware on their own. The MDX
+  // integration extends this markdown config, so one plugin covers .md and .mdx alike.
+  markdown: { rehypePlugins: [[rehypeBaseUrl, { base: process.env.DOCS_BASE ?? '/' }]] },
   integrations: [
     starlight({
       title: 'arun-design-system',
