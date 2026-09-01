@@ -88,7 +88,11 @@ export function SwitchPlayground() {
       controls={SWITCH_CONTROLS}
       children="<Switch.Thumb />"
       render={(props: ComponentProps<typeof Switch.Root>) => (
-        <Switch.Root {...props}>
+        // `defaultChecked` is read once, at mount — changing it later is deliberately
+        // ignored. Keying on it remounts the switch so the control demonstrates what the
+        // prop does, rather than appearing inert. The key is a playground device and is
+        // not part of the printed snippet.
+        <Switch.Root key={String(props.defaultChecked)} {...props}>
           <Switch.Thumb />
         </Switch.Root>
       )}

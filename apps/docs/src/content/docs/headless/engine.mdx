@@ -5,9 +5,9 @@ description: What happens on a single render, and the primitives every component
 
 import Diagram from '@/components/Diagram.astro';
 
-Every part of every component renders through one function, `useRender`. That is what makes the
-library consistent: one place decides how props combine, how state reaches the DOM, and what
-element comes out.
+Every [part](/headless/#components-are-made-of-parts) — each `Switch.Root`, each `Switch.Thumb` —
+renders through one function, `useRender`. That is what makes the library consistent: one place
+decides how props combine, how state reaches the DOM, and what element comes out.
 
 ## One render, start to finish
 
