@@ -19,6 +19,10 @@ prop is combined rather than replaced.
 State attributes sit at the bottom deliberately, so you can override a `data-*` attribute when you
 have a reason to.
 
+The order is not a convention components follow — `useRender` takes the component's props and
+yours in separate arguments and merges them itself, so there is no arrangement a component author
+could get wrong.
+
 | Prop            | How it combines                                              |
 | --------------- | ------------------------------------------------------------ |
 | `className`     | concatenated, never replaced                                 |

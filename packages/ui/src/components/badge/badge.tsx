@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useRender } from '@arun-dev/headless';
+import { cn } from '../../lib/cn';
 
 /** Generic status tones. Map your own domain vocabulary onto these at the call site. */
 export type BadgeTone = 'neutral' | 'success' | 'warning' | 'error' | 'info';
@@ -35,6 +36,7 @@ export function Badge({ tone = 'neutral', className, children, render, ...rest }
   return useRender({
     render,
     defaultTagName: 'span',
-    props: [{ className: classes }, rest, { className, children }],
+    props: { className: cn(classes, className), children },
+    consumerProps: rest,
   });
 }

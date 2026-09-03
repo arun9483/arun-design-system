@@ -70,6 +70,7 @@ export function Button({
   return useRender({
     render: safeRender,
     defaultTagName: 'button',
-    props: [{ role, className, children }, elementProps, { ref: buttonRef }],
+    props: { role, className, children, ref: buttonRef },
+    consumerProps: elementProps,
   });
 }

@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
 import type { ReactElement, ReactNode, Ref } from 'react';
+import type React from 'react';
 import { useRender } from './useRender';
 import { booleanAttribute } from './stateAttributes';
 
@@ -30,7 +31,8 @@ function Fixture({
     defaultTagName: 'span',
     state: { checked, disabled },
     stateAttributes,
-    props: [{ className: 'fixture' }, rest, { children }],
+    props: { className: 'fixture', children },
+    consumerProps: rest,
   });
 }
 
@@ -117,5 +119,81 @@ describe('useRender', () => {
     expect(objectRef.current).toBeNull();
     // A legacy callback ref returns nothing, so it must still be called with null.
     expect(seen.at(-1)).toBeNull();
+  });
+});
+
+describe('precedence is fixed by useRender, not the caller', () => {
+  /**
+   * The four tiers a component cannot reorder: state attributes, the component's own
+   * props, the consumer's, and the render element's. Handlers run the other way, so a
+   * consumer's runs before the component's and can stop it.
+   */
+  function Part({
+    componentOnClick,
+    consumer,
+    render: renderProp,
+  }: {
+    componentOnClick: () => void;
+    consumer?: Record<string, unknown>;
+    render?: React.ReactElement;
+  }) {
+    return useRender({
+      render: renderProp,
+      defaultTagName: 'button',
+      props: { className: 'component', onClick: componentOnClick },
+      consumerProps: consumer,
+    });
+  }
+
+  it("runs the consumer's handler before the component's", () => {
+    const order: string[] = [];
+    render(
+      <Part
+        componentOnClick={() => order.push('component')}
+        consumer={{ onClick: () => order.push('consumer'), 'data-testid': 'el' }}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('el'));
+    expect(order).toEqual(['consumer', 'component']);
+  });
+
+  it("lets the consumer stop the component's handler", () => {
+    const component = vi.fn();
+    render(
+      <Part
+        componentOnClick={component}
+        consumer={{
+          onClick: (event: { preventComponentHandler(): void }) => event.preventComponentHandler(),
+          'data-testid': 'el',
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('el'));
+    expect(component).not.toHaveBeenCalled();
+  });
+
+  it("runs the render element's handler before the consumer's", () => {
+    const order: string[] = [];
+    render(
+      <Part
+        componentOnClick={() => order.push('component')}
+        consumer={{ onClick: () => order.push('consumer'), 'data-testid': 'el' }}
+        render={<button type="button" onClick={() => order.push('render')} />}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('el'));
+    expect(order).toEqual(['render', 'consumer', 'component']);
+  });
+
+  it("lets a consumer's value override the component's", () => {
+    render(
+      <Part
+        componentOnClick={() => {}}
+        consumer={{ className: 'mine', 'data-testid': 'el', id: 'from-consumer' }}
+      />,
+    );
+    // className concatenates rather than replacing; other values take the consumer's.
+    expect(screen.getByTestId('el')).toHaveClass('component', 'mine');
+    expect(screen.getByTestId('el')).toHaveAttribute('id', 'from-consumer');
   });
 });

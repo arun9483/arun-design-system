@@ -1,7 +1,7 @@
 flowchart TB
-  A["1 · data-* state attributes"] --> B["2 · the component's own props"]
-  B --> C["3 · your props"]
-  C --> D["4 · props on the render element"]
+  A["1 · data-* state attributes<br/><small>useRender</small>"] --> B["2 · the component's own props<br/><small>props</small>"]
+  B --> C["3 · your props<br/><small>consumerProps</small>"]
+  C --> D["4 · props on the render element<br/><small>cloneElement</small>"]
 
   D -.->|"plain values: last wins"| V["className concatenated<br/>style shallow-merged<br/>refs merged"]
   D -.->|"handlers: run in reverse"| H["4 → 3 → 2 → 1<br/>stop with preventComponentHandler()"]

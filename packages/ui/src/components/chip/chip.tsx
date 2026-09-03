@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useRender } from '@arun-dev/headless';
+import { cn } from '../../lib/cn';
 
 export type ChipVariant = 'default' | 'accent';
 
@@ -28,6 +29,7 @@ export function Chip({ variant = 'default', className, children, render, ...rest
   return useRender({
     render,
     defaultTagName: 'span',
-    props: [{ className: variantClass }, rest, { className, children }],
+    props: { className: cn(variantClass, className), children },
+    consumerProps: rest,
   });
 }

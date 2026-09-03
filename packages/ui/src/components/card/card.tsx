@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useRender } from '@arun-dev/headless';
+import { cn } from '../../lib/cn';
 
 type CardOwnProps = {
   /** Tag to render. Prefer `render` when you need a component rather than a tag name. */
@@ -27,6 +28,7 @@ export function Card({ as = 'div', lift, className, children, render, ...rest }:
   return useRender({
     render,
     defaultTagName: as,
-    props: [{ className: cls }, rest, { className, children }],
+    props: { className: cn(cls, className), children },
+    consumerProps: rest,
   });
 }
