@@ -56,10 +56,15 @@ function Panel({ open, className, children, render, ...rest }) {
     defaultTagName: 'section',
     state: { open },
     stateAttributes,
-    props: [{ className, children }, rest],
+    props: { className, children }, // yours
+    consumerProps: rest, // the caller's
   });
 }
 ```
 
 `<Panel open />` renders `<section data-open class="…">`, accepts a `render` prop, and passes
 `id`, `aria-*` and event handlers through — without that component writing any of it.
+
+Note the two separate slots. `useRender` merges them in a fixed order, so a component cannot
+place a caller's props before its own even by accident — the precedence on the next page is a
+property of this signature rather than a rule to remember.

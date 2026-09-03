@@ -233,3 +233,26 @@ describe('disabled', () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 });
+
+describe('nativeButton', () => {
+  it('accepts an override for a render that cannot be inspected', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    function Wrapped(props: Record<string, unknown>) {
+      return <button {...props} />;
+    }
+    render(<Switch.Root render={<Wrapped />} nativeButton aria-label="s" data-testid="s" />);
+
+    // Treated as native, so no synthesised attributes and no warning.
+    expect(screen.getByTestId('s')).not.toHaveAttribute('tabindex');
+    expect(screen.getByTestId('s')).toHaveAttribute('type', 'button');
+    expect(error).not.toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it('still infers from an element literal', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    render(<Switch.Root render={<div />} aria-label="s" data-testid="s" />);
+    expect(screen.getByTestId('s')).toHaveAttribute('tabindex', '0');
+    error.mockRestore();
+  });
+});

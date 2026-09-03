@@ -78,6 +78,31 @@ function isComponentHandlerPrevented(event: unknown): boolean {
   );
 }
 
+type Handler = (...args: unknown[]) => void;
+
+/**
+ * Chains two handlers into one.
+ *
+ * `value` comes from a later prop object than `earlier`, and runs **first** — later
+ * objects hold higher-precedence props, and the higher-precedence handler gets the
+ * chance to stop the ones beneath it.
+ *
+ * Chaining is repeated as the merge folds, so `earlier` is usually itself a chain:
+ * three handlers give `chain(chain(a, b), c)`, which runs c, b, a. Because the signal
+ * lives on the event rather than in a closure, stopping at any level skips every level
+ * below it, not merely the next handler.
+ */
+function chainHandlers(earlier: Handler, value: Handler): Handler {
+  return (...args) => {
+    const event = args[0];
+    if (isSyntheticEvent(event)) makeEventPreventable(event as object);
+
+    value(...args);
+    if (isComponentHandlerPrevented(event)) return;
+    earlier(...args);
+  };
+}
+
 /**
  * Merge prop objects left to right. Later objects win for plain values, but:
  * - event handlers are chained rather than replaced
@@ -113,15 +138,7 @@ export function mergeProps(...objects: (UnknownProps | undefined)[]): UnknownPro
         const earlier = merged[key];
         merged[key] =
           typeof earlier === 'function'
-            ? (...args: unknown[]) => {
-                const event = args[0];
-                if (isSyntheticEvent(event)) makeEventPreventable(event as object);
-
-                // Later object first: the consumer is passed last, so theirs runs first.
-                (value as (...a: unknown[]) => void)(...args);
-                if (isComponentHandlerPrevented(event)) return;
-                (earlier as (...a: unknown[]) => void)(...args);
-              }
+            ? chainHandlers(earlier as Handler, value as Handler)
             : value;
       } else if (key === 'className') {
         merged.className = merged.className

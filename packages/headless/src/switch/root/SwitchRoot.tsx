@@ -17,6 +17,15 @@ export interface SwitchRootProps {
   checked?: boolean;
   /** Initial state when uncontrolled. Read once, at mount. */
   defaultChecked?: boolean;
+  /**
+   * Whether the rendered element is a native `<button>`.
+   *
+   * Inferred from `render`, which is right for an element literal. Set it explicitly
+   * when rendering a *component* — `render={<Tooltip.Trigger />}` cannot be inspected,
+   * so it is treated as non-native and picks up attributes it does not need. A mismatch
+   * logs a development warning.
+   */
+  nativeButton?: boolean;
   onCheckedChange?: (checked: boolean) => void;
   disabled?: boolean;
   /**
@@ -51,6 +60,7 @@ export interface SwitchRootProps {
 export function SwitchRoot({
   checked: checkedProp,
   defaultChecked,
+  nativeButton,
   onCheckedChange,
   disabled = false,
   name,
@@ -72,7 +82,7 @@ export function SwitchRoot({
   // Only a real <button> is disabled by the platform. Rendered as anything else the
   // attribute is inert, so the state has to be synthesised — and the consumer's own
   // props sanitised, since they would otherwise still activate an inert control.
-  const isNativeButton = render === undefined || render.type === 'button';
+  const isNativeButton = nativeButton ?? (render === undefined || render.type === 'button');
   const { props: consumerProps, ref: buttonRef } = useButton({
     disabled,
     native: isNativeButton,
@@ -91,24 +101,22 @@ export function SwitchRoot({
     defaultTagName: 'button',
     state,
     stateAttributes: switchStateAttributes,
-    props: [
-      {
-        role: 'switch',
-        'aria-checked': checked,
-        className,
-        children,
-        onClick() {
-          // A consumer's handlers are stripped by useButton when disabled; this guards
-          // the component's own, which useButton does not see.
-          if (disabled) return;
-          const next = !checked;
-          setChecked(next);
-          onCheckedChange?.(next);
-        },
+    props: {
+      role: 'switch',
+      'aria-checked': checked,
+      className,
+      children,
+      ref: buttonRef,
+      onClick() {
+        // A consumer's handlers are stripped by useButton when disabled; this guards
+        // the component's own, which useButton does not see.
+        if (disabled) return;
+        const next = !checked;
+        setChecked(next);
+        onCheckedChange?.(next);
       },
-      consumerProps,
-      { ref: buttonRef },
-    ],
+    },
+    consumerProps,
   });
 
   return (

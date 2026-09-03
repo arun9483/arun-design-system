@@ -209,8 +209,8 @@ consumer's handler.
 
 Plain values merge left to right — later objects win, so a consumer's props override a
 component's. **Event handlers run the other way**: the last object's handler first, the
-first object's last. A component passes its own props first and the consumer's last, so
-the consumer's handler runs first and can stop the component's:
+first object's last. The consumer's props are merged last, so their handler runs first
+and can stop the component's:
 
 ```tsx
 <Switch.Root onClick={(event) => event.preventComponentHandler()} />
@@ -235,6 +235,19 @@ introduced a separate method, and that is the better call. Ours is
 The signal is only attached to real events, detected by `'nativeEvent' in event`. An
 `on*` prop called with something else — `onCheckedChange(boolean)` — always runs every
 handler, since there is nothing to attach it to.
+
+**The order is structural, not a convention.** `useRender` takes the component's props
+and the consumer's in _separate named arguments_ and merges them itself:
+
+```ts
+mergeProps(attributes, props, consumerProps); // then mergeProps(merged, render.props)
+```
+
+An earlier design passed one array and left the arrangement to each component. That made
+the whole guarantee depend on every author writing the array in the right order, with
+nothing to catch an inversion — `preventComponentHandler()` would have silently stopped
+working for that component while every test still passed. There is now no position for a
+component to place a consumer's props in, so the four tiers cannot be reordered.
 
 **Consequence for disabled controls.** A component cannot use the chain to suppress a
 consumer's handler on an inert element. It removes the handler instead, before merging,

@@ -37,6 +37,7 @@ export function SwitchThumb({
     defaultTagName: 'span',
     state,
     stateAttributes: switchStateAttributes,
-    props: [{ 'aria-hidden': true, className, children }, rest],
+    props: { 'aria-hidden': true, className, children },
+    consumerProps: rest,
   });
 }

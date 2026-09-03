@@ -20,8 +20,16 @@ export interface UseRenderParams<State extends Record<string, unknown>> {
   render?: ReactElement | undefined;
   /** Tag rendered when `render` is not supplied. */
   defaultTagName: string;
-  /** Prop objects to merge, in precedence order (later wins). */
-  props: (UnknownProps | undefined)[];
+  /** The component's own props. */
+  props?: UnknownProps;
+  /**
+   * The consumer's props, spread from `...rest`.
+   *
+   * A separate slot rather than a position in a list: precedence is then a property of
+   * this signature rather than a rule each component has to remember. A component
+   * cannot put a consumer's props before its own, because there is nowhere to put them.
+   */
+  consumerProps?: UnknownProps;
   /** The part's state, projected onto the DOM through `stateAttributes`. */
   state?: State;
   /** How each state field becomes `data-*` attributes. */
@@ -32,12 +40,16 @@ export function useRender<State extends Record<string, unknown> = Record<string,
   render,
   defaultTagName,
   props,
+  consumerProps,
   state,
   stateAttributes,
 }: UseRenderParams<State>): ReactElement {
-  // State attributes come first so a consumer can still override them deliberately.
+  // The four tiers, in order, decided here rather than by the caller:
+  //   1. state attributes  2. the component's  3. the consumer's  4. the render element's
+  // State attributes come first so a consumer can still override them deliberately;
+  // the render element's props come last, in the cloneElement pass below.
   const attributes = state ? getStateAttributes(state, stateAttributes) : {};
-  const merged = mergeProps(attributes, ...props);
+  const merged = mergeProps(attributes, props, consumerProps);
 
   if (isValidElement(render)) {
     return cloneElement(render, mergeProps(merged, render.props as UnknownProps));
