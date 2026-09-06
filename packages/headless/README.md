@@ -89,6 +89,15 @@ Every part takes a `render` prop to change the element, and spreads unrecognised
 `className` is concatenated, `style` is merged, and refs are merged — so a `ref` on the `render`
 element and a `ref` on the component both receive the node.
 
+Everything else, `children` included, follows the plain rule: the `render` element's own props
+come last and win. An element that declares no children inherits yours, one that declares some
+keeps them.
+
+```tsx
+<Button render={<a href="/docs" />}>Docs</Button>            // renders "Docs"
+<Button render={<a href="/docs">Read the docs</a>}>Docs</Button> // renders "Read the docs"
+```
+
 Event handlers are chained rather than replaced, and **your handler runs before the component's**,
 so you can stop it:
 

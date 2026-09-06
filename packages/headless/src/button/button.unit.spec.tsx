@@ -86,6 +86,28 @@ describe('Button', () => {
     error.mockRestore();
   });
 
+  it('gives the render element its children when it declares none', () => {
+    render(
+      // eslint-disable-next-line jsx-a11y/anchor-has-content
+      <Button render={<a href="/docs" />} data-testid="b">
+        Docs
+      </Button>,
+    );
+    expect(el()).toHaveTextContent('Docs');
+  });
+
+  it("lets the render element's own children win", () => {
+    render(
+      <Button render={<a href="/docs">Read the docs</a>} data-testid="b">
+        Docs
+      </Button>,
+    );
+    // `children` is a plain value and the render element is the last tier, so its own
+    // content is the last word — the same rule that lets a bare element inherit yours.
+    expect(el()).toHaveTextContent('Read the docs');
+    expect(el()).not.toHaveTextContent('Docs');
+  });
+
   it('spreads unrecognised props onto the element', () => {
     render(
       <Button id="go" aria-describedby="hint" data-testid="b">

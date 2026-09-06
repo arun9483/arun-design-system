@@ -15,7 +15,12 @@ import { mergeProps, type UnknownProps } from './mergeProps';
  * call sites stable when that lands.
  */
 export interface UseRenderParams {
-  /** Element to render instead of the default. Props, className and ref are merged onto it. */
+  /**
+   * Element to render instead of the default. Props, className and ref are merged onto it.
+   *
+   * Its own props are the last word, `children` included: an element with no children of
+   * its own takes the component's, and one with children keeps them.
+   */
   render?: ReactElement | undefined;
   /** Tag rendered when `render` is not supplied. */
   defaultTagName: string;

@@ -120,6 +120,11 @@ function chainHandlers(earlier: Handler, value: Handler): Handler {
  * `undefined` values are skipped, so an absent key on a later object never
  * clobbers a value set by an earlier one.
  *
+ * `children` is deliberately not special-cased: it is a plain value, so the last
+ * object to declare it wins. That is what lets a `render` element either inherit the
+ * component's children (it declares none, so the key is absent and skipped) or supply
+ * its own (it declares them, and they win like any other value).
+ *
  * **Event handlers run right to left** — the last object's handler first, the first
  * object's last. Since a component passes its own props first and the consumer's last,
  * the consumer's handler runs before the component's and can stop it:

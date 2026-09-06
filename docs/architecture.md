@@ -209,6 +209,13 @@ Measured, not assumed: a prototype returning `href: undefined` and an `onClick` 
 `preventDefault()` produced an anchor that still carried `href` and still ran the
 consumer's handler.
 
+**`children` is deliberately not a third case.** It merges as a plain value, so the last
+object to declare it wins — which makes both idioms fall out of one rule rather than a
+special case: `<Button render={<a href="/docs" />}>Docs</Button>` inherits the
+component's children because the element declares none and the key is skipped, and
+`<Button render={<a href="/docs">Read the docs</a>}>` keeps its own because a declared
+value wins. Special-casing it either way would break one of the two.
+
 ### Handlers run right to left, and the consumer can stop the component's
 
 Plain values merge left to right — later objects win, so a consumer's props override a
@@ -244,14 +251,14 @@ handler, since there is nothing to attach it to.
 and the consumer's in _separate named arguments_ and merges them itself:
 
 ```ts
-mergeProps(attributes, props, consumerProps); // then mergeProps(merged, render.props)
+mergeProps(props, consumerProps); // then mergeProps(merged, render.props)
 ```
 
 An earlier design passed one array and left the arrangement to each component. That made
 the whole guarantee depend on every author writing the array in the right order, with
 nothing to catch an inversion — `preventComponentHandler()` would have silently stopped
 working for that component while every test still passed. There is now no position for a
-component to place a consumer's props in, so the four tiers cannot be reordered.
+component to place a consumer's props in, so the three tiers cannot be reordered.
 
 ### Retraction: still not possible, and no longer needed
 

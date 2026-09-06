@@ -80,6 +80,27 @@ describe('useRender', () => {
     expect(el).toHaveClass('fixture');
   });
 
+  it("takes the render element's children when it has its own", () => {
+    render(
+      <ul>
+        <Fixture render={<li data-testid="el">from the element</li>}>from the component</Fixture>
+      </ul>,
+    );
+    // `children` is a plain value, so the last object to declare it wins — and the
+    // render element's props are the last tier.
+    expect(screen.getByTestId('el')).toHaveTextContent('from the element');
+  });
+
+  it("keeps the component's children when the render element declares none", () => {
+    render(
+      <ul>
+        <Fixture render={<li data-testid="el" />}>from the component</Fixture>
+      </ul>,
+    );
+    // An absent key is `undefined`, which mergeProps skips, so nothing is clobbered.
+    expect(screen.getByTestId('el')).toHaveTextContent('from the component');
+  });
+
   it('spreads unrecognised props onto the element', () => {
     render(
       <Fixture id="x" aria-label="labelled" data-testid="fixture">
@@ -120,9 +141,9 @@ describe('useRender', () => {
 
 describe('precedence is fixed by useRender, not the caller', () => {
   /**
-   * The four tiers a component cannot reorder: state attributes, the component's own
-   * props, the consumer's, and the render element's. Handlers run the other way, so a
-   * consumer's runs before the component's and can stop it.
+   * The three tiers a component cannot reorder: its own props (its `data-*` state
+   * among them), the consumer's, and the render element's. Handlers run the other way,
+   * so a consumer's runs before the component's and can stop it.
    */
   function Part({
     componentOnClick,
