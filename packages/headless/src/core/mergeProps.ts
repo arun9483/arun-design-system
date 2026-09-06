@@ -1,10 +1,13 @@
-/**
+/*
  * Prop merging for headless components.
  *
- * A component and its consumer both want to put things on the same element. Naive
- * spreading lets whichever runs last silently destroy the other's behaviour, so each
- * kind of prop is combined rather than replaced.
+ * A component and its consumer both put props on the same element, and both sets have to
+ * survive. This file owns that: `mergeProps` folds any number of prop objects into one,
+ * and `ComponentEvent` gives a consumer's handler a way to stop the component's own.
+ * The merge rules, and the precedence they follow, are documented on `mergeProps` below.
  */
+
+/** The shape prop objects are handled as here: unknown keys, unknown values. */
 export type UnknownProps = Record<string, unknown>;
 
 type Ref = ((node: unknown) => unknown) | { current: unknown } | null | undefined;
@@ -63,11 +66,31 @@ function isSyntheticEvent(event: unknown): boolean {
   return typeof event === 'object' && event !== null && 'nativeEvent' in event;
 }
 
+type NativeEventLike = { stopImmediatePropagation?: () => void };
+
 function makeEventPreventable(event: object): void {
+  // A nested chain re-enters this for the same event — `chain(chain(a, b), c)` calls it
+  // once per level — so the work is done once and later levels see it already in place.
+  if (Object.prototype.hasOwnProperty.call(event, 'preventComponentHandler')) return;
+
   const target = event as ComponentEvent<object>;
-  target.preventComponentHandler = () => {
+  const prevent = () => {
     (target as { componentHandlerPrevented: boolean }).componentHandlerPrevented = true;
   };
+  target.preventComponentHandler = prevent;
+
+  // `stopImmediatePropagation()` means "no further listeners on this element", and the
+  // chain is exactly that: several handlers folded into one listener. A consumer reaching
+  // for the standard call gets the native behaviour *and* the component's handler stopped,
+  // rather than the call quietly doing nothing to the chain.
+  const native = (event as { nativeEvent?: NativeEventLike }).nativeEvent;
+  const stopImmediate = native?.stopImmediatePropagation?.bind(native);
+  if (native && stopImmediate) {
+    native.stopImmediatePropagation = () => {
+      stopImmediate();
+      prevent();
+    };
+  }
 }
 
 function isComponentHandlerPrevented(event: unknown): boolean {

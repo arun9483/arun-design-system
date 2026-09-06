@@ -2,17 +2,9 @@
   "extends": "@arun-dev/config/typescript/base",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
     "jsx": "react-jsx",
     "incremental": false
   },
-  "include": ["src"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.unit.spec.ts",
-    "**/*.unit.spec.tsx",
-    "vitest.config.ts",
-    "vitest.unit.config.ts"
-  ]
+  "include": ["src", "tests"],
+  "exclude": ["node_modules", "dist"]
 }

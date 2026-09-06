@@ -236,6 +236,17 @@ The signal is only attached to real events, detected by `'nativeEvent' in event`
 `on*` prop called with something else — `onCheckedChange(boolean)` — always runs every
 handler, since there is nothing to attach it to.
 
+**`stopImmediatePropagation()` stops the chain too.** The standard call means "no further
+listeners on this element", and a merged chain is exactly that: several handlers folded
+into one listener. `makeEventPreventable` wraps the native method so it keeps its own
+behaviour and raises the same flag, rather than appearing to work and doing nothing.
+`preventComponentHandler()` stays the documented path; this is for consumers who reach
+for the standard API first.
+
+`stopPropagation()` is deliberately **not** bridged — it means "do not reach ancestors",
+and the component's handler is on the same element. Honouring it there would break the
+common case of stopping a parent while keeping the component's own behaviour.
+
 **The order is structural, not a convention.** `useRender` takes the component's props
 and the consumer's in _separate named arguments_ and merges them itself:
 

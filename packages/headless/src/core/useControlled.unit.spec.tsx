@@ -41,7 +41,9 @@ describe('useControlled', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const { rerender } = render(<Toggle checked={true} />);
     rerender(<Toggle />);
-    expect(error).toHaveBeenCalledWith(expect.stringContaining('controlled and uncontrolled'));
+    expect(error).toHaveBeenCalledWith(
+      expect.stringContaining('cannot switch between controlled and uncontrolled'),
+    );
     error.mockRestore();
   });
 
@@ -49,7 +51,7 @@ describe('useControlled', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const { rerender } = render(<Toggle defaultChecked={false} />);
     rerender(<Toggle defaultChecked={true} />);
-    expect(error).toHaveBeenCalledWith(expect.stringContaining('default'));
+    expect(error).toHaveBeenCalledWith(expect.stringContaining('cannot change the default'));
     error.mockRestore();
   });
 });

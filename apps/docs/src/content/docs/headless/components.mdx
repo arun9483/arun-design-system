@@ -51,8 +51,8 @@ import { Switch } from '@arun-dev/headless/switch';
 ```
 
 `Switch.Root` renders a native `<button>` carrying `role="switch"` and `aria-checked`. It has no
-accessible name of its own — wrap it in a `<label>` or pass `aria-label`. A headless component
-should not guess at your copy.
+accessible name of its own — pair it with a `<label htmlFor>` by `id`, or pass `aria-label`. A
+headless component should not guess at your copy.
 
 <Diagram
   name="switch-anatomy"

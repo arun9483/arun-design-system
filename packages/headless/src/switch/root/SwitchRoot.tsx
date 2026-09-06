@@ -35,6 +35,16 @@ export interface SwitchRootProps {
   name?: string;
   /** Value submitted when checked. Defaults to `"on"`, as a native checkbox does. */
   value?: string;
+  /**
+   * Names the switch when paired with a `<label htmlFor>`.
+   *
+   * Declared rather than left to the prop spread because it is how a switch gets an
+   * accessible name: `Switch.Root` renders a `<button>`, which a wrapping `<label>`
+   * would name implicitly, but `jsx-a11y/label-has-associated-control` rejects a
+   * `<button>` as a nested control. The explicit association keeps the rule quiet
+   * without a disable at the call site.
+   */
+  id?: string;
   className?: string;
   children?: ReactNode;
   /**
@@ -53,8 +63,8 @@ export interface SwitchRootProps {
  * activation, and the disabled semantics for free. Per the WAI-ARIA switch pattern
  * it carries `role="switch"` and `aria-checked`.
  *
- * It has no accessible name of its own — wrap it in a `<label>`, or pass `aria-label`
- * or `aria-labelledby`. That is the consumer's decision, not something a headless
+ * It has no accessible name of its own — pair it with a `<label htmlFor>` by `id`, or
+ * pass `aria-label` or `aria-labelledby`. That is the consumer's decision, not a headless
  * component should guess.
  */
 export function SwitchRoot({

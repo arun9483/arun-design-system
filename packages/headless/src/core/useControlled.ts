@@ -30,12 +30,18 @@ export function useControlled<T>({
   const value = isControlled ? (controlled as T) : uncontrolled;
 
   if (process.env.NODE_ENV !== 'production') {
+    // mode captured at mount is compared against the mode this render's `controlled` implies,
+    // so this is true only when the parent switched sides, e.g. mounted with `checked={x}` and
+    // now passing undefined, or mounted without it and now passing a value.
     if (isControlled !== (controlled !== undefined)) {
       console.error(
         `${name}: cannot switch between controlled and uncontrolled \`${state}\`. ` +
           `Decide which one this component is for the whole of its life.`,
       );
     }
+    // in uncontrolled mode the default captured at mount is compared against this render's
+    // `default`, so this is true only when the parent changed it after mount, e.g.
+    // defaultChecked={false} then defaultChecked={true} — useState already ignored the new one.
     if (!isControlled && defaultRef.current !== defaultValue) {
       console.error(
         `${name}: cannot change the default \`${state}\` after mount. ` +
