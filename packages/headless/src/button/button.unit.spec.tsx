@@ -108,6 +108,18 @@ describe('Button', () => {
     expect(el()).not.toHaveTextContent('Docs');
   });
 
+  it('takes the render element as the whole content when Button has no children', () => {
+    render(<Button render={<a href="/docs">Read the docs</a>} data-testid="b" />);
+    // Nothing to merge from the component: `children: undefined` is skipped, so the
+    // element's own content is all there is. Enabled, so it stays a real link.
+    expect(el().tagName).toBe('A');
+    expect(el()).toHaveTextContent('Read the docs');
+    expect(el()).toHaveAttribute('href', '/docs');
+    expect(el()).not.toHaveAttribute('data-disabled');
+    expect(el()).not.toHaveAttribute('aria-disabled');
+    expect(screen.getByRole('link', { name: 'Read the docs' })).toBe(el());
+  });
+
   it('spreads unrecognised props onto the element', () => {
     render(
       <Button id="go" aria-describedby="hint" data-testid="b">
