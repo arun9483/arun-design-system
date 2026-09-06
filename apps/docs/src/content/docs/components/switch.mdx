@@ -17,8 +17,26 @@ A switch takes effect immediately. Use a checkbox instead when the change applie
 </Example>
 
 <Aside title="It needs a name">
-`Switch.Root` has no accessible name of its own. Wrap it in a `<label>`, or pass `aria-label`
-or `aria-labelledby`. A headless component should not guess at your copy.
+`Switch.Root` has no accessible name of its own — a headless component should not guess at your
+copy. Associate a `<label>` with it by `id`:
+
+```tsx
+<label htmlFor="notifications">
+  <Switch.Root id="notifications">
+    <Switch.Thumb />
+  </Switch.Root>
+  Notifications
+</label>
+```
+
+`Switch.Root` renders a `<button>`, so wrapping it in a `<label>` would name it implicitly and
+the `htmlFor` looks redundant. Keep it. `jsx-a11y/label-has-associated-control` only accepts
+`input`, `meter`, `output`, `progress`, `select` and `textarea` as a nested control, so it
+rejects a `<button>` that HTML labels perfectly well. The explicit association satisfies the
+rule, and you avoid disabling it at every call site.
+
+Where there is no visible copy, pass `aria-label` or `aria-labelledby` instead.
+
 </Aside>
 
 ## Playground

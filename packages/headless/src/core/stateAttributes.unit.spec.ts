@@ -27,7 +27,7 @@ describe('getStateAttributes', () => {
     // With only data-checked, :not([data-checked]) would match unchecked AND
     // indeterminate — the reason both sides are emitted.
     const mapping = {
-      checked: (v: boolean | 'indeterminate') =>
+      checked: (v: boolean | 'indeterminate'): Record<string, string> =>
         v === 'indeterminate'
           ? { 'data-indeterminate': '' }
           : v

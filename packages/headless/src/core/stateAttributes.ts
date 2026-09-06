@@ -25,6 +25,17 @@ export type StateAttributeMapping<State> = {
   [Key in keyof State]?: (value: State[Key]) => Record<string, string> | null;
 };
 
+/**
+ * Turns a state object into the `data-*` attributes a mapping declares for it.
+ *
+ * Walks the state's own keys, so a field the mapping does not cover contributes
+ * nothing, and a mapping entry that returns `null` is skipped. Entries may each
+ * emit several attributes; later keys win if two entries name the same attribute.
+ *
+ * @param state - The component's current state.
+ * @param mapping - Which fields become attributes. `undefined` yields `{}`.
+ * @returns The attributes to spread onto the element.
+ */
 export function getStateAttributes<State extends Record<string, unknown>>(
   state: State,
   mapping: StateAttributeMapping<State> | undefined,
@@ -34,10 +45,18 @@ export function getStateAttributes<State extends Record<string, unknown>>(
   const attributes: UnknownProps = {};
 
   for (const key of Object.keys(state) as (keyof State)[]) {
+    // mapping function declared for this state key is looked-up from mapping object and stored
+    // in toAttributes, e.g. `checked` -> booleanAttribute(...).
     const toAttributes = mapping[key];
+    // no mapping function found for this state key, so the key is skipped and contributes
+    // nothing to attributes — every key in a mapping is optional.
     if (!toAttributes) continue;
 
+    // mapping function is executed with the current value of this state key and its return is
+    // stored in result, e.g. true -> { 'data-checked': '' }.
     const result = toAttributes(state[key]);
+    // result is merged into attributes when the value emitted something, and dropped when the
+    // mapping function returned null, e.g. disabledAttribute(false) -> null.
     if (result) Object.assign(attributes, result);
   }
 

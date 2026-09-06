@@ -6,8 +6,11 @@ export default function SwitchControlled() {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
-      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2xs)' }}>
-        <Switch.Root checked={enabled} onCheckedChange={setEnabled}>
+      <label
+        htmlFor="dark-mode"
+        style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2xs)' }}
+      >
+        <Switch.Root id="dark-mode" checked={enabled} onCheckedChange={setEnabled}>
           <Switch.Thumb />
         </Switch.Root>
         Dark mode

@@ -5,11 +5,12 @@ import { Switch } from './index';
 /** Renders the anatomy a consumer would write, with an accessible name. */
 function Fixture(props: Record<string, unknown> = {}) {
   return (
-    // Switch.Root renders a <button>, which IS a labelable element — the rule just
-    // cannot see through the component. The name assertion below proves it resolves.
-    // eslint-disable-next-line jsx-a11y/label-has-associated-control
-    <label>
-      <Switch.Root {...props}>
+    // `htmlFor` is not redundant with the wrapping: Switch.Root renders a <button>,
+    // which a <label> would name implicitly, but jsx-a11y/label-has-associated-control
+    // only accepts input/meter/output/progress/select/textarea as a nested control.
+    // The explicit association satisfies the rule, so no call site needs a disable.
+    <label htmlFor="notifications">
+      <Switch.Root id="notifications" {...props}>
         <Switch.Thumb />
       </Switch.Root>
       Notifications

@@ -19,9 +19,10 @@
     "@arun-dev/headless": "workspace:*",
     "@arun-dev/tokens": "workspace:*",
     "@arun-dev/ui": "workspace:*",
+    "@astrojs/markdown-remark": "7.3.0",
     "@astrojs/react": "6.0.4",
-    "@astrojs/starlight": "0.41.9",
-    "astro": "7.2.6",
+    "@astrojs/starlight": "0.42.0",
+    "astro": "7.2.10",
     "mermaid": "11.17.2",
     "react": "catalog:",
     "react-dom": "catalog:"
