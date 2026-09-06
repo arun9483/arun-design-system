@@ -4,7 +4,7 @@ import { useControlled } from '../core/useControlled';
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
 import { SwitchRootContext, type SwitchState } from './SwitchRootContext';
-import { switchDataAttributes } from './stateAttributes';
+import { switchDataAttributes } from './switchDataAttributes';
 
 /**
  * Switch.Root's own props. Everything else — `id`, `className`, `children`, `aria-*`,

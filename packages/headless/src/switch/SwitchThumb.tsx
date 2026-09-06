@@ -2,7 +2,7 @@ import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
 import { useSwitchRootContext } from './SwitchRootContext';
-import { switchDataAttributes } from './stateAttributes';
+import { switchDataAttributes } from './switchDataAttributes';
 
 /**
  * Switch.Thumb's own props. Everything else — `id`, `className`, `children`, `aria-*`,
