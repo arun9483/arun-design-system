@@ -54,7 +54,8 @@ Every component also accepts:
 
 - **`className`** — concatenated with the component's own classes, never replacing them.
 - **`render`** — an element or component to render instead of the default. Props, `className`,
-  event handlers and `ref` are merged onto it.
+  event handlers and `ref` are merged onto it. Its own props win, `children` included: an element
+  with no children of its own takes the component's, one that declares children keeps them.
 - **`ref`** — merged with any ref on the `render` element.
 - **any other prop** — spread onto the rendered element, so `id`, `aria-*`, `data-*` and event
   handlers all reach the DOM.

@@ -22,8 +22,8 @@ import { describe, expect, it } from 'vitest';
  *
  * Attribute names are read from every source file in @arun-dev/headless, with comments
  * stripped first — several docstrings show example selectors that are not emissions.
- * Scanning all sources rather than the `stateAttributes.ts` mappings alone matters:
- * `useButton` emits `data-disabled` directly, without going through a mapping.
+ * Scanning all sources rather than one file matters: each component spells its own
+ * attributes out, and `Button` emits `data-disabled` without a shared helper.
  */
 
 const EMISSION = /'(data-[a-z0-9-]+)'/g;

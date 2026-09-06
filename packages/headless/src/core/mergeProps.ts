@@ -66,31 +66,15 @@ function isSyntheticEvent(event: unknown): boolean {
   return typeof event === 'object' && event !== null && 'nativeEvent' in event;
 }
 
-type NativeEventLike = { stopImmediatePropagation?: () => void };
-
 function makeEventPreventable(event: object): void {
   // A nested chain re-enters this for the same event — `chain(chain(a, b), c)` calls it
   // once per level — so the work is done once and later levels see it already in place.
   if (Object.prototype.hasOwnProperty.call(event, 'preventComponentHandler')) return;
 
   const target = event as ComponentEvent<object>;
-  const prevent = () => {
+  target.preventComponentHandler = () => {
     (target as { componentHandlerPrevented: boolean }).componentHandlerPrevented = true;
   };
-  target.preventComponentHandler = prevent;
-
-  // `stopImmediatePropagation()` means "no further listeners on this element", and the
-  // chain is exactly that: several handlers folded into one listener. A consumer reaching
-  // for the standard call gets the native behaviour *and* the component's handler stopped,
-  // rather than the call quietly doing nothing to the chain.
-  const native = (event as { nativeEvent?: NativeEventLike }).nativeEvent;
-  const stopImmediate = native?.stopImmediatePropagation?.bind(native);
-  if (native && stopImmediate) {
-    native.stopImmediatePropagation = () => {
-      stopImmediate();
-      prevent();
-    };
-  }
 }
 
 function isComponentHandlerPrevented(event: unknown): boolean {
@@ -135,6 +119,11 @@ function chainHandlers(earlier: Handler, value: Handler): Handler {
  *
  * `undefined` values are skipped, so an absent key on a later object never
  * clobbers a value set by an earlier one.
+ *
+ * `children` is deliberately not special-cased: it is a plain value, so the last
+ * object to declare it wins. That is what lets a `render` element either inherit the
+ * component's children (it declares none, so the key is absent and skipped) or supply
+ * its own (it declares them, and they win like any other value).
  *
  * **Event handlers run right to left** — the last object's handler first, the first
  * object's last. Since a component passes its own props first and the consumer's last,

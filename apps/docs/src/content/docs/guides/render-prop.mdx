@@ -45,22 +45,22 @@ Because handlers run before the component's own, you can stop it from acting:
 
 ```tsx
 {
-  /* correct — href belongs to the anchor */
-}
-<Button render={<a href="/docs" />}>Docs</Button>;
-
-{
-  /* also correct — the href shorthand renders the anchor for you */
+  /* correct — Button renders the anchor, and `disabled` can take the href back */
 }
 <Button href="/docs">Docs</Button>;
 
 {
-  /* wrong — render wins, so the href is dropped and the link goes nowhere.
-     Button logs a development warning for this. */
+  /* also fine — Button's href reaches an anchor supplied through render */
 }
-<Button href="/docs" render={<a />}>
+<Button href="/docs" render={<NextLink />}>
   Docs
 </Button>;
+
+{
+  /* works, but `disabled` cannot remove this href — the render element's own props
+     outrank the component's. Button logs a development warning for that case. */
+}
+<Button render={<a href="/docs" />}>Docs</Button>;
 ```
 
 The same applies to `type` on a button: `<Chip render={<button type="button" />}>`, or it

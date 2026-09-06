@@ -40,6 +40,7 @@ describe('Button', () => {
     // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's children
     const link = <a href="/docs" />;
     render(<Button render={link}>Docs</Button>);
+    // `type` means something else on an anchor, so Button does not put one there.
     const el = screen.getByRole('link', { name: 'Docs' });
     expect(el.tagName).toBe('A');
     expect(el).toHaveClass('btn', 'btn-ghost');

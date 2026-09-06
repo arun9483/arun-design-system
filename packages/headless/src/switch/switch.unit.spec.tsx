@@ -116,39 +116,53 @@ describe('Switch — controlled and uncontrolled', () => {
 });
 
 describe('Switch — forms', () => {
+  const input = (container: HTMLElement) =>
+    container.querySelector<HTMLInputElement>('input[type="checkbox"]');
+
   it('submits nothing when unchecked, like a native checkbox', () => {
     const { container } = render(<Fixture name="notifications" />);
-    expect(container.querySelector('input[type="hidden"]')).toBeNull();
+    expect(input(container)?.checked).toBe(false);
   });
 
   it('submits its value when checked', () => {
     const { container } = render(<Fixture name="notifications" defaultChecked />);
-    const input = container.querySelector('input[type="hidden"]');
-    expect(input).toHaveAttribute('name', 'notifications');
-    expect(input).toHaveAttribute('value', 'on');
+    expect(input(container)).toHaveAttribute('name', 'notifications');
+    expect(input(container)).toHaveAttribute('value', 'on');
+    expect(input(container)?.checked).toBe(true);
   });
 
   it('accepts a custom submitted value', () => {
     const { container } = render(<Fixture name="plan" value="pro" defaultChecked />);
-    expect(container.querySelector('input[type="hidden"]')).toHaveAttribute('value', 'pro');
+    expect(input(container)).toHaveAttribute('value', 'pro');
   });
 
-  it('renders no hidden input without a name', () => {
+  it('renders no form control without a name', () => {
     const { container } = render(<Fixture defaultChecked />);
-    expect(container.querySelector('input[type="hidden"]')).toBeNull();
+    expect(input(container)).toBeNull();
+  });
+
+  it('keeps the form control out of the accessibility tree and the tab order', () => {
+    const { container } = render(<Fixture name="notifications" />);
+    // `hidden` does both, and leaves the input a real form control that form.reset()
+    // and form.elements still see.
+    expect(input(container)).toHaveAttribute('hidden');
   });
 });
 
 describe('Switch — composition', () => {
-  it('renders the element given to `render`', () => {
+  it('renders the component given to `render`, merging its props onto it', () => {
+    function Wrapped(props: Record<string, unknown>) {
+      return <button {...props} />;
+    }
     render(
-      <Switch.Root render={<div />} data-testid="root">
+      <Switch.Root render={<Wrapped />} className="switch" data-testid="root">
         <Switch.Thumb />
       </Switch.Root>,
     );
     const el = screen.getByTestId('root');
-    expect(el.tagName).toBe('DIV');
+    expect(el.tagName).toBe('BUTTON');
     expect(el).toHaveAttribute('role', 'switch');
+    expect(el).toHaveClass('switch');
   });
 
   it('spreads unrecognised props and merges className', () => {
@@ -180,7 +194,7 @@ describe('Switch — composition', () => {
 });
 
 describe('disabled', () => {
-  it('relies on the platform when rendered as a button', () => {
+  it('relies on the platform, because the element is always a button', () => {
     const onCheckedChange = vi.fn();
     render(
       <Switch.Root disabled onCheckedChange={onCheckedChange} aria-label="s" data-testid="s" />,
@@ -191,29 +205,7 @@ describe('disabled', () => {
     expect(el).toHaveAttribute('data-disabled');
     fireEvent.click(el);
     expect(onCheckedChange).not.toHaveBeenCalled();
-  });
-
-  it('synthesises the state when rendered as something the platform will not disable', () => {
-    const onCheckedChange = vi.fn();
-    const onClick = vi.fn();
-    render(
-      <Switch.Root
-        render={<div />}
-        disabled
-        onCheckedChange={onCheckedChange}
-        onClick={onClick}
-        aria-label="s"
-        data-testid="s"
-      />,
-    );
-    const el = screen.getByTestId('s');
-
-    expect(el).toHaveAttribute('aria-disabled', 'true');
-    expect(el).toHaveAttribute('tabindex', '-1');
-    fireEvent.click(el);
     expect(el).toHaveAttribute('aria-checked', 'false');
-    expect(onCheckedChange).not.toHaveBeenCalled();
-    expect(onClick).not.toHaveBeenCalled();
   });
 
   it('still toggles, and still calls the consumer, when enabled', () => {
@@ -221,7 +213,6 @@ describe('disabled', () => {
     const onClick = vi.fn();
     render(
       <Switch.Root
-        render={<div />}
         onCheckedChange={onCheckedChange}
         onClick={onClick}
         aria-label="s"
@@ -235,25 +226,24 @@ describe('disabled', () => {
   });
 });
 
-describe('nativeButton', () => {
-  it('accepts an override for a render that cannot be inspected', () => {
+describe('render must produce a button', () => {
+  it('accepts a component that forwards its props to one', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     function Wrapped(props: Record<string, unknown>) {
       return <button {...props} />;
     }
-    render(<Switch.Root render={<Wrapped />} nativeButton aria-label="s" data-testid="s" />);
+    render(<Switch.Root render={<Wrapped />} aria-label="s" data-testid="s" />);
 
-    // Treated as native, so no synthesised attributes and no warning.
-    expect(screen.getByTestId('s')).not.toHaveAttribute('tabindex');
     expect(screen.getByTestId('s')).toHaveAttribute('type', 'button');
     expect(error).not.toHaveBeenCalled();
     error.mockRestore();
   });
 
-  it('still infers from an element literal', () => {
+  it('reports anything else, rather than synthesising button behaviour for it', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     render(<Switch.Root render={<div />} aria-label="s" data-testid="s" />);
-    expect(screen.getByTestId('s')).toHaveAttribute('tabindex', '0');
+
+    expect(error).toHaveBeenCalledWith(expect.stringContaining('instead of <button>'));
     error.mockRestore();
   });
 });

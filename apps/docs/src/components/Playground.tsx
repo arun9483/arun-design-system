@@ -19,6 +19,14 @@ function initialValues(controls: readonly Control[]): Record<string, unknown> {
   return Object.fromEntries(controls.map((c) => [c.name, c.initial]));
 }
 
+/**
+ * An empty text control means "not set". Passing `href=""` through would render a link
+ * to nowhere, and the printed JSX already drops it — so the preview drops it too.
+ */
+function omitEmpty(values: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(values).filter(([, v]) => v !== ''));
+}
+
 /** Prints the JSX a consumer would write for the current prop values. */
 function toJsx(component: string, values: Record<string, unknown>, children: string): string {
   const attrs = Object.entries(values)
@@ -50,7 +58,7 @@ export function Playground<P>({ render, controls, component, children = 'Label' 
 
   return (
     <div className="ds-example not-content">
-      <div className="ds-example-preview">{render({ ...values, children } as P)}</div>
+      <div className="ds-example-preview">{render({ ...omitEmpty(values), children } as P)}</div>
 
       <div className="ds-playground-controls">
         {controls.map((control) => {
