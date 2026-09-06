@@ -1,12 +1,23 @@
 import { cloneElement, useMemo } from 'react';
-import type { ReactElement, ReactNode, Ref } from 'react';
+import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import { retractActivationProps, useButton } from '../../useButton';
 import { useControlled } from '../../core/useControlled';
 import { useRender } from '../../core/useRender';
+import type { UnknownProps } from '../../core/mergeProps';
 import { SwitchRootContext, type SwitchState } from '../SwitchRootContext';
 import { switchStateAttributes } from '../stateAttributes';
 
-export interface SwitchRootProps {
+/**
+ * Switch.Root's own props. Everything else — `id`, `className`, `children`, `aria-*`,
+ * `data-*`, event handlers — comes from React's own `<button>` props, so it is typed
+ * and checked without being declared here.
+ *
+ * `id` in particular is how a switch gets an accessible name, paired with a
+ * `<label htmlFor>`: `Switch.Root` renders a `<button>`, which a wrapping `<label>`
+ * would name implicitly, but `jsx-a11y/label-has-associated-control` rejects a
+ * `<button>` as a nested control.
+ */
+type SwitchRootOwnProps = {
   /**
    * Controlled state. Provide `onCheckedChange` alongside it.
    *
@@ -36,24 +47,16 @@ export interface SwitchRootProps {
   /** Value submitted when checked. Defaults to `"on"`, as a native checkbox does. */
   value?: string;
   /**
-   * Names the switch when paired with a `<label htmlFor>`.
-   *
-   * Declared rather than left to the prop spread because it is how a switch gets an
-   * accessible name: `Switch.Root` renders a `<button>`, which a wrapping `<label>`
-   * would name implicitly, but `jsx-a11y/label-has-associated-control` rejects a
-   * `<button>` as a nested control. The explicit association keeps the rule quiet
-   * without a disable at the call site.
-   */
-  id?: string;
-  className?: string;
-  children?: ReactNode;
-  /**
    * Element to render instead of the default `<button>`. Props, className, event
    * handlers and ref are merged onto it.
    */
   render?: ReactElement;
+  /** Ref to the rendered element, whatever `render` makes it. */
   ref?: Ref<HTMLElement>;
-}
+};
+
+export type SwitchRootProps = SwitchRootOwnProps &
+  Omit<ComponentPropsWithRef<'button'>, keyof SwitchRootOwnProps>;
 
 /**
  * A switch — an immediate on/off control, distinct from a checkbox in that it takes
@@ -79,7 +82,7 @@ export function SwitchRoot({
   children,
   render,
   ...rest
-}: SwitchRootProps & Record<string, unknown>) {
+}: SwitchRootProps) {
   const [checked, setChecked] = useControlled({
     controlled: checkedProp,
     default: defaultChecked ?? false,
@@ -96,7 +99,7 @@ export function SwitchRoot({
   const { props: consumerProps, ref: buttonRef } = useButton({
     disabled,
     native: isNativeButton,
-    props: rest,
+    props: rest as UnknownProps,
   });
 
   // A `render` element's own props merge last, so an href written directly on it

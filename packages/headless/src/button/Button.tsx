@@ -1,9 +1,15 @@
 import { cloneElement } from 'react';
-import type { ReactElement, ReactNode, Ref } from 'react';
+import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import { useRender } from '../core/useRender';
+import type { UnknownProps } from '../core/mergeProps';
 import { retractActivationProps, useButton } from '../useButton';
 
-export interface ButtonProps {
+/**
+ * Button's own props. Everything else — `id`, `className`, `children`, `aria-*`,
+ * `data-*`, event handlers — comes from React's own `<button>` props, so it is typed
+ * and checked without being declared here.
+ */
+type ButtonOwnProps = {
   /**
    * Prevents activation. On a native `<button>` the platform handles it; on any other
    * element the state is synthesised — `aria-disabled`, removal from the tab order,
@@ -18,15 +24,17 @@ export interface ButtonProps {
    * gets treated as non-native. A mismatch logs a development warning.
    */
   nativeButton?: boolean;
-  className?: string;
-  children?: ReactNode;
   /**
    * Element to render instead of the default `<button>`. Props, className, event
    * handlers and ref are merged onto it.
    */
   render?: ReactElement;
+  /** Ref to the rendered element, whatever `render` makes it. */
   ref?: Ref<HTMLElement>;
-}
+};
+
+export type ButtonProps = ButtonOwnProps &
+  Omit<ComponentPropsWithRef<'button'>, keyof ButtonOwnProps>;
 
 /**
  * A button — behaviour only, no styling.
@@ -49,7 +57,7 @@ export function Button({
   children,
   render,
   ...rest
-}: ButtonProps & Record<string, unknown>) {
+}: ButtonProps) {
   const native = nativeButton ?? (render === undefined || render.type === 'button');
 
   // A `<div>` or `<span>` has no role of its own, so a screen reader would announce
@@ -58,7 +66,11 @@ export function Button({
   const isAnchor = render !== undefined && render.type === 'a';
   const role = native || isAnchor ? undefined : 'button';
 
-  const { props: elementProps, ref: buttonRef } = useButton({ disabled, native, props: rest });
+  const { props: elementProps, ref: buttonRef } = useButton({
+    disabled,
+    native,
+    props: rest as UnknownProps,
+  });
 
   // A `render` element's own props merge last, so an href written directly on it
   // outranks anything useButton returns. Retract it on the element instead.

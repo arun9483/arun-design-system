@@ -1,15 +1,22 @@
-import type { ReactElement, ReactNode, Ref } from 'react';
+import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import { useRender } from '../../core/useRender';
+import type { UnknownProps } from '../../core/mergeProps';
 import { useSwitchRootContext, type SwitchState } from '../SwitchRootContext';
 import { switchStateAttributes } from '../stateAttributes';
 
-export interface SwitchThumbProps {
-  className?: string;
-  children?: ReactNode;
+/**
+ * Switch.Thumb's own props. Everything else — `id`, `className`, `children`, `aria-*`,
+ * `data-*` — comes from React's own `<span>` props.
+ */
+type SwitchThumbOwnProps = {
   /** Element to render instead of the default `<span>`. */
   render?: ReactElement;
+  /** Ref to the rendered element, whatever `render` makes it. */
   ref?: Ref<HTMLElement>;
-}
+};
+
+export type SwitchThumbProps = SwitchThumbOwnProps &
+  Omit<ComponentPropsWithRef<'span'>, keyof SwitchThumbOwnProps>;
 
 /**
  * The moving part of the switch.
@@ -24,12 +31,7 @@ export interface SwitchThumbProps {
  * Purely presentational — hidden from assistive technology, since the Root already
  * announces the state.
  */
-export function SwitchThumb({
-  className,
-  children,
-  render,
-  ...rest
-}: SwitchThumbProps & Record<string, unknown>) {
+export function SwitchThumb({ className, children, render, ...rest }: SwitchThumbProps) {
   const state = useSwitchRootContext();
 
   return useRender<SwitchState>({
@@ -38,6 +40,6 @@ export function SwitchThumb({
     state,
     stateAttributes: switchStateAttributes,
     props: { 'aria-hidden': true, className, children },
-    consumerProps: rest,
+    consumerProps: rest as UnknownProps,
   });
 }
