@@ -32,7 +32,9 @@ form by accident. Give it `href` for an anchor, or `render` for anything else.
 
 ## Notes
 
-- `type` applies only to the plain button form. It is not forwarded to an anchor or to an
-  element supplied through `render`.
-- The `render` element owns its own attributes: `<Button render={<a href="…" />}>` needs the
-  `href` on the anchor, not on `Button`.
+- `type` applies only to the button form. It is not forwarded to an anchor, nor to a component
+  supplied through `render` — pass it on the element there.
+- Pass a URL as `href` on `Button` rather than writing it on a `render` element. `disabled` has
+  to be able to remove it, and a `render` element's own props outrank the component's.
+- `disabled` with an `href` renders a `<button disabled>`: a link that navigates nowhere is not
+  a link, and the platform then handles the tab order and activation itself.

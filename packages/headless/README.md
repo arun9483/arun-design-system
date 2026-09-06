@@ -28,18 +28,20 @@ import { Switch } from '@arun-dev/headless/switch';
 
 | Component | Parts                   | Props                                                                       |
 | --------- | ----------------------- | --------------------------------------------------------------------------- |
-| `Button`  | —                       | `disabled`, `nativeButton`                                                  |
+| `Button`  | —                       | `disabled`, `href`, `type`                                                  |
 | `Switch`  | `Switch.Root`, `.Thumb` | `checked`, `defaultChecked`, `onCheckedChange`, `disabled`, `name`, `value` |
 
-`Button` exists for the moment `render` points at something that is not a `<button>`. It then
-supplies what the platform stops giving you — focus, `Enter` and `Space` activation, and a
-`disabled` state that actually disables. It takes no `href`: a control that navigates should be an
-anchor, so pass one in and keep middle-click, cmd-click and "link" in assistive technology.
+`Button` renders a `<button>`, or a real `<a href>` when you give it an `href` — a control that
+navigates should be an anchor, so middle-click, cmd-click and "link" in assistive technology all
+keep working. It defaults `type="button"` so a button never submits a form by accident, and a
+disabled `href` renders a `<button disabled>`, because a link that navigates nowhere is not a link.
 
 ```tsx
 import { Button } from '@arun-dev/headless/button';
 
-<Button render={<a href="/docs" target="_blank" rel="noreferrer" />}>Docs</Button>;
+<Button href="/docs" target="_blank" rel="noreferrer">
+  Docs
+</Button>;
 ```
 
 `Switch.Root` renders a native `<button>`, so focus, `Space`, `Enter` and disabled semantics come
@@ -101,24 +103,23 @@ so you can stop it:
 The primitives the components are built from are exported from the root, for building your own:
 
 ```ts
-import {
-  useRender,
-  useControlled,
-  mergeProps,
-  getStateAttributes,
-  booleanAttribute,
-} from '@arun-dev/headless';
+import { useRender, useControlled, mergeProps } from '@arun-dev/headless';
 ```
 
-| Export               | Purpose                                                                       |
-| -------------------- | ----------------------------------------------------------------------------- |
-| `useRender`          | Resolves what a part renders — merges props, projects state, applies `render` |
-| `useControlled`      | One value, controlled or uncontrolled, decided at mount                       |
-| `mergeProps`         | Merges prop objects: handlers chain, `className` concatenates, refs merge     |
-| `getStateAttributes` | Projects a state object onto `data-*` attributes via a declared mapping       |
-| `booleanAttribute`   | The common mapping — one attribute when true, another when false              |
-| `disabledAttribute`  | The shared spelling of `data-disabled`, so every component agrees on it       |
-| `ComponentEvent`     | Type for a handler that can call `preventComponentHandler()`                  |
+| Export           | Purpose                                                                   |
+| ---------------- | ------------------------------------------------------------------------- |
+| `useRender`      | Resolves what a part renders — merges props and applies `render`          |
+| `useControlled`  | One value, controlled or uncontrolled, decided at mount                   |
+| `mergeProps`     | Merges prop objects: handlers chain, `className` concatenates, refs merge |
+| `ComponentEvent` | Type for a handler that can call `preventComponentHandler()`              |
+
+State attributes are plain objects a component spreads onto its element — React drops the
+`undefined` ones — so there is no mapping layer to learn:
+
+```ts
+'data-checked': checked ? '' : undefined,
+'data-unchecked': checked ? undefined : '',
+```
 
 Everything this library uses to implement its own components stays private, so it can
 change without breaking anyone. The public surface is the table above plus the

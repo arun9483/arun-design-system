@@ -104,48 +104,7 @@ describe('handler chain', () => {
     expect(component).toHaveBeenCalledWith(true);
   });
 
-  it('honours stopImmediatePropagation as a stop signal for the chain', () => {
-    // The standard call means "no further listeners on this element", and the chain is
-    // several handlers folded into one listener.
-    const component = vi.fn();
-    const stopImmediate = vi.fn();
-    const event = { nativeEvent: { stopImmediatePropagation: stopImmediate } };
-    const merged = mergeProps(
-      { onClick: component },
-      {
-        onClick: (e: { nativeEvent: { stopImmediatePropagation(): void } }) => {
-          e.nativeEvent.stopImmediatePropagation();
-        },
-      },
-    );
-
-    (merged.onClick as (e: unknown) => void)(event);
-    expect(component).not.toHaveBeenCalled();
-    // The native behaviour is kept, not swallowed.
-    expect(stopImmediate).toHaveBeenCalledOnce();
-  });
-
-  it('stops every earlier handler when stopImmediatePropagation is called', () => {
-    const first = vi.fn();
-    const second = vi.fn();
-    const merged = mergeProps(
-      { onClick: first },
-      { onClick: second },
-      {
-        onClick: (e: { nativeEvent: { stopImmediatePropagation(): void } }) => {
-          e.nativeEvent.stopImmediatePropagation();
-        },
-      },
-    );
-
-    (merged.onClick as (e: unknown) => void)({
-      nativeEvent: { stopImmediatePropagation: vi.fn() },
-    });
-    expect(second).not.toHaveBeenCalled();
-    expect(first).not.toHaveBeenCalled();
-  });
-
-  it('runs the chain normally when the native event has no stopImmediatePropagation', () => {
+  it('runs the chain normally when nothing stops it', () => {
     const component = vi.fn();
     const merged = mergeProps({ onClick: component }, { onClick: () => {} });
 

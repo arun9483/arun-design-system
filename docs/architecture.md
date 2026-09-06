@@ -168,26 +168,30 @@ JavaScript: the platform removes it from the tab order, suppresses activation an
 exposes `:disabled`. An `<a href>` gets none of that, and a `disabled` attribute on it
 is inert — the link stays focusable, still fires handlers and still navigates.
 
-So the _prop_ is not what belongs in `@arun-dev/headless`; the "make a non-button
-element behave like one" logic is — the disabled state, focus, keyboard activation and
-the conditional `type`.
+The first answer was to synthesise the missing half: `useButton` gave any element a
+`tabIndex`, `Enter`/`Space` handlers, a `role`, and — when disabled — stripped the
+consumer's activation handlers and retracted the `href`. It reached 172 lines, needed a
+`nativeButton` escape hatch because a `render` component cannot be inspected, and needed
+`retractActivationProps` because a `render` element's own props outrank everything.
 
-That started as a hook, `useButton`, on the reasoning that Button's value in
-`@arun-dev/ui` is its variants and its `href` convenience, neither of which is
-behaviour. It did not hold. The logic grew past a hundred lines, and a separate package
-cannot reach into another's internals, so `@arun-dev/ui` had to import it — which is
-precisely the violation this decision forbids. `Button` now lives in
-`@arun-dev/headless`, `@arun-dev/ui`'s is a styling wrapper, and `useButton` is private.
+**That was the wrong layer to solve it at.** The second answer is to choose an element
+that already behaves: `Button` renders `<button>`, or `<a href>` when navigating, and a
+disabled `href` renders `<button disabled>` — a link that navigates nowhere is not a
+link. Both elements are natively focusable and activatable, so there is nothing left to
+synthesise. `useButton`, `nativeButton` and `retractActivationProps` are all gone.
 
-Base UI settled the same way: a public `Button` over an internal `use-button`.
+`Switch.Root` is the same decision taken further: it is always a native `<button>`, and
+a `render` producing anything else is _reported_ in development rather than compensated
+for. Radix does the same — its Switch is a `<button role="switch">` and `asChild` is for
+wrappers that forward to one.
 
-**Rules out:** behaviour in `@arun-dev/ui`. Every component there is class names and
-element choice; if it needs JavaScript to be correct, the JavaScript belongs one layer
-down. The wrapper that costs is worth the invariant it buys.
+**Rules out:** behaviour in `@arun-dev/ui`; also synthesising platform behaviour for an
+element that was never going to be right. If a component needs the platform's focus and
+keyboard handling, it renders an element that has them.
 
-**Consequence:** `useButton` returns consumer props _sanitised_ rather than merged over,
-and `retractActivationProps` exists for `render` elements, because neither case can be
-expressed through `mergeProps` today. See decision 8.
+**Consequence:** `Button` owns the `href` prop, moved down from `@arun-dev/ui`, because
+`disabled` has to be able to take the URL away and `mergeProps` cannot retract. See
+decision 8.
 
 ---
 
@@ -236,17 +240,6 @@ The signal is only attached to real events, detected by `'nativeEvent' in event`
 `on*` prop called with something else — `onCheckedChange(boolean)` — always runs every
 handler, since there is nothing to attach it to.
 
-**`stopImmediatePropagation()` stops the chain too.** The standard call means "no further
-listeners on this element", and a merged chain is exactly that: several handlers folded
-into one listener. `makeEventPreventable` wraps the native method so it keeps its own
-behaviour and raises the same flag, rather than appearing to work and doing nothing.
-`preventComponentHandler()` stays the documented path; this is for consumers who reach
-for the standard API first.
-
-`stopPropagation()` is deliberately **not** bridged — it means "do not reach ancestors",
-and the component's handler is on the same element. Honouring it there would break the
-common case of stopping a parent while keeping the component's own behaviour.
-
 **The order is structural, not a convention.** `useRender` takes the component's props
 and the consumer's in _separate named arguments_ and merges them itself:
 
@@ -260,21 +253,19 @@ nothing to catch an inversion — `preventComponentHandler()` would have silentl
 working for that component while every test still passed. There is now no position for a
 component to place a consumer's props in, so the four tiers cannot be reordered.
 
-**Consequence for disabled controls.** A component cannot use the chain to suppress a
-consumer's handler on an inert element. It removes the handler instead, before merging,
-which is what `useButton` does — deterministic, rather than depending on a runtime
-convention the consumer could ignore.
+### Retraction: still not possible, and no longer needed
 
-### Retraction: still not possible
+`href: undefined` remains a no-op through `mergeProps`. Nothing depends on it any more:
+a component that must not carry a prop does not put it there in the first place.
+`Button` owns `href` for exactly this reason — when disabled it renders a `<button>`
+with no URL, rather than trying to take one back off an `<a>`.
 
-`href: undefined` remains a no-op through `mergeProps`. Components that must remove a
-prop do it before merging — `useButton` returns consumer props sanitised, and
-`retractActivationProps` rewrites a `render` element with `cloneElement`, which _can_
-overwrite with `undefined`.
+The one case left is an `href` written directly on a `render` element, which no layer
+can retract. `Button` reports it in development and tells you to pass `href` instead.
 
-**Deferred:** a sentinel value meaning "delete this key" in `useRender`. It would fold
-both helpers into the engine, at the cost of a new concept every component author has
-to know. Revisit if a third component needs to retract a prop.
+**Rules out:** a sentinel value meaning "delete this key" in `useRender`. It was
+deferred here waiting for a third component to need it; instead the two that needed it
+stopped needing it.
 
 ---
 
@@ -284,26 +275,22 @@ Every exported name is a compatibility promise, and the surface grows by acciden
 primitive is public only if someone building their own component against
 `@arun-dev/headless` needs it. Anything this library uses to implement itself stays out.
 
-| Public (root entry)                                                | Not public                            |
-| ------------------------------------------------------------------ | ------------------------------------- |
-| `useRender`, `mergeProps`, `useControlled`                         | `useButton`, `retractActivationProps` |
-| `getStateAttributes`, `booleanAttribute`, `disabledAttribute`      |                                       |
-| `ComponentEvent`, `UnknownProps`, and each component's props types |                                       |
+| Public (root entry)                                                | Not public                          |
+| ------------------------------------------------------------------ | ----------------------------------- |
+| `useRender`, `mergeProps`, `useControlled`                         | `switchDataAttributes` and the like |
+| `ComponentEvent`, `UnknownProps`, and each component's props types |                                     |
 
-`useButton` is the worked example. It is 100 lines of element-kind edge cases that will
-keep growing — composite widgets will need a `focusableWhenDisabled` parameter, and the
-disabled-focus half may eventually split out the way Base UI's has. None of that should
-be a breaking change, and it is not, as long as only this library calls it.
+`useButton` was the worked example, and it ended differently than expected: rather than
+growing into a stable private API, it was deleted. Keeping it private is what made that
+possible — 172 lines could be removed in one commit without a single consumer noticing,
+because nobody could import it.
 
 **A separate package cannot reach into internals.** `@arun-dev/ui` is published
 independently, so anything it imports has to be exported. The answer is not to publish
 the primitive with a disclaimer — it is to put the behaviour where it belongs. `Button`
 moved into `@arun-dev/headless` for exactly this reason, which is also what decision 7
-required all along; `@arun-dev/ui`'s Button is now a styling wrapper, and `useButton` is
-private to this package with no way in from outside.
-
-This is Base UI's structure too: a public `Button` component over an internal
-`use-button` hook.
+required all along; `@arun-dev/ui`'s Button is now a styling wrapper, and its `href`
+sugar moved down with it, since `disabled` has to be able to remove the URL.
 
 **Rules out:** exporting a primitive "because it might be useful". It becomes useful the
 day someone asks for it, and adding an export later is not a breaking change; removing
@@ -315,14 +302,14 @@ one is.
 
 Shipped since this list was written:
 
-| Was deferred                    | Landed in                                                                         |
-| ------------------------------- | --------------------------------------------------------------------------------- |
-| `@arun-dev/headless` package    | `0.1.0` — the render engine and state plumbing                                    |
-| `data-*` state attributes       | `0.2.0`, with Switch — the first component with state                             |
-| `useRender` moved out of `ui`   | `0.1.0` — now `@arun-dev/headless` `core/`, exported                              |
-| Shared `data-disabled` spelling | `disabledAttribute` in `core/stateAttributes.ts`, used by Switch and `useButton`  |
-| `mergeProps` handler order      | consumer first, cancellable with `preventComponentHandler()` — decision 8         |
-| Button's non-native behaviour   | `@arun-dev/headless/button` — focus, keyboard, role, disabled — decisions 7 and 9 |
+| Was deferred                    | Landed in                                                                     |
+| ------------------------------- | ----------------------------------------------------------------------------- |
+| `@arun-dev/headless` package    | `0.1.0` — the render engine and state plumbing                                |
+| `data-*` state attributes       | `0.2.0`, with Switch — the first component with state                         |
+| `useRender` moved out of `ui`   | `0.1.0` — now `@arun-dev/headless` `core/`, exported                          |
+| Shared `data-disabled` spelling | emitted directly by each component; React drops the `undefined` case          |
+| `mergeProps` handler order      | consumer first, cancellable with `preventComponentHandler()` — decision 8     |
+| Button's non-native behaviour   | removed — `Button` renders `<button>` or `<a href>`, both native — decision 7 |
 
 Still deferred:
 
@@ -331,7 +318,6 @@ Still deferred:
 | Runtime layout vars + `--hl-*` prefix    | the first anchored/positioned component (Popover)        |
 | Vitest browser mode                      | focus trapping or scroll locking needs testing           |
 | Positioning engine, Floating UI          | Popover; the engine is a port so it can be swapped later |
-| Prop retraction sentinel in `useRender`  | a third component needs to remove a consumer's prop      |
 | Memoisation inside `useRender`           | profiling shows the per-render merge costs something     |
 | `focusableWhenDisabled`, roving tabindex | the first composite widget — Toolbar, Menu, Tabs         |
 

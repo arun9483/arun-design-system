@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
-import { useControlled } from '../../core/useControlled';
-import { useRender } from '../../core/useRender';
-import type { UnknownProps } from '../../core/mergeProps';
-import { SwitchRootContext, type SwitchState } from '../SwitchRootContext';
-import { switchDataAttributes } from '../stateAttributes';
+import { useControlled } from '../core/useControlled';
+import { useRender } from '../core/useRender';
+import type { UnknownProps } from '../core/mergeProps';
+import { SwitchRootContext, type SwitchState } from './SwitchRootContext';
+import { switchDataAttributes } from './stateAttributes';
 
 /**
  * Switch.Root's own props. Everything else — `id`, `className`, `children`, `aria-*`,

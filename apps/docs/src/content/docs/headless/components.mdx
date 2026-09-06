@@ -7,10 +7,9 @@ import Diagram from '@/components/Diagram.astro';
 
 ## Button
 
-A native `<button>` already gets focus, `Enter` and `Space` activation, and a working `disabled`
-from the platform. `Button` earns its place the moment `render` points somewhere else, because
-none of that holds any more — and a `disabled` attribute on a `<div>` or an `<a>` does nothing at
-all.
+`Button` picks the right element and expresses `disabled` the way that element already
+understands. Both elements it renders — `<button>` and `<a href>` — are natively focusable and
+keyboard-activatable, so nothing is synthesised on top of them.
 
 ```tsx
 import { Button } from '@arun-dev/headless/button';
@@ -18,25 +17,24 @@ import { Button } from '@arun-dev/headless/button';
 <Button onClick={save}>Save</Button>;
 ```
 
-|          | native `<button>`           | anything else                                                        |
-| -------- | --------------------------- | -------------------------------------------------------------------- |
-| enabled  | `type="button"`             | `tabIndex`, `Enter` and `Space` activation, `role="button"`          |
-| disabled | `disabled`, `data-disabled` | `aria-disabled`, out of the tab order, no activation, target dropped |
+|                     | element             | what it adds                          |
+| ------------------- | ------------------- | ------------------------------------- |
+| default             | `<button>`          | `type="button"`, so it never submits  |
+| `href`              | `<a href>`          | a real link — middle-click, cmd-click |
+| `disabled`          | `<button disabled>` | the platform's own disabled semantics |
+| `href` + `disabled` | `<button disabled>` | not a link: it navigates nowhere      |
 
-`role="button"` is added only where the element has none of its own. An anchor keeps
-its role — for a link that is the more accurate one, and it is what makes
-`render={<a href />}` still announce as a link.
-
-It takes no `href`. A control that navigates should be an anchor, so that middle-click,
-cmd-click, "open in new tab" and "link" in assistive technology all work — pass one in:
+`href` is a prop rather than something you write on a `render` element, because `disabled` has to
+be able to take it away — and a `render` element's own props outrank the component's.
 
 ```tsx
-<Button render={<a href="/docs" target="_blank" rel="noreferrer" />}>Docs</Button>
+<Button href="/docs" target="_blank" rel="noreferrer">
+  Docs
+</Button>
 ```
 
-`nativeButton` overrides the inference for a `render` that cannot be inspected, such as
-`render={<MyButton />}`. A mismatch between what you declared and what actually rendered logs a
-development warning.
+Use `render` for a component that wraps a button or a link — a router `Link`, a tooltip trigger.
+It is merged into, not replaced.
 
 ## Switch
 
@@ -50,8 +48,10 @@ import { Switch } from '@arun-dev/headless/switch';
 </Switch.Root>;
 ```
 
-`Switch.Root` renders a native `<button>` carrying `role="switch"` and `aria-checked`. It has no
-accessible name of its own — pair it with a `<label htmlFor>` by `id`, or pass `aria-label`. A
+`Switch.Root` is always a native `<button>`, carrying `role="switch"` and `aria-checked` — focus,
+`Space`, `Enter` and `disabled` all come from the platform, which is why the component is short.
+A `render` that produces anything else is reported in development rather than compensated for.
+It has no accessible name of its own — pair it with a `<label htmlFor>` by `id`, or pass `aria-label`. A
 headless component should not guess at your copy.
 
 <Diagram
