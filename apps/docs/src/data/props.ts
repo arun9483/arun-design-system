@@ -53,7 +53,7 @@ export const PROPS = {
       name: 'href',
       type: 'string',
       description:
-        'Convenience for the common case: renders an `<a>` instead of a `<button>`. For a router link or any other element, use `render`.',
+        'Renders a real `<a href>` instead of a `<button>`. Pass the URL here rather than on a `render` element, so `disabled` can take it away.',
     },
     {
       name: 'type',
@@ -67,7 +67,7 @@ export const PROPS = {
       type: 'boolean',
       default: 'false',
       description:
-        'Prevents activation. On a native `<button>` the platform handles it; rendered as anything else the state is synthesised, and the navigation target is dropped.',
+        'Prevents activation, using the platform rather than synthesising it. With an `href` the element becomes a `<button disabled>`, since a link that navigates nowhere is not a link.',
     },
   ],
   Card: [
