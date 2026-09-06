@@ -1,8 +1,6 @@
-import { cloneElement } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
-import { retractActivationProps, useButton } from '../useButton';
 
 /**
  * Button's own props. Everything else — `id`, `className`, `children`, `aria-*`,
@@ -11,78 +9,90 @@ import { retractActivationProps, useButton } from '../useButton';
  */
 type ButtonOwnProps = {
   /**
-   * Prevents activation. On a native `<button>` the platform handles it; on any other
-   * element the state is synthesised — `aria-disabled`, removal from the tab order,
-   * no activation, and a navigation target dropped.
+   * Prevents activation. On a `<button>` the platform does it; on the `<a>` that
+   * `href` renders, dropping the `href` does it — the DOM leaves an anchor without one
+   * unfocusable, unactivatable and no longer a link.
    */
   disabled?: boolean;
   /**
-   * Whether the rendered element is a native `<button>`.
+   * Renders an `<a href>` instead of a `<button>`.
    *
-   * Inferred from `render`, which is right for an element literal. Set it explicitly
-   * when rendering a *component* — `render={<MyButton />}` cannot be inspected, and
-   * gets treated as non-native. A mismatch logs a development warning.
+   * A control that navigates should be an anchor, so middle-click, cmd-click, the
+   * status bar and "link" in assistive technology all work. It is a prop rather than
+   * something to write on a `render` element because `disabled` has to be able to take
+   * it away, and a `render` element's own props outrank everything.
    */
-  nativeButton?: boolean;
+  href?: string;
   /**
-   * Element to render instead of the default `<button>`. Props, className, event
+   * Element or component to render instead of the default. Props, className, event
    * handlers and ref are merged onto it.
+   *
+   * @example <Button render={<NextLink href="/docs" />}>Docs</Button>
    */
   render?: ReactElement;
-  /** Ref to the rendered element, whatever `render` makes it. */
+  /** Ref to the rendered element. Merged with any ref on the `render` element. */
   ref?: Ref<HTMLElement>;
 };
 
 export type ButtonProps = ButtonOwnProps &
-  Omit<ComponentPropsWithRef<'button'>, keyof ButtonOwnProps>;
+  Omit<ComponentPropsWithRef<'button'>, keyof ButtonOwnProps> &
+  Pick<ComponentPropsWithRef<'a'>, 'target' | 'rel' | 'download'>;
 
 /**
  * A button — behaviour only, no styling.
  *
- * A native `<button>` needs almost none of this; the platform supplies focus, `Enter`
- * and `Space` activation, and `disabled`. The component earns its place the moment
- * `render` points somewhere else, which is exactly when all of that stops holding.
+ * Renders a `<button>`, or an `<a href>` when `href` is set. Both are natively
+ * focusable and keyboard-activatable, so nothing here is synthesised: the component
+ * picks the right element, defaults `type` so a button does not submit by accident,
+ * and expresses `disabled` the way that element already understands.
  *
- * It has no `href`. A control that navigates should be an `<a>`, so that middle-click,
- * cmd-click, the status bar and "link" in assistive technology all work — pass one in:
+ * A disabled `href` renders a `<button disabled>` rather than a dead link — the
+ * platform then removes it from the tab order and suppresses activation, with no
+ * handler stripping or `tabindex` bookkeeping of our own.
  *
- *   <Button render={<a href="/docs" target="_blank" rel="noreferrer" />}>Docs</Button>
- *
- * Emits `data-disabled` so one selector styles a disabled control whatever the element.
+ * Emits `data-disabled` so one selector styles a disabled control either way.
  */
 export function Button({
   disabled = false,
-  nativeButton,
+  href,
+  type = 'button',
   className,
   children,
   render,
   ...rest
 }: ButtonProps) {
-  const native = nativeButton ?? (render === undefined || render.type === 'button');
+  // A disabled link is not a link: it navigates nowhere, so it stops being an `<a>`
+  // and becomes a `<button disabled>`, which the platform takes care of completely.
+  const linksOut = href !== undefined && !disabled;
 
-  // A `<div>` or `<span>` has no role of its own, so a screen reader would announce
-  // nothing. An anchor is left alone: it already carries a role, and one that suits
-  // navigation better than `button` would.
-  const isAnchor = render !== undefined && render.type === 'a';
-  const role = native || isAnchor ? undefined : 'button';
+  // `type` and `disabled` only mean anything on a `<button>`, and `render` is the one
+  // thing that can move us off one. An element literal says which it is; a component
+  // cannot be inspected, so it is left to pass its own `type` if it needs one.
+  const rendersButton = render === undefined ? !linksOut : render.type === 'button';
 
-  const { props: elementProps, ref: buttonRef } = useButton({
-    disabled,
-    native,
-    props: rest as UnknownProps,
-  });
+  if (process.env.NODE_ENV !== 'production' && disabled && render !== undefined) {
+    const renderProps = render.props as { href?: unknown };
+    if (renderProps?.href !== undefined) {
+      console.error(
+        'Button: `disabled` cannot remove the `href` on a `render` element — its own ' +
+          'props outrank the component. Pass the URL as `href` on Button instead.',
+      );
+    }
+  }
 
-  // A `render` element's own props merge last, so an href written directly on it
-  // outranks anything useButton returns. Retract it on the element instead.
-  const safeRender =
-    disabled && !native && render !== undefined
-      ? cloneElement(render, retractActivationProps(render.props as Record<string, unknown>))
-      : render;
+  const elementProps: UnknownProps = rendersButton
+    ? { type, disabled: disabled || undefined }
+    : { href: linksOut ? href : undefined, 'aria-disabled': disabled || undefined };
 
   return useRender({
-    render: safeRender,
-    defaultTagName: 'button',
-    props: { role, className, children, ref: buttonRef },
-    consumerProps: elementProps,
+    render,
+    defaultTagName: linksOut ? 'a' : 'button',
+    props: {
+      ...elementProps,
+      'data-disabled': disabled ? '' : undefined,
+      className,
+      children,
+    },
+    consumerProps: rest as UnknownProps,
   });
 }

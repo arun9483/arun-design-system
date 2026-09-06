@@ -3,14 +3,6 @@ import { describe, it, expect, vi } from 'vitest';
 import type { ReactElement, ReactNode, Ref } from 'react';
 import type React from 'react';
 import { useRender } from './useRender';
-import { booleanAttribute } from './stateAttributes';
-
-type FixtureState = { checked: boolean; disabled: boolean };
-
-const stateAttributes = {
-  checked: booleanAttribute('data-checked', 'data-unchecked'),
-  disabled: booleanAttribute('data-disabled'),
-};
 
 /** A minimal part, standing in for a real component. */
 function Fixture({
@@ -26,12 +18,16 @@ function Fixture({
   children?: ReactNode;
   ref?: Ref<HTMLElement>;
 } & Record<string, unknown>) {
-  return useRender<FixtureState>({
+  return useRender({
     render: renderProp,
     defaultTagName: 'span',
-    state: { checked, disabled },
-    stateAttributes,
-    props: { className: 'fixture', children },
+    props: {
+      'data-checked': checked ? '' : undefined,
+      'data-unchecked': checked ? undefined : '',
+      'data-disabled': disabled ? '' : undefined,
+      className: 'fixture',
+      children,
+    },
     consumerProps: rest,
   });
 }
@@ -44,7 +40,7 @@ describe('useRender', () => {
     expect(el).toHaveClass('fixture');
   });
 
-  it('projects state onto the DOM as data-* attributes', () => {
+  it('puts the data-* attributes a component emits onto the element', () => {
     render(<Fixture checked>content</Fixture>);
     const el = screen.getByText('content');
     expect(el).toHaveAttribute('data-checked');
@@ -63,7 +59,7 @@ describe('useRender', () => {
     expect(el).toHaveAttribute('data-disabled');
   });
 
-  it('renders the element given to `render`, keeping the state attributes', () => {
+  it('renders the element given to `render`, keeping the data-* attributes', () => {
     render(
       <ul>
         <Fixture checked render={<li />}>

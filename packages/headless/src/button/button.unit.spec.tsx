@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { Button } from './index';
 
 const el = () => screen.getByTestId('b');
-const silence = () => vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
 describe('Button', () => {
   it('renders a native button with an explicit type', () => {
@@ -12,33 +11,29 @@ describe('Button', () => {
     expect(el()).toHaveAttribute('type', 'button');
   });
 
-  it('infers a non-native element from render, and makes it operable', () => {
-    const onClick = vi.fn();
+  it('keeps a submit button a submit button', () => {
     render(
-      <Button render={<div />} onClick={onClick} data-testid="b">
+      <Button type="submit" data-testid="b">
         go
       </Button>,
     );
-    expect(el()).toHaveAttribute('tabindex', '0');
-    expect(el()).not.toHaveAttribute('type');
-
-    fireEvent.keyDown(el(), { key: 'Enter' });
-    expect(onClick).toHaveBeenCalledOnce();
+    expect(el()).toHaveAttribute('type', 'submit');
   });
 
-  it('takes an anchor for navigation, leaving it a real link', () => {
+  it('renders a real link when given an href', () => {
     render(
-      // eslint-disable-next-line jsx-a11y/anchor-has-content
-      <Button render={<a href="/docs" target="_blank" rel="noreferrer" />} data-testid="b">
+      <Button href="/docs" target="_blank" rel="noreferrer" data-testid="b">
         Docs
       </Button>,
     );
     expect(el().tagName).toBe('A');
     expect(el()).toHaveAttribute('href', '/docs');
     expect(el()).toHaveAttribute('target', '_blank');
+    // `type` means something else on an anchor, so it is not passed through.
+    expect(el()).not.toHaveAttribute('type');
   });
 
-  it('leans on the platform when disabled and native', () => {
+  it('leans on the platform when disabled', () => {
     const onClick = vi.fn();
     render(
       <Button disabled onClick={onClick} data-testid="b">
@@ -51,62 +46,53 @@ describe('Button', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
-  it('synthesises the disabled state on an anchor, and drops the target', () => {
-    const error = silence();
+  it('renders a disabled link as a disabled button, not a dead anchor', () => {
     const onClick = vi.fn();
     render(
-      // eslint-disable-next-line jsx-a11y/anchor-has-content
-      <Button render={<a href="/docs" />} disabled onClick={onClick} data-testid="b">
+      <Button href="/docs" disabled onClick={onClick} data-testid="b">
         Docs
       </Button>,
     );
+    // It navigates nowhere, so it is not a link. The platform then supplies the tab
+    // stop removal and the suppressed activation for free.
+    expect(el().tagName).toBe('BUTTON');
+    expect(el()).toBeDisabled();
     expect(el()).not.toHaveAttribute('href');
-    expect(el()).toHaveAttribute('aria-disabled', 'true');
-    expect(el()).toHaveAttribute('tabindex', '-1');
+    expect(el()).toHaveAttribute('data-disabled');
+    expect(screen.queryByRole('link')).toBeNull();
     fireEvent.click(el());
     expect(onClick).not.toHaveBeenCalled();
-    error.mockRestore();
   });
 
-  it('gives an element with no role of its own a button role', () => {
-    const error = silence();
+  it('renders the element given to `render`, merging its own props onto it', () => {
     render(
-      <Button render={<span />} data-testid="b">
+      <Button render={<span />} className="btn" data-testid="b">
         go
       </Button>,
     );
-    expect(el()).toHaveAttribute('role', 'button');
-    error.mockRestore();
+    expect(el().tagName).toBe('SPAN');
+    expect(el()).toHaveClass('btn');
   });
 
-  it('leaves an anchor its own role, which suits navigation better', () => {
+  it('reports an href it cannot take away when disabled', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     render(
       // eslint-disable-next-line jsx-a11y/anchor-has-content
-      <Button render={<a href="/docs" />} data-testid="b">
+      <Button render={<a href="/docs" />} disabled data-testid="b">
         Docs
       </Button>,
     );
-    expect(el()).not.toHaveAttribute('role');
+    expect(error).toHaveBeenCalledWith(expect.stringContaining('cannot remove the `href`'));
+    error.mockRestore();
   });
 
-  it('adds no role to a native button', () => {
-    render(<Button data-testid="b">go</Button>);
-    expect(el()).not.toHaveAttribute('role');
-  });
-
-  it('accepts nativeButton for a component render cannot inspect', () => {
-    const error = silence();
-    function Wrapped(props: Record<string, unknown>) {
-      return <button {...props} />;
-    }
+  it('spreads unrecognised props onto the element', () => {
     render(
-      <Button render={<Wrapped />} nativeButton data-testid="b">
+      <Button id="go" aria-describedby="hint" data-testid="b">
         go
       </Button>,
     );
-    // Treated as native despite render being a component, so no synthesised attributes.
-    expect(el()).not.toHaveAttribute('tabindex');
-    expect(error).not.toHaveBeenCalled();
-    error.mockRestore();
+    expect(el()).toHaveAttribute('id', 'go');
+    expect(el()).toHaveAttribute('aria-describedby', 'hint');
   });
 });

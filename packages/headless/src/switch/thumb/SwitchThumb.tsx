@@ -1,8 +1,8 @@
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import { useRender } from '../../core/useRender';
 import type { UnknownProps } from '../../core/mergeProps';
-import { useSwitchRootContext, type SwitchState } from '../SwitchRootContext';
-import { switchStateAttributes } from '../stateAttributes';
+import { useSwitchRootContext } from '../SwitchRootContext';
+import { switchDataAttributes } from '../stateAttributes';
 
 /**
  * Switch.Thumb's own props. Everything else — `id`, `className`, `children`, `aria-*`,
@@ -34,12 +34,10 @@ export type SwitchThumbProps = SwitchThumbOwnProps &
 export function SwitchThumb({ className, children, render, ...rest }: SwitchThumbProps) {
   const state = useSwitchRootContext();
 
-  return useRender<SwitchState>({
+  return useRender({
     render,
     defaultTagName: 'span',
-    state,
-    stateAttributes: switchStateAttributes,
-    props: { 'aria-hidden': true, className, children },
+    props: { 'aria-hidden': true, ...switchDataAttributes(state), className, children },
     consumerProps: rest as UnknownProps,
   });
 }
