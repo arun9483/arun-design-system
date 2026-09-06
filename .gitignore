@@ -29,6 +29,7 @@ Thumbs.db
 .claude/*
 !.claude/skills/
 !.claude/settings.json
+CLAUDE.md
 
 # Package manager
 .pnp.*
