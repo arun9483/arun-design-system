@@ -167,3 +167,10 @@
   block-size: 65%;
   stroke-linecap: round;
 }
+
+/* Thumb rendered as the icon itself — it keeps the thumb's circle, so the glyph needs
+   the colour inverted against it rather than the accent used when it sits inside one. */
+.ds-icon-thumb {
+  color: var(--switch-track-bg-checked);
+  padding: 0;
+}
