@@ -6,6 +6,7 @@ description: An immediate on/off control. Behaviour from @arun-dev/headless, sty
 import Example from '@/components/Example.astro';
 import SwitchBasics from '@/examples/switch-basics';
 import SwitchControlled from '@/examples/switch-controlled';
+import SwitchThemeToggle from '@/examples/switch-theme-toggle';
 import PropTable from '@/components/PropTable.astro';
 import { SwitchPlayground } from '@/components/playgrounds';
 import { Aside } from '@astrojs/starlight/components';
@@ -38,6 +39,19 @@ rule, and you avoid disabling it at every call site.
 Where there is no visible copy, pass `aria-label` or `aria-labelledby` instead.
 
 </Aside>
+
+## A thumb with an icon
+
+`Switch.Thumb` is a real element, not a pseudo-element, so it can hold content — an icon, a
+loading spinner. That is [why the switch is two parts](/headless/components/#why-two-parts).
+
+<Example name="switch-theme-toggle" layout="stack">
+  <SwitchThemeToggle client:load />
+</Example>
+
+The icon is decorative: the Root already carries `role="switch"` and `aria-checked`, and the
+thumb is `aria-hidden`, so a screen reader hears the state once rather than twice. Size the icon
+relative to `--switch-thumb-size` and it survives a re-scale of the switch tokens.
 
 ## Playground
 

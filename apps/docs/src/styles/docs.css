@@ -145,3 +145,25 @@
   font-size: var(--text-sm);
   text-align: center;
 }
+
+/* Theme-toggle example — a switch whose thumb carries an icon. */
+.ds-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+/* The thumb is 0.875rem across, so the icon is sized as a share of it rather than in
+   absolute units — it stays centred if the switch tokens are re-scaled. */
+.ds-theme-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--switch-track-bg-checked);
+}
+
+.ds-theme-thumb svg {
+  inline-size: 65%;
+  block-size: 65%;
+  stroke-linecap: round;
+}
