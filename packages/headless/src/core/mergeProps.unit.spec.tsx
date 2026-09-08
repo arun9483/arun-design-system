@@ -29,7 +29,7 @@ describe('mergeProps', () => {
       { onClick: () => calls.push('consumer') },
     );
     (merged.onClick as () => void)();
-    // Right to left — see the handler chain suite below for why.
+    // Right to left: the consumer runs first, which is what lets it stop the ones behind it.
     expect(calls).toEqual(['consumer', 'component']);
   });
 
@@ -41,32 +41,6 @@ describe('mergeProps', () => {
 describe('handler chain', () => {
   /** React attaches `nativeEvent`; the chain uses it to tell events from plain values. */
   const syntheticEvent = () => ({ nativeEvent: {} }) as Record<string, unknown>;
-
-  it('runs the consumer handler before the component one', () => {
-    const order: string[] = [];
-    const merged = mergeProps(
-      { onClick: () => order.push('component') },
-      { onClick: () => order.push('consumer') },
-    );
-
-    (merged.onClick as (e: unknown) => void)(syntheticEvent());
-    expect(order).toEqual(['consumer', 'component']);
-  });
-
-  it("lets the consumer stop the component's handler", () => {
-    const component = vi.fn();
-    const merged = mergeProps(
-      { onClick: component },
-      {
-        onClick: (event: { preventComponentHandler(): void }) => {
-          event.preventComponentHandler();
-        },
-      },
-    );
-
-    (merged.onClick as (e: unknown) => void)(syntheticEvent());
-    expect(component).not.toHaveBeenCalled();
-  });
 
   it('runs the component handler when the consumer does not stop it', () => {
     const component = vi.fn();
@@ -102,26 +76,6 @@ describe('handler chain', () => {
 
     (merged.onCheckedChange as (v: boolean) => void)(true);
     expect(component).toHaveBeenCalledWith(true);
-  });
-
-  it('runs the chain normally when nothing stops it', () => {
-    const component = vi.fn();
-    const merged = mergeProps({ onClick: component }, { onClick: () => {} });
-
-    (merged.onClick as (e: unknown) => void)(syntheticEvent());
-    expect(component).toHaveBeenCalledOnce();
-  });
-
-  it('leaves preventDefault alone', () => {
-    const component = vi.fn();
-    const merged = mergeProps(
-      { onClick: component },
-      { onClick: (event: { defaultPrevented: boolean }) => (event.defaultPrevented = true) },
-    );
-
-    (merged.onClick as (e: unknown) => void)(syntheticEvent());
-    // Cancelling the browser's default action says nothing about the handler chain.
-    expect(component).toHaveBeenCalledOnce();
   });
 
   it('calling preventDefault() does not stop the chain, and still reaches the event', () => {
@@ -173,88 +127,122 @@ describe('handler chain', () => {
     expect(component).toHaveBeenCalledOnce();
     expect(stopPropagation).toHaveBeenCalledOnce();
   });
-
-  it('preventDefault() and preventComponentHandler() are independent signals', () => {
-    const component = vi.fn();
-    const preventDefault = vi.fn();
-    const event = { nativeEvent: {}, preventDefault };
-    const merged = mergeProps(
-      { onClick: component },
-      {
-        onClick: (e: { preventDefault(): void; preventComponentHandler(): void }) => {
-          e.preventDefault();
-          e.preventComponentHandler();
-        },
-      },
-    );
-
-    (merged.onClick as (e: unknown) => void)(event);
-    // Both were asked for, and both happened: browser action cancelled, chain stopped.
-    expect(preventDefault).toHaveBeenCalledOnce();
-    expect(component).not.toHaveBeenCalled();
-  });
 });
 
 /**
  * The suites above drive the chain with plain objects. These go through React and the DOM
  * instead, so the standard calls are the real ones and the browser behaviour they govern —
- * a checkbox toggling, an event bubbling — is what is actually asserted.
+ * a checkbox ticking, an event bubbling — is what is actually asserted.
+ *
+ * Every test renders the same shape: a checkbox whose onClick is merged from a component
+ * handler and a consumer handler, sitting inside a bare parent that catches the event on its
+ * way up. One click then reports all three outcomes — the tick, the parent, the chain — so
+ * each test can say what its signal changed and, just as importantly, what it left alone.
  */
 describe('native browser behaviour', () => {
-  const checkbox = (consumer: Record<string, unknown>, component = vi.fn()) => {
-    const props = mergeProps({ onClick: component }, consumer);
-    render(<input type="checkbox" aria-label="box" onChange={() => {}} {...props} />);
-    return { box: screen.getByLabelText('box') as HTMLInputElement, component };
-  };
-
-  it('toggles the checkbox when nobody cancels it', () => {
-    // The control for the test below: without it, asserting `false` proves nothing.
-    const { box, component } = checkbox({ onClick: () => {} });
+  it('ticks the box, reaches the parent, and runs the chain when nothing cancels anything', () => {
+    const parent = vi.fn();
+    const component = vi.fn();
+    const props = mergeProps({ onClick: component }, { onClick: () => {} });
+    render(
+      // A bare wrapper, there only to catch the event on its way up.
+      <div role="presentation" onClick={parent}>
+        <input type="checkbox" aria-label="box" onChange={() => {}} {...props} />
+      </div>,
+    );
+    const box = screen.getByLabelText('box') as HTMLInputElement;
 
     fireEvent.click(box);
+    // The control for the tests below: without it, asserting the opposite proves nothing.
     expect(box.checked).toBe(true);
+    expect(parent).toHaveBeenCalledOnce();
     expect(component).toHaveBeenCalledOnce();
   });
 
-  it("preventDefault() in a chained handler still cancels the browser's action", () => {
-    const { box, component } = checkbox({
-      onClick: (event: React.MouseEvent) => event.preventDefault(),
+  it('preventDefault() in a chained handler stops the tick but not the bubbling', () => {
+    const parent = vi.fn();
+    let defaultPreventedWhenComponentRan: boolean | undefined;
+    const component = vi.fn((event: React.MouseEvent) => {
+      defaultPreventedWhenComponentRan = event.defaultPrevented;
     });
+    const props = mergeProps(
+      { onClick: component },
+      { onClick: (event: React.MouseEvent) => event.preventDefault() },
+    );
+    render(
+      // A bare wrapper, there only to catch the event on its way up.
+      <div role="presentation" onClick={parent}>
+        <input type="checkbox" aria-label="box" onChange={() => {}} {...props} />
+      </div>,
+    );
+    const box = screen.getByLabelText('box') as HTMLInputElement;
 
     fireEvent.click(box);
-    // Cancelled for real — the merge did not swallow the call.
+    // The default action here is ticking the box, and it was cancelled.
     expect(box.checked).toBe(false);
-    // And the component's handler ran anyway: the two signals are independent.
+    // Cancelling it does not stop the event: the parent still hears the click,
+    expect(parent).toHaveBeenCalledOnce();
+    // and the chain on this element ran in full: it never consults defaultPrevented, so an
+    // already-cancelled event is no reason to stop.
     expect(component).toHaveBeenCalledOnce();
+    expect(defaultPreventedWhenComponentRan).toBe(true);
   });
 
-  it('preventComponentHandler() leaves the browser action alone', () => {
-    const { box, component } = checkbox({
-      onClick: (event: React.MouseEvent & { preventComponentHandler(): void }) =>
-        event.preventComponentHandler(),
-    });
+  it('preventComponentHandler() stops the component handler and nothing else', () => {
+    const parent = vi.fn();
+    const component = vi.fn();
+    const props = mergeProps(
+      { onClick: component },
+      {
+        onClick: (event: React.MouseEvent & { preventComponentHandler(): void }) =>
+          event.preventComponentHandler(),
+      },
+    );
+    render(
+      // A bare wrapper, there only to catch the event on its way up.
+      <div role="presentation" onClick={parent}>
+        <input type="checkbox" aria-label="box" onChange={() => {}} {...props} />
+      </div>,
+    );
+    const box = screen.getByLabelText('box') as HTMLInputElement;
 
     fireEvent.click(box);
+    // The chain stopped before the component's handler,
     expect(component).not.toHaveBeenCalled();
-    // The other direction of the same independence: the checkbox still toggles.
+    // but the browser action and the trip upwards are untouched: the signals are independent.
     expect(box.checked).toBe(true);
+    expect(parent).toHaveBeenCalledOnce();
   });
 
   it('applies both when preventDefault() and preventComponentHandler() are called together', () => {
-    const { box, component } = checkbox({
-      onClick: (event: React.MouseEvent & { preventComponentHandler(): void }) => {
-        event.preventDefault();
-        event.preventComponentHandler();
+    const parent = vi.fn();
+    const component = vi.fn();
+    const props = mergeProps(
+      { onClick: component },
+      {
+        onClick: (event: React.MouseEvent & { preventComponentHandler(): void }) => {
+          event.preventDefault();
+          event.preventComponentHandler();
+        },
       },
-    });
+    );
+    render(
+      // A bare wrapper, there only to catch the event on its way up.
+      <div role="presentation" onClick={parent}>
+        <input type="checkbox" aria-label="box" onChange={() => {}} {...props} />
+      </div>,
+    );
+    const box = screen.getByLabelText('box') as HTMLInputElement;
 
     fireEvent.click(box);
-    // Neither call weakens the other: the browser action is cancelled and the chain stops.
+    // Neither call weakens the other: the tick is cancelled and the chain stops.
     expect(box.checked).toBe(false);
     expect(component).not.toHaveBeenCalled();
+    // Neither of them is about propagation, so the parent still hears the click.
+    expect(parent).toHaveBeenCalledOnce();
   });
 
-  it('stopPropagation() in a chained handler still stops the event reaching a parent', () => {
+  it('stopPropagation() in a chained handler stops the bubbling and nothing else', () => {
     const parent = vi.fn();
     const component = vi.fn();
     const props = mergeProps(
@@ -262,35 +250,18 @@ describe('native browser behaviour', () => {
       { onClick: (event: React.MouseEvent) => event.stopPropagation() },
     );
     render(
-      // A bare click target for propagation, not a control anyone interacts with.
-      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-      <div onClick={parent}>
-        <button type="button" {...props}>
-          go
-        </button>
+      // A bare wrapper, there only to catch the event on its way up.
+      <div role="presentation" onClick={parent}>
+        <input type="checkbox" aria-label="box" onChange={() => {}} {...props} />
       </div>,
     );
+    const box = screen.getByLabelText('box') as HTMLInputElement;
 
-    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(box);
+    // The event never reached the parent — stopped for real, the merge did not swallow the call.
     expect(parent).not.toHaveBeenCalled();
-    // Bubbling stopped, but the chain on this element ran in full.
+    // Only the trip upwards is stopped: the box still ticks and the chain ran in full.
+    expect(box.checked).toBe(true);
     expect(component).toHaveBeenCalledOnce();
-  });
-
-  it('lets the event reach a parent when nothing stops it', () => {
-    const parent = vi.fn();
-    const props = mergeProps({ onClick: vi.fn() }, { onClick: vi.fn() });
-    render(
-      // A bare click target for propagation, not a control anyone interacts with.
-      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-      <div onClick={parent}>
-        <button type="button" {...props}>
-          go
-        </button>
-      </div>,
-    );
-
-    fireEvent.click(screen.getByRole('button'));
-    expect(parent).toHaveBeenCalledOnce();
   });
 });
