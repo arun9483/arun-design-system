@@ -1,15 +1,19 @@
 # arun-design-system
 
 A standalone, publishable design system monorepo. Pure-CSS design tokens with white-label brand
-generation, and a brand-agnostic React component library built on top of them.
+generation, unstyled React behaviour primitives, and a brand-agnostic React component library built
+on top of both.
 
 ## Packages
 
-| Package                               | Description                                                                                             | Published  |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------- |
-| [`@arun-dev/tokens`](packages/tokens) | Design tokens — pure CSS primitives, brand palettes, semantic layers, and the `createBrand()` generator | ✅         |
-| [`@arun-dev/ui`](packages/ui)         | React components (`Button`, `Card`, `Chip`, `Badge`) styled entirely via semantic tokens                | ✅         |
-| [`@arun-dev/config`](packages/config) | Internal ESLint and TypeScript base configs                                                             | ❌ private |
+| Package                                             | Description                                                                                                                                        | Published  |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| [`@arun-dev/tokens`](packages/tokens)               | Design tokens — pure CSS primitives, brand palettes, semantic layers, and the `createBrand()` generator                                            | ✅         |
+| [`@arun-dev/headless`](packages/headless)           | Unstyled React behaviour primitives — render engine, controlled/uncontrolled state, and `data-*` state projection. Ships no CSS and no class names | ✅         |
+| [`@arun-dev/ui`](packages/ui)                       | React components (`Button`, `Card`, `Chip`, `Badge`, `Switch`) built on the headless primitives and styled entirely via semantic tokens            | ✅         |
+| [`@arun-dev/eslint-config`](packages/eslint-config) | Shared ESLint flat config — typescript-eslint strict, react, react-hooks, jsx-a11y and security plugins as one rule set                            | ✅         |
+| [`@arun-dev/ts-config`](packages/ts-config)         | Shared strict TypeScript configs — `base` and `nextjs` variants                                                                                    | ✅         |
+| [`@arun-dev/config`](packages/config)               | ESLint and TypeScript base configs consumed inside this repo only                                                                                  | ❌ private |
 
 ## Documentation
 
@@ -39,8 +43,12 @@ from that same file — there is no second copy to drift.
 ## Quick start (consumers)
 
 ```bash
-npm install @arun-dev/tokens @arun-dev/ui
+npm install @arun-dev/tokens @arun-dev/ui @arun-dev/headless
 ```
+
+`@arun-dev/headless` is a peer dependency of `@arun-dev/ui` (it backs `Switch`), as are `react`
+and `react-dom` >= 19. npm installs peers automatically; pnpm and yarn do not, so install it
+explicitly as above.
 
 ```ts
 // 1. Structural primitives — spacing, radius, typography, motion, shadow, elevation
@@ -50,7 +58,7 @@ import '@arun-dev/tokens/brands/default';
 // 3. Component styles
 import '@arun-dev/ui/components.css';
 
-import { Button, Card, Chip, Badge } from '@arun-dev/ui';
+import { Button, Card, Chip, Badge, Switch } from '@arun-dev/ui';
 ```
 
 > **All three imports are required.** `@arun-dev/tokens/base` provides only the brand-independent
@@ -98,7 +106,8 @@ tier that matches the blast radius you want:
 ```
 
 Component tokens ship with `@arun-dev/tokens/base`, and are also exported standalone as
-`@arun-dev/tokens/components`. Current sets: `--chip-*`, `--badge-*`.
+`@arun-dev/tokens/components`. Current sets: `--chip-*`, `--badge-*`, `--button-*`,
+`--switch-*`.
 
 ## Two public APIs
 
@@ -106,7 +115,9 @@ Component tokens ship with `@arun-dev/tokens/base`, and are also exported standa
 
 ### 1. React components
 
-`Button`, `Card`, `Chip`, `Badge` — imported from `@arun-dev/ui`.
+`Button`, `Card`, `Chip`, `Badge` and the two-part `Switch.Root` / `Switch.Thumb` — imported from
+`@arun-dev/ui`. Switch is built on `@arun-dev/headless`, which owns its props types; derive them
+with `ComponentProps<typeof Switch.Root>` rather than importing them from `@arun-dev/ui`.
 
 Components render a sensible default element, and accept a `render` prop to change it. Props,
 `className`, event handlers and refs are merged onto whatever you pass:
@@ -143,7 +154,7 @@ element the components don't render.
 | Component-only | `metric` — an accent-tinted stat container; supply your own markup (e.g. a `<dl>`)                                                                                                                                     |
 
 Individual stylesheets are also exported for granular loading: `@arun-dev/ui/css/reset`,
-`/css/btn`, `/css/card`, `/css/chip`, `/css/badge`, `/css/metric`, `/css/utilities`.
+`/css/btn`, `/css/card`, `/css/chip`, `/css/badge`, `/css/switch`, `/css/metric`, `/css/utilities`.
 
 ## Development
 
