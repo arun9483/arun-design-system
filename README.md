@@ -23,10 +23,6 @@ Live examples, interactive playgrounds and a prop reference — an Astro Starlig
 [`apps/docs`](apps/docs), deployed from `main`. Run it locally with
 `pnpm --filter @arun-dev/docs dev`.
 
-| Home                             | A component page                     |
-| -------------------------------- | ------------------------------------ |
-| ![Docs home](docs/docs-home.png) | ![Button page](docs/docs-button.png) |
-
 Two controls in the header demonstrate the architecture rather than the components:
 
 The site is itself a consumer, following the documented path exactly: one `createBrand()` call
