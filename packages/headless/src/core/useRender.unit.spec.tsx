@@ -124,17 +124,35 @@ describe('useRender', () => {
     expect(seen[0]).toBe(screen.getByText('content'));
   });
 
+  /**
+   * Both refs have to be let go of when the element goes away.
+   *
+   * React 19 decides how to do that by looking at what a callback ref returns:
+   *   returns a function -> React calls that function to clean up
+   *   returns nothing    -> React calls the ref a second time, with null
+   *
+   * `mergeRefs` in mergeProps.ts gives React one callback for both refs, and that
+   * callback returns a cleanup function. So React takes the first path and never calls
+   * our refs with null. mergeRefs makes that null call itself instead, in the
+   * callback-ref branch:
+   *   `typeof result === 'function' ? result : () => ref(null)`
+   */
   it('clears an object ref and a legacy callback ref on unmount', () => {
     const objectRef: { current: HTMLElement | null } = { current: null };
     const seen: (Element | null)[] = [];
     const { unmount } = render(
+      // `void` throws away what push returns, so this ref returns nothing. That makes it
+      // the plain old kind of ref — the kind that expects to be called with null.
       <Fixture ref={objectRef} render={<span ref={(node) => void seen.push(node)} />}>
         content
       </Fixture>,
     );
     unmount();
+    // mergeRefs sets .current back to null for object refs (mergeProps.ts, object-ref branch).
     expect(objectRef.current).toBeNull();
-    // A legacy callback ref returns nothing, so it must still be called with null.
+    // `seen` is now [<span>, null]. That null is the last push, and it came from the
+    // `() => ref(null)` in mergeRefs — nothing else would have called this ref
+    // again. .at(-1) reads the last entry, i.e. where the ref ended up.
     expect(seen.at(-1)).toBeNull();
   });
 });

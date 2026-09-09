@@ -16,15 +16,30 @@ function isEventHandler(key: string): boolean {
   return key.length > 2 && key.startsWith('on') && key[2] === key[2]?.toUpperCase();
 }
 
+/**
+ * Folds several refs into one callback ref.
+ *
+ * What each kind of ref gets:
+ *
+ * | ref                                       | on attach            | on detach (cleanup)      |
+ * | ----------------------------------------- | -------------------- | ------------------------ |
+ * | object (`useRef`, `{current}`)            | `ref.current = node` | `ref.current = null`     |
+ * | function returning a cleanup function     | `ref(node)`          | its own cleanup runs     |
+ * | function not returning a cleanup function | `ref(node)`          | `ref(null)`, synthesized |
+ * | `null` / `undefined`                      | nothing              | nothing                  |
+ *
+ * The branch is picked on the way in, not on the way out: the return value of
+ * `ref(node)` decides which cleanup is stored in `cleanups`, so by the time React runs
+ * the merged cleanup the choice is already fixed. React calls that cleanup with no
+ * arguments and ignores what it returns — the node was captured on attach.
+ */
 function mergeRefs(...refs: Ref[]) {
   return (node: unknown) => {
     const cleanups = refs.map((ref) => {
       if (typeof ref === 'function') {
         const result = ref(node);
-        // React 19 lets a ref callback return its own cleanup. A legacy callback
-        // returns nothing and expects to be called with null on detach instead —
-        // and it would never get that call, because returning a cleanup from the
-        // merged callback opts the whole ref out of React's null-on-detach path.
+        // Returning a cleanup from the merged callback opts every ref inside it out of
+        // React's null-on-detach path, so a legacy ref's null call is made here instead.
         return typeof result === 'function' ? result : () => ref(null);
       }
       if (ref && typeof ref === 'object') {

@@ -6,7 +6,7 @@
  * documentation wrong. It asserts names, not descriptions — prose still needs a human.
  */
 import type { BadgeProps, ButtonProps, CardProps, ChipProps } from '@arun-dev/ui';
-import type { SwitchRootProps } from '@arun-dev/headless/switch';
+import type { SwitchRootProps, SwitchThumbProps } from '@arun-dev/headless/switch';
 import type { COMMON, PROPS } from './props';
 
 type Documented<Key extends keyof typeof PROPS> = (typeof PROPS)[Key][number]['name'];
@@ -25,7 +25,8 @@ type Unknown =
   | OnlyRealProps<Documented<'Card'>, CardProps>
   | OnlyRealProps<Documented<'Chip'>, ChipProps>
   | OnlyRealProps<Documented<'Badge'>, BadgeProps>
-  | OnlyRealProps<Documented<'Switch.Root'>, SwitchRootProps>;
+  | OnlyRealProps<Documented<'Switch.Root'>, SwitchRootProps>
+  | OnlyRealProps<Documented<'Switch.Thumb'>, SwitchThumbProps>;
 
 /**
  * `never` means every documented name resolves. Anything else is the name that does

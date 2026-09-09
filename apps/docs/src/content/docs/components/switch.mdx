@@ -117,6 +117,30 @@ import { Switch } from '@arun-dev/ui';
 
 <PropTable component="Switch.Root" />
 
+### Typing a wrapper
+
+`@arun-dev/ui` does not export a props type for the switch. The type is defined by
+`@arun-dev/headless`, and a re-export would only record where it lives today: the moment
+`@arun-dev/ui` adds a prop of its own, the alias is wrong, and wrong silently, because it still
+compiles and merely under-reports. Derive it from the component instead — that is a reference to
+the component rather than a snapshot of its type's origin, so it survives the change:
+
+```tsx
+import type { ComponentProps } from 'react';
+import { Switch } from '@arun-dev/ui';
+
+function NotificationSwitch(props: ComponentProps<typeof Switch.Root>) {
+  return (
+    <Switch.Root {...props}>
+      <Switch.Thumb />
+    </Switch.Root>
+  );
+}
+```
+
+Using the headless parts directly, the types are exported by the package that owns them:
+`import type { SwitchRootProps, SwitchThumbProps } from '@arun-dev/headless/switch'`.
+
 ## Behaviour
 
 - Always a native `<button>`, so focus, `Space` and `Enter` come from the platform rather than
