@@ -1,6 +1,6 @@
 {
   "name": "@arun-dev/headless",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Unstyled React behaviour primitives — render engine, controlled/uncontrolled state, and data-* state projection. Ships no CSS and no class names.",
   "license": "MIT",
   "type": "module",
