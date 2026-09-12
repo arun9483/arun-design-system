@@ -35,6 +35,8 @@ import { Switch } from '@arun-dev/headless/switch';
 navigates should be an anchor, so middle-click, cmd-click and "link" in assistive technology all
 keep working. It defaults `type="button"` so a button never submits a form by accident, and a
 disabled `href` renders a `<button disabled>`, because a link that navigates nowhere is not a link.
+A `render` component cannot be inspected, so a disabled Button gives it `aria-disabled` and
+`data-disabled` rather than `disabled` — actually disabling itself is up to the component.
 
 ```tsx
 import { Button } from '@arun-dev/headless/button';
@@ -47,6 +49,10 @@ import { Button } from '@arun-dev/headless/button';
 `Switch.Root` renders a native `<button>`, so focus, `Space`, `Enter` and disabled semantics come
 from the platform. It carries `role="switch"` and `aria-checked`, but **no accessible name** —
 wrap it in a `<label>` or pass `aria-label`. A headless component should not guess at your copy.
+
+In a form it behaves like a native checkbox: with a `name` it submits its `value` only when checked
+and enabled, and `form.reset()` returns it to the state it mounted with, reported through
+`onCheckedChange`.
 
 ## State reaches CSS through `data-*`
 

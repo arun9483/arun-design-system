@@ -12,6 +12,9 @@ type ButtonOwnProps = {
    * Prevents activation. On a `<button>` the platform does it; on the `<a>` that
    * `href` renders, dropping the `href` does it — the DOM leaves an anchor without one
    * unfocusable, unactivatable and no longer a link.
+   *
+   * A `render` component cannot be inspected, so it gets `aria-disabled` and
+   * `data-disabled` rather than `disabled`: actually disabling itself is up to it.
    */
   disabled?: boolean;
   /**

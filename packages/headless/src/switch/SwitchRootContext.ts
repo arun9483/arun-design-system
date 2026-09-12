@@ -1,10 +1,6 @@
 import { createContext, useContext } from 'react';
 
-/**
- * A type alias rather than an interface: only aliases get an implicit index
- * signature, which is what lets this satisfy the `Record<string, unknown>` the
- * state-attribute mapper is generic over.
- */
+/** The state Switch.Root shares with its parts, and projects as `data-*` attributes. */
 export type SwitchState = {
   checked: boolean;
   disabled: boolean;
