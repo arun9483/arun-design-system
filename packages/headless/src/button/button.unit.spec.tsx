@@ -64,6 +64,20 @@ describe('Button', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
+  it('leaves disabling to a render component, which it cannot inspect', () => {
+    function Forwarding(props: Record<string, unknown>) {
+      return <button {...props} />;
+    }
+    render(
+      <Button render={<Forwarding />} disabled data-testid="b">
+        go
+      </Button>,
+    );
+    expect(el()).not.toBeDisabled();
+    expect(el()).toHaveAttribute('aria-disabled', 'true');
+    expect(el()).toHaveAttribute('data-disabled');
+  });
+
   it('renders the element given to `render`, merging its own props onto it', () => {
     render(
       <Button render={<span />} className="btn" data-testid="b">

@@ -89,7 +89,7 @@ describe('state attribute contract', () => {
   const emitted = emittedBy(HEADLESS_SRC);
   const styled = styledBy(UI_SRC);
 
-  it('finds the state-attribute mappings it is meant to check', () => {
+  it('finds the attributes and selectors it is meant to check', () => {
     // Guards the scan itself: a rename or move would otherwise empty both sets and
     // leave the contract passing while checking nothing.
     expect(emitted.size, `no data-* attributes found under ${HEADLESS_SRC}`).toBeGreaterThan(0);

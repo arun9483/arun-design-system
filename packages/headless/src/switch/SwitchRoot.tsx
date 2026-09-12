@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
+import type { ComponentPropsWithRef, ReactElement, Ref, RefObject } from 'react';
 import { useControlled } from '../core/useControlled';
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
@@ -12,8 +12,9 @@ import { switchDataAttributes } from './switchDataAttributes';
  * and checked without being declared here.
  *
  * `id` in particular is how a switch gets an accessible name, paired with a
- * `<label htmlFor>`: the rendered `<button>` is not named implicitly by a wrapping
- * `<label>`, and `jsx-a11y/label-has-associated-control` rejects it as a nested control.
+ * `<label htmlFor>`. A wrapping `<label>` names the rendered `<button>` too, but
+ * `jsx-a11y/label-has-associated-control` rejects a button as a nested control, so the
+ * explicit pairing is the one that passes lint.
  */
 type SwitchRootOwnProps = {
   /**
@@ -30,7 +31,7 @@ type SwitchRootOwnProps = {
   disabled?: boolean;
   /**
    * Submits with the enclosing form when checked, mirroring a native checkbox:
-   * an unchecked control contributes nothing.
+   * an unchecked or disabled control contributes nothing.
    */
   name?: string;
   /** Value submitted when checked. Defaults to `"on"`, as a native checkbox does. */
@@ -59,6 +60,10 @@ export type SwitchRootProps = SwitchRootOwnProps &
  * of it is synthesised here. Per the WAI-ARIA switch pattern it carries `role="switch"`
  * and `aria-checked`.
  *
+ * Inside a form it behaves as a checkbox would there: `form.reset()` returns it to the
+ * state it mounted with. The change is reported through `onCheckedChange`, so a
+ * controlled switch moves only if its parent accepts it.
+ *
  * It has no accessible name of its own — pair it with a `<label htmlFor>` by `id`, or
  * pass `aria-label` or `aria-labelledby`. That is the consumer's decision, not one a
  * headless component should guess.
@@ -83,7 +88,11 @@ export function SwitchRoot({
   });
 
   const state: SwitchState = useMemo(() => ({ checked, disabled }), [checked, disabled]);
-  const elementRef = useNativeButtonWarning();
+  const elementRef = useRef<HTMLElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useNativeButtonWarning(elementRef);
+  useFormReset({ elementRef, inputRef, checked, setChecked, onCheckedChange });
 
   const element = useRender({
     render,
@@ -111,15 +120,72 @@ export function SwitchRoot({
   return (
     <SwitchRootContext.Provider value={state}>
       {element}
-      {/* Native checkboxes submit only when checked; an unchecked switch contributes
-          nothing, so a form sees the same shape it would from a checkbox. A real
-          checkbox rather than a hidden input, so `form.reset()` and `form.elements`
-          behave as they would for one. */}
+      {/* Native checkboxes submit only when checked and enabled; the hidden input does
+          the same, so a form sees the shape it would from a checkbox. A real checkbox
+          rather than type="hidden", so it is listed in `form.elements`. */}
       {name !== undefined ? (
-        <input type="checkbox" hidden readOnly name={name} value={value} checked={checked} />
+        <input
+          ref={inputRef}
+          type="checkbox"
+          hidden
+          readOnly
+          name={name}
+          value={value}
+          checked={checked}
+          disabled={disabled}
+        />
       ) : null}
     </SwitchRootContext.Provider>
   );
+}
+
+/**
+ * Returns the switch to the state it mounted with when its form is reset.
+ *
+ * The platform resets the hidden checkbox by itself, but knows nothing of the React
+ * state behind `aria-checked` and the `data-*` attributes — without this, a reset form
+ * shows one value and submits another. React writes the mount-time `checked` as the
+ * input's default, so "the state it mounted with" is exactly what the platform resets
+ * the input to.
+ *
+ * `reset` fires before the form resets, and a listener that runs after this one can
+ * still cancel it, so the work waits for a microtask, when dispatch has finished.
+ */
+function useFormReset({
+  elementRef,
+  inputRef,
+  checked,
+  setChecked,
+  onCheckedChange,
+}: {
+  elementRef: RefObject<HTMLElement | null>;
+  inputRef: RefObject<HTMLInputElement | null>;
+  checked: boolean;
+  setChecked: (next: boolean) => void;
+  onCheckedChange: ((checked: boolean) => void) | undefined;
+}) {
+  const { current: initialChecked } = useRef(checked);
+
+  useEffect(() => {
+    // `.form` also honours a `form="id"` attribute on the button.
+    const form = (elementRef.current as HTMLButtonElement | null)?.form;
+    if (!form) return;
+
+    function onReset(event: Event) {
+      queueMicrotask(() => {
+        if (event.defaultPrevented) return;
+        // Undo the platform's reset of the input: it follows the switch, and only moves
+        // when the state below does — which a controlled parent may decline.
+        if (inputRef.current) inputRef.current.checked = checked;
+        if (checked === initialChecked) return;
+        setChecked(initialChecked);
+        onCheckedChange?.(initialChecked);
+      });
+    }
+
+    form.addEventListener('reset', onReset);
+    return () => form.removeEventListener('reset', onReset);
+  }, [elementRef, inputRef, checked, setChecked, onCheckedChange, initialChecked]);
 }
 
 /**
@@ -129,9 +195,7 @@ export function SwitchRoot({
  * `render` element can take away. Reporting it is cheaper than synthesising focus and
  * keyboard activation for elements nobody should be passing here.
  */
-function useNativeButtonWarning(): Ref<HTMLElement> {
-  const elementRef = useRef<HTMLElement | null>(null);
-
+function useNativeButtonWarning(elementRef: RefObject<HTMLElement | null>) {
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') return;
     const element = elementRef.current;
@@ -142,7 +206,5 @@ function useNativeButtonWarning(): Ref<HTMLElement> {
         'Focus, Space and Enter activation and `disabled` all come from the button ' +
         'element; pass a `render` component that forwards its props to one.',
     );
-  }, []);
-
-  return elementRef;
+  }, [elementRef]);
 }

@@ -1,6 +1,11 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { act, render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { Switch } from './index';
+
+/** What the enclosing form would submit, as [name, value] pairs. */
+const submitted = (container: HTMLElement) => [
+  ...new FormData(container.querySelector('form') ?? undefined).entries(),
+];
 
 /** Renders the anatomy a consumer would write, with an accessible name. */
 function Fixture(props: Record<string, unknown> = {}) {
@@ -39,6 +44,17 @@ describe('Switch — ARIA switch pattern', () => {
 
   it('takes its accessible name from the wrapping label', () => {
     render(<Fixture />);
+    expect(screen.getByRole('switch', { name: 'Notifications' })).toBeInTheDocument();
+  });
+
+  it('is named by a wrapping label on its own, without htmlFor', () => {
+    render(
+      // eslint-disable-next-line jsx-a11y/label-has-associated-control -- the case under test
+      <label>
+        <Switch.Root />
+        Notifications
+      </label>,
+    );
     expect(screen.getByRole('switch', { name: 'Notifications' })).toBeInTheDocument();
   });
 
@@ -143,9 +159,91 @@ describe('Switch — forms', () => {
 
   it('keeps the form control out of the accessibility tree and the tab order', () => {
     const { container } = render(<Fixture name="notifications" />);
-    // `hidden` does both, and leaves the input a real form control that form.reset()
-    // and form.elements still see.
+    // `hidden` does both, and leaves the input a real form control that form.elements
+    // still lists.
     expect(input(container)).toHaveAttribute('hidden');
+  });
+
+  it('submits nothing when disabled, like a native checkbox', () => {
+    const { container } = render(
+      <form>
+        <Fixture name="notifications" defaultChecked disabled />
+      </form>,
+    );
+    expect(submitted(container)).toEqual([]);
+  });
+});
+
+describe('Switch — form reset', () => {
+  const reset = (container: HTMLElement) =>
+    act(async () => container.querySelector('form')?.reset());
+
+  it.each([false, true])('returns to its initial state (defaultChecked=%s)', async (initial) => {
+    const { container } = render(
+      <form>
+        <Fixture name="notifications" defaultChecked={initial} />
+      </form>,
+    );
+    fireEvent.click(screen.getByRole('switch'));
+    await reset(container);
+    expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', String(initial));
+  });
+
+  it('keeps what it shows and what it submits in agreement', async () => {
+    const { container } = render(
+      <form>
+        <Fixture name="notifications" />
+      </form>,
+    );
+    fireEvent.click(screen.getByRole('switch'));
+    await reset(container);
+    expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'false');
+    expect(submitted(container)).toEqual([]);
+  });
+
+  it('reports the reset, and returns to its initial state without a name too', async () => {
+    const onCheckedChange = vi.fn();
+    const { container } = render(
+      <form>
+        <Fixture defaultChecked onCheckedChange={onCheckedChange} />
+      </form>,
+    );
+    fireEvent.click(screen.getByRole('switch'));
+    await reset(container);
+    expect(onCheckedChange).toHaveBeenLastCalledWith(true);
+    expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'true');
+  });
+
+  it('asks a controlled parent, and stays in agreement when the parent declines', async () => {
+    const onCheckedChange = vi.fn();
+    const { container, rerender } = render(
+      <form>
+        <Fixture name="notifications" checked={false} onCheckedChange={onCheckedChange} />
+      </form>,
+    );
+    rerender(
+      <form>
+        <Fixture name="notifications" checked onCheckedChange={onCheckedChange} />
+      </form>,
+    );
+    await reset(container);
+    expect(onCheckedChange).toHaveBeenCalledWith(false);
+    // The parent did not feed `false` back, so the switch stays on — and so does the
+    // value it submits.
+    expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'true');
+    expect(submitted(container)).toEqual([['notifications', 'on']]);
+  });
+
+  it('ignores a reset that was cancelled', async () => {
+    const { container } = render(
+      <form onReset={(event) => event.preventDefault()}>
+        <Fixture name="notifications" />
+      </form>,
+    );
+    fireEvent.click(screen.getByRole('switch'));
+    await reset(container);
+    expect(screen.getByRole('switch')).toHaveAttribute('aria-checked', 'true');
+    expect(submitted(container)).toEqual([['notifications', 'on']]);
   });
 });
 
