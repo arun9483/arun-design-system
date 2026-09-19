@@ -175,23 +175,41 @@ consumer's activation handlers and retracted the `href`. It reached 172 lines, n
 `retractActivationProps` because a `render` element's own props outrank everything.
 
 **That was the wrong layer to solve it at.** The second answer is to choose an element
-that already behaves: `Button` renders `<button>`, or `<a href>` when navigating, and a
-disabled `href` renders `<button disabled>` — a link that navigates nowhere is not a
-link. Both elements are natively focusable and activatable, so there is nothing left to
-synthesise. `useButton`, `nativeButton` and `retractActivationProps` are all gone.
+that already behaves. It went through `<button>` or `<a href>` chosen by an `href` prop;
+the final form is simpler still — `Button` always renders a `<button>`, which is natively
+focusable and activatable, so there is nothing left to synthesise. Navigation is not a
+button's job: a link is a separate `Link` component. `useButton`, `nativeButton`,
+`retractActivationProps` and `href` are all gone.
 
-`Switch.Root` is the same decision taken further: it is always a native `<button>`, and
-a `render` producing anything else is _reported_ in development rather than compensated
-for. Radix does the same — its Switch is a `<button role="switch">` and `asChild` is for
-wrappers that forward to one.
+`Switch.Root` is the same decision: its default is a native `<button>`. A `render`
+producing anything else is neither reported nor compensated for — it is the consumer's
+choice (decision 10). Radix makes the same element choice — its Switch is a
+`<button role="switch">` and `asChild` is for wrappers that forward to one.
 
 **Rules out:** behaviour in `@arun-dev/ui`; also synthesising platform behaviour for an
 element that was never going to be right. If a component needs the platform's focus and
 keyboard handling, it renders an element that has them.
 
-**Consequence:** `Button` owns the `href` prop, moved down from `@arun-dev/ui`, because
-`disabled` has to be able to take the URL away and `mergeProps` cannot retract. See
-decision 8.
+### Native first
+
+A component uses the native element unless that element fails one of three tests:
+
+| Test          | Fails when                                                                   |
+| ------------- | ---------------------------------------------------------------------------- |
+| **Content**   | it cannot hold what the design needs — `<input>` is void, `<option>` is text |
+| **Styling**   | it cannot be styled to the design in every supported browser                 |
+| **Behaviour** | its built-in behaviour differs from the pattern — a multi-thumb slider, say  |
+
+Passing all three means native: `Button` is a `<button>`, a link is an `<a href>`, a
+dialog is a `<dialog>` opened with `showModal()`. Failing one means a custom element that
+still leans on native pieces where it can — `Switch.Root` fails the content test (a thumb
+cannot go inside an `<input>`), so it is a `<button>` carrying a hidden
+`<input type="checkbox">` for the form.
+
+Every native element used is focus, keyboard, form or dismissal code that is neither
+written nor tested here. Browser support for the newer candidates — customisable
+`<select>`, CSS anchor positioning, `popover="hint"` — moves fast, so each is checked when
+its component is designed rather than decided in advance.
 
 ---
 
@@ -211,9 +229,9 @@ consumer's handler.
 
 **`children` is deliberately not a third case.** It merges as a plain value, so the last
 object to declare it wins — which makes both idioms fall out of one rule rather than a
-special case: `<Button render={<a href="/docs" />}>Docs</Button>` inherits the
+special case: `<Button render={<span />}>Docs</Button>` inherits the
 component's children because the element declares none and the key is skipped, and
-`<Button render={<a href="/docs">Read the docs</a>}>` keeps its own because a declared
+`<Button render={<span>Read the docs</span>}>` keeps its own because a declared
 value wins. Special-casing it either way would break one of the two.
 
 ### Handlers run right to left, and the consumer can stop the component's
@@ -264,11 +282,10 @@ component to place a consumer's props in, so the three tiers cannot be reordered
 
 `href: undefined` remains a no-op through `mergeProps`. Nothing depends on it any more:
 a component that must not carry a prop does not put it there in the first place.
-`Button` owns `href` for exactly this reason — when disabled it renders a `<button>`
-with no URL, rather than trying to take one back off an `<a>`.
+`Button` no longer renders links at all, so there is no URL to take back.
 
-The one case left is an `href` written directly on a `render` element, which no layer
-can retract. `Button` reports it in development and tells you to pass `href` instead.
+A prop written directly on a `render` element outranks the component and no layer can
+retract it. That is the consumer's choice and is not reported (decision 10).
 
 **Rules out:** a sentinel value meaning "delete this key" in `useRender`. It was
 deferred here waiting for a third component to need it; instead the two that needed it
@@ -296,8 +313,7 @@ because nobody could import it.
 independently, so anything it imports has to be exported. The answer is not to publish
 the primitive with a disclaimer — it is to put the behaviour where it belongs. `Button`
 moved into `@arun-dev/headless` for exactly this reason, which is also what decision 7
-required all along; `@arun-dev/ui`'s Button is now a styling wrapper, and its `href`
-sugar moved down with it, since `disabled` has to be able to remove the URL.
+required all along; `@arun-dev/ui`'s Button is now a styling wrapper.
 
 **Rules out:** exporting a primitive "because it might be useful". It becomes useful the
 day someone asks for it, and adding an export later is not a breaking change; removing
@@ -305,18 +321,87 @@ one is.
 
 ---
 
-## 10. Deferred, with reasons
+## 10. State is owned by the component; `render` only shapes the element
+
+Ground rules for every stateful component from Checkbox on — form controls first.
+
+There are two layers, and `render` reaches only the second:
+
+| Layer                                                | Set by                          | Can `render` change it?   |
+| ---------------------------------------------------- | ------------------------------- | ------------------------- |
+| **State** — `checked`, `disabled`, `indeterminate`…  | the component's own props       | no                        |
+| **Element attributes** — ARIA, `data-*`, `disabled`… | derived from state, then merged | yes — `render.props` wins |
+
+1. **The component is the only source of state.** It comes from the component's props,
+   through `useControlled`. Nothing is read back from `render` or the DOM.
+2. **Everything is derived from that one state object** — attributes, ARIA, `data-*`,
+   the hidden form input and the context sub-parts read.
+3. **`render` is unrestricted.** Merge precedence is unchanged (decision 8): the
+   component proposes attributes, and `render.props` has the final say on the element.
+   No warnings, no protected keys, no tag enforcement.
+4. **Behaviour reads state, never the element.** Handlers guard on the component's own
+   `disabled` / `readOnly` rather than relying on the native attribute; the hidden input
+   and sub-part context use the same state.
+5. **Every change goes through one setter** — click, keyboard and `form.reset()` alike —
+   which then calls `onChange`-style callbacks.
+
+```tsx
+<Checkbox.Root disabled render={<MyCheckbox disabled={false} />} />
+```
+
+The element renders enabled, because `render` wins. The checkbox is still disabled:
+clicks are ignored, the form input stays disabled and `Checkbox.Indicator` reads
+`disabled: true`. An override on `render` changes what the element shows, never what the
+component knows or does. Set state on the component, not on the `render` element.
+
+**Why.** What a consumer writes in `render` is theirs; the library cannot inspect a
+`render` component, so it does not police one. Keeping behaviour on the component's own
+state is what makes that safe — the worst a `render` override can do is desync the markup
+it chose to override.
+
+**Rules out:** dev warnings or errors about `render` content, a protected final merge
+tier for state keys, and reading state back from the rendered element.
+
+---
+
+## 11. Parts are earned, case by case
+
+A component is split into parts only when an element passes all three:
+
+1. **It is a separate DOM element** the consumer styles, places or replaces.
+2. **It needs something from the root** — state, ids for ARIA wiring, or behaviour.
+3. **The consumer decides where it goes.** If the component can place it unaided, it is
+   internal rather than a part.
+
+One element means one component: `Button`, `Link` and text inputs have no parts, and a
+`<label>` is the consumer's own element linked by `id`. `Switch` has `Root` + `Thumb`
+because the thumb is a separate element that reads `checked` from context.
+
+Parts are independent of decision 7's native-first rule. A native `<dialog>` still needs
+`Trigger`, `Title` and `Close` parts — they are separate elements the consumer places, and
+`Title` supplies the id for `aria-labelledby` — while a custom-built single element would
+still be one component.
+
+**Start with the fewest parts.** Adding one later is not a breaking change; removing or
+merging one is. Same reasoning as decision 9.
+
+**Rules out:** splitting a component into parts for symmetry with other components, or
+exposing an element the component can place itself.
+
+---
+
+## 12. Deferred, with reasons
 
 Shipped since this list was written:
 
-| Was deferred                    | Landed in                                                                     |
-| ------------------------------- | ----------------------------------------------------------------------------- |
-| `@arun-dev/headless` package    | `0.1.0` — the render engine and state plumbing                                |
-| `data-*` state attributes       | `0.2.0`, with Switch — the first component with state                         |
-| `useRender` moved out of `ui`   | `0.1.0` — now `@arun-dev/headless` `core/`, exported                          |
-| Shared `data-disabled` spelling | emitted directly by each component; React drops the `undefined` case          |
-| `mergeProps` handler order      | consumer first, cancellable with `preventComponentHandler()` — decision 8     |
-| Button's non-native behaviour   | removed — `Button` renders `<button>` or `<a href>`, both native — decision 7 |
+| Was deferred                    | Landed in                                                                 |
+| ------------------------------- | ------------------------------------------------------------------------- |
+| `@arun-dev/headless` package    | `0.1.0` — the render engine and state plumbing                            |
+| `data-*` state attributes       | `0.2.0`, with Switch — the first component with state                     |
+| `useRender` moved out of `ui`   | `0.1.0` — now `@arun-dev/headless` `core/`, exported                      |
+| Shared `data-disabled` spelling | emitted directly by each component; React drops the `undefined` case      |
+| `mergeProps` handler order      | consumer first, cancellable with `preventComponentHandler()` — decision 8 |
+| Button's non-native behaviour   | removed — `Button` always renders a native `<button>` — decision 7        |
 
 Still deferred:
 
@@ -327,5 +412,6 @@ Still deferred:
 | Positioning engine, Floating UI          | Popover; the engine is a port so it can be swapped later |
 | Memoisation inside `useRender`           | profiling shows the per-render merge costs something     |
 | `focusableWhenDisabled`, roving tabindex | the first composite widget — Toolbar, Menu, Tabs         |
+| `Link` — navigation, split out of Button | a consumer needs a styled link                           |
 
 Popover triggers the first three at once, so its decisions belong here before its code exists.

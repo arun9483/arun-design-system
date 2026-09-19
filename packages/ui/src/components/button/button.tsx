@@ -9,7 +9,7 @@ export type ButtonProps = HeadlessButtonProps & {
 };
 
 /**
- * Styling only. The element choice, `type`, `href` and `disabled` all come from
+ * Styling only. The element, `type` and `disabled` all come from
  * `@arun-dev/headless`.
  */
 export function Button({ variant = 'ghost', className, ...rest }: ButtonProps) {

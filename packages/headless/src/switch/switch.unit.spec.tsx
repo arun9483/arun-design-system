@@ -292,7 +292,7 @@ describe('Switch — composition', () => {
 });
 
 describe('disabled', () => {
-  it('relies on the platform, because the element is always a button', () => {
+  it('uses the native attribute on the default button', () => {
     const onCheckedChange = vi.fn();
     render(
       <Switch.Root disabled onCheckedChange={onCheckedChange} aria-label="s" data-testid="s" />,
@@ -304,6 +304,29 @@ describe('disabled', () => {
     fireEvent.click(el);
     expect(onCheckedChange).not.toHaveBeenCalled();
     expect(el).toHaveAttribute('aria-checked', 'false');
+  });
+
+  it('stays disabled when the render element overrides the attribute', () => {
+    const onCheckedChange = vi.fn();
+    const { container } = render(
+      <Switch.Root
+        disabled
+        name="n"
+        render={<button disabled={false} />}
+        onCheckedChange={onCheckedChange}
+        aria-label="s"
+        data-testid="s"
+      />,
+    );
+    const el = screen.getByTestId('s');
+
+    // The render element wins the markup; the component's state still decides behaviour.
+    expect(el).not.toBeDisabled();
+    fireEvent.click(el);
+    expect(onCheckedChange).not.toHaveBeenCalled();
+    expect(el).toHaveAttribute('aria-checked', 'false');
+    expect(el).toHaveAttribute('data-disabled');
+    expect(container.querySelector('input[name="n"]')).toBeDisabled();
   });
 
   it('still toggles, and still calls the consumer, when enabled', () => {
@@ -324,24 +347,13 @@ describe('disabled', () => {
   });
 });
 
-describe('render must produce a button', () => {
-  it('accepts a component that forwards its props to one', () => {
-    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    function Wrapped(props: Record<string, unknown>) {
-      return <button {...props} />;
-    }
-    render(<Switch.Root render={<Wrapped />} aria-label="s" data-testid="s" />);
-
-    expect(screen.getByTestId('s')).toHaveAttribute('type', 'button');
-    expect(error).not.toHaveBeenCalled();
-    error.mockRestore();
-  });
-
-  it('reports anything else, rather than synthesising button behaviour for it', () => {
+describe('render', () => {
+  it('renders whatever the render element produces, without a warning', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     render(<Switch.Root render={<div />} aria-label="s" data-testid="s" />);
 
-    expect(error).toHaveBeenCalledWith(expect.stringContaining('instead of <button>'));
+    expect(screen.getByTestId('s').tagName).toBe('DIV');
+    expect(error).not.toHaveBeenCalled();
     error.mockRestore();
   });
 });

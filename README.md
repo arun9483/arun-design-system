@@ -120,7 +120,7 @@ Components render a sensible default element, and accept a `render` prop to chan
 
 ```tsx
 <Chip render={<li />}>React</Chip>
-<Button render={<NextLink href="/docs" />}>Docs</Button>
+<Button render={<motion.button />}>Save</Button>
 <Card render={<article />} lift>…</Card>
 ```
 

@@ -145,9 +145,9 @@ Using the headless parts directly, the types are exported by the package that ow
 
 - Always a native `<button>`, so focus, `Space` and `Enter` come from the platform rather than
   from JavaScript. Carries `role="switch"` and `aria-checked` per the
-  [WAI-ARIA switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/). A `render` that
-  produces anything else is reported in development rather than compensated for — pass a
-  component that forwards its props to a button.
+  [WAI-ARIA switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/). Those come from
+  the button element, so a `render` that produces something else is the consumer's choice —
+  nothing checks or compensates for it.
 - `disabled` is the button's own attribute, so the platform removes it from the tab order and
   suppresses activation. `data-disabled` is emitted alongside it for styling.
 - `type="button"`, so it never submits an enclosing form by accident.

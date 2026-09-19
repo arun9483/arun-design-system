@@ -28,21 +28,19 @@ import { Switch } from '@arun-dev/headless/switch';
 
 | Component | Parts                   | Props                                                                       |
 | --------- | ----------------------- | --------------------------------------------------------------------------- |
-| `Button`  | —                       | `disabled`, `href`, `type`                                                  |
+| `Button`  | —                       | `disabled`, `type`                                                          |
 | `Switch`  | `Switch.Root`, `.Thumb` | `checked`, `defaultChecked`, `onCheckedChange`, `disabled`, `name`, `value` |
 
-`Button` renders a `<button>`, or a real `<a href>` when you give it an `href` — a control that
-navigates should be an anchor, so middle-click, cmd-click and "link" in assistive technology all
-keep working. It defaults `type="button"` so a button never submits a form by accident, and a
-disabled `href` renders a `<button disabled>`, because a link that navigates nowhere is not a link.
-A `render` component cannot be inspected, so a disabled Button gives it `aria-disabled` and
-`data-disabled` rather than `disabled` — actually disabling itself is up to the component.
+`Button` renders a `<button>` and defaults `type="button"` so it never submits a form by accident.
+It does not navigate — a link is a separate `Link` component. A `render` component cannot be
+inspected, so a disabled Button gives it `aria-disabled` and `data-disabled` rather than
+`disabled` — actually disabling itself is up to the component.
 
 ```tsx
 import { Button } from '@arun-dev/headless/button';
 
-<Button href="/docs" target="_blank" rel="noreferrer">
-  Docs
+<Button type="submit" disabled={saving}>
+  Save
 </Button>;
 ```
 
@@ -100,8 +98,8 @@ come last and win. An element that declares no children inherits yours, one that
 keeps them.
 
 ```tsx
-<Button render={<a href="/docs" />}>Docs</Button>            // renders "Docs"
-<Button render={<a href="/docs">Read the docs</a>}>Docs</Button> // renders "Read the docs"
+<Button render={<span />}>Docs</Button>                     // renders "Docs"
+<Button render={<span>Read the docs</span>}>Docs</Button> // renders "Read the docs"
 ```
 
 Event handlers are chained rather than replaced, and **your handler runs before the component's**,

@@ -8,7 +8,7 @@ pass, merging the component's props, classes, handlers and ref onto it.
 
 ```tsx
 <Chip render={<li />}>React</Chip>
-<Button render={<NextLink href="/docs" />}>Docs</Button>
+<Button render={<motion.button />}>Save</Button>
 <Card render={<article />} lift>…</Card>
 ```
 
@@ -43,25 +43,17 @@ Because handlers run before the component's own, you can stop it from acting:
 
 ## The element owns its own attributes
 
+State belongs on the component; the `render` element only decides what gets rendered. The
+component derives attributes such as `disabled`, `aria-*` and `data-*` from its own props, and
+the render element's own props win the merge — so writing one there overrides the markup, never
+the component's state.
+
 ```tsx
-{
-  /* correct — Button renders the anchor, and `disabled` can take the href back */
-}
-<Button href="/docs">Docs</Button>;
-
-{
-  /* also fine — Button's href reaches an anchor supplied through render */
-}
-<Button href="/docs" render={<NextLink />}>
-  Docs
-</Button>;
-
-{
-  /* works, but `disabled` cannot remove this href — the render element's own props
-     outrank the component's. Button logs a development warning for that case. */
-}
-<Button render={<a href="/docs" />}>Docs</Button>;
+<Switch.Root disabled render={<motion.button />} /> // correct
+<Switch.Root render={<motion.button disabled />} /> // markup only — `data-disabled` and the form input stay enabled
 ```
+
+Nothing is checked or warned about: what you pass through `render` is yours.
 
 The same applies to `type` on a button: `<Chip render={<button type="button" />}>`, or it
 defaults to `type="submit"`.

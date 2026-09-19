@@ -3,17 +3,9 @@ import { describe, it, expect } from 'vitest';
 import { Button } from './button';
 
 describe('Button', () => {
-  it('renders as <button> when no href', () => {
+  it('renders as <button>', () => {
     render(<Button>Click</Button>);
     expect(screen.getByRole('button', { name: 'Click' })).toBeInTheDocument();
-  });
-
-  it('renders as <a> when href provided', () => {
-    render(<Button href="https://example.com">Link</Button>);
-    expect(screen.getByRole('link', { name: 'Link' })).toHaveAttribute(
-      'href',
-      'https://example.com',
-    );
   });
 
   it('defaults to type=button', () => {
@@ -31,18 +23,15 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveClass('btn', 'btn-primary');
   });
 
-  it('does not put a type attribute on the anchor form', () => {
-    render(<Button href="https://example.com">Link</Button>);
-    expect(screen.getByRole('link')).not.toHaveAttribute('type');
-  });
-
   it('renders the element given to `render`', () => {
-    // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's children
-    const link = <a href="/docs" />;
-    render(<Button render={link}>Docs</Button>);
-    // `type` means something else on an anchor, so Button does not put one there.
-    const el = screen.getByRole('link', { name: 'Docs' });
-    expect(el.tagName).toBe('A');
+    render(
+      <Button render={<span />} data-testid="btn">
+        Docs
+      </Button>,
+    );
+    // `type` means nothing on a span, so Button does not put one there.
+    const el = screen.getByTestId('btn');
+    expect(el.tagName).toBe('SPAN');
     expect(el).toHaveClass('btn', 'btn-ghost');
     expect(el).not.toHaveAttribute('type');
   });
@@ -56,17 +45,6 @@ describe('Button', () => {
     const el = screen.getByTestId('btn');
     expect(el).toHaveAttribute('id', 'save');
     expect(el).toHaveAttribute('aria-label', 'Save document');
-  });
-
-  it('forwards target and rel on the anchor form', () => {
-    render(
-      <Button href="https://example.com" target="_blank" rel="noopener noreferrer">
-        External
-      </Button>,
-    );
-    const el = screen.getByRole('link');
-    expect(el).toHaveAttribute('target', '_blank');
-    expect(el).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('accepts an explicit type', () => {

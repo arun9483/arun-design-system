@@ -7,9 +7,8 @@ import Diagram from '@/components/Diagram.astro';
 
 ## Button
 
-`Button` picks the right element and expresses `disabled` the way that element already
-understands. Both elements it renders — `<button>` and `<a href>` — are natively focusable and
-keyboard-activatable, so nothing is synthesised on top of them.
+`Button` renders a native `<button>` and expresses `disabled` the way it already understands. The
+element is natively focusable and keyboard-activatable, so nothing is synthesised on top of it.
 
 ```tsx
 import { Button } from '@arun-dev/headless/button';
@@ -17,24 +16,13 @@ import { Button } from '@arun-dev/headless/button';
 <Button onClick={save}>Save</Button>;
 ```
 
-|                     | element             | what it adds                          |
-| ------------------- | ------------------- | ------------------------------------- |
-| default             | `<button>`          | `type="button"`, so it never submits  |
-| `href`              | `<a href>`          | a real link — middle-click, cmd-click |
-| `disabled`          | `<button disabled>` | the platform's own disabled semantics |
-| `href` + `disabled` | `<button disabled>` | not a link: it navigates nowhere      |
+|            | element             | what it adds                          |
+| ---------- | ------------------- | ------------------------------------- |
+| default    | `<button>`          | `type="button"`, so it never submits  |
+| `disabled` | `<button disabled>` | the platform's own disabled semantics |
 
-`href` is a prop rather than something you write on a `render` element, because `disabled` has to
-be able to take it away — and a `render` element's own props outrank the component's.
-
-```tsx
-<Button href="/docs" target="_blank" rel="noreferrer">
-  Docs
-</Button>
-```
-
-Use `render` for a component that wraps a button or a link — a router `Link`, a tooltip trigger.
-It is merged into, not replaced.
+`Button` does not navigate — a link is a separate `Link` component. Use `render` for a component
+that wraps a button — an animation wrapper, a tooltip trigger. It is merged into, not replaced.
 
 ## Switch
 
@@ -50,7 +38,6 @@ import { Switch } from '@arun-dev/headless/switch';
 
 `Switch.Root` is always a native `<button>`, carrying `role="switch"` and `aria-checked` — focus,
 `Space`, `Enter` and `disabled` all come from the platform, which is why the component is short.
-A `render` that produces anything else is reported in development rather than compensated for.
 It has no accessible name of its own — pair it with a `<label htmlFor>` by `id`, or pass `aria-label`. A
 headless component should not guess at your copy.
 

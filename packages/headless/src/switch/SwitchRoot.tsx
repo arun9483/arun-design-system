@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref, RefObject } from 'react';
 import { useControlled } from '../core/useControlled';
 import { useRender } from '../core/useRender';
@@ -40,8 +40,8 @@ type SwitchRootOwnProps = {
    * Component to render instead of the default `<button>`. Props, className, event
    * handlers and ref are merged onto it.
    *
-   * It must render a native `<button>` — a wrapper such as `<Tooltip.Trigger />` that
-   * forwards its props to one. Anything else is reported in development.
+   * The default `<button>` is what supplies focus, Space and Enter activation and
+   * `disabled`; what `render` produces instead is the consumer's choice.
    */
   render?: ReactElement;
   /** Ref to the rendered element. Merged with any ref on the `render` element. */
@@ -87,12 +87,21 @@ export function SwitchRoot({
     state: 'checked',
   });
 
+  // The one path every change takes — click and form reset alike — so the state and
+  // the report of it cannot drift apart.
+  const commitChecked = useCallback(
+    (next: boolean) => {
+      setChecked(next);
+      onCheckedChange?.(next);
+    },
+    [setChecked, onCheckedChange],
+  );
+
   const state: SwitchState = useMemo(() => ({ checked, disabled }), [checked, disabled]);
   const elementRef = useRef<HTMLElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  useNativeButtonWarning(elementRef);
-  useFormReset({ elementRef, inputRef, checked, setChecked, onCheckedChange });
+  useFormReset({ elementRef, inputRef, checked, commitChecked });
 
   const element = useRender({
     render,
@@ -102,16 +111,17 @@ export function SwitchRoot({
       type: 'button',
       role: 'switch',
       'aria-checked': checked,
-      // The platform suppresses activation, focus and the click handler below.
+      // The platform suppresses activation and focus on a native button.
       disabled: disabled || undefined,
       ...switchDataAttributes(state),
       className,
       children,
       ref: elementRef,
       onClick() {
-        const next = !checked;
-        setChecked(next);
-        onCheckedChange?.(next);
+        // Guarded on state rather than trusting the native attribute: a `render`
+        // element can drop or override `disabled`, but not the component's state.
+        if (disabled) return;
+        commitChecked(!checked);
       },
     },
     consumerProps: rest as UnknownProps,
@@ -155,14 +165,12 @@ function useFormReset({
   elementRef,
   inputRef,
   checked,
-  setChecked,
-  onCheckedChange,
+  commitChecked,
 }: {
   elementRef: RefObject<HTMLElement | null>;
   inputRef: RefObject<HTMLInputElement | null>;
   checked: boolean;
-  setChecked: (next: boolean) => void;
-  onCheckedChange: ((checked: boolean) => void) | undefined;
+  commitChecked: (next: boolean) => void;
 }) {
   const { current: initialChecked } = useRef(checked);
 
@@ -178,33 +186,11 @@ function useFormReset({
         // when the state below does — which a controlled parent may decline.
         if (inputRef.current) inputRef.current.checked = checked;
         if (checked === initialChecked) return;
-        setChecked(initialChecked);
-        onCheckedChange?.(initialChecked);
+        commitChecked(initialChecked);
       });
     }
 
     form.addEventListener('reset', onReset);
     return () => form.removeEventListener('reset', onReset);
-  }, [elementRef, inputRef, checked, setChecked, onCheckedChange, initialChecked]);
-}
-
-/**
- * Development-only check that `render` produced a native `<button>`.
- *
- * The component's correctness rests on that single fact, and it is the one thing a
- * `render` element can take away. Reporting it is cheaper than synthesising focus and
- * keyboard activation for elements nobody should be passing here.
- */
-function useNativeButtonWarning(elementRef: RefObject<HTMLElement | null>) {
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'production') return;
-    const element = elementRef.current;
-    if (!element || element.tagName === 'BUTTON') return;
-
-    console.error(
-      `Switch.Root rendered <${element.tagName.toLowerCase()}> instead of <button>. ` +
-        'Focus, Space and Enter activation and `disabled` all come from the button ' +
-        'element; pass a `render` component that forwards its props to one.',
-    );
-  }, [elementRef]);
+  }, [elementRef, inputRef, checked, commitChecked, initialChecked]);
 }

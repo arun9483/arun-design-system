@@ -16,7 +16,6 @@ export default function Gallery() {
         <Button>Ghost</Button>
         <Button variant="primary">Primary</Button>
         <Button disabled>Disabled</Button>
-        <Button href="#gallery">Anchor</Button>
       </div>
 
       <div style={row}>

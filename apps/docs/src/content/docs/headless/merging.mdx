@@ -40,14 +40,14 @@ keeps it — and one that declares none inherits yours:
 
 ```tsx
 {
-  /* renders "Docs" — the anchor has no children, so yours survive */
+  /* renders "Docs" — the span has no children, so yours survive */
 }
-<Button render={<a href="/docs" />}>Docs</Button>;
+<Button render={<span />}>Docs</Button>;
 
 {
-  /* renders "Read the docs" — the anchor's own children are the last word */
+  /* renders "Read the docs" — the span's own children are the last word */
 }
-<Button render={<a href="/docs">Read the docs</a>}>Docs</Button>;
+<Button render={<span>Read the docs</span>}>Docs</Button>;
 ```
 
 Both are useful, and neither is a special case: an absent `children` key is `undefined` and gets

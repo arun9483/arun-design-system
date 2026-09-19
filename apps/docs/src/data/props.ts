@@ -50,24 +50,16 @@ export const PROPS = {
       description: 'Visual weight. `primary` is the filled call to action.',
     },
     {
-      name: 'href',
-      type: 'string',
-      description:
-        'Renders a real `<a href>` instead of a `<button>`. Pass the URL here rather than on a `render` element, so `disabled` can take it away.',
-    },
-    {
       name: 'type',
       type: "'button' | 'submit' | 'reset'",
       default: "'button'",
-      description:
-        'Defaults to `button` so it never submits a form by accident. Not applied when `href` is set — `type` means something else on an anchor.',
+      description: 'Defaults to `button` so it never submits a form by accident.',
     },
     {
       name: 'disabled',
       type: 'boolean',
       default: 'false',
-      description:
-        'Prevents activation, using the platform rather than synthesising it. With an `href` the element becomes a `<button disabled>`, since a link that navigates nowhere is not a link.',
+      description: 'Prevents activation, using the platform rather than synthesising it.',
     },
   ],
   Card: [

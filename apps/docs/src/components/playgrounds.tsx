@@ -9,7 +9,6 @@ import { Playground, type Control } from './Playground';
 const BUTTON_CONTROLS: Control[] = [
   { name: 'variant', type: 'select', options: ['ghost', 'primary'], initial: 'ghost' },
   { name: 'disabled', type: 'boolean', initial: false },
-  { name: 'href', type: 'text', initial: '' },
 ];
 
 export function ButtonPlayground() {
