@@ -190,6 +190,27 @@ choice (decision 10). Radix makes the same element choice — its Switch is a
 element that was never going to be right. If a component needs the platform's focus and
 keyboard handling, it renders an element that has them.
 
+### Native first
+
+A component uses the native element unless that element fails one of three tests:
+
+| Test          | Fails when                                                                   |
+| ------------- | ---------------------------------------------------------------------------- |
+| **Content**   | it cannot hold what the design needs — `<input>` is void, `<option>` is text |
+| **Styling**   | it cannot be styled to the design in every supported browser                 |
+| **Behaviour** | its built-in behaviour differs from the pattern — a multi-thumb slider, say  |
+
+Passing all three means native: `Button` is a `<button>`, a link is an `<a href>`, a
+dialog is a `<dialog>` opened with `showModal()`. Failing one means a custom element that
+still leans on native pieces where it can — `Switch.Root` fails the content test (a thumb
+cannot go inside an `<input>`), so it is a `<button>` carrying a hidden
+`<input type="checkbox">` for the form.
+
+Every native element used is focus, keyboard, form or dismissal code that is neither
+written nor tested here. Browser support for the newer candidates — customisable
+`<select>`, CSS anchor positioning, `popover="hint"` — moves fast, so each is checked when
+its component is designed rather than decided in advance.
+
 ---
 
 ## 8. `mergeProps` cannot retract or replace
@@ -343,7 +364,33 @@ tier for state keys, and reading state back from the rendered element.
 
 ---
 
-## 11. Deferred, with reasons
+## 11. Parts are earned, case by case
+
+A component is split into parts only when an element passes all three:
+
+1. **It is a separate DOM element** the consumer styles, places or replaces.
+2. **It needs something from the root** — state, ids for ARIA wiring, or behaviour.
+3. **The consumer decides where it goes.** If the component can place it unaided, it is
+   internal rather than a part.
+
+One element means one component: `Button`, `Link` and text inputs have no parts, and a
+`<label>` is the consumer's own element linked by `id`. `Switch` has `Root` + `Thumb`
+because the thumb is a separate element that reads `checked` from context.
+
+Parts are independent of decision 7's native-first rule. A native `<dialog>` still needs
+`Trigger`, `Title` and `Close` parts — they are separate elements the consumer places, and
+`Title` supplies the id for `aria-labelledby` — while a custom-built single element would
+still be one component.
+
+**Start with the fewest parts.** Adding one later is not a breaking change; removing or
+merging one is. Same reasoning as decision 9.
+
+**Rules out:** splitting a component into parts for symmetry with other components, or
+exposing an element the component can place itself.
+
+---
+
+## 12. Deferred, with reasons
 
 Shipped since this list was written:
 
