@@ -20,8 +20,8 @@ function initialValues(controls: readonly Control[]): Record<string, unknown> {
 }
 
 /**
- * An empty text control means "not set". Passing `href=""` through would render a link
- * to nowhere, and the printed JSX already drops it — so the preview drops it too.
+ * An empty text control means "not set". Passing `""` through would set the prop to an
+ * empty string, and the printed JSX already drops it — so the preview drops it too.
  */
 function omitEmpty(values: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(Object.entries(values).filter(([, v]) => v !== ''));

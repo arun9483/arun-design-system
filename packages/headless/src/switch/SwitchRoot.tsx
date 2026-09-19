@@ -40,8 +40,8 @@ type SwitchRootOwnProps = {
    * Component to render instead of the default `<button>`. Props, className, event
    * handlers and ref are merged onto it.
    *
-   * It must render a native `<button>` — a wrapper such as `<Tooltip.Trigger />` that
-   * forwards its props to one. Anything else is reported in development.
+   * The default `<button>` is what supplies focus, Space and Enter activation and
+   * `disabled`; what `render` produces instead is the consumer's choice.
    */
   render?: ReactElement;
   /** Ref to the rendered element. Merged with any ref on the `render` element. */
@@ -91,7 +91,6 @@ export function SwitchRoot({
   const elementRef = useRef<HTMLElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  useNativeButtonWarning(elementRef);
   useFormReset({ elementRef, inputRef, checked, setChecked, onCheckedChange });
 
   const element = useRender({
@@ -186,25 +185,4 @@ function useFormReset({
     form.addEventListener('reset', onReset);
     return () => form.removeEventListener('reset', onReset);
   }, [elementRef, inputRef, checked, setChecked, onCheckedChange, initialChecked]);
-}
-
-/**
- * Development-only check that `render` produced a native `<button>`.
- *
- * The component's correctness rests on that single fact, and it is the one thing a
- * `render` element can take away. Reporting it is cheaper than synthesising focus and
- * keyboard activation for elements nobody should be passing here.
- */
-function useNativeButtonWarning(elementRef: RefObject<HTMLElement | null>) {
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'production') return;
-    const element = elementRef.current;
-    if (!element || element.tagName === 'BUTTON') return;
-
-    console.error(
-      `Switch.Root rendered <${element.tagName.toLowerCase()}> instead of <button>. ` +
-        'Focus, Space and Enter activation and `disabled` all come from the button ' +
-        'element; pass a `render` component that forwards its props to one.',
-    );
-  }, [elementRef]);
 }

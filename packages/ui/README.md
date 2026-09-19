@@ -38,7 +38,7 @@ import { Button, Card, Chip, Badge } from '@arun-dev/ui';
 
 | Component | Props                                                                                               |
 | --------- | --------------------------------------------------------------------------------------------------- |
-| `Button`  | `variant: 'ghost' \| 'primary'`, `href` (renders `<a>`), `type`, `disabled`, `onClick`              |
+| `Button`  | `variant: 'ghost' \| 'primary'`, `type`, `disabled`, `onClick`                                      |
 | `Card`    | `as` (tag name, default `div`), `lift` (hover elevation)                                            |
 | `Chip`    | `variant: 'default' \| 'accent'`                                                                    |
 | `Badge`   | `tone: 'neutral' \| 'success' \| 'warning' \| 'error' \| 'info'`                                    |
@@ -62,7 +62,6 @@ Every component also accepts:
 
 ```tsx
 <Chip render={<li />}>React</Chip>
-<Button render={<NextLink href="/docs" />}>Docs</Button>
 <Card render={<article />} lift>…</Card>
 ```
 

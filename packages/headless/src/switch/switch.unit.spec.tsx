@@ -324,24 +324,13 @@ describe('disabled', () => {
   });
 });
 
-describe('render must produce a button', () => {
-  it('accepts a component that forwards its props to one', () => {
-    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    function Wrapped(props: Record<string, unknown>) {
-      return <button {...props} />;
-    }
-    render(<Switch.Root render={<Wrapped />} aria-label="s" data-testid="s" />);
-
-    expect(screen.getByTestId('s')).toHaveAttribute('type', 'button');
-    expect(error).not.toHaveBeenCalled();
-    error.mockRestore();
-  });
-
-  it('reports anything else, rather than synthesising button behaviour for it', () => {
+describe('render', () => {
+  it('renders whatever the render element produces, without a warning', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     render(<Switch.Root render={<div />} aria-label="s" data-testid="s" />);
 
-    expect(error).toHaveBeenCalledWith(expect.stringContaining('instead of <button>'));
+    expect(screen.getByTestId('s').tagName).toBe('DIV');
+    expect(error).not.toHaveBeenCalled();
     error.mockRestore();
   });
 });

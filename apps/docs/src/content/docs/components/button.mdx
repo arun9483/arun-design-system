@@ -1,11 +1,10 @@
 ---
 title: Button
-description: An action. Renders a button by default, an anchor with href, or anything via render.
+description: An action. Renders a button by default, or anything via render.
 ---
 
 import Example from '@/components/Example.astro';
 import ButtonVariants from '@/examples/button-variants';
-import ButtonAsLink from '@/examples/button-as-link';
 import PropTable from '@/components/PropTable.astro';
 import { ButtonPlayground } from '@/components/playgrounds';
 
@@ -17,24 +16,13 @@ import { ButtonPlayground } from '@/components/playgrounds';
 
 <ButtonPlayground client:load />
 
-## Links
-
-A bare `Button` renders `<button type="button">` — the explicit type means it never submits a
-form by accident. Give it `href` for an anchor, or `render` for anything else.
-
-<Example name="button-as-link">
-  <ButtonAsLink client:load />
-</Example>
-
 ## Props
 
 <PropTable component="Button" />
 
 ## Notes
 
-- `type` applies only to the button form. It is not forwarded to an anchor, nor to a component
-  supplied through `render` — pass it on the element there.
-- Pass a URL as `href` on `Button` rather than writing it on a `render` element. `disabled` has
-  to be able to remove it, and a `render` element's own props outrank the component's.
-- `disabled` with an `href` renders a `<button disabled>`: a link that navigates nowhere is not
-  a link, and the platform then handles the tab order and activation itself.
+- A bare `Button` renders `<button type="button">` — the explicit type means it never submits a
+  form by accident.
+- `type` is not forwarded to a component supplied through `render` — pass it on the element there.
+- `Button` does not navigate. A link is a separate `Link` component.
