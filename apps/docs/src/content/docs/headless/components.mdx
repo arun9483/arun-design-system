@@ -94,6 +94,11 @@ behind it — React cannot set it declaratively, the first click clears it behin
 A click never moves _to_ `indeterminate`: activating a mixed checkbox resolves it to checked, as a
 native one does. Only a parent can set the third state.
 
+<Diagram
+  name="checkbox-anatomy"
+  caption="A click resolves the third state rather than cycling through it, and the indicator follows from context."
+/>
+
 ### Why two parts
 
 The same reason as Switch: an indicator that is a real element can take a `ref`, accept a `render`

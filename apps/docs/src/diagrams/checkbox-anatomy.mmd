@@ -1,0 +1,15 @@
+sequenceDiagram
+  actor User
+  participant Root as Checkbox.Root
+  participant Ctx as CheckboxRootContext
+  participant Ind as Checkbox.Indicator
+
+  Root->>Ctx: provide { checked, disabled }
+  Ctx->>Ind: read state
+  Note over Root,Ind: checked is true, false or indeterminate —<br/>one of three data-* attributes, never two
+
+  User->>Root: click
+  Root->>Root: commitChecked(next)
+  Root-->>User: onCheckedChange(next)
+  Root->>Ctx: new state
+  Ctx->>Ind: re-render, data-indeterminate gives way to data-checked
