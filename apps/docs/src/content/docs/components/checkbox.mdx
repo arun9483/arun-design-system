@@ -117,6 +117,29 @@ Indicator is `aria-hidden`, so a screen reader hears the state once rather than 
 the mark component renders its own root — the wrapper span disappears, and the component receives
 `className`, `aria-hidden` and the `data-*` state directly.
 
+## With react-hook-form
+
+Bind it with `Controller`, not `register()` — `register` fails quietly here, because it returns
+props for a native input and the state lives in React. See the
+[react-hook-form guide](/guides/react-hook-form/).
+
+```tsx
+<Controller
+  control={control}
+  name="terms"
+  render={({ field }) => (
+    <Checkbox.Root
+      checked={field.value}
+      onCheckedChange={field.onChange}
+      onBlur={field.onBlur}
+      aria-label="Accept terms"
+    >
+      <Checkbox.Indicator />
+    </Checkbox.Root>
+  )}
+/>
+```
+
 ## Anatomy
 
 ```tsx

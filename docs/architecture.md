@@ -225,6 +225,46 @@ written nor tested here. Browser support for the newer candidates — customisab
 `<select>`, CSS anchor positioning, `popover="hint"` — moves fast, so each is checked when
 its component is designed rather than decided in advance.
 
+### Weighing the loss when a test fails
+
+The three tests say _whether_ the native element fits. They do not say what leaving it
+costs, and the cost is easy to underestimate, because a native element is not a bundle of
+features — it is a **protocol**. Everything that speaks it works for free: the browser,
+form libraries, autofill, `:checked`, the constraint-validation API, testing tools. Leave
+the protocol and you keep only the parts you re-implement by hand.
+
+The hidden input is exactly such a partial re-implementation, and it covers one direction:
+
+| Half of the protocol | What it means                                    | Restored by the hidden input                      |
+| -------------------- | ------------------------------------------------ | ------------------------------------------------- |
+| **Read**             | something asks the form what the value is        | yes — `FormData`, `form.elements`, `form.reset()` |
+| **Write**            | something sets the value and expects to be heard | no                                                |
+
+react-hook-form's `register()` needs the write half, so it cannot work here: it hands back
+a `ref` for a native input and an `onChange` for a `change` event, and a `<button>` has
+neither. Supporting it would mean reading state back out of the DOM, which decision 10
+rule 1 rules out for every component at once. `Controller` is the answer, and it is
+react-hook-form's own API for this case. `react-hook-form-contract.unit.spec.tsx` in
+`@arun-dev/ui` pins both halves — what works, and that `register()` does not.
+
+**The rule.** Leave the native element only when what you gain is impossible on the
+platform _and_ what you lose can be rebuilt in userland.
+
+| Component    | Gained                                                   | Lost                                                                       | Recoverable?                                                     |
+| ------------ | -------------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `Checkbox`   | an indicator holding JSX; three states as one typed prop | `register()`                                                               | yes — one `Controller`                                           |
+| `Switch`     | a thumb holding an icon or a spinner                     | `register()`                                                               | yes — one `Controller`                                           |
+| `Button`     | —                                                        | focus, `Space`/`Enter`, `disabled`                                         | in principle; `useButton` reached 172 lines before being deleted |
+| a text field | —                                                        | autofill, IME composition, spellcheck, mobile keyboards, password managers | **no, at any price**                                             |
+
+That asymmetry is what makes Checkbox and Switch defensible rather than merely convenient:
+an `<input>` is void, so an indicator that holds children is unobtainable natively, while
+the interop given up costs one wrapper. Invert the columns and the answer inverts with
+them — which is why `Button` stayed native, and why a text field must be a real `<input>`
+whatever else it needs. Radio is the next one to weigh: a native `<input type="radio">`
+brings roving focus and group semantics for free, and a radio's indicator has far less
+reason to hold JSX than a checkbox's.
+
 ---
 
 ## 8. `mergeProps` cannot retract or replace

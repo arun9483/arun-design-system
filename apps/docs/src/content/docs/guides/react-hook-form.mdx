@@ -1,0 +1,111 @@
+---
+title: react-hook-form
+description: Why these controls need Controller rather than register, and what works once they have it.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Every control that carries a value — [Checkbox](/components/checkbox/) and
+[Switch](/components/switch/) — works with react-hook-form through `Controller`.
+
+`register()` does not work, and fails quietly. That is the whole of what you need to know; the
+rest of this page explains why, and what you get once the binding is right.
+
+## Use Controller
+
+```tsx
+import { Controller, useForm } from 'react-hook-form';
+import { Checkbox } from '@arun-dev/ui';
+
+const { control, handleSubmit } = useForm({ defaultValues: { terms: false } });
+
+<Controller
+  control={control}
+  name="terms"
+  render={({ field }) => (
+    <Checkbox.Root
+      checked={field.value}
+      onCheckedChange={field.onChange}
+      onBlur={field.onBlur}
+      aria-label="Accept terms"
+    >
+      <Checkbox.Indicator />
+    </Checkbox.Root>
+  )}
+/>;
+```
+
+`Switch` is the same, with `Switch.Root` and `Switch.Thumb`. `useController` works equally well
+if you prefer a hook to a render prop.
+
+<Aside type="danger" title="register() fails silently">
+Spreading `register('terms')` onto `Checkbox.Root` or `Switch.Root` type-checks, renders, and
+looks right on screen. The control flips when clicked — and the form keeps its default value.
+No error, no warning. `useWatch` reports the stale value forever, and the form submits something
+the user never chose.
+
+`register()` returns props for a native input:
+
+|            | goes to          | result                                            |
+| ---------- | ---------------- | ------------------------------------------------- |
+| `ref`      | the `<button>`   | it has no `.checked`, so there is nothing to read |
+| `onChange` | the `<button>`   | a `<button>` never fires a `change` event         |
+| `name`     | the hidden input | works, and is the only part that does             |
+
+The control's state lives in React, not on an element react-hook-form can inspect. That is the
+cost of the element choice described in [Components](/headless/components/), and `Controller`
+is what it is for.
+
+</Aside>
+
+## What works once it is bound
+
+All of this is covered by a contract spec in `@arun-dev/ui`, so it stays true:
+
+|                                              | Checkbox | Switch |
+| -------------------------------------------- | -------- | ------ |
+| `Controller` / `useController`               | ✅       | ✅     |
+| `useWatch` and `watch`                       | ✅       | ✅     |
+| `setValue` drives the control                | ✅       | ✅     |
+| `reset()` drives the control                 | ✅       | ✅     |
+| Native `form.reset()` keeps the form in step | ✅       | ✅     |
+| `rules` validation, errors block submit      | ✅       | ✅     |
+| `formState.isDirty`                          | ✅       | ✅     |
+| `disabled` cannot move the value             | ✅       | ✅     |
+| `register()`                                 | ❌       | ❌     |
+
+The native reset row is worth a moment. A `<button type="reset">` resets the hidden input by
+itself, and the control returns to the state it mounted with — but react-hook-form only hears
+about that because the change is reported through `onCheckedChange`, the same callback a click
+goes through. Without that it would show one value and hold another.
+
+## Three things to watch
+
+**`name` is redundant under Controller, and not harmless.** `name` makes the control render a
+hidden input for native form submission. Under `Controller`, react-hook-form owns the value, and
+the hidden input will _also_ appear in a native `FormData` read of the form. Pass `name` for
+native submission, or use `Controller`, not both.
+
+**Do not rely on `field.ref`.** It resolves to the `<button>`, not the hidden input, so
+react-hook-form's focus-on-error lands on the right element but any value read through it is
+`undefined`. Passing it is harmless; trusting it is not.
+
+**`required` treats `false` as missing.** `rules={{ required: 'Required' }}` on an unchecked
+control blocks submit, which is what you want for "accept the terms" and wrong for a genuine
+yes/no. Use `validate` when `false` is a legitimate answer.
+
+## Checkbox's third state
+
+`checked` is `boolean | 'indeterminate'`, and that value round-trips through react-hook-form
+unchanged — `useWatch` reports `'indeterminate'`, and `handleSubmit` hands you the literal
+string. Correct, and almost never what an API wants. Resolve it at the edge:
+
+```tsx
+handleSubmit((data) => save({ terms: data.terms === true }));
+```
+
+## Buttons
+
+`Button` defaults to `type="button"`, so a button inside a form does nothing until told
+otherwise. Give the submit button `type="submit"` for `handleSubmit` to run, and a reset button
+`type="reset"`.

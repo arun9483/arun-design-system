@@ -99,6 +99,29 @@ the first render look correct while the switch has already taken ownership.
 
 </Aside>
 
+## With react-hook-form
+
+Bind it with `Controller`, not `register()` — `register` fails quietly here, because it returns
+props for a native input and the state lives in React. See the
+[react-hook-form guide](/guides/react-hook-form/).
+
+```tsx
+<Controller
+  control={control}
+  name="notifications"
+  render={({ field }) => (
+    <Switch.Root
+      checked={field.value}
+      onCheckedChange={field.onChange}
+      onBlur={field.onBlur}
+      aria-label="Notifications"
+    >
+      <Switch.Thumb />
+    </Switch.Root>
+  )}
+/>
+```
+
 ## Anatomy
 
 ```tsx

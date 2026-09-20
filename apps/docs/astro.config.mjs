@@ -54,6 +54,7 @@ export default defineConfig({
           items: [
             { label: 'The render prop', slug: 'guides/render-prop' },
             { label: 'Design tokens', slug: 'guides/tokens' },
+            { label: 'react-hook-form', slug: 'guides/react-hook-form' },
             { label: 'Gallery', slug: 'guides/gallery' },
           ],
         },
