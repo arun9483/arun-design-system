@@ -1,6 +1,6 @@
 ---
 title: Components
-description: Button and Switch — what each provides, and when you need them.
+description: Button, Switch and Checkbox — what each provides, and when you need them.
 ---
 
 import Diagram from '@/components/Diagram.astro';
@@ -63,3 +63,49 @@ valid, empty track.
 
 Give `Switch.Root` a `name` and it submits with the enclosing form, mirroring a native checkbox —
 an unchecked switch contributes nothing.
+
+## Checkbox
+
+A three-state control read on submit, made of two parts.
+
+```tsx
+import { Checkbox } from '@arun-dev/headless/checkbox';
+
+<Checkbox.Root className="my-checkbox" name="terms" aria-label="Accept terms">
+  <Checkbox.Indicator className="my-checkbox-mark" />
+</Checkbox.Root>;
+```
+
+`Checkbox.Root` is a native `<button>` carrying `role="checkbox"` and `aria-checked`, for the
+same reason `Switch.Root` is: an `<input type="checkbox">` is void and cannot hold an indicator,
+so it fails the content test above. The hidden input it renders for a `name` keeps everything the
+native element was still good for.
+
+### Three states, one prop
+
+`checked` is `boolean | 'indeterminate'`, not a boolean beside an `indeterminate` flag. One prop
+makes `checked && indeterminate` unrepresentable, and leaves a single value to derive the ARIA,
+the `data-*` attributes and the submitted value from.
+
+Native HTML splits the two, but only because `.indeterminate` is a DOM property with no attribute
+behind it — React cannot set it declaratively, the first click clears it behind React's back, and
+`form.reset()` leaves it alone. There was nothing there to inherit.
+
+A click never moves _to_ `indeterminate`: activating a mixed checkbox resolves it to checked, as a
+native one does. Only a parent can set the third state.
+
+### Why two parts
+
+The same reason as Switch: an indicator that is a real element can take a `ref`, accept a `render`
+prop and hold children — which is how a consumer swaps in their own check, dash or spinner. It
+reads state from the Root through context, so the two cannot get out of step.
+
+`Checkbox.Indicator` renders in every state, unchecked included, so CSS has an element to
+transition and a place to put an unchecked mark. It ships no glyph of its own — like every part
+here it has no colour, no class and no content until you give it one. [`@arun-dev/ui`](/components/checkbox/)
+is the layer that supplies a default check and dash.
+
+Both parts emit `data-checked` / `data-unchecked` / `data-indeterminate` / `data-disabled`. Three
+mutually exclusive attributes rather than one with a value, so all three are addressable at equal
+specificity — and so the third state could be added without `:not([data-checked])` silently
+absorbing it, which is what `data-unchecked` was introduced for.

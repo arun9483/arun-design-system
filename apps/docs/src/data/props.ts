@@ -84,6 +84,40 @@ export const PROPS = {
       description: 'Neutral for tags and filters, accent for emphasis.',
     },
   ],
+  'Checkbox.Root': [
+    {
+      name: 'checked',
+      type: "boolean | 'indeterminate'",
+      description:
+        'Controlled state. Provide `onCheckedChange` alongside it. Never pass `undefined` — the mode is fixed at mount, so write `checked={x ?? false}`.',
+    },
+    {
+      name: 'defaultChecked',
+      type: "boolean | 'indeterminate'",
+      default: 'false',
+      description: 'Initial state when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onCheckedChange',
+      type: "(checked: boolean | 'indeterminate') => void",
+      description:
+        'Called with the value being moved to, in both controlled and uncontrolled modes. A click never moves to `indeterminate` — only a parent can set it.',
+    },
+    { name: 'disabled', type: 'boolean', default: 'false', description: 'Prevents activation.' },
+    {
+      name: 'name',
+      type: 'string',
+      description:
+        'Submits with the enclosing form when checked. An unchecked or indeterminate checkbox contributes nothing, mirroring a native checkbox.',
+    },
+    {
+      name: 'value',
+      type: 'string',
+      default: "'on'",
+      description: 'Value submitted when checked.',
+    },
+  ],
+  'Checkbox.Indicator': [],
   'Switch.Root': [
     {
       name: 'checked',

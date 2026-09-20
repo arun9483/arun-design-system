@@ -1,0 +1,20 @@
+/* Checkbox component tokens — map semantic tokens onto the checkbox's styleable surfaces.
+   Override any of these to restyle checkboxes without moving other components. */
+:root {
+  /* Box */
+  --checkbox-size: 1.125rem;
+  --checkbox-radius: var(--radius-sm);
+  --checkbox-bg: var(--color-bg-primary);
+  --checkbox-bg-checked: var(--color-text-accent);
+  --checkbox-border-color: var(--color-border-default);
+  --checkbox-border-color-checked: var(--color-text-accent);
+  --checkbox-border-width: var(--space-px);
+
+  /* Mark — the check and the dash alike, so the two never drift apart */
+  --checkbox-indicator-size: 0.75rem;
+  --checkbox-indicator-color: var(--color-text-on-accent);
+  --checkbox-indicator-stroke-width: 2.5;
+
+  --checkbox-disabled-opacity: 0.5;
+  --checkbox-duration: var(--duration-fast);
+}

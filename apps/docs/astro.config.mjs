@@ -45,6 +45,7 @@ export default defineConfig({
             { label: 'Card', slug: 'components/card' },
             { label: 'Chip', slug: 'components/chip' },
             { label: 'Badge', slug: 'components/badge' },
+            { label: 'Checkbox', slug: 'components/checkbox' },
             { label: 'Switch', slug: 'components/switch' },
           ],
         },

@@ -20,8 +20,12 @@ import { describe, expect, it } from 'vitest';
  *
  * This is the `data-*` counterpart to the token contract: same failure mode, other seam.
  *
- * Attribute names are read from every source file in @arun-dev/headless, with comments
- * stripped first — several docstrings show example selectors that are not emissions.
+ * Comments are stripped from both sides before scanning, because both sides document
+ * themselves with the very strings being counted: headless docstrings show example
+ * selectors that are not emissions, and ui's stylesheets name attributes they have
+ * deliberately chosen *not* to style. Counting either would make the contract report
+ * something it never checked.
+ *
  * Scanning all sources rather than one file matters: each component spells its own
  * attributes out, and `Button` emits `data-disabled` without a shared helper.
  */
@@ -50,7 +54,18 @@ function filesIn(dir: string, extension: string): string[] {
 
 /** Comments hold example selectors and sample mappings, which are not emissions. */
 function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+  return stripBlockComments(source).replace(/\/\/.*$/gm, '');
+}
+
+/**
+ * CSS has only block comments, and stripping `//` here would eat the rest of any line
+ * holding a `url(https://…)`. Both sides of this contract need their comments gone:
+ * headless docstrings show example emissions, and ui's show example selectors — and a
+ * commented-out selector that still counted would report an attribute as styled when
+ * nothing styles it.
+ */
+function stripBlockComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '');
 }
 
 /** Every `data-*` attribute @arun-dev/headless emits, keyed to the file declaring it. */
@@ -68,13 +83,13 @@ function emittedBy(headlessSrc: string): Map<string, string> {
   return attributes;
 }
 
-/** Every `[data-*]` selector in this package's CSS. */
+/** Every `[data-*]` selector in this package's CSS, comments excluded. */
 function styledBy(uiSrc: string): Map<string, string> {
   const attributes = new Map<string, string>();
 
   for (const file of filesIn(uiSrc, '.css')) {
     const relative = file.slice(file.indexOf('src'));
-    for (const [, name] of readFileSync(file, 'utf8').matchAll(USAGE)) {
+    for (const [, name] of stripBlockComments(readFileSync(file, 'utf8')).matchAll(USAGE)) {
       if (name && !attributes.has(name)) attributes.set(name, relative);
     }
   }
