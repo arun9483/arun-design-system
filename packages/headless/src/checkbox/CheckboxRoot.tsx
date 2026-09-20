@@ -4,35 +4,35 @@ import { useControlled } from '../core/useControlled';
 import { useFormReset } from '../core/useFormReset';
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
-import { SwitchRootContext, type SwitchState } from './SwitchRootContext';
-import { switchDataAttributes } from './switchDataAttributes';
+import { CheckboxRootContext, type CheckboxState, type CheckedState } from './CheckboxRootContext';
+import { checkboxDataAttributes } from './checkboxDataAttributes';
 
 /**
- * Switch.Root's own props. Everything else — `id`, `className`, `children`, `aria-*`,
+ * Checkbox.Root's own props. Everything else — `id`, `className`, `children`, `aria-*`,
  * `data-*`, event handlers — comes from React's own `<button>` props, so it is typed
  * and checked without being declared here.
  *
- * `id` in particular is how a switch gets an accessible name, paired with a
+ * `id` in particular is how a checkbox gets an accessible name, paired with a
  * `<label htmlFor>`. A wrapping `<label>` names the rendered `<button>` too, but
  * `jsx-a11y/label-has-associated-control` rejects a button as a nested control, so the
  * explicit pairing is the one that passes lint.
  */
-type SwitchRootOwnProps = {
+type CheckboxRootOwnProps = {
   /**
    * Controlled state. Provide `onCheckedChange` alongside it.
    *
    * Never `undefined` once mounted. The mode is latched at mount, so an `undefined`
-   * first render makes the switch uncontrolled for good and every value passed later
+   * first render makes the checkbox uncontrolled for good and every value passed later
    * is ignored. Coalesce at the call site — `checked={x ?? false}`.
    */
-  checked?: boolean;
+  checked?: CheckedState;
   /** Initial state when uncontrolled. Read once, at mount. */
-  defaultChecked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
+  defaultChecked?: CheckedState;
+  onCheckedChange?: (checked: CheckedState) => void;
   disabled?: boolean;
   /**
    * Submits with the enclosing form when checked, mirroring a native checkbox:
-   * an unchecked or disabled control contributes nothing.
+   * an unchecked, indeterminate or disabled control contributes nothing.
    */
   name?: string;
   /** Value submitted when checked. Defaults to `"on"`, as a native checkbox does. */
@@ -49,27 +49,28 @@ type SwitchRootOwnProps = {
   ref?: Ref<HTMLElement>;
 };
 
-export type SwitchRootProps = SwitchRootOwnProps &
-  Omit<ComponentPropsWithRef<'button'>, keyof SwitchRootOwnProps>;
+export type CheckboxRootProps = CheckboxRootOwnProps &
+  Omit<ComponentPropsWithRef<'button'>, keyof CheckboxRootOwnProps>;
 
 /**
- * A switch — an immediate on/off control, distinct from a checkbox in that it takes
- * effect at once rather than on submit.
+ * A checkbox — a three-state control whose value is read on submit, distinct from a
+ * switch in that it does not take effect at once.
  *
- * Always a native `<button>`, which is the whole reason this component is short: the
- * platform supplies focusability, Space and Enter activation, and `disabled`, so none
- * of it is synthesised here. Per the WAI-ARIA switch pattern it carries `role="switch"`
- * and `aria-checked`.
+ * A `<button role="checkbox">` rather than an `<input type="checkbox">`, because an
+ * input is void and cannot hold an indicator — the content test in decision 7, the same
+ * one Switch.Root fails. Everything the input was still good for, the hidden one below
+ * keeps doing. The platform supplies focusability, Space and Enter activation and
+ * `disabled`, so none of it is synthesised here.
  *
- * Inside a form it behaves as a checkbox would there: `form.reset()` returns it to the
- * state it mounted with. The change is reported through `onCheckedChange`, so a
- * controlled switch moves only if its parent accepts it.
+ * Inside a form it behaves as a native checkbox would: `form.reset()` returns it to the
+ * state it mounted with, indeterminate included — which a native checkbox does not
+ * manage, since `.indeterminate` is a DOM property the platform never resets.
  *
  * It has no accessible name of its own — pair it with a `<label htmlFor>` by `id`, or
  * pass `aria-label` or `aria-labelledby`. That is the consumer's decision, not one a
  * headless component should guess.
  */
-export function SwitchRoot({
+export function CheckboxRoot({
   checked: checkedProp,
   defaultChecked,
   onCheckedChange,
@@ -80,33 +81,37 @@ export function SwitchRoot({
   children,
   render,
   ...rest
-}: SwitchRootProps) {
-  const [checked, setChecked] = useControlled({
+}: CheckboxRootProps) {
+  const [checked, setChecked] = useControlled<CheckedState>({
     controlled: checkedProp,
     default: defaultChecked ?? false,
-    name: 'Switch.Root',
+    name: 'Checkbox.Root',
     state: 'checked',
   });
 
   // The one path every change takes — click and form reset alike — so the state and
   // the report of it cannot drift apart.
   const commitChecked = useCallback(
-    (next: boolean) => {
+    (next: CheckedState) => {
       setChecked(next);
       onCheckedChange?.(next);
     },
     [setChecked, onCheckedChange],
   );
 
-  const state: SwitchState = useMemo(() => ({ checked, disabled }), [checked, disabled]);
+  const state: CheckboxState = useMemo(() => ({ checked, disabled }), [checked, disabled]);
   const elementRef = useRef<HTMLElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  // Indeterminate is a state to resolve, not one to cycle back through: only `true`
+  // clears, so a mixed checkbox becomes checked, as a native one does.
+  const submitted = checked === true;
 
   useFormReset({
     elementRef,
     inputRef,
     value: checked,
-    inputChecked: checked,
+    inputChecked: submitted,
     commit: commitChecked,
   });
 
@@ -114,13 +119,14 @@ export function SwitchRoot({
     render,
     defaultTagName: 'button',
     props: {
-      // Without this a switch inside a form would submit it on every toggle.
+      // Without this a checkbox inside a form would submit it on every toggle.
       type: 'button',
-      role: 'switch',
-      'aria-checked': checked,
+      role: 'checkbox',
+      // The ARIA spelling of the third state is "mixed", not "indeterminate".
+      'aria-checked': checked === 'indeterminate' ? 'mixed' : checked,
       // The platform suppresses activation and focus on a native button.
       disabled: disabled || undefined,
-      ...switchDataAttributes(state),
+      ...checkboxDataAttributes(state),
       className,
       children,
       ref: elementRef,
@@ -128,18 +134,20 @@ export function SwitchRoot({
         // Guarded on state rather than trusting the native attribute: a `render`
         // element can drop or override `disabled`, but not the component's state.
         if (disabled) return;
-        commitChecked(!checked);
+        commitChecked(!submitted);
       },
     },
     consumerProps: rest as UnknownProps,
   });
 
   return (
-    <SwitchRootContext.Provider value={state}>
+    <CheckboxRootContext.Provider value={state}>
       {element}
       {/* Native checkboxes submit only when checked and enabled; the hidden input does
-          the same, so a form sees the shape it would from a checkbox. A real checkbox
-          rather than type="hidden", so it is listed in `form.elements`. */}
+          the same, so a form sees the shape it would from a checkbox. Indeterminate
+          submits nothing, because a native checkbox submits on checkedness alone and
+          `.indeterminate` never changes it. A real checkbox rather than type="hidden",
+          so it is listed in `form.elements`. */}
       {name !== undefined ? (
         <input
           ref={inputRef}
@@ -148,10 +156,10 @@ export function SwitchRoot({
           readOnly
           name={name}
           value={value}
-          checked={checked}
+          checked={submitted}
           disabled={disabled}
         />
       ) : null}
-    </SwitchRootContext.Provider>
+    </CheckboxRootContext.Provider>
   );
 }

@@ -1,0 +1,73 @@
+@layer checkbox {
+  /* State comes from data-* attributes emitted by @arun-dev/headless, so the CSS
+     never needs to know how the component decides it is checked. Unchecked is the
+     base rule and the other two states override it, which is why [data-unchecked]
+     never appears as a selector here — see UNSTYLED_HERE in the contract spec. */
+  .checkbox {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    inline-size: var(--checkbox-size);
+    block-size: var(--checkbox-size);
+    padding: 0;
+    border: var(--checkbox-border-width) solid var(--checkbox-border-color);
+    border-radius: var(--checkbox-radius);
+    background-color: var(--checkbox-bg);
+    color: var(--checkbox-indicator-color);
+    cursor: pointer;
+    transition:
+      background-color var(--checkbox-duration) var(--ease-smooth),
+      border-color var(--checkbox-duration) var(--ease-smooth);
+  }
+
+  .checkbox[data-checked],
+  .checkbox[data-indeterminate] {
+    background-color: var(--checkbox-bg-checked);
+    border-color: var(--checkbox-border-color-checked);
+  }
+
+  .checkbox[data-disabled] {
+    opacity: var(--checkbox-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  .checkbox:focus-visible {
+    outline: var(--space-2px) solid var(--color-text-accent);
+    outline-offset: var(--space-2px);
+  }
+
+  .checkbox-indicator {
+    display: grid;
+    /* Both marks share one cell, so swapping between them cannot shift the layout. */
+    grid-template-areas: 'mark';
+    inline-size: var(--checkbox-indicator-size);
+    block-size: var(--checkbox-indicator-size);
+  }
+
+  .checkbox-mark {
+    grid-area: mark;
+    inline-size: 100%;
+    block-size: 100%;
+    stroke-width: var(--checkbox-indicator-stroke-width);
+    /* Scaled rather than hidden, so the mark can be animated in. */
+    opacity: 0;
+    transform: scale(0.8);
+    transition:
+      opacity var(--checkbox-duration) var(--ease-smooth),
+      transform var(--checkbox-duration) var(--ease-smooth);
+  }
+
+  .checkbox[data-checked] .checkbox-mark-check,
+  .checkbox[data-indeterminate] .checkbox-mark-dash {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .checkbox,
+    .checkbox-mark {
+      transition-duration: 0ms;
+    }
+  }
+}

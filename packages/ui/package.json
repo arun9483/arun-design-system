@@ -43,6 +43,7 @@
     "./css/badge": "./dist/css/badge.css",
     "./css/metric": "./dist/css/metric.css",
     "./css/utilities": "./dist/css/utilities.css",
+    "./css/checkbox": "./dist/css/checkbox.css",
     "./css/switch": "./dist/css/switch.css"
   },
   "publishConfig": {

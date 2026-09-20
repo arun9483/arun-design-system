@@ -204,7 +204,21 @@ Passing all three means native: `Button` is a `<button>`, a link is an `<a href>
 dialog is a `<dialog>` opened with `showModal()`. Failing one means a custom element that
 still leans on native pieces where it can — `Switch.Root` fails the content test (a thumb
 cannot go inside an `<input>`), so it is a `<button>` carrying a hidden
-`<input type="checkbox">` for the form.
+`<input type="checkbox">` for the form. `Checkbox.Root` fails it the same way, for the
+same reason: an indicator cannot go inside an `<input>` either.
+
+**The seam that pattern opens.** The platform resets the hidden input on `form.reset()`
+but knows nothing of the React state behind `aria-checked` and the `data-*` attributes,
+so a reset form would show one value and submit another. `core/useFormReset` closes it
+for both components — it restores the state the component mounted with, through the same
+setter a click goes through, once the `reset` event has finished dispatching and no
+listener has cancelled it. It is internal: shared between components, not exported.
+
+Checkbox is what shows the cost of _not_ having that. Native `indeterminate` is a DOM
+property with no attribute behind it, so React cannot set it declaratively, the first
+click clears it behind React's back, and `form.reset()` leaves it untouched — three
+imperative fixes that a native `<input>` would have demanded anyway. Choosing the element
+that already behaves only pays off when the element actually behaves.
 
 Every native element used is focus, keyboard, form or dismissal code that is neither
 written nor tested here. Browser support for the newer candidates — customisable

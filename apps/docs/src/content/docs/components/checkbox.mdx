@@ -1,0 +1,201 @@
+---
+title: Checkbox
+description: A three-state control read on submit. Behaviour from @arun-dev/headless, styling from @arun-dev/ui.
+---
+
+import Example from '@/components/Example.astro';
+import CheckboxBasics from '@/examples/checkbox-basics';
+import CheckboxIndeterminate from '@/examples/checkbox-indeterminate';
+import CheckboxCustomMark from '@/examples/checkbox-custom-mark';
+import PropTable from '@/components/PropTable.astro';
+import { CheckboxPlayground } from '@/components/playgrounds';
+import { Aside } from '@astrojs/starlight/components';
+
+A checkbox is read on submit. Use a [switch](/components/switch/) instead when the change takes
+effect immediately.
+
+<Example name="checkbox-basics" layout="stack">
+  <CheckboxBasics client:load />
+</Example>
+
+<Aside title="It needs a name">
+`Checkbox.Root` has no accessible name of its own — a headless component should not guess at your
+copy. Associate a `<label>` with it by `id`:
+
+```tsx
+<label htmlFor="terms">
+  <Checkbox.Root id="terms">
+    <Checkbox.Indicator />
+  </Checkbox.Root>
+  Accept terms
+</label>
+```
+
+`Checkbox.Root` renders a `<button>`, so wrapping it in a `<label>` would name it implicitly and
+the `htmlFor` looks redundant. Keep it. `jsx-a11y/label-has-associated-control` only accepts
+`input`, `meter`, `output`, `progress`, `select` and `textarea` as a nested control, so it
+rejects a `<button>` that HTML labels perfectly well. The explicit association satisfies the
+rule, and you avoid disabling it at every call site.
+
+Where there is no visible copy, pass `aria-label` or `aria-labelledby` instead.
+
+</Aside>
+
+## Three states, one prop
+
+`checked` is `boolean | 'indeterminate'` rather than a `checked` plus an `indeterminate` flag.
+One prop means `checked && indeterminate` cannot be written, and everything else — the ARIA, the
+`data-*` attributes, the submitted value — derives from the single value.
+
+The state exists for a parent standing in for a set of children, where _some_ is a real answer:
+
+<Example name="checkbox-indeterminate" layout="stack">
+  <CheckboxIndeterminate client:load />
+</Example>
+
+Keep the parent's value **derived** from the children, as above, rather than stored. A stored
+copy is a second source of truth, and the two drift the moment a child changes by some other route.
+
+A click never moves _to_ `indeterminate` — only a parent can set it. Activating a mixed checkbox
+resolves it to checked, as a native one does, so the cycle a user sees is
+`indeterminate → checked → unchecked → checked`.
+
+<Aside title="Why not a native input?">
+An `<input type="checkbox">` is a void element, so it cannot contain an indicator — the content
+test in [decision 7](/headless/components/). That is the same reason `Switch.Root` is a
+`<button>`, and everything the input was still good for, the hidden one below keeps doing.
+
+Native `indeterminate` would not have saved any work either. It is a DOM property with no
+attribute behind it, so React cannot set it declaratively; the first click clears it behind
+React's back; and `form.reset()` leaves it untouched. All three would need the same JavaScript
+this component already has, plus a ref to apply it to.
+
+</Aside>
+
+## Playground
+
+<CheckboxPlayground client:load />
+
+## Controlled
+
+Pass `checked` with `onCheckedChange` and the parent owns the value — the checkbox will not move
+on its own. `onCheckedChange` reports the value being moved to in both modes, so the same handler
+works either way.
+
+<Aside type="caution" title="Never pass an undefined checked">
+The mode is decided once, at mount, and never re-evaluated. A `checked` of `undefined` on the
+first render makes the checkbox **uncontrolled for the rest of its life** — it starts tracking its
+own state and ignores every value you pass afterwards. This bites when the value loads
+asynchronously. Coalesce at the call site:
+
+```tsx
+<Checkbox.Root checked={x ?? false} onCheckedChange={setX} />
+```
+
+`defaultChecked` does not guard against this. It is ignored in controlled mode, and only makes
+the first render look correct while the checkbox has already taken ownership.
+
+</Aside>
+
+## A mark of your own
+
+`Checkbox.Indicator` ships a check and a dash. Children replace both at once, so supply a mark
+for every state you want to show.
+
+Which one is visible is a CSS question, not a React one — the Indicator carries the same
+`data-checked` / `data-indeterminate` as the Root, so the stylesheet decides. That is what keeps
+this working in an uncontrolled checkbox, where the state is not in your hands at all.
+
+<Example name="checkbox-custom-mark" layout="stack">
+  <CheckboxCustomMark client:load />
+</Example>
+
+The marks are decorative: the Root already carries `role="checkbox"` and `aria-checked`, and the
+Indicator is `aria-hidden`, so a screen reader hears the state once rather than twice.
+
+`render` replaces the Indicator's element rather than its contents, which is what you want when
+the mark component renders its own root — the wrapper span disappears, and the component receives
+`className`, `aria-hidden` and the `data-*` state directly.
+
+## Anatomy
+
+```tsx
+import { Checkbox } from '@arun-dev/ui';
+
+<Checkbox.Root>
+  <Checkbox.Indicator />
+</Checkbox.Root>;
+```
+
+`Checkbox.Indicator` reads its state from `Checkbox.Root`, so the two cannot get out of step. It
+renders in every state, checked or not, so its mark has something to animate from.
+
+## Props
+
+### `Checkbox.Root`
+
+<PropTable component="Checkbox.Root" />
+
+### Typing a wrapper
+
+`@arun-dev/ui` does not export a props type for the checkbox. The type is defined by
+`@arun-dev/headless`, and a re-export would only record where it lives today. Derive it from the
+component instead:
+
+```tsx
+import type { ComponentProps } from 'react';
+import { Checkbox } from '@arun-dev/ui';
+
+function TermsCheckbox(props: ComponentProps<typeof Checkbox.Root>) {
+  return (
+    <Checkbox.Root {...props}>
+      <Checkbox.Indicator />
+    </Checkbox.Root>
+  );
+}
+```
+
+Using the headless parts directly, the types are exported by the package that owns them:
+`import type { CheckboxRootProps, CheckboxIndicatorProps, CheckedState } from '@arun-dev/headless/checkbox'`.
+
+## Behaviour
+
+- A native `<button role="checkbox">`, so focus, `Space` and `Enter` come from the platform
+  rather than from JavaScript. `aria-checked` is `true`, `false` or `mixed` — the ARIA spelling
+  of the third state.
+- `disabled` is the button's own attribute, so the platform removes it from the tab order and
+  suppresses activation. `data-disabled` is emitted alongside it for styling.
+- `type="button"`, so it never submits an enclosing form by accident.
+- With a `name`, it renders a hidden `<input type="checkbox">` carrying the value, so
+  `form.reset()` and `form.elements` treat it as the checkbox it behaves like. An unchecked or
+  indeterminate checkbox submits nothing — checkedness alone decides, as in HTML.
+- `form.reset()` restores the state it mounted with, `indeterminate` included. A native checkbox
+  does not manage that much: the platform's reset algorithm never touches `.indeterminate`.
+- Both parts emit `data-checked` / `data-unchecked` / `data-indeterminate` / `data-disabled`.
+  The three checked states are three mutually exclusive attributes rather than one attribute
+  with a value, so all three are addressable at equal specificity:
+
+  ```css
+  .checkbox[data-checked] {
+    background: var(--checkbox-bg-checked);
+  }
+  .checkbox[data-indeterminate] .checkbox-mark-dash {
+    opacity: 1;
+  }
+  ```
+
+- `Checkbox.Indicator` is `aria-hidden` — the Root already announces the state.
+- The mark transition is disabled under `prefers-reduced-motion`.
+
+## Styling it yourself
+
+The behaviour, keyboard handling and accessibility all come from
+[`@arun-dev/headless`](/headless/), which ships no CSS, no class names and no marks —
+`<Checkbox.Indicator />` there renders an empty `<span>`, and the check is yours to supply.
+`@arun-dev/ui` is the layer with an opinion about what a checkmark looks like.
+
+```tsx
+import { Checkbox } from '@arun-dev/headless/checkbox';
+```
+
+Identical props and parts, styled entirely by you.

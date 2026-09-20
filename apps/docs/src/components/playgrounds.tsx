@@ -3,7 +3,7 @@
  * consistent, and so each MDX page needs a single import.
  */
 import type { ComponentProps } from 'react';
-import { Badge, Button, Card, Chip, Switch } from '@arun-dev/ui';
+import { Badge, Button, Card, Checkbox, Chip, Switch } from '@arun-dev/ui';
 import { Playground, type Control } from './Playground';
 
 const BUTTON_CONTROLS: Control[] = [
@@ -71,6 +71,39 @@ export function BadgePlayground() {
       controls={BADGE_CONTROLS}
       children="Status"
       render={(props: ComponentProps<typeof Badge>) => <Badge {...props} />}
+    />
+  );
+}
+
+const CHECKBOX_CONTROLS: Control[] = [
+  {
+    name: 'defaultChecked',
+    type: 'select',
+    // '' stands for "not set", so the printed snippet drops the prop entirely rather
+    // than claiming defaultChecked={false}.
+    options: ['', 'true', 'indeterminate'],
+    initial: '',
+    parse: (option) =>
+      option === 'true' ? true : option === 'indeterminate' ? 'indeterminate' : undefined,
+  },
+  { name: 'disabled', type: 'boolean', initial: false },
+];
+
+export function CheckboxPlayground() {
+  return (
+    <Playground
+      component="Checkbox.Root"
+      controls={CHECKBOX_CONTROLS}
+      children="<Checkbox.Indicator />"
+      render={(props: ComponentProps<typeof Checkbox.Root>) => (
+        // `defaultChecked` is read once, at mount — changing it later is deliberately
+        // ignored. Keying on it remounts the checkbox so the control demonstrates what
+        // the prop does, rather than appearing inert. The key is a playground device
+        // and is not part of the printed snippet.
+        <Checkbox.Root key={String(props.defaultChecked)} {...props}>
+          <Checkbox.Indicator />
+        </Checkbox.Root>
+      )}
     />
   );
 }
