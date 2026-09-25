@@ -3,7 +3,13 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   // One entry per public subpath. Components are exported individually so a
   // consumer importing only Switch does not pay for the rest.
-  entry: ['src/index.ts', 'src/button/index.ts', 'src/checkbox/index.ts', 'src/switch/index.ts'],
+  entry: [
+    'src/index.ts',
+    'src/button/index.ts',
+    'src/checkbox/index.ts',
+    'src/radio-group/index.ts',
+    'src/switch/index.ts',
+  ],
   format: ['esm', 'cjs'],
   dts: true,
   clean: true,

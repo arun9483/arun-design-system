@@ -1,0 +1,21 @@
+/* Radio group component tokens — map semantic tokens onto the radio's styleable surfaces.
+   Override any of these to restyle radios without moving other components. */
+:root {
+  /* Circle */
+  --radio-size: 1.125rem;
+  --radio-bg: var(--color-bg-primary);
+  --radio-bg-checked: var(--color-text-accent);
+  --radio-border-color: var(--color-border-default);
+  --radio-border-color-checked: var(--color-text-accent);
+  --radio-border-width: var(--space-px);
+
+  /* Dot */
+  --radio-dot-size: 0.5rem;
+  --radio-dot-color: var(--color-text-on-accent);
+
+  /* Group */
+  --radio-group-gap: var(--space-2xs);
+
+  --radio-disabled-opacity: 0.5;
+  --radio-duration: var(--duration-fast);
+}

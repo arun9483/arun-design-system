@@ -7,6 +7,7 @@
  */
 import type { BadgeProps, ButtonProps, CardProps, ChipProps } from '@arun-dev/ui';
 import type { CheckboxIndicatorProps, CheckboxRootProps } from '@arun-dev/headless/checkbox';
+import type { RadioGroupItemProps, RadioGroupRootProps } from '@arun-dev/headless/radio-group';
 import type { SwitchRootProps, SwitchThumbProps } from '@arun-dev/headless/switch';
 import type { COMMON, PROPS } from './props';
 
@@ -28,6 +29,8 @@ type Unknown =
   | OnlyRealProps<Documented<'Badge'>, BadgeProps>
   | OnlyRealProps<Documented<'Checkbox.Root'>, CheckboxRootProps>
   | OnlyRealProps<Documented<'Checkbox.Indicator'>, CheckboxIndicatorProps>
+  | OnlyRealProps<Documented<'RadioGroup.Root'>, RadioGroupRootProps>
+  | OnlyRealProps<Documented<'RadioGroup.Item'>, RadioGroupItemProps>
   | OnlyRealProps<Documented<'Switch.Root'>, SwitchRootProps>
   | OnlyRealProps<Documented<'Switch.Thumb'>, SwitchThumbProps>;
 

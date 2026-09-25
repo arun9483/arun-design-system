@@ -17,6 +17,7 @@ const CSS_LAYERS = [
   { layer: 'btn', src: 'src/components/button/button.css' },
   { layer: 'badge', src: 'src/components/badge/badge.css' },
   { layer: 'checkbox', src: 'src/components/checkbox/checkbox.css' },
+  { layer: 'radio-group', src: 'src/components/radio-group/radio-group.css' },
   { layer: 'switch', src: 'src/components/switch/switch.css' },
   { layer: 'metric', src: 'src/css/metric.css' },
   { layer: 'utilities', src: 'src/css/utilities.css' },

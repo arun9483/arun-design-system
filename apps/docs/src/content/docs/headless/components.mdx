@@ -1,6 +1,6 @@
 ---
 title: Components
-description: Button, Switch and Checkbox — what each provides, and when you need them.
+description: Button, Switch, Checkbox and RadioGroup — what each provides, and when you need them.
 ---
 
 import Diagram from '@/components/Diagram.astro';
@@ -114,3 +114,45 @@ Both parts emit `data-checked` / `data-unchecked` / `data-indeterminate` / `data
 mutually exclusive attributes rather than one with a value, so all three are addressable at equal
 specificity — and so the third state could be added without `:not([data-checked])` silently
 absorbing it, which is what `data-unchecked` was introduced for.
+
+## RadioGroup
+
+One choice from a set, made of two parts: the group, which owns the value, and the radios.
+
+```tsx
+import { RadioGroup } from '@arun-dev/headless/radio-group';
+
+<RadioGroup.Root className="my-group" name="plan" aria-label="Plan">
+  <label>
+    <RadioGroup.Item className="my-radio" value="free" />
+    Free
+  </label>
+</RadioGroup.Root>;
+```
+
+`RadioGroup.Item` is a native `<input type="radio">`, the first value-carrying control here that
+is. It passes all three tests where Checkbox and Switch fail the content one: a radio's dot is a
+`::before`, so nothing needs to go _inside_ the input. What staying native keeps is exactly what a
+`<button role="radio">` would have to rebuild: arrow-key selection, a single Tab stop at the
+checked radio, `required` validation, and the form protocol.
+
+### Why two parts, and no indicator
+
+`RadioGroup.Root` is a separate element the consumer places, and its radios need something from
+it: the shared `name`, the value, `disabled`, `required` and `form`. So it earns a part. An
+indicator would not. The input is void, so there is nothing for one to wrap, and decision 11
+gives one element one component.
+
+### Where the value lives
+
+The group owns a single value through `useControlled`, and each radio derives `checked` from it,
+so React restores any change the group declines. A `name` is generated when none is given,
+because the platform only groups radios that share one.
+
+`form.reset()` resets the inputs natively, and React's value would not follow. The group listens
+for the reset, puts the inputs back to match its value, then commits the mount-time value through
+the same setter a change goes through. This is the seam `useFormReset` closes for Checkbox and
+Switch, closed at the group because a reset there concerns several inputs at once.
+
+Radios emit `data-checked` / `data-unchecked` / `data-disabled`, and the group `data-disabled`.
+The shape matches the other controls, so a stylesheet reads them all the same way.

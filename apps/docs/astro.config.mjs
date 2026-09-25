@@ -46,6 +46,7 @@ export default defineConfig({
             { label: 'Chip', slug: 'components/chip' },
             { label: 'Badge', slug: 'components/badge' },
             { label: 'Checkbox', slug: 'components/checkbox' },
+            { label: 'Radio group', slug: 'components/radio-group' },
             { label: 'Switch', slug: 'components/switch' },
           ],
         },

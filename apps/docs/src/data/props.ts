@@ -118,6 +118,60 @@ export const PROPS = {
     },
   ],
   'Checkbox.Indicator': [],
+  'RadioGroup.Root': [
+    {
+      name: 'value',
+      type: 'string | null',
+      description:
+        "Controlled value — the selected item's `value`, or `null` for none. Provide `onValueChange` alongside it. Never pass `undefined` — the mode is fixed at mount, so write `value={x ?? null}`.",
+    },
+    {
+      name: 'defaultValue',
+      type: 'string | null',
+      default: 'null',
+      description: 'Initial value when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onValueChange',
+      type: '(value: string | null) => void',
+      description:
+        'Called with the value being moved to, in both modes. `null` arrives only from `form.reset()` returning a group that mounted with nothing selected.',
+    },
+    {
+      name: 'name',
+      type: 'string',
+      default: 'generated',
+      description:
+        'Shared by every radio — the platform groups radios by name — and submitted with the form. Pass your own inside a form; a generated one still submits.',
+    },
+    { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every radio.' },
+    {
+      name: 'required',
+      type: 'boolean',
+      default: 'false',
+      description: 'Blocks form submission until a radio is selected, via native validation.',
+    },
+    {
+      name: 'form',
+      type: 'string',
+      description:
+        'Id of the `<form>` the radios belong to, when the group is rendered outside it.',
+    },
+  ],
+  'RadioGroup.Item': [
+    {
+      name: 'value',
+      type: 'string',
+      description:
+        "Required. The group's value when this radio is selected, and what the form submits for it.",
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Disables this radio alone. A disabled group disables it regardless.',
+    },
+  ],
   'Switch.Root': [
     {
       name: 'checked',

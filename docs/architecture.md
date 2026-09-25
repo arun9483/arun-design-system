@@ -255,15 +255,28 @@ platform _and_ what you lose can be rebuilt in userland.
 | `Checkbox`   | an indicator holding JSX; three states as one typed prop | `register()`                                                               | yes — one `Controller`                                           |
 | `Switch`     | a thumb holding an icon or a spinner                     | `register()`                                                               | yes — one `Controller`                                           |
 | `Button`     | —                                                        | focus, `Space`/`Enter`, `disabled`                                         | in principle; `useButton` reached 172 lines before being deleted |
+| `Radio`      | an indicator holding JSX — a dot needs only `::before`   | arrow-key selection, roving Tab stop, `required`, the form protocol        | only by building roving tabindex, still deferred (decision 12)   |
 | a text field | —                                                        | autofill, IME composition, spellcheck, mobile keyboards, password managers | **no, at any price**                                             |
 
 That asymmetry is what makes Checkbox and Switch defensible rather than merely convenient:
 an `<input>` is void, so an indicator that holds children is unobtainable natively, while
 the interop given up costs one wrapper. Invert the columns and the answer inverts with
 them — which is why `Button` stayed native, and why a text field must be a real `<input>`
-whatever else it needs. Radio is the next one to weigh: a native `<input type="radio">`
-brings roving focus and group semantics for free, and a radio's indicator has far less
-reason to hold JSX than a checkbox's.
+whatever else it needs.
+
+**Radio stayed native.** It passes all three tests. The gain column is close to empty,
+since a dot is a pseudo-element and not an element, and the loss column holds the one
+behaviour this library has deliberately not built yet. `RadioGroup.Item` is a real
+`<input type="radio">`, and `RadioGroup.Root` owns the value. Two things follow from that:
+
+- **The reset seam reappears, at the group.** The platform resets the real inputs, and
+  React's value does not follow. It is closed the way `useFormReset` closes it, but in the
+  group, because one reset spans several inputs. Per-radio resets would race each other.
+- **Being native does not restore `register()`'s write half.** The value lives in React
+  (decision 10), so `setValue` writing `.checked` on the DOM is exactly as unheard as it
+  is on a `<button>`. `register()` reads a radio group correctly and cannot drive it.
+  `Controller` remains the answer, and the contract spec pins both halves. The write half
+  is lost to React state, not to the element, so no element choice gets it back.
 
 ---
 

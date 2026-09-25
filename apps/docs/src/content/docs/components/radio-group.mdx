@@ -1,0 +1,177 @@
+---
+title: Radio group
+description: One choice from a set, built on native radio inputs. Behaviour from @arun-dev/headless, styling from @arun-dev/ui.
+---
+
+import Example from '@/components/Example.astro';
+import RadioGroupBasics from '@/examples/radio-group-basics';
+import RadioGroupControlled from '@/examples/radio-group-controlled';
+import RadioGroupFieldset from '@/examples/radio-group-fieldset';
+import PropTable from '@/components/PropTable.astro';
+import { RadioGroupPlayground } from '@/components/playgrounds';
+import { Aside } from '@astrojs/starlight/components';
+
+A radio group picks exactly one option from a small set, read on submit. Use a
+[checkbox](/components/checkbox/) when several can be chosen at once, and a
+[switch](/components/switch/) for a single setting that takes effect immediately.
+
+<Example name="radio-group-basics" layout="stack">
+  <RadioGroupBasics client:load />
+</Example>
+
+<Aside title="It needs names — two of them">
+The group needs one, and so does each radio. Point the group at its caption with
+`aria-labelledby`, or render it as a `<fieldset>` with a `<legend>`. Wrap each radio in a
+`<label>`:
+
+```tsx
+<RadioGroup.Root aria-labelledby="plan-caption">
+  <label>
+    <RadioGroup.Item value="free" />
+    Free
+  </label>
+</RadioGroup.Root>
+```
+
+A radio is a real `<input>`, so the wrapping label names it natively. `jsx-a11y/label-has-associated-control`
+cannot see through `RadioGroup.Item` to the input it renders, though, and rejects the wrapping on
+its own. Under that rule, either pair each label by `id` as well (`<label htmlFor="free">` with
+`<RadioGroup.Item id="free">`), or list `RadioGroup.Item` in the rule's `controlComponents` once.
+
+</Aside>
+
+## Native, on purpose
+
+Each `RadioGroup.Item` renders a real `<input type="radio">`. Checkbox and Switch render a `<button>`
+with a hidden input, because an input cannot hold an indicator. A radio needs no indicator: its dot
+is a `::before` drawn in CSS. So the native element passes all three tests in
+[decision 7](/headless/components/), and everything it does comes from the platform:
+
+- **Arrow keys** move the selection, and wrap at the ends.
+- **Tab** enters the group once, at the checked radio (or the first, when none is checked), and
+  leaves it on the next Tab.
+- **`required`** blocks submission until something is chosen, using the browser's own message.
+- **`FormData`, `form.elements` and `:checked`** all see ordinary radios.
+
+What the group adds is a single value in React. Every radio derives `checked` from it, so the
+screen, the `data-*` attributes and the submitted value cannot disagree.
+
+## Playground
+
+<RadioGroupPlayground client:load />
+
+## Controlled
+
+Pass `value` with `onValueChange` and the parent owns the selection. The group will not move on
+its own. `null` means nothing is selected.
+
+<Example name="radio-group-controlled">
+  <RadioGroupControlled client:load />
+</Example>
+
+<Aside type="caution" title="Never pass an undefined value">
+The mode is decided once, at mount. A `value` of `undefined` on the first render makes the group
+**uncontrolled for the rest of its life**. Use `null` for "nothing selected" and coalesce at the
+call site:
+
+```tsx
+<RadioGroup.Root value={plan ?? null} onValueChange={setPlan} />
+```
+
+</Aside>
+
+## In a form
+
+Give the group a `name` and it submits the selected value under it. Nothing is submitted while no
+radio is selected, or while the group is disabled.
+
+`form.reset()` returns the group to the value it mounted with, including "nothing selected", and
+reports the change through `onValueChange`. The platform resets the inputs by itself, but React's
+value would not follow without this.
+
+<Example name="radio-group-fieldset" layout="stack">
+  <RadioGroupFieldset client:load />
+</Example>
+
+`name` is optional, but the group always has one. The platform only moves the selection between
+radios that share a name, so one is generated when you omit it. A generated name still submits,
+so pass your own when the group sits inside a form you read.
+
+## With react-hook-form
+
+Bind it with `Controller`. `register()` reads a native radio correctly, but react-hook-form's
+`setValue` and `reset` write `.checked` on the DOM directly, and the group's value never hears of
+it. See the [react-hook-form guide](/guides/react-hook-form/).
+
+```tsx
+<Controller
+  control={control}
+  name="plan"
+  render={({ field }) => (
+    <RadioGroup.Root
+      name={field.name}
+      value={field.value}
+      onValueChange={field.onChange}
+      onBlur={field.onBlur}
+      aria-label="Plan"
+    >
+      {/* items */}
+    </RadioGroup.Root>
+  )}
+/>
+```
+
+## Anatomy
+
+```tsx
+import { RadioGroup } from '@arun-dev/ui';
+
+<RadioGroup.Root>
+  <RadioGroup.Item value="a" />
+</RadioGroup.Root>;
+```
+
+Two parts, and no indicator. `RadioGroup.Item` is a void `<input>`, so there is nothing for an
+indicator part to wrap. [Decision 11](/headless/components/) gives one element one component.
+
+## Props
+
+### `RadioGroup.Root`
+
+<PropTable component="RadioGroup.Root" />
+
+### `RadioGroup.Item`
+
+<PropTable component="RadioGroup.Item" />
+
+`name`, `checked`, `defaultChecked`, `required` and `form` are not accepted on an item. They
+belong to the group, and a radio's checkedness is the group's value rather than its own.
+
+Derive wrapper types from the component, as for Checkbox:
+`ComponentProps<typeof RadioGroup.Root>`. With the headless parts directly, the types come from
+the package that owns them:
+`import type { RadioGroupRootProps, RadioGroupItemProps } from '@arun-dev/headless/radio-group'`.
+
+## Behaviour
+
+- `RadioGroup.Root` renders `<div role="radiogroup">`, with `aria-disabled` and `aria-required`
+  when set. Render a `<fieldset>` through `render` to name it with a `<legend>`.
+- Each `RadioGroup.Item` is a native `<input type="radio">`. Focus, arrow keys, Tab order,
+  `disabled` and `required` come from the platform.
+- `readOnly` is not offered. The platform ignores `readonly` on radios, so it would be pure
+  JavaScript layered over an element that does not honour it.
+- Items emit `data-checked` / `data-unchecked` / `data-disabled`, and the group emits
+  `data-disabled`: the same shape as every other control here. `:checked` works as well. The
+  `data-*` attributes are the ones that follow the component's state when a `render` element
+  takes over.
+- The dot's transition is disabled under `prefers-reduced-motion`.
+
+## Styling it yourself
+
+[`@arun-dev/headless`](/headless/) ships the same two parts with no CSS and no class names. Its
+radio is an unstyled native input, so it looks like the browser's until you give it
+`appearance: none`.
+
+```tsx
+import { RadioGroup } from '@arun-dev/headless/radio-group';
+```
