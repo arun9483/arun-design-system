@@ -1,0 +1,73 @@
+@layer radio-group {
+  /* State comes from data-* attributes emitted by @arun-dev/headless, as for every other
+     control, rather than from :checked. The two agree on the default <input>; the data-*
+     attributes are the ones that also hold when a `render` element takes over. Unchecked
+     is the base rule, so [data-unchecked] never appears as a selector here. */
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--radio-group-gap);
+  }
+
+  /* The native input, restyled rather than replaced — see decision 7. `appearance: none`
+     drops the platform's drawing and keeps everything else it does. */
+  .radio {
+    appearance: none;
+    display: inline-grid;
+    place-content: center;
+    flex-shrink: 0;
+    inline-size: var(--radio-size);
+    block-size: var(--radio-size);
+    margin: 0;
+    border: var(--radio-border-width) solid var(--radio-border-color);
+    border-radius: var(--radius-full);
+    background-color: var(--radio-bg);
+    cursor: pointer;
+    transition:
+      background-color var(--radio-duration) var(--ease-smooth),
+      border-color var(--radio-duration) var(--ease-smooth);
+  }
+
+  /* The dot. An <input> is void, so it cannot hold an element — but it can hold a
+     pseudo-element, which is all a radio's mark needs. */
+  .radio::before {
+    content: '';
+    inline-size: var(--radio-dot-size);
+    block-size: var(--radio-dot-size);
+    border-radius: var(--radius-full);
+    background-color: var(--radio-dot-color);
+    /* Scaled rather than hidden, so the dot can be animated in. */
+    opacity: 0;
+    transform: scale(0.5);
+    transition:
+      opacity var(--radio-duration) var(--ease-smooth),
+      transform var(--radio-duration) var(--ease-smooth);
+  }
+
+  .radio[data-checked] {
+    background-color: var(--radio-bg-checked);
+    border-color: var(--radio-border-color-checked);
+  }
+
+  .radio[data-checked]::before {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .radio[data-disabled] {
+    opacity: var(--radio-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  .radio:focus-visible {
+    outline: var(--space-2px) solid var(--color-text-accent);
+    outline-offset: var(--space-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .radio,
+    .radio::before {
+      transition-duration: 0ms;
+    }
+  }
+}

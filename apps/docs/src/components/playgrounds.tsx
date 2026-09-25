@@ -3,7 +3,7 @@
  * consistent, and so each MDX page needs a single import.
  */
 import type { ComponentProps } from 'react';
-import { Badge, Button, Card, Checkbox, Chip, Switch } from '@arun-dev/ui';
+import { Badge, Button, Card, Checkbox, Chip, RadioGroup, Switch } from '@arun-dev/ui';
 import { Playground, type Control } from './Playground';
 
 const BUTTON_CONTROLS: Control[] = [
@@ -127,6 +127,45 @@ export function SwitchPlayground() {
         <Switch.Root key={String(props.defaultChecked)} {...props}>
           <Switch.Thumb />
         </Switch.Root>
+      )}
+    />
+  );
+}
+
+const RADIO_GROUP_OPTIONS = ['free', 'pro', 'team'];
+
+const RADIO_GROUP_CONTROLS: Control[] = [
+  {
+    name: 'defaultValue',
+    type: 'select',
+    // '' stands for "not set", so the printed snippet drops the prop entirely.
+    options: ['', ...RADIO_GROUP_OPTIONS],
+    initial: '',
+    parse: (option) => (option === '' ? undefined : option),
+  },
+  { name: 'disabled', type: 'boolean', initial: false },
+];
+
+export function RadioGroupPlayground() {
+  return (
+    <Playground
+      component="RadioGroup.Root"
+      controls={RADIO_GROUP_CONTROLS}
+      children={'<RadioGroup.Item value="free" /> …'}
+      render={({ children: _snippet, ...props }: ComponentProps<typeof RadioGroup.Root>) => (
+        // Keyed on `defaultValue` for the same reason as the checkbox above: it is read
+        // once, at mount. The key is a playground device and is not part of the snippet.
+        <RadioGroup.Root key={String(props.defaultValue)} aria-label="Plan" {...props}>
+          {RADIO_GROUP_OPTIONS.map((option) => (
+            <label
+              key={option}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2xs)' }}
+            >
+              <RadioGroup.Item value={option} />
+              {option}
+            </label>
+          ))}
+        </RadioGroup.Root>
       )}
     />
   );

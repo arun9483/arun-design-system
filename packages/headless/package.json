@@ -54,6 +54,16 @@
         "default": "./dist/checkbox/index.cjs"
       }
     },
+    "./radio-group": {
+      "import": {
+        "types": "./dist/radio-group/index.d.ts",
+        "default": "./dist/radio-group/index.js"
+      },
+      "require": {
+        "types": "./dist/radio-group/index.d.cts",
+        "default": "./dist/radio-group/index.cjs"
+      }
+    },
     "./switch": {
       "import": {
         "types": "./dist/switch/index.d.ts",

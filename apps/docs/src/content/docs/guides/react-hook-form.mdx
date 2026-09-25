@@ -5,8 +5,9 @@ description: Why these controls need Controller rather than register, and what w
 
 import { Aside } from '@astrojs/starlight/components';
 
-Every control that carries a value — [Checkbox](/components/checkbox/) and
-[Switch](/components/switch/) — works with react-hook-form through `Controller`.
+Every control that carries a value — [Checkbox](/components/checkbox/),
+[Radio group](/components/radio-group/) and [Switch](/components/switch/) — works with
+react-hook-form through `Controller`.
 
 `register()` does not work, and fails quietly. That is the whole of what you need to know; the
 rest of this page explains why, and what you get once the binding is right.
@@ -58,33 +59,68 @@ is what it is for.
 
 </Aside>
 
+### Radio group: native, and still Controller
+
+A radio group's items are real `<input type="radio">` elements, so `register()` gets further
+there. It reads them correctly: a click reaches the form, and the form submits it. It still cannot
+_write_ to them. `setValue` and `reset` set `.checked` on the DOM directly, and the group's value
+never hears of it. The radio shows checked while its `data-checked` stays on the old one, and a
+later render puts the old one back.
+
+That is a property of the value living in React rather than of the element, so it would not
+change with a different element either. Bind the group with `Controller`, passing `field.value`
+to `value` and `field.onChange` to `onValueChange`:
+
+```tsx
+<Controller
+  control={control}
+  name="plan"
+  render={({ field }) => (
+    <RadioGroup.Root
+      name={field.name}
+      value={field.value}
+      onValueChange={field.onChange}
+      onBlur={field.onBlur}
+      aria-label="Plan"
+    >
+      <label>
+        <RadioGroup.Item value="free" />
+        Free
+      </label>
+    </RadioGroup.Root>
+  )}
+/>
+```
+
 ## What works once it is bound
 
 All of this is covered by a contract spec in `@arun-dev/ui`, so it stays true:
 
-|                                              | Checkbox | Switch |
-| -------------------------------------------- | -------- | ------ |
-| `Controller` / `useController`               | ✅       | ✅     |
-| `useWatch` and `watch`                       | ✅       | ✅     |
-| `setValue` drives the control                | ✅       | ✅     |
-| `reset()` drives the control                 | ✅       | ✅     |
-| Native `form.reset()` keeps the form in step | ✅       | ✅     |
-| `rules` validation, errors block submit      | ✅       | ✅     |
-| `formState.isDirty`                          | ✅       | ✅     |
-| `disabled` cannot move the value             | ✅       | ✅     |
-| `register()`                                 | ❌       | ❌     |
+|                                              | Checkbox | Radio group   | Switch |
+| -------------------------------------------- | -------- | ------------- | ------ |
+| `Controller` / `useController`               | ✅       | ✅            | ✅     |
+| `useWatch` and `watch`                       | ✅       | ✅            | ✅     |
+| `setValue` drives the control                | ✅       | ✅            | ✅     |
+| `reset()` drives the control                 | ✅       | ✅            | ✅     |
+| Native `form.reset()` keeps the form in step | ✅       | ✅            | ✅     |
+| `rules` validation, errors block submit      | ✅       | ✅            | ✅     |
+| `formState.isDirty`                          | ✅       | ✅            | ✅     |
+| `disabled` cannot move the value             | ✅       | ✅            | ✅     |
+| `register()`                                 | ❌       | ❌ reads only | ❌     |
 
 The native reset row is worth a moment. A `<button type="reset">` resets the hidden input by
 itself, and the control returns to the state it mounted with — but react-hook-form only hears
-about that because the change is reported through `onCheckedChange`, the same callback a click
-goes through. Without that it would show one value and hold another.
+about that because the change is reported through `onCheckedChange` (`onValueChange` for a radio
+group), the same callback a click goes through. Without that it would show one value and hold another.
 
 ## Three things to watch
 
 **`name` is redundant under Controller, and not harmless.** `name` makes the control render a
 hidden input for native form submission. Under `Controller`, react-hook-form owns the value, and
 the hidden input will _also_ appear in a native `FormData` read of the form. Pass `name` for
-native submission, or use `Controller`, not both.
+native submission, or use `Controller`, not both. A radio group is the exception: it always has a
+name, generated if you omit it, so pass `field.name` and a native read at least sees the field's
+own.
 
 **Do not rely on `field.ref`.** It resolves to the `<button>`, not the hidden input, so
 react-hook-form's focus-on-error lands on the right element but any value read through it is

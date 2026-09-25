@@ -4,18 +4,20 @@ import { useForm, Controller, useController, useWatch } from 'react-hook-form';
 import type { ControllerRenderProps } from 'react-hook-form';
 import { Button } from './components/button';
 import { Checkbox } from './components/checkbox';
+import { RadioGroup } from './components/radio-group';
 import { Switch } from './components/switch';
 
 /**
  * Contract: every control that carries a value works with react-hook-form's
  * `Controller` API, and keeps working.
  *
- * These components are not native inputs — a `<button>` holds the state and a hidden
- * `<input>` carries the form value — so nothing about that compatibility is guaranteed
- * by construction. It rests on details that are easy to change without noticing: that
- * `onCheckedChange` fires in both controlled and uncontrolled modes, that a controlled
- * component does not move unless its parent moves it, and that a native `form.reset()`
- * reports through the same callback rather than silently.
+ * Checkbox and Switch are not native inputs — a `<button>` holds the state and a hidden
+ * `<input>` carries the form value. RadioGroup is, but its value lives in React. Either
+ * way nothing about that compatibility is guaranteed by construction. It rests on details
+ * that are easy to change without noticing: that the change callback fires in both
+ * controlled and uncontrolled modes, that a controlled component does not move unless
+ * its parent moves it, and that a native `form.reset()` reports through the same
+ * callback rather than silently.
  *
  * Break any of those and the component still renders, still passes its own unit tests,
  * and silently submits a value the user never chose. This is the third contract spec,
@@ -307,6 +309,231 @@ describe.each(CONTROLS)('$label with react-hook-form', (control) => {
   });
 });
 
+/**
+ * RadioGroup is the one value-carrying control built on the native element — each item
+ * is a real `<input type="radio">` — so it does not share the battery above: its value is
+ * a string, not a boolean, and it has no `aria-checked` to assert on.
+ *
+ * Being native does not buy `register()`, though. The group owns the value in React and
+ * every radio's `checked` derives from it (decision 10), while `register` expects inputs
+ * whose DOM is the value. Its reads work; its writes land on the DOM behind React's back.
+ * `Controller` is the answer here too — see the last case.
+ */
+describe('RadioGroup with react-hook-form', () => {
+  type PlanField = Pick<ControllerRenderProps, 'value' | 'onChange' | 'onBlur' | 'name'>;
+
+  function Plan({ field, ...extra }: { field: PlanField } & Record<string, unknown>) {
+    return (
+      <RadioGroup.Root
+        name={field.name}
+        value={field.value}
+        onValueChange={field.onChange}
+        onBlur={field.onBlur}
+        aria-label="Plan"
+        {...extra}
+      >
+        <RadioGroup.Item value="free" aria-label="free" />
+        <RadioGroup.Item value="pro" aria-label="pro" />
+      </RadioGroup.Root>
+    );
+  }
+
+  const radio = (name: string) => screen.getByRole<HTMLInputElement>('radio', { name });
+
+  it('binds both ways and submits what the user chose', async () => {
+    const onSubmit = vi.fn();
+
+    function Form() {
+      const { control, handleSubmit } = useForm({ defaultValues: { plan: 'free' } });
+      return (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Controller
+            control={control}
+            name="plan"
+            render={({ field }) => <Plan field={field} />}
+          />
+          <Button type="submit">Save</Button>
+        </form>
+      );
+    }
+
+    render(<Form />);
+    expect(radio('free')).toBeChecked();
+    fireEvent.click(radio('pro'));
+    await act(async () => fireEvent.click(screen.getByText('Save')));
+
+    expect(onSubmit).toHaveBeenCalledWith({ plan: 'pro' }, expect.anything());
+  });
+
+  it('works through useController, and marks the form dirty', async () => {
+    let isDirty = true;
+
+    function Form() {
+      const { control, formState } = useForm({
+        defaultValues: { plan: 'free' },
+        mode: 'onChange',
+      });
+      const { field } = useController({ control, name: 'plan' });
+      isDirty = formState.isDirty;
+      return (
+        <>
+          <Plan field={field} />
+          <span data-testid="value">{field.value}</span>
+        </>
+      );
+    }
+
+    render(<Form />);
+    expect(isDirty).toBe(false);
+    await act(async () => fireEvent.click(radio('pro')));
+    expect(screen.getByTestId('value')).toHaveTextContent('pro');
+    expect(isDirty).toBe(true);
+  });
+
+  it('follows setValue and reset — the form can drive it, not just read it', () => {
+    let setValue: (name: 'plan', value: string) => void;
+    let reset: () => void;
+
+    function Form() {
+      const form = useForm({ defaultValues: { plan: 'free' } });
+      setValue = form.setValue;
+      reset = form.reset;
+      return (
+        <Controller
+          control={form.control}
+          name="plan"
+          render={({ field }) => <Plan field={field} />}
+        />
+      );
+    }
+
+    render(<Form />);
+    act(() => setValue('plan', 'pro'));
+    expect(radio('pro')).toBeChecked();
+    expect(radio('pro')).toHaveAttribute('data-checked');
+
+    act(() => reset());
+    expect(radio('free')).toBeChecked();
+    expect(radio('pro')).toHaveAttribute('data-unchecked');
+  });
+
+  it('keeps the form in step through a native form reset', async () => {
+    const seen: unknown[] = [];
+
+    function Watcher({ control }: { control: never }) {
+      seen.push(useWatch({ control, name: 'plan' }));
+      return null;
+    }
+
+    function Form() {
+      const { control } = useForm({ defaultValues: { plan: 'free' } });
+      return (
+        <form>
+          <Controller
+            control={control}
+            name="plan"
+            render={({ field }) => <Plan field={field} />}
+          />
+          <Watcher control={control as never} />
+          <Button type="reset">Reset</Button>
+        </form>
+      );
+    }
+
+    render(<Form />);
+    fireEvent.click(radio('pro'));
+    expect(seen.at(-1)).toBe('pro');
+
+    // The platform resets the inputs; the group reports the change through
+    // onValueChange, which is the only reason react-hook-form hears about it at all.
+    await act(async () => fireEvent.click(screen.getByText('Reset')));
+
+    expect(radio('free')).toBeChecked();
+    expect(seen.at(-1)).toBe('free');
+  });
+
+  it('participates in validation', async () => {
+    const onSubmit = vi.fn();
+    let message: string | undefined;
+
+    function Form() {
+      const { control, handleSubmit, formState } = useForm<{ plan: string | null }>({
+        defaultValues: { plan: null },
+      });
+      message = formState.errors.plan?.message;
+      return (
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <Controller
+            control={control}
+            name="plan"
+            rules={{ required: 'Required' }}
+            render={({ field }) => <Plan field={field} />}
+          />
+          <Button type="submit">Save</Button>
+        </form>
+      );
+    }
+
+    render(<Form />);
+    await act(async () => fireEvent.click(screen.getByText('Save')));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(message).toBe('Required');
+
+    fireEvent.click(radio('free'));
+    await act(async () => fireEvent.click(screen.getByText('Save')));
+    expect(onSubmit).toHaveBeenCalledOnce();
+  });
+
+  it('does not move the form value when disabled', () => {
+    let value: unknown;
+
+    function Form() {
+      const { control, watch } = useForm({ defaultValues: { plan: 'free' } });
+      value = watch('plan');
+      return (
+        <Controller
+          control={control}
+          name="plan"
+          render={({ field }) => <Plan field={field} disabled />}
+        />
+      );
+    }
+
+    render(<Form />);
+    fireEvent.click(radio('pro'));
+    expect(value).toBe('free');
+  });
+
+  it('reads through register(), but cannot be driven by it — known, not accepted', () => {
+    const api: { form?: ReturnType<typeof useForm<{ plan: string | null }>> } = {};
+
+    function Form() {
+      const form = useForm<{ plan: string | null }>({ defaultValues: { plan: 'free' } });
+      api.form = form;
+      const { name, ...field } = form.register('plan');
+      return (
+        <RadioGroup.Root name={name} defaultValue="free" aria-label="Plan">
+          <RadioGroup.Item value="free" aria-label="free" {...field} />
+          <RadioGroup.Item value="pro" aria-label="pro" {...field} />
+        </RadioGroup.Root>
+      );
+    }
+
+    render(<Form />);
+
+    // The read half works: the inputs are native, and register reads them.
+    fireEvent.click(radio('pro'));
+    expect(api.form?.getValues('plan')).toBe('pro');
+
+    // The write half does not. setValue sets `.checked` on the DOM directly; the group's
+    // value — and everything derived from it — never hears of it. The screen and the
+    // state attributes now disagree, which is the failure Controller avoids.
+    act(() => api.form?.setValue('plan', 'free'));
+    expect(radio('free')).toBeChecked();
+    expect(radio('free')).toHaveAttribute('data-unchecked');
+    expect(radio('pro')).toHaveAttribute('data-checked');
+  });
+});
 describe('Button with react-hook-form', () => {
   it('submits only when asked to', async () => {
     const onSubmit = vi.fn();
