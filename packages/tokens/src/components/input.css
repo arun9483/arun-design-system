@@ -1,0 +1,26 @@
+/* Input component tokens — map semantic tokens onto the text field's styleable surfaces.
+   Override any of these to restyle inputs without moving other components. */
+:root {
+  /* Box — the bordered frame that holds the control and its slots */
+  --input-height: 2.25rem;
+  --input-padding-inline: var(--space-xs);
+  --input-radius: var(--radius-md);
+  --input-bg: var(--color-bg-primary);
+  --input-border-width: var(--space-px);
+  --input-border-color: var(--color-border-default);
+  --input-border-color-hover: var(--color-border-strong);
+  --input-border-color-focus: var(--color-text-accent);
+  --input-border-color-invalid: var(--color-status-error);
+
+  /* Text */
+  --input-font-size: var(--text-sm);
+  --input-color: var(--color-text-primary);
+  --input-placeholder-color: var(--color-text-muted);
+
+  /* Slots — icons, units or buttons before and after the text */
+  --input-slot-color: var(--color-text-secondary);
+  --input-slot-gap: var(--space-2xs);
+
+  --input-disabled-opacity: 0.5;
+  --input-duration: var(--duration-fast);
+}

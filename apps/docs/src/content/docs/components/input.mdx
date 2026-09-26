@@ -1,0 +1,82 @@
+---
+title: Input
+description: A native single-line text field in a styled box, with optional slots before and after the text.
+---
+
+import Example from '@/components/Example.astro';
+import InputBasics from '@/examples/input-basics';
+import InputSlots from '@/examples/input-slots';
+import PropTable from '@/components/PropTable.astro';
+import { InputPlayground } from '@/components/playgrounds';
+import { Aside } from '@astrojs/starlight/components';
+
+`Input` is a real `<input>`. Typing, selection, autofill, validation and form submission are all
+the platform's, so there is no headless half and nothing to keep in sync. It works with
+react-hook-form's `register()` as-is.
+
+<Example name="input-basics" layout="stack">
+  <InputBasics client:load />
+</Example>
+
+## Playground
+
+<InputPlayground client:load />
+
+## Two elements, one rule
+
+The `<input>` sits inside a `<div class="input">` that draws the border, and the box is always
+there, with or without slots. That gives one rule for where props go:
+
+| Prop                                             | Lands on       |
+| ------------------------------------------------ | -------------- |
+| `className`                                      | the box        |
+| `startSlot`, `endSlot`                           | inside the box |
+| everything else, including `id`, `ref`, `render` | the `<input>`  |
+
+So a `<label htmlFor>`, `aria-describedby`, `register()` and a focus ref all reach the control,
+and `className` is where you set width or margins.
+
+## Slots
+
+`startSlot` and `endSlot` hold anything: an icon, a prefix or unit, a keyboard hint, or a
+button. The box sizes itself around them, so wide content like `https://` fits without tuning.
+
+<Example name="input-slots" layout="stack">
+  <InputSlots client:load />
+</Example>
+
+<Aside title="Slot content is yours">
+The slot renders what you pass and adds nothing. Mark a decorative icon `aria-hidden`, since the
+label already names the field. Give a slot button `type="button"`, its own accessible name and
+its own focus style. The box's focus ring follows the text control only, so a focused slot
+button draws its own ring and doesn't light up the whole field.
+
+Clicking a decorative icon does not move focus into the input. Moving it would take JavaScript
+in `@arun-dev/ui`, which decision 7 rules out. Click targets are the text and the label.
+
+</Aside>
+
+## States
+
+All of them come from the native control, read with `:has()`. There is no `data-*` attribute
+to set:
+
+| State    | Set it with                     |
+| -------- | ------------------------------- |
+| focus    | the platform (`:focus-visible`) |
+| invalid  | `aria-invalid` on the input     |
+| disabled | `disabled` on the input         |
+
+Point `aria-describedby` at the error text too, so it is read out with the field.
+
+## Props
+
+<PropTable component="Input" />
+
+## Notes
+
+- For text-like types only: `text`, `email`, `password`, `search`, `tel`, `url`, `number`.
+  Use [Checkbox](/components/checkbox/), [Radio group](/components/radio-group/) or
+  [Switch](/components/switch/) for the others.
+- Restyle every input with the `--input-*` tokens, e.g. `--input-height` or
+  `--input-border-color-focus`.

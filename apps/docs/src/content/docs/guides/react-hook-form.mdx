@@ -9,8 +9,11 @@ Every control that carries a value — [Checkbox](/components/checkbox/),
 [Radio group](/components/radio-group/) and [Switch](/components/switch/) — works with
 react-hook-form through `Controller`.
 
-`register()` does not work, and fails quietly. That is the whole of what you need to know; the
-rest of this page explains why, and what you get once the binding is right.
+`register()` does not work for them, and fails quietly. That is the whole of what you need to
+know; the rest of this page explains why, and what you get once the binding is right.
+
+[Input](/components/input/) is the exception: it is a plain native `<input>` with no state of its
+own, so [`register()` is the binding](#input-use-register).
 
 ## Use Controller
 
@@ -139,6 +142,29 @@ string. Correct, and almost never what an API wants. Resolve it at the edge:
 ```tsx
 handleSubmit((data) => save({ terms: data.terms === true }));
 ```
+
+## Input: use register()
+
+`Input` keeps nothing in React. The value lives on the `<input>`, which is exactly what
+`register()` reads and writes, so spread it straight on:
+
+```tsx
+const { register, formState } = useForm({ defaultValues: { email: '' } });
+
+<label htmlFor="email">Email</label>
+<Input
+  id="email"
+  type="email"
+  aria-invalid={formState.errors.email ? true : undefined}
+  {...register('email', { required: true })}
+/>
+```
+
+`ref`, `name`, `onChange` and `onBlur` all land on the `<input>`, never on the box, whether or not
+the input has slots. `setValue`, `reset()`, validation and `isDirty` work with no extra wiring.
+Set `aria-invalid` from `formState.errors` to turn the border to the error colour.
+
+`Controller` works too, if a field needs a transformed value, but it isn't required.
 
 ## Buttons
 

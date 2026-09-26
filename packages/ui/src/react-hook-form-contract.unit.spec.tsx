@@ -4,6 +4,7 @@ import { useForm, Controller, useController, useWatch } from 'react-hook-form';
 import type { ControllerRenderProps } from 'react-hook-form';
 import { Button } from './components/button';
 import { Checkbox } from './components/checkbox';
+import { Input } from './components/input';
 import { RadioGroup } from './components/radio-group';
 import { Switch } from './components/switch';
 
@@ -555,5 +556,60 @@ describe('Button with react-hook-form', () => {
 
     await act(async () => fireEvent.click(screen.getByText('Save')));
     expect(onSubmit).toHaveBeenCalledOnce();
+  });
+});
+
+describe('Input with react-hook-form', () => {
+  // Input is a native <input> and keeps no state of its own, so register() — not
+  // Controller — is the binding. The box around it must not get in the way: ref, name,
+  // onChange and onBlur all have to reach the <input>, with or without slots.
+  type Values = { email: string };
+
+  function setup() {
+    const api: { form?: ReturnType<typeof useForm<Values>> } = {};
+    const onSubmit = vi.fn();
+
+    function Form() {
+      const form = useForm<Values>({ defaultValues: { email: 'ada@example.com' } });
+      api.form = form;
+      const error = form.formState.errors.email;
+      return (
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <Input
+            aria-label="Email"
+            aria-invalid={error ? true : undefined}
+            startSlot="@"
+            {...form.register('email', { required: true })}
+          />
+          <button type="submit">Save</button>
+        </form>
+      );
+    }
+
+    render(<Form />);
+    return { api, onSubmit, input: screen.getByRole<HTMLInputElement>('textbox') };
+  }
+
+  it('shows defaultValues and reads what the user types', () => {
+    const { api, input } = setup();
+    expect(input.value).toBe('ada@example.com');
+    fireEvent.change(input, { target: { value: 'grace@example.com' } });
+    expect(api.form?.getValues('email')).toBe('grace@example.com');
+  });
+
+  it('is driven by setValue and reset', () => {
+    const { api, input } = setup();
+    act(() => api.form?.setValue('email', 'grace@example.com'));
+    expect(input.value).toBe('grace@example.com');
+    act(() => api.form?.reset());
+    expect(input.value).toBe('ada@example.com');
+  });
+
+  it('blocks submit on a failed rule, and aria-invalid reaches the input', async () => {
+    const { onSubmit, input } = setup();
+    fireEvent.change(input, { target: { value: '' } });
+    await act(async () => fireEvent.click(screen.getByText('Save')));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(input).toHaveAttribute('aria-invalid', 'true');
   });
 });
