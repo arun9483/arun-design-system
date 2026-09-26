@@ -1,0 +1,82 @@
+@layer input {
+  /* The box draws the frame; the <input> inside it is borderless and fills the space
+     the slots leave. State is read from the native control with :has() — it is the
+     platform's, so no data-* attribute stands in for it. */
+  .input {
+    display: flex;
+    align-items: center;
+    gap: var(--input-slot-gap);
+    min-block-size: var(--input-height);
+    padding-inline: var(--input-padding-inline);
+    border: var(--input-border-width) solid var(--input-border-color);
+    border-radius: var(--input-radius);
+    background-color: var(--input-bg);
+    color: var(--input-color);
+    font-size: var(--input-font-size);
+    cursor: text;
+    transition: border-color var(--input-duration) var(--ease-smooth);
+  }
+
+  .input:hover {
+    border-color: var(--input-border-color-hover);
+  }
+
+  .input:has(> .input-control[aria-invalid='true']) {
+    border-color: var(--input-border-color-invalid);
+  }
+
+  /* The ring follows the text control only: a button in a slot draws its own. */
+  .input:has(> .input-control:focus-visible) {
+    border-color: var(--input-border-color-focus);
+    outline: var(--input-border-width) solid var(--input-border-color-focus);
+  }
+
+  .input:has(> .input-control[aria-invalid='true']:focus-visible) {
+    border-color: var(--input-border-color-invalid);
+    outline-color: var(--input-border-color-invalid);
+  }
+
+  .input:has(> .input-control:disabled) {
+    opacity: var(--input-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  .input:has(> .input-control:disabled):hover {
+    border-color: var(--input-border-color);
+  }
+
+  .input-control {
+    flex: 1;
+    min-inline-size: 0;
+    align-self: stretch;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+
+  .input-control::placeholder {
+    color: var(--input-placeholder-color);
+    opacity: 1;
+  }
+
+  .input-control:disabled {
+    cursor: not-allowed;
+  }
+
+  .input-slot {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: var(--input-slot-color);
+    cursor: default;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .input {
+      transition-duration: 0ms;
+    }
+  }
+}

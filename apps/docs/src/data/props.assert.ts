@@ -5,7 +5,7 @@
  * rename in the library fails `pnpm typecheck` here instead of quietly leaving the
  * documentation wrong. It asserts names, not descriptions — prose still needs a human.
  */
-import type { BadgeProps, ButtonProps, CardProps, ChipProps } from '@arun-dev/ui';
+import type { BadgeProps, ButtonProps, CardProps, ChipProps, InputProps } from '@arun-dev/ui';
 import type { CheckboxIndicatorProps, CheckboxRootProps } from '@arun-dev/headless/checkbox';
 import type { RadioGroupItemProps, RadioGroupRootProps } from '@arun-dev/headless/radio-group';
 import type { SwitchRootProps, SwitchThumbProps } from '@arun-dev/headless/switch';
@@ -27,6 +27,7 @@ type Unknown =
   | OnlyRealProps<Documented<'Card'>, CardProps>
   | OnlyRealProps<Documented<'Chip'>, ChipProps>
   | OnlyRealProps<Documented<'Badge'>, BadgeProps>
+  | OnlyRealProps<Documented<'Input'> | (typeof COMMON)[number]['name'], InputProps>
   | OnlyRealProps<Documented<'Checkbox.Root'>, CheckboxRootProps>
   | OnlyRealProps<Documented<'Checkbox.Indicator'>, CheckboxIndicatorProps>
   | OnlyRealProps<Documented<'RadioGroup.Root'>, RadioGroupRootProps>

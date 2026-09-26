@@ -84,6 +84,26 @@ export const PROPS = {
       description: 'Neutral for tags and filters, accent for emphasis.',
     },
   ],
+  Input: [
+    {
+      name: 'startSlot',
+      type: 'ReactNode',
+      description:
+        'Content before the text, inside the box: an icon, prefix or button. Mark decorative icons `aria-hidden`.',
+    },
+    {
+      name: 'endSlot',
+      type: 'ReactNode',
+      description:
+        'Content after the text, inside the box: a unit, hint, or clear or reveal button.',
+    },
+    {
+      name: 'className',
+      type: 'string',
+      description:
+        'Goes on the box that frames the input and its slots, not on the `<input>`. Every other prop, `ref` and `render` included, goes on the `<input>`.',
+    },
+  ],
   'Checkbox.Root': [
     {
       name: 'checked',

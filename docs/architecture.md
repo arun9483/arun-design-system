@@ -119,10 +119,10 @@ All components also spread unrecognised props onto the rendered element, so `id`
 
 A package exports the props types it **defines**, and never re-exports one it merely borrows.
 
-| Component                         | Props type defined in | Exported from `ui`? |
-| --------------------------------- | --------------------- | ------------------- |
-| `Button`, `Card`, `Chip`, `Badge` | `@arun-dev/ui`        | yes                 |
-| `Switch.Root`, `Switch.Thumb`     | `@arun-dev/headless`  | no                  |
+| Component                                  | Props type defined in | Exported from `ui`? |
+| ------------------------------------------ | --------------------- | ------------------- |
+| `Button`, `Card`, `Chip`, `Badge`, `Input` | `@arun-dev/ui`        | yes                 |
+| `Switch.Root`, `Switch.Thumb`              | `@arun-dev/headless`  | no                  |
 
 Prop _value_ types are exported the same way — `BadgeTone`, `ButtonVariant`, `ChipVariant` — since
 a consumer must be able to construct those values and map their own vocabulary onto them, per
@@ -277,6 +277,17 @@ behaviour this library has deliberately not built yet. `RadioGroup.Item` is a re
   is on a `<button>`. `register()` reads a radio group correctly and cannot drive it.
   `Controller` remains the answer, and the contract spec pins both halves. The write half
   is lost to React state, not to the element, so no element choice gets it back.
+
+**Input keeps no state at all, so it gets `register()` back.** A text field must be a real
+`<input>`, per the table. `Input` also leaves the value on that element and keeps none in
+React, so both halves of the protocol are intact and `register()` is the binding. With
+nothing that needs JavaScript, it has no headless half either: it is a styling wrapper in
+`@arun-dev/ui`, like `Chip`. The icons and units it holds go in a `<div>` box around the
+`<input>`, through `startSlot` / `endSlot` props rather than parts (decision 11). They need
+nothing from the input, and the box places them. `className` goes on the box, and every other
+prop goes on the `<input>`, so `ref`, `id` and `aria-*` land on the control whether or not
+there are slots. Focus, `aria-invalid` and `disabled` are styled with `:has()` on the native
+control, so no `data-*` attribute stands in for platform state.
 
 ---
 

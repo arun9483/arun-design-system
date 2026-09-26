@@ -29,8 +29,8 @@ type Props<P> = {
   controls: readonly Control[];
   /** Component name used when printing the JSX. */
   component: string;
-  /** Children rendered inside the printed JSX. */
-  children?: string;
+  /** Children rendered inside the printed JSX. `null` for a component that takes none. */
+  children?: string | null;
 };
 
 function initialValues(controls: readonly Control[]): Record<string, unknown> {
@@ -61,12 +61,23 @@ function resolve(
 }
 
 /** Prints the JSX a consumer would write for the current prop values. */
-function toJsx(component: string, values: Record<string, unknown>, children: string): string {
+function toJsx(
+  component: string,
+  values: Record<string, unknown>,
+  children: string | null,
+): string {
   const attrs = Object.entries(values)
     .filter(([, v]) => v !== '' && v !== false && v !== undefined)
     .map(([k, v]) =>
       v === true ? k : typeof v === 'string' ? `${k}="${v}"` : `${k}={${String(v)}}`,
     );
+
+  if (children === null) {
+    const inline = `<${component}${attrs.map((a) => ` ${a}`).join('')} />`;
+    return inline.length <= 72
+      ? inline
+      : [`<${component}`, ...attrs.map((a) => `  ${a}`), `/>`].join('\n');
+  }
 
   if (attrs.length === 0) return `<${component}>${children}</${component}>`;
 
@@ -94,7 +105,9 @@ export function Playground<P>({ render, controls, component, children = 'Label' 
 
   return (
     <div className="ds-example not-content">
-      <div className="ds-example-preview">{render({ ...omitEmpty(resolved), children } as P)}</div>
+      <div className="ds-example-preview">
+        {render({ ...omitEmpty(resolved), ...(children === null ? {} : { children }) } as P)}
+      </div>
 
       <div className="ds-playground-controls">
         {controls.map((control) => {

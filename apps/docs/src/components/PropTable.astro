@@ -25,7 +25,12 @@ function format(description: string): string {
   return escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
 }
 
-const rows: readonly PropDoc[] = [...own, ...COMMON];
+// A component may document a shared prop itself when it behaves differently there —
+// Input's className goes on its box — and its own row replaces the shared one.
+const rows: readonly PropDoc[] = [
+  ...own,
+  ...COMMON.filter((common) => !own.some((prop) => prop.name === common.name)),
+];
 ---
 
 <div class="ds-props">
