@@ -1,0 +1,107 @@
+@layer select {
+  /* The box draws the frame and holds the chevron; the <select> inside it is unstyled by
+     the platform (appearance: none) and fills the box, so the whole frame opens the picker.
+     State is read from the native control with :has() — no data-* attribute stands in. */
+  .select {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-block-size: var(--select-height);
+    border: var(--select-border-width) solid var(--select-border-color);
+    border-radius: var(--select-radius);
+    background-color: var(--select-bg);
+    color: var(--select-color);
+    font-size: var(--select-font-size);
+    transition: border-color var(--select-duration) var(--ease-smooth);
+  }
+
+  .select:hover {
+    border-color: var(--select-border-color-hover);
+  }
+
+  .select:has(> .select-control[aria-invalid='true']) {
+    border-color: var(--select-border-color-invalid);
+  }
+
+  .select:has(> .select-control:focus-visible) {
+    border-color: var(--select-border-color-focus);
+    outline: var(--select-border-width) solid var(--select-border-color-focus);
+  }
+
+  .select:has(> .select-control[aria-invalid='true']:focus-visible) {
+    border-color: var(--select-border-color-invalid);
+    outline-color: var(--select-border-color-invalid);
+  }
+
+  .select:has(> .select-control:disabled) {
+    opacity: var(--select-disabled-opacity);
+  }
+
+  .select:has(> .select-control:disabled):hover {
+    border-color: var(--select-border-color);
+  }
+
+  .select-control {
+    appearance: none;
+    flex: 1;
+    min-inline-size: 0;
+    align-self: stretch;
+    /* Room on the end for the chevron, which sits over the control. */
+    padding-block: 0;
+    padding-inline: var(--select-padding-inline)
+      calc(var(--select-padding-inline) + var(--select-icon-size) + var(--select-icon-gap));
+    border: none;
+    border-radius: inherit;
+    outline: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  /* A selected option with an empty value is the "Choose…" prompt, so it reads as one.
+     The options in the list keep the normal colour. */
+  .select-control:has(option[value='']:checked) {
+    color: var(--select-placeholder-color);
+  }
+
+  .select-control option,
+  .select-control optgroup {
+    color: var(--select-color);
+    background-color: var(--select-bg);
+  }
+
+  .select-control:disabled {
+    cursor: not-allowed;
+  }
+
+  /* Over the control, so a click on it lands on the <select> beneath. */
+  .select-icon {
+    position: absolute;
+    inset-inline-end: var(--select-padding-inline);
+    inline-size: var(--select-icon-size);
+    block-size: var(--select-icon-size);
+    color: var(--select-icon-color);
+    pointer-events: none;
+  }
+
+  /* A list box (multiple, or size above 1) shows its options in place: no chevron, and it
+     sets its own height. */
+  .select:has(> .select-control:is([multiple], [size]:not([size='1']))) {
+    align-items: stretch;
+  }
+
+  .select:has(> .select-control:is([multiple], [size]:not([size='1']))) .select-icon {
+    display: none;
+  }
+
+  .select-control:is([multiple], [size]:not([size='1'])) {
+    padding: var(--select-padding-block-list) var(--select-padding-inline);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .select {
+      transition-duration: 0ms;
+    }
+  }
+}

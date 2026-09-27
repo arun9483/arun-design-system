@@ -12,9 +12,9 @@ react-hook-form through `Controller`.
 `register()` does not work for them, and fails quietly. That is the whole of what you need to
 know; the rest of this page explains why, and what you get once the binding is right.
 
-[Input](/components/input/) and [Textarea](/components/textarea/) are the exceptions: each is a
-plain native element with no state of its own, so
-[`register()` is the binding](#input-and-textarea-use-register).
+[Input](/components/input/), [Textarea](/components/textarea/) and [Select](/components/select/)
+are the exceptions: each is a plain native element with no state of its own, so
+[`register()` is the binding](#input-textarea-and-select-use-register).
 
 ## Use Controller
 
@@ -144,7 +144,7 @@ string. Correct, and almost never what an API wants. Resolve it at the edge:
 handleSubmit((data) => save({ terms: data.terms === true }));
 ```
 
-## Input and Textarea: use register()
+## Input, Textarea and Select: use register()
 
 `Input` keeps nothing in React. The value lives on the `<input>`, which is exactly what
 `register()` reads and writes, so spread it straight on:
@@ -167,6 +167,10 @@ Set `aria-invalid` from `formState.errors` to turn the border to the error colou
 
 `Textarea` binds the same way, with the same spread. It has no box, so everything lands on the
 `<textarea>` directly.
+
+`Select` binds the same way too; like Input, `ref`, `name` and the handlers land on the
+`<select>`, not its box. For a "Choose…" prompt, add an `<option value="">` and a `required`
+rule: react-hook-form treats the empty string as missing.
 
 `Controller` works too, if a field needs a transformed value, but it isn't required.
 

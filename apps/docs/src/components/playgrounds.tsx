@@ -11,6 +11,7 @@ import {
   Chip,
   Input,
   RadioGroup,
+  Select,
   Switch,
   Textarea,
 } from '@arun-dev/ui';
@@ -119,6 +120,31 @@ export function TextareaPlayground() {
       children={null}
       render={(props: ComponentProps<typeof Textarea>) => (
         <Textarea {...props} aria-label="Playground textarea" style={{ maxInlineSize: '24rem' }} />
+      )}
+    />
+  );
+}
+
+const SELECT_CONTROLS: Control[] = [
+  { name: 'required', type: 'boolean', initial: false },
+  { name: 'disabled', type: 'boolean', initial: false },
+  { name: 'aria-invalid', type: 'boolean', initial: false },
+];
+
+export function SelectPlayground() {
+  return (
+    <Playground
+      component="Select"
+      controls={SELECT_CONTROLS}
+      // Printed in the snippet; the preview renders real options instead.
+      children="{options}"
+      render={({ children: _printed, ...props }: ComponentProps<typeof Select>) => (
+        <Select {...props} aria-label="Playground select" style={{ maxInlineSize: '20rem' }}>
+          <option value="">Choose a fruit…</option>
+          <option value="apple">Apple</option>
+          <option value="banana">Banana</option>
+          <option value="cherry">Cherry</option>
+        </Select>
       )}
     />
   );

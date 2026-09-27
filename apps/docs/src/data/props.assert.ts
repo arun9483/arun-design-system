@@ -12,6 +12,7 @@ import type {
   ChipProps,
   InputProps,
   TextareaProps,
+  SelectProps,
 } from '@arun-dev/ui';
 import type { CheckboxIndicatorProps, CheckboxRootProps } from '@arun-dev/headless/checkbox';
 import type { RadioGroupItemProps, RadioGroupRootProps } from '@arun-dev/headless/radio-group';
@@ -36,6 +37,7 @@ type Unknown =
   | OnlyRealProps<Documented<'Badge'>, BadgeProps>
   | OnlyRealProps<Documented<'Input'> | (typeof COMMON)[number]['name'], InputProps>
   | OnlyRealProps<Documented<'Textarea'>, TextareaProps>
+  | OnlyRealProps<Documented<'Select'> | (typeof COMMON)[number]['name'], SelectProps>
   | OnlyRealProps<Documented<'Checkbox.Root'>, CheckboxRootProps>
   | OnlyRealProps<Documented<'Checkbox.Indicator'>, CheckboxIndicatorProps>
   | OnlyRealProps<Documented<'RadioGroup.Root'>, RadioGroupRootProps>

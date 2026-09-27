@@ -119,10 +119,10 @@ All components also spread unrecognised props onto the rendered element, so `id`
 
 A package exports the props types it **defines**, and never re-exports one it merely borrows.
 
-| Component                                              | Props type defined in | Exported from `ui`? |
-| ------------------------------------------------------ | --------------------- | ------------------- |
-| `Button`, `Card`, `Chip`, `Badge`, `Input`, `Textarea` | `@arun-dev/ui`        | yes                 |
-| `Switch.Root`, `Switch.Thumb`                          | `@arun-dev/headless`  | no                  |
+| Component                                                        | Props type defined in | Exported from `ui`? |
+| ---------------------------------------------------------------- | --------------------- | ------------------- |
+| `Button`, `Card`, `Chip`, `Badge`, `Input`, `Textarea`, `Select` | `@arun-dev/ui`        | yes                 |
+| `Switch.Root`, `Switch.Thumb`                                    | `@arun-dev/headless`  | no                  |
 
 Prop _value_ types are exported the same way — `BadgeTone`, `ButtonVariant`, `ChipVariant` — since
 a consumer must be able to construct those values and map their own vocabulary onto them, per
@@ -295,6 +295,16 @@ no natural place for an icon or unit — so it is one element, and per decision 
 is one component: `className` and every other prop land on the `<textarea>`. Growing with its
 content is `field-sizing: content` behind an `autoResize` class, not a measuring script, so a
 browser without it keeps the `rows` height, which is the platform default anyway.
+
+**Select is Input's shape around a `<select>`, and does not search.** A native `<select>` keeps
+its value on the element, so it is a styling wrapper with `register()` as the binding. It
+brings the system picker on phones, typeahead, `required` and the form protocol, none of which
+is rebuilt. The box draws the chevron, since `appearance: none` removes the platform's, and
+`className` goes on the box as for Input. Filtering is deliberately out: a `<select>` cannot
+hold a text field, and adding one means a custom listbox that gives all of the above up. Type
+to filter is a **combobox** — an `<input role="combobox">` driving a popup listbox — with its
+own headless half. `<input list>` with `<datalist>` was weighed and rejected: its popup cannot
+be styled, it differs by browser, and it accepts free text rather than one of the options.
 
 ---
 
@@ -490,13 +500,15 @@ Shipped since this list was written:
 
 Still deferred:
 
-| Deferred                                 | Revisit when                                             |
-| ---------------------------------------- | -------------------------------------------------------- |
-| Runtime layout vars + `--hl-*` prefix    | the first anchored/positioned component (Popover)        |
-| Vitest browser mode                      | focus trapping or scroll locking needs testing           |
-| Positioning engine, Floating UI          | Popover; the engine is a port so it can be swapped later |
-| Memoisation inside `useRender`           | profiling shows the per-render merge costs something     |
-| `focusableWhenDisabled`, roving tabindex | the first composite widget — Toolbar, Menu, Tabs         |
-| `Link` — navigation, split out of Button | a consumer needs a styled link                           |
+| Deferred                                 | Revisit when                                                            |
+| ---------------------------------------- | ----------------------------------------------------------------------- |
+| Runtime layout vars + `--hl-*` prefix    | the first anchored/positioned component (Popover)                       |
+| Vitest browser mode                      | focus trapping or scroll locking needs testing                          |
+| Positioning engine, Floating UI          | Popover; the engine is a port so it can be swapped later                |
+| Memoisation inside `useRender`           | profiling shows the per-render merge costs something                    |
+| `focusableWhenDisabled`, roving tabindex | the first composite widget — Toolbar, Menu, Tabs                        |
+| `Link` — navigation, split out of Button | a consumer needs a styled link                                          |
+| Combobox — search over a list of options | after Popover, whose positioning it needs                               |
+| Customizable select (`base-select`)      | it ships in every engine; it swaps the system picker for an in-page one |
 
 Popover triggers the first three at once, so its decisions belong here before its code exists.

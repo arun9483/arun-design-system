@@ -1,0 +1,29 @@
+/* Select component tokens — map semantic tokens onto the dropdown's styleable surfaces.
+   Values match Input's so fields sit together, but map from the semantic tier directly:
+   overriding --input-* moves only inputs, and these move only selects. */
+:root {
+  /* Box — the bordered frame that holds the control and its chevron */
+  --select-height: 2.25rem;
+  --select-padding-inline: var(--space-xs);
+  --select-padding-block-list: var(--space-2xs);
+  --select-radius: var(--radius-md);
+  --select-bg: var(--color-bg-primary);
+  --select-border-width: var(--space-px);
+  --select-border-color: var(--color-border-default);
+  --select-border-color-hover: var(--color-border-strong);
+  --select-border-color-focus: var(--color-text-accent);
+  --select-border-color-invalid: var(--color-status-error);
+
+  /* Text */
+  --select-font-size: var(--text-sm);
+  --select-color: var(--color-text-primary);
+  --select-placeholder-color: var(--color-text-muted);
+
+  /* Chevron */
+  --select-icon-size: 1rem;
+  --select-icon-gap: var(--space-2xs);
+  --select-icon-color: var(--color-text-secondary);
+
+  --select-disabled-opacity: 0.5;
+  --select-duration: var(--duration-fast);
+}

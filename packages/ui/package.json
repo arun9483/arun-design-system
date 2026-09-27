@@ -45,6 +45,7 @@
     "./css/utilities": "./dist/css/utilities.css",
     "./css/input": "./dist/css/input.css",
     "./css/textarea": "./dist/css/textarea.css",
+    "./css/select": "./dist/css/select.css",
     "./css/checkbox": "./dist/css/checkbox.css",
     "./css/radio-group": "./dist/css/radio-group.css",
     "./css/switch": "./dist/css/switch.css"

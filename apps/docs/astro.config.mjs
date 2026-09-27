@@ -47,6 +47,7 @@ export default defineConfig({
             { label: 'Badge', slug: 'components/badge' },
             { label: 'Input', slug: 'components/input' },
             { label: 'Textarea', slug: 'components/textarea' },
+            { label: 'Select', slug: 'components/select' },
             { label: 'Checkbox', slug: 'components/checkbox' },
             { label: 'Radio group', slug: 'components/radio-group' },
             { label: 'Switch', slug: 'components/switch' },
