@@ -7,6 +7,7 @@ export default defineConfig({
     'src/index.ts',
     'src/button/index.ts',
     'src/checkbox/index.ts',
+    'src/dialog/index.ts',
     'src/radio-group/index.ts',
     'src/switch/index.ts',
   ],

@@ -3,9 +3,11 @@ import { COMMON, PROPS, type PropDoc } from '../data/props';
 
 interface Props {
   component: keyof typeof PROPS;
+  /** Append the shared rows. Off for a part that renders no element, like Dialog.Root. */
+  common?: boolean;
 }
 
-const { component } = Astro.props;
+const { component, common = true } = Astro.props;
 // PROPS is `as const` so props.assert.ts can check the names; that makes the index
 // signature literal, hence the widening here.
 const own = PROPS[component] as readonly PropDoc[] | undefined;
@@ -29,7 +31,7 @@ function format(description: string): string {
 // Input's className goes on its box — and its own row replaces the shared one.
 const rows: readonly PropDoc[] = [
   ...own,
-  ...COMMON.filter((common) => !own.some((prop) => prop.name === common.name)),
+  ...(common ? COMMON.filter((shared) => !own.some((prop) => prop.name === shared.name)) : []),
 ];
 ---
 

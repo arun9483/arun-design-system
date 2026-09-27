@@ -17,6 +17,13 @@ import type {
 import type { CheckboxIndicatorProps, CheckboxRootProps } from '@arun-dev/headless/checkbox';
 import type { RadioGroupItemProps, RadioGroupRootProps } from '@arun-dev/headless/radio-group';
 import type { SwitchRootProps, SwitchThumbProps } from '@arun-dev/headless/switch';
+import type {
+  DialogCloseProps,
+  DialogPopupProps,
+  DialogRootProps,
+  DialogTitleProps,
+  DialogTriggerProps,
+} from '@arun-dev/headless/dialog';
 import type { COMMON, PROPS } from './props';
 
 type Documented<Key extends keyof typeof PROPS> = (typeof PROPS)[Key][number]['name'];
@@ -43,7 +50,12 @@ type Unknown =
   | OnlyRealProps<Documented<'RadioGroup.Root'>, RadioGroupRootProps>
   | OnlyRealProps<Documented<'RadioGroup.Item'>, RadioGroupItemProps>
   | OnlyRealProps<Documented<'Switch.Root'>, SwitchRootProps>
-  | OnlyRealProps<Documented<'Switch.Thumb'>, SwitchThumbProps>;
+  | OnlyRealProps<Documented<'Switch.Thumb'>, SwitchThumbProps>
+  | OnlyRealProps<Documented<'Dialog.Root'>, DialogRootProps>
+  | OnlyRealProps<Documented<'Dialog.Popup'>, DialogPopupProps>
+  | OnlyRealProps<Documented<'Dialog.Trigger'>, DialogTriggerProps>
+  | OnlyRealProps<Documented<'Dialog.Title'>, DialogTitleProps>
+  | OnlyRealProps<Documented<'Dialog.Close'>, DialogCloseProps>;
 
 /**
  * `never` means every documented name resolves. Anything else is the name that does

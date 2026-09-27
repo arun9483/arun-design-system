@@ -249,6 +249,42 @@ export const PROPS = {
     },
   ],
   'Switch.Thumb': [],
+  'Dialog.Root': [
+    {
+      name: 'open',
+      type: 'boolean',
+      description:
+        'Controlled state. Provide `onOpenChange` alongside it. Never pass `undefined` — the mode is fixed at mount.',
+    },
+    {
+      name: 'defaultOpen',
+      type: 'boolean',
+      default: 'false',
+      description: 'Initial state when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onOpenChange',
+      type: '(open: boolean) => void',
+      description:
+        'Called on every request to open or close: Trigger, Close, Esc, a backdrop click or a `<form method="dialog">`. A controlled dialog moves only if you accept it.',
+    },
+    {
+      name: 'closeOnBackdropClick',
+      type: 'boolean',
+      default: 'true',
+      description:
+        'Close when the backdrop is clicked. Turn it off where a stray click would lose work; Esc and `Dialog.Close` still close.',
+    },
+    {
+      name: 'children',
+      type: 'ReactNode',
+      description: 'The other parts. Root renders no element of its own.',
+    },
+  ],
+  'Dialog.Popup': [],
+  'Dialog.Trigger': [],
+  'Dialog.Title': [],
+  'Dialog.Close': [],
   Badge: [
     {
       name: 'tone',

@@ -1,0 +1,89 @@
+@layer dialog {
+  /* The <dialog> is in the top layer while open, so it needs no z-index and no portal.
+     State is data-open / data-closed from @arun-dev/headless; the element's own [open]
+     is what display follows, so a closed dialog stays display: none as the UA sheet says. */
+  /* Centred by inset and translate, not the UA's margin: auto. A `* { margin: 0 }` reset
+     is common, and an unlayered one (or one in a later layer) beats every rule here, which
+     would pin the dialog to the top-left corner. Nothing below depends on margin. */
+  .dialog {
+    position: fixed;
+    inset: 50% auto auto 50%;
+    /* translate (-50% -50%, plus the enter offset) is set with the transitions below. */
+    inline-size: min(var(--dialog-width), 100% - 2 * var(--dialog-viewport-gap));
+    max-inline-size: none;
+    max-block-size: calc(100% - 2 * var(--dialog-viewport-gap));
+    margin: 0;
+    padding: var(--dialog-padding);
+    border: var(--dialog-border-width) solid var(--dialog-border-color);
+    border-radius: var(--dialog-radius);
+    background-color: var(--dialog-bg);
+    color: var(--dialog-color);
+    box-shadow: var(--dialog-shadow);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  .dialog::backdrop {
+    background-color: var(--dialog-backdrop);
+  }
+
+  /* Padding rather than margin, for the same reason as the centring above. */
+  .dialog-title {
+    margin: 0;
+    padding-block-end: var(--dialog-title-gap);
+    font-size: var(--dialog-title-font-size);
+    font-weight: var(--dialog-title-font-weight);
+    line-height: var(--line-height-snug);
+  }
+
+  /* The page behind a modal dialog is inert but would still scroll; stop it. The gutter
+     keeps the layout from shifting when the scrollbar goes. */
+  :root:has(.dialog:modal) {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
+
+  /* Fade and rise in, fade out. display and overlay are animated discretely so the
+     closing transition plays before the element leaves the top layer; a browser without
+     that support simply skips the animation. */
+  .dialog,
+  .dialog::backdrop {
+    transition:
+      opacity var(--dialog-duration) var(--ease-smooth),
+      translate var(--dialog-duration) var(--ease-smooth),
+      display var(--dialog-duration) allow-discrete,
+      overlay var(--dialog-duration) allow-discrete;
+    opacity: 0;
+  }
+
+  .dialog {
+    translate: -50% calc(-50% + var(--dialog-enter-offset));
+  }
+
+  .dialog[open],
+  .dialog[open]::backdrop {
+    opacity: 1;
+  }
+
+  .dialog[open] {
+    translate: -50% -50%;
+  }
+
+  @starting-style {
+    .dialog[open],
+    .dialog[open]::backdrop {
+      opacity: 0;
+    }
+
+    .dialog[open] {
+      translate: -50% calc(-50% + var(--dialog-enter-offset));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dialog,
+    .dialog::backdrop {
+      transition-duration: 0ms;
+    }
+  }
+}

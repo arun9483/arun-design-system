@@ -22,6 +22,10 @@
     "test:unit": {
       "dependsOn": ["^build"]
     },
+    "test:browser": {
+      "dependsOn": ["^build"],
+      "passThroughEnv": ["PLAYWRIGHT_BROWSERS_PATH"]
+    },
     "clean": {
       "cache": false
     }

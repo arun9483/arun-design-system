@@ -1,0 +1,27 @@
+/* Dialog component tokens — map semantic tokens onto the modal panel and its backdrop.
+   Override any of these to restyle dialogs without moving other components. */
+:root {
+  /* Panel */
+  --dialog-width: 32rem;
+  --dialog-viewport-gap: var(--space-md);
+  --dialog-padding: var(--space-lg);
+  --dialog-radius: var(--radius-lg);
+  --dialog-bg: var(--color-bg-primary);
+  --dialog-color: var(--color-text-primary);
+  --dialog-border-width: var(--space-px);
+  --dialog-border-color: var(--color-border-subtle);
+  --dialog-shadow: var(--shadow-xl);
+
+  /* Title */
+  --dialog-title-font-size: var(--text-lg);
+  --dialog-title-font-weight: var(--font-weight-semibold);
+  --dialog-title-gap: var(--space-xs);
+
+  /* Backdrop — a neutral scrim, the same in every brand and mode, so it is a value
+     rather than a mapping: no semantic token describes it. */
+  --dialog-backdrop: rgb(0 0 0 / 0.5);
+
+  /* Motion */
+  --dialog-duration: var(--duration-normal);
+  --dialog-enter-offset: var(--space-xs);
+}

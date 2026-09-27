@@ -51,6 +51,7 @@ export default defineConfig({
             { label: 'Checkbox', slug: 'components/checkbox' },
             { label: 'Radio group', slug: 'components/radio-group' },
             { label: 'Switch', slug: 'components/switch' },
+            { label: 'Dialog', slug: 'components/dialog' },
           ],
         },
         {

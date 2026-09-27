@@ -19,6 +19,7 @@ const CSS_LAYERS = [
   { layer: 'input', src: 'src/components/input/input.css' },
   { layer: 'textarea', src: 'src/components/textarea/textarea.css' },
   { layer: 'select', src: 'src/components/select/select.css' },
+  { layer: 'dialog', src: 'src/components/dialog/dialog.css' },
   { layer: 'checkbox', src: 'src/components/checkbox/checkbox.css' },
   { layer: 'radio-group', src: 'src/components/radio-group/radio-group.css' },
   { layer: 'switch', src: 'src/components/switch/switch.css' },
