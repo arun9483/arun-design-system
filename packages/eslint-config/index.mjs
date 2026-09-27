@@ -45,7 +45,17 @@ export const reactConfig = [
 ];
 
 export const ignores = {
-  ignores: ['node_modules/**', '.next/**', 'dist/**', 'build/**', 'coverage/**'],
+  ignores: [
+    'node_modules/**',
+    '.next/**',
+    'dist/**',
+    'build/**',
+    'coverage/**',
+    // tsup bundles its config to a temporary `tsup.config.bundled_<id>.mjs` beside it and
+    // deletes it after. A lint running alongside a build can list the file and then fail
+    // to open it (ENOENT), so it is never linted.
+    '**/*.bundled_*.{mjs,cjs}',
+  ],
 };
 
 export default [ignores, ...baseConfig];
