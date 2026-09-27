@@ -1,0 +1,68 @@
+---
+title: Textarea
+description: A native multi-line text field that can grow with its content, without JavaScript.
+---
+
+import Example from '@/components/Example.astro';
+import TextareaBasics from '@/examples/textarea-basics';
+import TextareaAutoResize from '@/examples/textarea-auto-resize';
+import PropTable from '@/components/PropTable.astro';
+import { TextareaPlayground } from '@/components/playgrounds';
+import { Aside } from '@astrojs/starlight/components';
+
+`Textarea` is a real `<textarea>`. Typing, selection, spellcheck, validation and form submission
+are all the platform's, so there is no headless half and nothing to keep in sync. It works with
+react-hook-form's `register()` as-is.
+
+<Example name="textarea-basics" layout="stack">
+  <TextareaBasics client:load />
+</Example>
+
+## Playground
+
+<TextareaPlayground client:load />
+
+## One element
+
+Unlike [Input](/components/input/), there is no box and there are no slots. The `<textarea>`
+draws its own frame, so every prop lands on it, `className` included. A `<label htmlFor>`,
+`aria-describedby`, `register()` and a focus ref all reach the control directly.
+
+## Auto-resize
+
+`autoResize` makes the field grow with what is typed, from `--textarea-min-height` up to
+`--textarea-max-height`, then scroll. The manual resize handle is removed, since the height is no
+longer the user's to set.
+
+<Example name="textarea-auto-resize" layout="stack">
+  <TextareaAutoResize client:load />
+</Example>
+
+<Aside title="CSS only">
+Auto-resize is `field-sizing: content`, with no JavaScript measuring the text. Where a browser
+lacks it, the textarea keeps its `rows` height and scrolls, just as it would without the prop.
+
+</Aside>
+
+## States
+
+All of them come from the native control. There is no `data-*` attribute to set:
+
+| State    | Set it with                     |
+| -------- | ------------------------------- |
+| focus    | the platform (`:focus-visible`) |
+| invalid  | `aria-invalid` on the textarea  |
+| disabled | `disabled` on the textarea      |
+
+Point `aria-describedby` at the error text too, so it is read out with the field.
+
+## Props
+
+<PropTable component="Textarea" />
+
+## Notes
+
+- Set the starting height with `rows`, and cap input with `maxLength`. Both are native.
+- Restyle every textarea with the `--textarea-*` tokens, e.g. `--textarea-min-height` or
+  `--textarea-border-color-focus`. They match Input's by default but are independent: changing
+  `--input-*` does not move textareas.

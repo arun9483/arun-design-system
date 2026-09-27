@@ -12,8 +12,9 @@ react-hook-form through `Controller`.
 `register()` does not work for them, and fails quietly. That is the whole of what you need to
 know; the rest of this page explains why, and what you get once the binding is right.
 
-[Input](/components/input/) is the exception: it is a plain native `<input>` with no state of its
-own, so [`register()` is the binding](#input-use-register).
+[Input](/components/input/) and [Textarea](/components/textarea/) are the exceptions: each is a
+plain native element with no state of its own, so
+[`register()` is the binding](#input-and-textarea-use-register).
 
 ## Use Controller
 
@@ -143,7 +144,7 @@ string. Correct, and almost never what an API wants. Resolve it at the edge:
 handleSubmit((data) => save({ terms: data.terms === true }));
 ```
 
-## Input: use register()
+## Input and Textarea: use register()
 
 `Input` keeps nothing in React. The value lives on the `<input>`, which is exactly what
 `register()` reads and writes, so spread it straight on:
@@ -163,6 +164,9 @@ const { register, formState } = useForm({ defaultValues: { email: '' } });
 `ref`, `name`, `onChange` and `onBlur` all land on the `<input>`, never on the box, whether or not
 the input has slots. `setValue`, `reset()`, validation and `isDirty` work with no extra wiring.
 Set `aria-invalid` from `formState.errors` to turn the border to the error colour.
+
+`Textarea` binds the same way, with the same spread. It has no box, so everything lands on the
+`<textarea>` directly.
 
 `Controller` works too, if a field needs a transformed value, but it isn't required.
 

@@ -104,6 +104,15 @@ export const PROPS = {
         'Goes on the box that frames the input and its slots, not on the `<input>`. Every other prop, `ref` and `render` included, goes on the `<input>`.',
     },
   ],
+  Textarea: [
+    {
+      name: 'autoResize',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Grow with the content between `--textarea-min-height` and `--textarea-max-height`, then scroll. CSS only (`field-sizing: content`); browsers without it keep the `rows` height.',
+    },
+  ],
   'Checkbox.Root': [
     {
       name: 'checked',

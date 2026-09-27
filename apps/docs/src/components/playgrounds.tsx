@@ -3,7 +3,17 @@
  * consistent, and so each MDX page needs a single import.
  */
 import type { ComponentProps } from 'react';
-import { Badge, Button, Card, Checkbox, Chip, Input, RadioGroup, Switch } from '@arun-dev/ui';
+import {
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  Chip,
+  Input,
+  RadioGroup,
+  Switch,
+  Textarea,
+} from '@arun-dev/ui';
 import { Playground, type Control } from './Playground';
 
 const BUTTON_CONTROLS: Control[] = [
@@ -89,6 +99,26 @@ export function InputPlayground() {
       children={null}
       render={(props: ComponentProps<typeof Input>) => (
         <Input {...props} aria-label="Playground input" style={{ maxInlineSize: '20rem' }} />
+      )}
+    />
+  );
+}
+
+const TEXTAREA_CONTROLS: Control[] = [
+  { name: 'placeholder', type: 'text', initial: 'Write something…' },
+  { name: 'autoResize', type: 'boolean', initial: false },
+  { name: 'disabled', type: 'boolean', initial: false },
+  { name: 'aria-invalid', type: 'boolean', initial: false },
+];
+
+export function TextareaPlayground() {
+  return (
+    <Playground
+      component="Textarea"
+      controls={TEXTAREA_CONTROLS}
+      children={null}
+      render={(props: ComponentProps<typeof Textarea>) => (
+        <Textarea {...props} aria-label="Playground textarea" style={{ maxInlineSize: '24rem' }} />
       )}
     />
   );

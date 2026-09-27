@@ -1,0 +1,26 @@
+/* Textarea component tokens — map semantic tokens onto the multi-line field's styleable
+   surfaces. Values match Input's so the two fields sit together, but map from the semantic
+   tier directly: overriding --input-* moves only inputs, and these move only textareas. */
+:root {
+  /* Frame */
+  --textarea-min-height: 5rem;
+  --textarea-max-height: 20rem;
+  --textarea-padding-block: var(--space-2xs);
+  --textarea-padding-inline: var(--space-xs);
+  --textarea-radius: var(--radius-md);
+  --textarea-bg: var(--color-bg-primary);
+  --textarea-border-width: var(--space-px);
+  --textarea-border-color: var(--color-border-default);
+  --textarea-border-color-hover: var(--color-border-strong);
+  --textarea-border-color-focus: var(--color-text-accent);
+  --textarea-border-color-invalid: var(--color-status-error);
+
+  /* Text */
+  --textarea-font-size: var(--text-sm);
+  --textarea-line-height: var(--line-height-normal);
+  --textarea-color: var(--color-text-primary);
+  --textarea-placeholder-color: var(--color-text-muted);
+
+  --textarea-disabled-opacity: 0.5;
+  --textarea-duration: var(--duration-fast);
+}
