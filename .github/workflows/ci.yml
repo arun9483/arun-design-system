@@ -31,6 +31,8 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.63.0-noble
     env:
+      # The image's browsers live here; without it Playwright looks under $HOME/.cache.
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
     steps:
