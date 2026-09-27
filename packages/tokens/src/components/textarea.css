@@ -5,6 +5,7 @@
   /* Frame */
   --textarea-min-height: 5rem;
   --textarea-max-height: 20rem;
+  --textarea-min-width: 10rem;
   --textarea-padding-block: var(--space-2xs);
   --textarea-padding-inline: var(--space-xs);
   --textarea-radius: var(--radius-md);
