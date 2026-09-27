@@ -6,6 +6,7 @@ description: A native multi-line text field that can grow with its content, with
 import Example from '@/components/Example.astro';
 import TextareaBasics from '@/examples/textarea-basics';
 import TextareaAutoResize from '@/examples/textarea-auto-resize';
+import TextareaControlled from '@/examples/textarea-controlled';
 import PropTable from '@/components/PropTable.astro';
 import { TextareaPlayground } from '@/components/playgrounds';
 import { Aside } from '@astrojs/starlight/components';
@@ -60,6 +61,20 @@ Auto-resize is `field-sizing: content`, with no JavaScript measuring the text. W
 lacks it, the textarea keeps its `rows` height and scrolls, just as it would without the prop.
 
 </Aside>
+
+## Controlled
+
+Uncontrolled is the default: pass `defaultValue`, or `register()`, and the value lives on the
+`<textarea>`. When something else needs the value as it is typed, such as a counter, a preview or
+a reset button, control it with `value` and `onChange`, exactly as with a plain `<textarea>`.
+React's `onChange` fires on every keystroke, not on blur.
+
+<Example name="textarea-controlled" layout="stack">
+  <TextareaControlled client:load />
+</Example>
+
+`autoResize` keeps working, since it sizes to whatever value the element holds. Pass the value as
+`value`, not as children.
 
 ## States
 
