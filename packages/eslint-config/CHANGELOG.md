@@ -1,5 +1,12 @@
 # @arun-dev/eslint-config
 
+## 0.1.1
+
+### Patch Changes
+
+- ba17991: Ignore tsup's temporary `*.bundled_*.mjs` config files. A lint running alongside a build could list
+  one and then fail with ENOENT when tsup deleted it.
+
 ## 0.1.0
 
 ### Minor Changes
