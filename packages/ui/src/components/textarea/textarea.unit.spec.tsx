@@ -1,4 +1,4 @@
-import { createRef } from 'react';
+import { createRef, useState } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { Textarea } from './textarea';
@@ -59,6 +59,41 @@ describe('Textarea', () => {
     fireEvent.change(textarea, { target: { value: 'Ada\nLovelace' } });
     expect(onChange).toHaveBeenCalledOnce();
     expect(textarea.value).toBe('Ada\nLovelace');
+  });
+
+  it('is controlled by value and onChange', () => {
+    function Controlled() {
+      const [bio, setBio] = useState('Ada');
+      return (
+        <>
+          <Textarea aria-label="Bio" value={bio} onChange={(e) => setBio(e.target.value)} />
+          <button type="button" onClick={() => setBio('Reset by the app')}>
+            Reset
+          </button>
+          <output>{bio.length}</output>
+        </>
+      );
+    }
+    render(<Controlled />);
+    const textarea = screen.getByRole<HTMLTextAreaElement>('textbox');
+    expect(textarea.value).toBe('Ada');
+
+    fireEvent.change(textarea, { target: { value: 'Ada\nLovelace' } });
+    expect(textarea.value).toBe('Ada\nLovelace');
+    expect(screen.getByRole('status')).toHaveTextContent('12');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+    expect(textarea.value).toBe('Reset by the app');
+  });
+
+  it('keeps the controlled value when onChange does not update it', () => {
+    // Read the value inside the handler: React restores the DOM value right after it.
+    const seen: string[] = [];
+    render(<Textarea aria-label="Bio" value="Fixed" onChange={(e) => seen.push(e.target.value)} />);
+    const textarea = screen.getByRole<HTMLTextAreaElement>('textbox');
+    fireEvent.change(textarea, { target: { value: 'Typed' } });
+    expect(seen).toEqual(['Typed']);
+    expect(textarea.value).toBe('Fixed');
   });
 
   it('adds the auto-resize class only when asked', () => {
