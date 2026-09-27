@@ -296,6 +296,14 @@ is one component: `className` and every other prop land on the `<textarea>`. Gro
 content is `field-sizing: content` behind an `autoResize` class, not a measuring script, so a
 browser without it keeps the `rows` height, which is the platform default anyway.
 
+**Dialog leans on `showModal()` for everything but state.** The top layer, backdrop, inert
+page, focus trap and focus return are all the platform's, so `@arun-dev/headless` holds only
+`open` and the setter every close goes through. State drives the element — `showModal()` or
+`close()` after each render — and the platform's own closes (Esc's `cancel`, a backdrop click,
+`<form method="dialog">`) become requests, so a controlled parent can refuse any of them. It
+needs no portal, since the top layer is not a DOM position, and its scroll lock is CSS in
+`@arun-dev/ui` (`:root:has(.dialog:modal)`), not a script.
+
 **Select is Input's shape around a `<select>`, and does not search.** A native `<select>` keeps
 its value on the element, so it is a styling wrapper with `register()` as the binding. It
 brings the system picker on phones, typeahead, `required` and the form protocol, none of which
@@ -497,13 +505,13 @@ Shipped since this list was written:
 | Shared `data-disabled` spelling | emitted directly by each component; React drops the `undefined` case      |
 | `mergeProps` handler order      | consumer first, cancellable with `preventComponentHandler()` — decision 8 |
 | Button's non-native behaviour   | removed — `Button` always renders a native `<button>` — decision 7        |
+| Vitest browser mode             | with Dialog: `*.browser.spec.tsx` in Chromium, for what jsdom lacks       |
 
 Still deferred:
 
 | Deferred                                 | Revisit when                                                            |
 | ---------------------------------------- | ----------------------------------------------------------------------- |
 | Runtime layout vars + `--hl-*` prefix    | the first anchored/positioned component (Popover)                       |
-| Vitest browser mode                      | focus trapping or scroll locking needs testing                          |
 | Positioning engine, Floating UI          | Popover; the engine is a port so it can be swapped later                |
 | Memoisation inside `useRender`           | profiling shows the per-render merge costs something                    |
 | `focusableWhenDisabled`, roving tabindex | the first composite widget — Toolbar, Menu, Tabs                        |
@@ -511,4 +519,4 @@ Still deferred:
 | Combobox — search over a list of options | after Popover, whose positioning it needs                               |
 | Customizable select (`base-select`)      | it ships in every engine; it swaps the system picker for an in-page one |
 
-Popover triggers the first three at once, so its decisions belong here before its code exists.
+Popover triggers the first two at once, so its decisions belong here before its code exists.

@@ -20,3 +20,28 @@ jobs:
 
   security:
     uses: arun9483/frontend-platform-kit/.github/workflows/security.yml@v1
+
+  # Behaviour jsdom cannot run — <dialog>, the top layer, real focus and keys — in
+  # Chromium. Kept out of the shared quality job, whose `pnpm test` stays jsdom-only; the
+  # Playwright image ships the browser, so nothing is downloaded per run. The image tag
+  # must match the `playwright` devDependency in packages/headless.
+  browser-tests:
+    name: Browser tests
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Trust the workspace
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Setup
+        uses: arun9483/frontend-platform-kit/actions/setup-node-pnpm@v1
+
+      - name: Browser tests
+        run: pnpm test:browser

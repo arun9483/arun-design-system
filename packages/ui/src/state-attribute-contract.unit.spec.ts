@@ -41,8 +41,13 @@ const USAGE = /\[\s*(data-[a-z0-9-]+)/g;
  * overrides with `[data-checked]`, so it never needs the negative form. The attribute
  * exists so that adding a third state (Checkbox's `indeterminate`) stays additive —
  * `:not([data-checked])` would silently absorb it, `[data-unchecked]` will not.
+ *
+ * `data-open` / `data-closed` are Dialog's. ui styles the popup from the native `[open]`
+ * attribute instead: `display` follows `[open]` in the UA sheet, and a `<form
+ * method="dialog">` removes it before React re-renders, so animating from the same
+ * attribute keeps the two in step. The data pair is there for a Trigger, or for consumers.
  */
-const UNSTYLED_HERE = ['data-unchecked'];
+const UNSTYLED_HERE = ['data-closed', 'data-open', 'data-unchecked'];
 
 function filesIn(dir: string, extension: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

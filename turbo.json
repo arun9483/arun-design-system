@@ -22,6 +22,9 @@
     "test:unit": {
       "dependsOn": ["^build"]
     },
+    "test:browser": {
+      "dependsOn": ["^build"]
+    },
     "clean": {
       "cache": false
     }

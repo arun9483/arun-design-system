@@ -1,0 +1,115 @@
+---
+title: Dialog
+description: A modal dialog built on the native <dialog> and showModal(), with state, parts and ARIA from @arun-dev/headless.
+---
+
+import Example from '@/components/Example.astro';
+import DialogBasics from '@/examples/dialog-basics';
+import DialogForm from '@/examples/dialog-form';
+import PropTable from '@/components/PropTable.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+`Dialog` is a real `<dialog>`, opened with `showModal()`. The platform supplies the hard parts: the
+top layer (no portal, no `z-index`), the backdrop, an inert page behind it, a focus trap, and focus
+returning to the trigger on close. [`@arun-dev/headless`](/headless/) adds the state, one path
+every close goes through, and the ARIA wiring.
+
+<Example name="dialog-basics">
+  <DialogBasics client:load />
+</Example>
+
+## Anatomy
+
+```tsx
+import { Dialog } from '@arun-dev/ui';
+
+<Dialog.Root>
+  <Dialog.Trigger />
+  <Dialog.Popup>
+    <Dialog.Title />
+    <Dialog.Close />
+  </Dialog.Popup>
+</Dialog.Root>;
+```
+
+| Part      | Renders    | Does                                                             |
+| --------- | ---------- | ---------------------------------------------------------------- |
+| `Root`    | nothing    | holds `open`, and the setter every other part goes through       |
+| `Trigger` | `<button>` | opens; carries `aria-haspopup`, `aria-expanded`, `aria-controls` |
+| `Popup`   | `<dialog>` | the modal itself; `aria-labelledby` points at the Title          |
+| `Title`   | `<h2>`     | the heading, and the dialog's accessible name                    |
+| `Close`   | `<button>` | closes                                                           |
+
+`Trigger` and `Close` are unstyled buttons, so render a [Button](/components/button/) to style
+them: `<Dialog.Close render={<Button />}>Cancel</Dialog.Close>`. A `Close` can do work too — give
+it an `onClick`, as the Delete button above does. `Trigger` is optional; a dialog opened from state
+alone needs none.
+
+There is no Portal or Backdrop part. The top layer sits above everything without being moved in
+the DOM, and the backdrop is the `::backdrop` pseudo-element, styled by `--dialog-backdrop`.
+
+## Closing
+
+Every close is a request through `onOpenChange(false)`:
+
+| How            | Notes                                                                |
+| -------------- | -------------------------------------------------------------------- |
+| `Dialog.Close` |                                                                      |
+| Esc            | the platform's `cancel` event, prevented and routed through the Root |
+| backdrop click | on by default; `closeOnBackdropClick={false}` turns it off           |
+| a form         | `<form method="dialog">` closes natively, and the Root is told       |
+
+A press that starts inside the dialog and is released on the backdrop — a text selection dragged
+out — does not count as a backdrop click.
+
+## Controlled
+
+Pass `open` and `onOpenChange` to own the state. Every request arrives through `onOpenChange`, and
+the dialog moves only if you accept it, so refusing a close is simply not setting state.
+
+<Example name="dialog-form">
+  <DialogForm client:load />
+</Example>
+
+This one also turns off `closeOnBackdropClick`, since a stray click would lose a half-written
+issue. Esc and Cancel still close it.
+
+<Aside title="Stopping Esc yourself">
+`onCancel` on `Dialog.Popup` sees Esc first. `event.preventDefault()` keeps the dialog open, as it
+does on a plain `<dialog>`. `event.preventComponentHandler()` instead hands Esc back to the
+platform, which closes the element; the Root is still told.
+
+</Aside>
+
+## Accessibility
+
+- Name the dialog with `Dialog.Title`. Without one, pass `aria-label` to `Dialog.Popup`.
+- Focus moves to the first focusable element inside when it opens. Put `autoFocus` on a different
+  one to choose it — for a destructive confirmation, the safe button.
+- Focus returns to whatever had it before, usually the Trigger, when it closes.
+- The page behind is inert and does not scroll.
+
+## Props
+
+### `Dialog.Root`
+
+<PropTable component="Dialog.Root" common={false} />
+
+### `Dialog.Popup`
+
+<PropTable component="Dialog.Popup" />
+
+`Dialog.Trigger`, `Dialog.Title` and `Dialog.Close` take the props of the element they render —
+`<button>`, `<h2>`, `<button>` — plus `render` and `ref`.
+
+## Notes
+
+- The content stays mounted while closed — a closed `<dialog>` is `display: none` — so a form
+  inside keeps what was typed between openings. Reset it yourself if it shouldn't.
+- Dialogs nest: open one from inside another, and Esc closes only the top one.
+- Opening and closing fade and rise, using `@starting-style`. A browser without it just skips the
+  animation, and `prefers-reduced-motion` turns it off.
+- Restyle every dialog with the `--dialog-*` tokens, e.g. `--dialog-width` or `--dialog-backdrop`.
+- Types come from the package that owns them:
+  `import type { DialogRootProps } from '@arun-dev/headless/dialog'`, or
+  `ComponentProps<typeof Dialog.Root>`.

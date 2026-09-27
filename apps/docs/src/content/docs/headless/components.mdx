@@ -1,6 +1,6 @@
 ---
 title: Components
-description: Button, Switch, Checkbox and RadioGroup — what each provides, and when you need them.
+description: Button, Switch, Checkbox, RadioGroup and Dialog — what each provides, and when you need them.
 ---
 
 import Diagram from '@/components/Diagram.astro';
@@ -156,3 +156,46 @@ Switch, closed at the group because a reset there concerns several inputs at onc
 
 Radios emit `data-checked` / `data-unchecked` / `data-disabled`, and the group `data-disabled`.
 The shape matches the other controls, so a stylesheet reads them all the same way.
+
+## Dialog
+
+```tsx
+import { Dialog } from '@arun-dev/headless/dialog';
+
+<Dialog.Root onOpenChange={track}>
+  <Dialog.Trigger className="my-button">Delete…</Dialog.Trigger>
+  <Dialog.Popup className="my-dialog">
+    <Dialog.Title>Delete report.pdf?</Dialog.Title>
+    <Dialog.Close className="my-button">Cancel</Dialog.Close>
+  </Dialog.Popup>
+</Dialog.Root>;
+```
+
+`Dialog.Popup` is a native `<dialog>` opened with `showModal()`, so the top layer, the backdrop,
+the inert page, the focus trap and focus return are the platform's. None of it is rebuilt here.
+What the component adds is state: one `open` value owned by `Dialog.Root`, and a single setter
+that every close path goes through.
+
+### State drives the element
+
+After each render the popup compares its `open` state with the element's and calls
+`showModal()` or `close()` to match. The platform's own ways of closing are turned into requests
+instead, so a controlled parent can refuse any of them:
+
+- **Esc** fires `cancel`. It is prevented, then reported through `onOpenChange(false)`.
+- **A backdrop click** is a click on the `<dialog>` itself, outside its box. The press must start
+  there too, so a text selection dragged out of the dialog is not one.
+- **`<form method="dialog">`** closes the element before anyone is asked. The `close` event
+  reports it, and if the state stays open the element is reopened.
+
+A `cancel` or `close` from a nested dialog reaches the outer popup's handlers through React's
+tree, though not the DOM's, so each popup acts only on events whose target is its own element.
+
+### Why five parts
+
+Each one is an element the consumer places that needs something from the Root (decision 11).
+`Trigger` and `Close` need the setter, `Popup` the state and the title's id, and `Title` supplies
+that id for `aria-labelledby`. There is no Portal, because the top layer needs none, and no
+Backdrop, because `::backdrop` is not an element anyone places.
+
+Both `Trigger` and `Popup` emit `data-open` / `data-closed`.
