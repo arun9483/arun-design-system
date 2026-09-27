@@ -119,10 +119,10 @@ All components also spread unrecognised props onto the rendered element, so `id`
 
 A package exports the props types it **defines**, and never re-exports one it merely borrows.
 
-| Component                                  | Props type defined in | Exported from `ui`? |
-| ------------------------------------------ | --------------------- | ------------------- |
-| `Button`, `Card`, `Chip`, `Badge`, `Input` | `@arun-dev/ui`        | yes                 |
-| `Switch.Root`, `Switch.Thumb`              | `@arun-dev/headless`  | no                  |
+| Component                                              | Props type defined in | Exported from `ui`? |
+| ------------------------------------------------------ | --------------------- | ------------------- |
+| `Button`, `Card`, `Chip`, `Badge`, `Input`, `Textarea` | `@arun-dev/ui`        | yes                 |
+| `Switch.Root`, `Switch.Thumb`                          | `@arun-dev/headless`  | no                  |
 
 Prop _value_ types are exported the same way — `BadgeTone`, `ButtonVariant`, `ChipVariant` — since
 a consumer must be able to construct those values and map their own vocabulary onto them, per
@@ -288,6 +288,13 @@ nothing from the input, and the box places them. `className` goes on the box, an
 prop goes on the `<input>`, so `ref`, `id` and `aria-*` land on the control whether or not
 there are slots. Focus, `aria-invalid` and `disabled` are styled with `:has()` on the native
 control, so no `data-*` attribute stands in for platform state.
+
+**Textarea follows Input, minus the box.** It is a real `<textarea>` with no React state, so
+it too has no headless half and `register()` binds it. It has no slots — a multi-line field has
+no natural place for an icon or unit — so it is one element, and per decision 11 one element
+is one component: `className` and every other prop land on the `<textarea>`. Growing with its
+content is `field-sizing: content` behind an `autoResize` class, not a measuring script, so a
+browser without it keeps the `rows` height, which is the platform default anyway.
 
 ---
 

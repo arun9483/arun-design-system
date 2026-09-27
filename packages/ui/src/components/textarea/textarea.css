@@ -1,0 +1,67 @@
+@layer textarea {
+  /* One element, so the textarea draws its own frame. State is read from the native
+     control — it is the platform's, so no data-* attribute stands in for it. */
+  .textarea {
+    display: block;
+    inline-size: 100%;
+    min-block-size: var(--textarea-min-height);
+    padding-block: var(--textarea-padding-block);
+    padding-inline: var(--textarea-padding-inline);
+    border: var(--textarea-border-width) solid var(--textarea-border-color);
+    border-radius: var(--textarea-radius);
+    background-color: var(--textarea-bg);
+    color: var(--textarea-color);
+    font: inherit;
+    font-size: var(--textarea-font-size);
+    line-height: var(--textarea-line-height);
+    resize: vertical;
+    transition: border-color var(--textarea-duration) var(--ease-smooth);
+  }
+
+  .textarea::placeholder {
+    color: var(--textarea-placeholder-color);
+    opacity: 1;
+  }
+
+  .textarea:hover {
+    border-color: var(--textarea-border-color-hover);
+  }
+
+  .textarea[aria-invalid='true'] {
+    border-color: var(--textarea-border-color-invalid);
+  }
+
+  .textarea:focus-visible {
+    border-color: var(--textarea-border-color-focus);
+    outline: var(--textarea-border-width) solid var(--textarea-border-color-focus);
+  }
+
+  .textarea[aria-invalid='true']:focus-visible {
+    border-color: var(--textarea-border-color-invalid);
+    outline-color: var(--textarea-border-color-invalid);
+  }
+
+  .textarea:disabled {
+    opacity: var(--textarea-disabled-opacity);
+    cursor: not-allowed;
+    resize: none;
+  }
+
+  .textarea:disabled:hover {
+    border-color: var(--textarea-border-color);
+  }
+
+  /* Grows with its content up to the max, then scrolls. Browsers without field-sizing
+     ignore it and keep the rows height, which is the non-resizing default anyway. */
+  .textarea-auto-resize {
+    field-sizing: content;
+    max-block-size: var(--textarea-max-height);
+    resize: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .textarea {
+      transition-duration: 0ms;
+    }
+  }
+}

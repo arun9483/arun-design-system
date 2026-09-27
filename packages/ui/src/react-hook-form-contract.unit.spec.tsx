@@ -7,6 +7,7 @@ import { Checkbox } from './components/checkbox';
 import { Input } from './components/input';
 import { RadioGroup } from './components/radio-group';
 import { Switch } from './components/switch';
+import { Textarea } from './components/textarea';
 
 /**
  * Contract: every control that carries a value works with react-hook-form's
@@ -611,5 +612,59 @@ describe('Input with react-hook-form', () => {
     await act(async () => fireEvent.click(screen.getByText('Save')));
     expect(onSubmit).not.toHaveBeenCalled();
     expect(input).toHaveAttribute('aria-invalid', 'true');
+  });
+});
+
+describe('Textarea with react-hook-form', () => {
+  // Textarea is a native <textarea> with no state of its own, so register() is the
+  // binding, exactly as for Input.
+  type Values = { bio: string };
+
+  function setup() {
+    const api: { form?: ReturnType<typeof useForm<Values>> } = {};
+    const onSubmit = vi.fn();
+
+    function Form() {
+      const form = useForm<Values>({ defaultValues: { bio: 'First line\nSecond line' } });
+      api.form = form;
+      const error = form.formState.errors.bio;
+      return (
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <Textarea
+            aria-label="Bio"
+            aria-invalid={error ? true : undefined}
+            autoResize
+            {...form.register('bio', { required: true })}
+          />
+          <button type="submit">Save</button>
+        </form>
+      );
+    }
+
+    render(<Form />);
+    return { api, onSubmit, textarea: screen.getByRole<HTMLTextAreaElement>('textbox') };
+  }
+
+  it('shows defaultValues, newlines included, and reads what the user types', () => {
+    const { api, textarea } = setup();
+    expect(textarea.value).toBe('First line\nSecond line');
+    fireEvent.change(textarea, { target: { value: 'Rewritten' } });
+    expect(api.form?.getValues('bio')).toBe('Rewritten');
+  });
+
+  it('is driven by setValue and reset', () => {
+    const { api, textarea } = setup();
+    act(() => api.form?.setValue('bio', 'Set'));
+    expect(textarea.value).toBe('Set');
+    act(() => api.form?.reset());
+    expect(textarea.value).toBe('First line\nSecond line');
+  });
+
+  it('blocks submit on a failed rule, and aria-invalid reaches the textarea', async () => {
+    const { onSubmit, textarea } = setup();
+    fireEvent.change(textarea, { target: { value: '' } });
+    await act(async () => fireEvent.click(screen.getByText('Save')));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(textarea).toHaveAttribute('aria-invalid', 'true');
   });
 });

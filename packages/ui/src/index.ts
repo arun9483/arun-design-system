@@ -8,6 +8,8 @@ export { Badge } from './components/badge';
 export type { BadgeProps, BadgeTone } from './components/badge';
 export { Input } from './components/input';
 export type { InputProps } from './components/input';
+export { Textarea } from './components/textarea';
+export type { TextareaProps } from './components/textarea';
 
 // Checkbox, RadioGroup and Switch are backed by @arun-dev/headless, which owns its props
 // types. See docs/architecture.md decision 6 — consumers derive them with ComponentProps.
