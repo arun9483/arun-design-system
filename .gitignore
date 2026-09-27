@@ -13,6 +13,7 @@ dist/
 # Testing
 coverage/
 .vitest-attachments/
+__screenshots__/
 *.lcov
 
 # Logs
