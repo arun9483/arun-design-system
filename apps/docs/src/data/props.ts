@@ -113,6 +113,20 @@ export const PROPS = {
         'Grow with the content between `--textarea-min-height` and `--textarea-max-height`, then scroll. CSS only (`field-sizing: content`); browsers without it keep the `rows` height.',
     },
   ],
+  Select: [
+    {
+      name: 'children',
+      type: 'ReactNode',
+      description:
+        'The `<option>` and `<optgroup>` elements, as for a native `<select>`. An option with `value=""` selected reads as a placeholder.',
+    },
+    {
+      name: 'className',
+      type: 'string',
+      description:
+        'Goes on the box that frames the select and its chevron, not on the `<select>`. Every other prop, `ref` and `render` included, goes on the `<select>`.',
+    },
+  ],
   'Checkbox.Root': [
     {
       name: 'checked',

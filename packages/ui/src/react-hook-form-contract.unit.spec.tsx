@@ -6,6 +6,7 @@ import { Button } from './components/button';
 import { Checkbox } from './components/checkbox';
 import { Input } from './components/input';
 import { RadioGroup } from './components/radio-group';
+import { Select } from './components/select';
 import { Switch } from './components/switch';
 import { Textarea } from './components/textarea';
 
@@ -666,5 +667,63 @@ describe('Textarea with react-hook-form', () => {
     await act(async () => fireEvent.click(screen.getByText('Save')));
     expect(onSubmit).not.toHaveBeenCalled();
     expect(textarea).toHaveAttribute('aria-invalid', 'true');
+  });
+});
+
+describe('Select with react-hook-form', () => {
+  // Select is a native <select> with no state of its own, so register() is the binding.
+  // As with Input, the box must not get in the way: ref, name, onChange and onBlur all
+  // have to reach the <select>.
+  type Values = { fruit: string };
+
+  function setup() {
+    const api: { form?: ReturnType<typeof useForm<Values>> } = {};
+    const onSubmit = vi.fn();
+
+    function Form() {
+      const form = useForm<Values>({ defaultValues: { fruit: 'apple' } });
+      api.form = form;
+      const error = form.formState.errors.fruit;
+      return (
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <Select
+            aria-label="Fruit"
+            aria-invalid={error ? true : undefined}
+            {...form.register('fruit', { required: true })}
+          >
+            <option value="">Choose…</option>
+            <option value="apple">Apple</option>
+            <option value="banana">Banana</option>
+          </Select>
+          <button type="submit">Save</button>
+        </form>
+      );
+    }
+
+    render(<Form />);
+    return { api, onSubmit, select: screen.getByRole<HTMLSelectElement>('combobox') };
+  }
+
+  it('shows defaultValues and reads what the user picks', () => {
+    const { api, select } = setup();
+    expect(select.value).toBe('apple');
+    fireEvent.change(select, { target: { value: 'banana' } });
+    expect(api.form?.getValues('fruit')).toBe('banana');
+  });
+
+  it('is driven by setValue and reset', () => {
+    const { api, select } = setup();
+    act(() => api.form?.setValue('fruit', 'banana'));
+    expect(select.value).toBe('banana');
+    act(() => api.form?.reset());
+    expect(select.value).toBe('apple');
+  });
+
+  it('blocks submit on the empty prompt, and aria-invalid reaches the select', async () => {
+    const { onSubmit, select } = setup();
+    fireEvent.change(select, { target: { value: '' } });
+    await act(async () => fireEvent.click(screen.getByText('Save')));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(select).toHaveAttribute('aria-invalid', 'true');
   });
 });

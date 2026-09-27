@@ -1,0 +1,100 @@
+---
+title: Select
+description: A native dropdown in a styled box, with the platform's picker, typeahead and form support.
+---
+
+import Example from '@/components/Example.astro';
+import SelectBasics from '@/examples/select-basics';
+import SelectMultiple from '@/examples/select-multiple';
+import PropTable from '@/components/PropTable.astro';
+import { SelectPlayground } from '@/components/playgrounds';
+import { Aside } from '@astrojs/starlight/components';
+
+`Select` is a real `<select>`. The picker, keyboard, typeahead, validation and form submission are
+all the platform's, so there is no headless half. On phones it opens the system picker. It works
+with react-hook-form's `register()` as-is.
+
+<Example name="select-basics" layout="stack">
+  <SelectBasics client:load />
+</Example>
+
+## Playground
+
+<SelectPlayground client:load />
+
+## Two elements, one rule
+
+Like [Input](/components/input/), the `<select>` sits inside a `<div class="select">` that draws
+the border and the chevron:
+
+| Prop                                             | Lands on       |
+| ------------------------------------------------ | -------------- |
+| `className`                                      | the box        |
+| `children` — your `<option>`s and `<optgroup>`s  | the `<select>` |
+| everything else, including `id`, `ref`, `render` | the `<select>` |
+
+The chevron is drawn by the box rather than the browser, so it looks the same everywhere, and
+clicks on it fall through to the `<select>`.
+
+## A placeholder
+
+`<select>` has no `placeholder`. Use an option with an empty value instead: while it is
+selected, the field text is muted, and `required` refuses to submit it. Add `disabled` to it so it
+can't be picked again once a real choice is made.
+
+```tsx
+<Select required defaultValue="">
+  <option value="" disabled>
+    Choose a country…
+  </option>
+  …
+</Select>
+```
+
+## Search
+
+There is no search box. A native `<select>` can't hold one, and building one would give up the
+system picker and everything else above. What it does have is **typeahead**: with the field
+focused, type the start of an option to jump to it.
+
+That covers short lists well. For long lists where users need to filter, a combobox is the right
+component; it will come after Popover, since it needs a positioned popup.
+
+## Multiple
+
+`multiple`, or a `size` above 1, turns the select into a list box: the options show in place, the
+chevron goes, and the field sets its own height.
+
+<Example name="select-multiple" layout="stack">
+  <SelectMultiple client:load />
+</Example>
+
+<Aside title="Consider checkboxes">
+A multi-select list box needs Ctrl or ⌘ to pick more than one, which many users don't know. For a
+handful of options, a set of [Checkboxes](/components/checkbox/) is easier to use.
+
+</Aside>
+
+## States
+
+All of them come from the native control, read with `:has()`. There is no `data-*` attribute
+to set:
+
+| State    | Set it with                     |
+| -------- | ------------------------------- |
+| focus    | the platform (`:focus-visible`) |
+| invalid  | `aria-invalid` on the select    |
+| disabled | `disabled` on the select        |
+
+## Props
+
+<PropTable component="Select" />
+
+## Notes
+
+- Controlled use works as with any `<select>`: `value` and `onChange`, where `onChange` fires as
+  soon as the choice changes.
+- The open list is drawn by the browser and operating system, so its look varies by platform.
+  Only the closed field is styled.
+- Restyle every select with the `--select-*` tokens, e.g. `--select-height` or
+  `--select-icon-color`.
