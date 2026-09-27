@@ -1,9 +1,13 @@
 @layer textarea {
   /* One element, so the textarea draws its own frame. State is read from the native
      control — it is the platform's, so no data-* attribute stands in for it. */
+  /* Fills its container by default. The user can drag either edge, narrower down to
+     --textarea-min-width and wider back up to the container, never past it. */
   .textarea {
     display: block;
     inline-size: 100%;
+    min-inline-size: min(var(--textarea-min-width), 100%);
+    max-inline-size: 100%;
     min-block-size: var(--textarea-min-height);
     padding-block: var(--textarea-padding-block);
     padding-inline: var(--textarea-padding-inline);
@@ -14,7 +18,7 @@
     font: inherit;
     font-size: var(--textarea-font-size);
     line-height: var(--textarea-line-height);
-    resize: vertical;
+    resize: both;
     transition: border-color var(--textarea-duration) var(--ease-smooth);
   }
 
@@ -51,12 +55,13 @@
     border-color: var(--textarea-border-color);
   }
 
-  /* Grows with its content up to the max, then scrolls. Browsers without field-sizing
-     ignore it and keep the rows height, which is the non-resizing default anyway. */
+  /* Grows with its content up to the max, then scrolls. Height follows the content, so
+     the handle drags width only. Browsers without field-sizing ignore it and keep the
+     rows height. */
   .textarea-auto-resize {
     field-sizing: content;
     max-block-size: var(--textarea-max-height);
-    resize: none;
+    resize: horizontal;
   }
 
   @media (prefers-reduced-motion: reduce) {

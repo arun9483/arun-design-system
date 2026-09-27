@@ -28,11 +28,28 @@ Unlike [Input](/components/input/), there is no box and there are no slots. The 
 draws its own frame, so every prop lands on it, `className` included. A `<label htmlFor>`,
 `aria-describedby`, `register()` and a focus ref all reach the control directly.
 
+## Resizing
+
+The field fills its container's width by default, and the user can drag the corner handle to
+change both height and width. Width can shrink to `--textarea-min-width` and grow back to the
+container, but never past it, so a dragged field cannot break the layout around it. Set the
+starting width with `className` or `style`; the container stays the ceiling.
+
+<Aside title="In a grid, give the column a size">
+The ceiling is `max-inline-size: 100%`, which holds in normal flow, in flex layouts and in grid
+columns with a definite size. An `auto` grid column instead grows to fit its content, including
+a width the user dragged, so the field can push past the grid. Size the column, e.g.
+`grid-template-columns: minmax(0, 1fr)`.
+
+</Aside>
+
+To lock a dimension, override `resize` in your own CSS, e.g. `resize: vertical`.
+
 ## Auto-resize
 
 `autoResize` makes the field grow with what is typed, from `--textarea-min-height` up to
-`--textarea-max-height`, then scroll. The manual resize handle is removed, since the height is no
-longer the user's to set.
+`--textarea-max-height`, then scroll. Height is no longer the user's to set, so the handle
+drags width only.
 
 <Example name="textarea-auto-resize" layout="stack">
   <TextareaAutoResize client:load />

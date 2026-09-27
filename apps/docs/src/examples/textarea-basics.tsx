@@ -1,6 +1,13 @@
 import { Textarea } from '@arun-dev/ui';
 
-const field = { display: 'grid', gap: 'var(--space-3xs)', maxInlineSize: '24rem' };
+// A definite column, so the textarea's width cap resolves: an auto track would grow with
+// whatever width the user drags to.
+const field = {
+  display: 'grid',
+  gridTemplateColumns: 'minmax(0, 1fr)',
+  gap: 'var(--space-3xs)',
+  maxInlineSize: '24rem',
+};
 
 export default function TextareaBasics() {
   return (
