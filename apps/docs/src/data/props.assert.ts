@@ -35,6 +35,12 @@ import type {
   TooltipRootProps,
   TooltipTriggerProps,
 } from '@arun-dev/headless/tooltip';
+import type {
+  TabsListProps,
+  TabsPanelProps,
+  TabsRootProps,
+  TabsTabProps,
+} from '@arun-dev/headless/tabs';
 import type { COMMON, PROPS } from './props';
 
 type Documented<Key extends keyof typeof PROPS> = (typeof PROPS)[Key][number]['name'];
@@ -73,7 +79,11 @@ type Unknown =
   | OnlyRealProps<Documented<'Popover.Close'>, PopoverCloseProps>
   | OnlyRealProps<Documented<'Tooltip.Root'>, TooltipRootProps>
   | OnlyRealProps<Documented<'Tooltip.Popup'>, TooltipPopupProps>
-  | OnlyRealProps<Documented<'Tooltip.Trigger'>, TooltipTriggerProps>;
+  | OnlyRealProps<Documented<'Tooltip.Trigger'>, TooltipTriggerProps>
+  | OnlyRealProps<Documented<'Tabs.Root'>, TabsRootProps>
+  | OnlyRealProps<Documented<'Tabs.List'>, TabsListProps>
+  | OnlyRealProps<Documented<'Tabs.Tab'>, TabsTabProps>
+  | OnlyRealProps<Documented<'Tabs.Panel'>, TabsPanelProps>;
 
 /**
  * `never` means every documented name resolves. Anything else is the name that does

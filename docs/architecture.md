@@ -250,13 +250,13 @@ react-hook-form's own API for this case. `react-hook-form-contract.unit.spec.tsx
 **The rule.** Leave the native element only when what you gain is impossible on the
 platform _and_ what you lose can be rebuilt in userland.
 
-| Component    | Gained                                                   | Lost                                                                       | Recoverable?                                                     |
-| ------------ | -------------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `Checkbox`   | an indicator holding JSX; three states as one typed prop | `register()`                                                               | yes — one `Controller`                                           |
-| `Switch`     | a thumb holding an icon or a spinner                     | `register()`                                                               | yes — one `Controller`                                           |
-| `Button`     | —                                                        | focus, `Space`/`Enter`, `disabled`                                         | in principle; `useButton` reached 172 lines before being deleted |
-| `Radio`      | an indicator holding JSX — a dot needs only `::before`   | arrow-key selection, roving Tab stop, `required`, the form protocol        | only by building roving tabindex, still deferred (decision 13)   |
-| a text field | —                                                        | autofill, IME composition, spellcheck, mobile keyboards, password managers | **no, at any price**                                             |
+| Component    | Gained                                                   | Lost                                                                       | Recoverable?                                                      |
+| ------------ | -------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `Checkbox`   | an indicator holding JSX; three states as one typed prop | `register()`                                                               | yes — one `Controller`                                            |
+| `Switch`     | a thumb holding an icon or a spinner                     | `register()`                                                               | yes — one `Controller`                                            |
+| `Button`     | —                                                        | focus, `Space`/`Enter`, `disabled`                                         | in principle; `useButton` reached 172 lines before being deleted  |
+| `Radio`      | an indicator holding JSX — a dot needs only `::before`   | arrow-key selection, roving Tab stop, `required`, the form protocol        | only by building roving tabindex, shipped with Tabs (decision 13) |
+| a text field | —                                                        | autofill, IME composition, spellcheck, mobile keyboards, password managers | **no, at any price**                                              |
 
 That asymmetry is what makes Checkbox and Switch defensible rather than merely convenient:
 an `<input>` is void, so an indicator that holds children is unobtainable natively, while
@@ -581,13 +581,14 @@ Shipped since this list was written:
 | Vitest browser mode                   | with Dialog: `*.browser.spec.tsx` in Chromium, for what jsdom lacks       |
 | Positioning engine, Floating UI       | decided: CSS anchor positioning, no JavaScript engine — decision 12       |
 | Runtime layout vars + `--hl-*` prefix | not needed; `--hl-` kept for generated anchor names — decision 12         |
+| Roving tabindex                       | with Tabs: internal `core/rovingFocus`, for Menu and Toolbar to reuse     |
 
 Still deferred:
 
 | Deferred                                 | Revisit when                                                            |
 | ---------------------------------------- | ----------------------------------------------------------------------- |
 | Memoisation inside `useRender`           | profiling shows the per-render merge costs something                    |
-| `focusableWhenDisabled`, roving tabindex | the first composite widget — Toolbar, Menu, Tabs                        |
+| `focusableWhenDisabled`                  | Menu, whose pattern keeps disabled items focusable; Tabs skips them     |
 | `Link` — navigation, split out of Button | a consumer needs a styled link                                          |
 | Combobox — search over a list of options | after Popover, whose positioning it needs                               |
 | Customizable select (`base-select`)      | it ships in every engine; it swaps the system picker for an in-page one |

@@ -1,0 +1,26 @@
+/* Tabs component tokens — map semantic tokens onto the tablist, its tabs and panels.
+   Override any of these to restyle tabs without moving other components. */
+:root {
+  --tabs-gap: var(--space-3xs);
+  --tabs-panel-gap: var(--space-md);
+  --tabs-border-width: var(--space-px);
+  --tabs-border-color: var(--color-border-default);
+
+  /* Tab */
+  --tabs-tab-padding-block: var(--space-xs);
+  --tabs-tab-padding-inline: var(--space-sm);
+  --tabs-tab-radius: var(--radius-sm);
+  --tabs-font-size: var(--text-sm);
+  --tabs-font-weight: var(--font-weight-medium);
+  --tabs-tab-color: var(--color-text-secondary);
+  --tabs-tab-color-hover: var(--color-text-primary);
+  --tabs-tab-color-selected: var(--color-text-primary);
+
+  /* The bar under (or beside) the selected tab */
+  --tabs-indicator-size: var(--space-2px);
+  --tabs-indicator-color: var(--color-text-accent);
+
+  --tabs-focus-color: var(--color-text-accent);
+  --tabs-disabled-opacity: 0.5;
+  --tabs-duration: var(--duration-fast);
+}

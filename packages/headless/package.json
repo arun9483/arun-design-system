@@ -94,6 +94,16 @@
         "default": "./dist/switch/index.cjs"
       }
     },
+    "./tabs": {
+      "import": {
+        "types": "./dist/tabs/index.d.ts",
+        "default": "./dist/tabs/index.js"
+      },
+      "require": {
+        "types": "./dist/tabs/index.d.cts",
+        "default": "./dist/tabs/index.cjs"
+      }
+    },
     "./tooltip": {
       "import": {
         "types": "./dist/tooltip/index.d.ts",

@@ -41,6 +41,8 @@ const USAGE = /\[\s*(data-[a-z0-9-]+)/g;
  * overrides with `[data-checked]`, so it never needs the negative form. The attribute
  * exists so that adding a third state (Checkbox's `indeterminate`) stays additive —
  * `:not([data-checked])` would silently absorb it, `[data-unchecked]` will not.
+ * `data-unselected` is Tabs' equivalent, unstyled for the same reason: the unselected tab
+ * is the base rule, `[data-selected]` the override.
  *
  * `data-open` / `data-closed` are Dialog's. ui styles the popup from the native `[open]`
  * attribute instead: `display` follows `[open]` in the UA sheet, and a `<form
@@ -51,7 +53,13 @@ const USAGE = /\[\s*(data-[a-z0-9-]+)/g;
  * `data-align` is Popover's. Alignment is placement, which headless sets inline as
  * `position-area`, so ui has nothing to add; `data-side` is styled, for the offset's axis.
  */
-const UNSTYLED_HERE = ['data-align', 'data-closed', 'data-open', 'data-unchecked'];
+const UNSTYLED_HERE = [
+  'data-align',
+  'data-closed',
+  'data-open',
+  'data-unchecked',
+  'data-unselected',
+];
 
 function filesIn(dir: string, extension: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

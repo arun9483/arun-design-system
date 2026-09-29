@@ -54,6 +54,7 @@ export default defineConfig({
             { label: 'Dialog', slug: 'components/dialog' },
             { label: 'Popover', slug: 'components/popover' },
             { label: 'Tooltip', slug: 'components/tooltip' },
+            { label: 'Tabs', slug: 'components/tabs' },
           ],
         },
         {

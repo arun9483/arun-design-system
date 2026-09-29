@@ -1,0 +1,102 @@
+@layer tabs {
+  /* State comes from data-* attributes emitted by @arun-dev/headless: data-orientation on
+     the root and list, data-selected / data-disabled on each tab. */
+  .tabs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tabs-panel-gap);
+  }
+
+  .tabs[data-orientation='vertical'] {
+    flex-direction: row;
+  }
+
+  .tabs-list {
+    display: flex;
+    gap: var(--tabs-gap);
+    border-block-end: var(--tabs-border-width) solid var(--tabs-border-color);
+  }
+
+  .tabs-list[data-orientation='vertical'] {
+    flex-direction: column;
+    flex-shrink: 0;
+    border-block-end: none;
+    border-inline-end: var(--tabs-border-width) solid var(--tabs-border-color);
+  }
+
+  .tabs-tab {
+    position: relative;
+    padding: var(--tabs-tab-padding-block) var(--tabs-tab-padding-inline);
+    border: none;
+    border-radius: var(--tabs-tab-radius) var(--tabs-tab-radius) 0 0;
+    background: none;
+    color: var(--tabs-tab-color);
+    font: inherit;
+    font-size: var(--tabs-font-size);
+    font-weight: var(--tabs-font-weight);
+    text-align: start;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color var(--tabs-duration) var(--ease-smooth);
+  }
+
+  .tabs-list[data-orientation='vertical'] .tabs-tab {
+    border-radius: var(--tabs-tab-radius) 0 0 var(--tabs-tab-radius);
+  }
+
+  .tabs-tab:hover {
+    color: var(--tabs-tab-color-hover);
+  }
+
+  .tabs-tab[data-selected] {
+    color: var(--tabs-tab-color-selected);
+  }
+
+  /* The indicator sits on the list's border, on the side the panels are. */
+  .tabs-tab[data-selected]::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: calc(-1 * var(--tabs-border-width));
+    block-size: var(--tabs-indicator-size);
+    background-color: var(--tabs-indicator-color);
+  }
+
+  .tabs-list[data-orientation='vertical'] .tabs-tab[data-selected]::after {
+    inset-block: 0;
+    inset-inline: auto calc(-1 * var(--tabs-border-width));
+    inline-size: var(--tabs-indicator-size);
+    block-size: auto;
+  }
+
+  .tabs-tab:focus-visible {
+    outline: var(--space-2px) solid var(--tabs-focus-color);
+    outline-offset: calc(-1 * var(--space-2px));
+  }
+
+  .tabs-tab[data-disabled] {
+    opacity: var(--tabs-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  .tabs-tab[data-disabled]:hover {
+    color: var(--tabs-tab-color);
+  }
+
+  .tabs-panel {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .tabs-panel:focus-visible {
+    outline: var(--space-2px) solid var(--tabs-focus-color);
+    outline-offset: var(--space-2px);
+    border-radius: var(--tabs-tab-radius);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tabs-tab {
+      transition-duration: 0ms;
+    }
+  }
+}
