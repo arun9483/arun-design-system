@@ -243,4 +243,28 @@ describe('Popover', () => {
     expect(isOpen()).toBe(false);
     expect(screen.getByRole('dialog', { name: 'Settings' })).toBeInTheDocument();
   });
+
+  it('reports an open cancelled in onBeforeToggle as a close, and stays in step', async () => {
+    const onOpenChange = vi.fn();
+    render(
+      <Popover.Root onOpenChange={onOpenChange}>
+        <Popover.Trigger>Filters</Popover.Trigger>
+        <Popover.Popup
+          data-testid="popup"
+          aria-label="Filters"
+          onBeforeToggle={(event) => {
+            if (event.newState === 'open') event.preventDefault();
+          }}
+        >
+          Content
+        </Popover.Popup>
+      </Popover.Root>,
+    );
+    await userEvent.click(trigger());
+
+    expect(isOpen()).toBe(false);
+    expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
+    expect(trigger()).toHaveAttribute('aria-expanded', 'false');
+    expect(popup()).toHaveAttribute('data-closed');
+  });
 });
