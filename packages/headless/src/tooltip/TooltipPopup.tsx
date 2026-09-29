@@ -59,8 +59,11 @@ export function TooltipPopup({
     const shown = popup.matches(':popover-open');
     // No `source`: that would make the trigger an invoker and put the tooltip in its Tab
     // order, and a tooltip is never focused.
-    if (open && !shown) popup.showPopover();
-    else if (!open && shown) popup.hidePopover();
+    if (open && !shown) {
+      popup.showPopover();
+      // A `beforetoggle` listener can cancel the open; report it, so the state follows.
+      if (!popup.matches(':popover-open')) setOpen(false);
+    } else if (!open && shown) popup.hidePopover();
   });
 
   // Esc closes the tooltip, and only the tooltip: taken in the capture phase and stopped,

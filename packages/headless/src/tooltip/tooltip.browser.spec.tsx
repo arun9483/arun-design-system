@@ -236,4 +236,30 @@ describe('Tooltip', () => {
     expect(isOpen()).toBe(false);
     expect(screen.getByTestId('popover').matches(':popover-open')).toBe(true);
   });
+
+  it('reports an open cancelled in onBeforeToggle as a close, and stays in step', async () => {
+    const onOpenChange = vi.fn();
+    render(
+      <>
+        <button type="button">Before</button>
+        <Tooltip.Root onOpenChange={onOpenChange}>
+          <Tooltip.Trigger>Save</Tooltip.Trigger>
+          <Tooltip.Popup
+            data-testid="tip"
+            onBeforeToggle={(event) => {
+              if (event.newState === 'open') event.preventDefault();
+            }}
+          >
+            Saves the draft
+          </Tooltip.Popup>
+        </Tooltip.Root>
+      </>,
+    );
+    screen.getByRole('button', { name: 'Before' }).focus();
+    await userEvent.keyboard('{Tab}');
+
+    expect(isOpen()).toBe(false);
+    expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
+    expect(tip()).toHaveAttribute('data-closed');
+  });
 });
