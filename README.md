@@ -170,6 +170,9 @@ Versioning and publishing are automated with [Changesets](https://github.com/cha
 
 1. Add a changeset with your PR: `pnpm changeset`
 2. On merge to `main`, the release workflow opens/updates a **Version Packages** PR
-3. Merging that PR publishes to npm (requires the `NPM_TOKEN` repository secret)
+3. Merging that PR publishes to npm through [trusted publishing](https://docs.npmjs.com/trusted-publishers):
+   `.github/workflows/release.yml` authenticates with GitHub's OIDC token, so no npm token is stored,
+   and each version gets a provenance attestation. The npm packages trust that workflow file by
+   name — renaming it stops publishing.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for design-system rules and workflow details.
