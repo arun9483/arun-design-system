@@ -70,6 +70,15 @@ controlled parent that refuses has it reopened.
 
 ## Events
 
+**Where to attach them.** Each part renders a real element and passes your props on to it, so any
+event that element fires — not only those listed here — is a prop on that part. `Popover.Root`
+renders nothing, so it has only `onOpenChange`.
+
+| Part                               | Renders         | Its events, for example                                      |
+| ---------------------------------- | --------------- | ------------------------------------------------------------ |
+| `Popover.Popup`                    | `<div popover>` | `onBeforeToggle`, `onToggle`, `onKeyDown`, `onTransitionEnd` |
+| `Popover.Trigger`, `Popover.Close` | `<button>`      | `onClick`, `onFocus`, `onKeyDown`                            |
+
 `onOpenChange` on the Root reports every open and close, but not what caused it. The popover's
 own events on `Popover.Popup` fire on every one too. Yours run before the component's:
 

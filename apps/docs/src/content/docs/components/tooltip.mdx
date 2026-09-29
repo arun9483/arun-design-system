@@ -69,6 +69,15 @@ Nothing essential should live only in a tooltip either: touch users never see on
 
 ## Events
 
+**Where to attach them.** Each part renders a real element and passes your props on to it, so any
+event that element fires — not only those listed here — is a prop on that part. `Tooltip.Root`
+renders nothing, so it has only `onOpenChange`.
+
+| Part              | Renders         | Its events, for example                         |
+| ----------------- | --------------- | ----------------------------------------------- |
+| `Tooltip.Popup`   | `<div popover>` | `onBeforeToggle`, `onToggle`, `onTransitionEnd` |
+| `Tooltip.Trigger` | `<button>`      | `onClick`, `onFocus`, `onPointerEnter`          |
+
 `onOpenChange` on the Root reports every open and close, after any delay has run.
 `Tooltip.Popup` also takes the popover events, `onBeforeToggle` and `onToggle`, which fire on each
 open and close with `event.newState` set to `'open'` or `'closed'`. Stopping an open in

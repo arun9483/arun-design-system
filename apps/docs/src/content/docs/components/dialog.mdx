@@ -84,6 +84,15 @@ platform, which closes the element; the Root is still told.
 
 ## Events
 
+**Where to attach them.** Each part renders a real element and passes your props on to it, so any
+event that element fires — not only those listed here — is a prop on that part. `Dialog.Root`
+renders nothing, so it has only `onOpenChange`.
+
+| Part                             | Renders    | Its events, for example                                                             |
+| -------------------------------- | ---------- | ----------------------------------------------------------------------------------- |
+| `Dialog.Popup`                   | `<dialog>` | `onCancel`, `onClose`, `onBeforeToggle`, `onToggle`, `onKeyDown`, `onTransitionEnd` |
+| `Dialog.Trigger`, `Dialog.Close` | `<button>` | `onClick`, `onFocus`, `onKeyDown`                                                   |
+
 `onOpenChange` on the Root reports every open and close, but not what caused it. The dialog's own
 events on `Dialog.Popup` add a little more. Yours run before the component's:
 
