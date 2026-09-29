@@ -14,6 +14,8 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
   contents: write
   pull-requests: write
+  # npm trusted publishing: the job's OIDC token is exchanged with npm for a
+  # short-lived publish credential, so no npm token is stored anywhere.
   id-token: write
 
 jobs:
@@ -44,6 +46,11 @@ jobs:
           version: pnpm run version-packages
           commit: 'chore(release): version packages'
           title: 'chore(release): version packages'
+        # No NPM_TOKEN: without it, changesets/action writes no token .npmrc and
+        # leaves auth to npm trusted publishing. `pnpm publish` packs, then runs
+        # `npm publish` — npm >= 11.5.1 (Node 24's) does the OIDC exchange, and
+        # attaches provenance. Each package's trusted publisher on npmjs.com names
+        # this repository and this workflow file, release.yml: rename it and
+        # publishing stops.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
