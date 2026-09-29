@@ -6,6 +6,7 @@ description: A non-modal popup anchored to its trigger, built on the native popo
 import Example from '@/components/Example.astro';
 import PopoverBasics from '@/examples/popover-basics';
 import PopoverSides from '@/examples/popover-sides';
+import PopoverEvents from '@/examples/popover-events';
 import PropTable from '@/components/PropTable.astro';
 import { Aside } from '@astrojs/starlight/components';
 
@@ -66,6 +67,44 @@ Every close is a request through `onOpenChange(false)`: `Popover.Close`, Esc, a 
 clicking the Trigger again, or opening another popover — only one is open at a time, unless one
 is inside the other. Esc and a click outside close the element before anyone is asked, so a
 controlled parent that refuses has it reopened.
+
+## Events
+
+**Where to attach them.** Each part renders a real element and passes your props on to it, so any
+event that element fires — not only those listed here — is a prop on that part. `Popover.Root`
+renders nothing, so it has only `onOpenChange`.
+
+| Part                               | Renders         | Its events, for example                                      |
+| ---------------------------------- | --------------- | ------------------------------------------------------------ |
+| `Popover.Popup`                    | `<div popover>` | `onBeforeToggle`, `onToggle`, `onKeyDown`, `onTransitionEnd` |
+| `Popover.Trigger`, `Popover.Close` | `<button>`      | `onClick`, `onFocus`, `onKeyDown`                            |
+
+`onOpenChange` on the Root reports every open and close, but not what caused it. The popover's
+own events on `Popover.Popup` fire on every one too. Yours run before the component's:
+
+| Prop             | Fires                                                                      |
+| ---------------- | -------------------------------------------------------------------------- |
+| `onBeforeToggle` | before each open and close. `event.preventDefault()` can stop an open only |
+| `onToggle`       | after each open and close; `event.newState` is `'open'` or `'closed'`      |
+
+Stopping an open in `onBeforeToggle` keeps the popover hidden, and `onOpenChange(false)` reports
+it, so the state and the Trigger follow. When opening, `event.nativeEvent.source` is the Trigger that opened
+it (Chrome 140, Firefox 145, Safari 26.5) — on the native event only; React's event leaves it out.
+
+<Example name="popover-events">
+  <PopoverEvents client:load />
+</Example>
+
+They don't tell Esc from a click outside — both look the same above. If that matters, listen for
+the Esc key yourself; a Close button's own `onClick` identifies it.
+
+`onOpenChange(false)` is a request, so it can arrive before the popover is hidden: a Close button
+or the Trigger report first, then it hides; Esc and a click outside hide it first. For work that
+needs it actually hidden, use `onToggle` with `event.newState === 'closed'`, which always comes
+after.
+
+Not reported: opening it by calling `showPopover()` yourself — use `open` and `onOpenChange`
+instead — or unmounting it while open.
 
 ## Popover or Dialog?
 

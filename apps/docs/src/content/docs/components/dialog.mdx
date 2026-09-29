@@ -6,6 +6,7 @@ description: A modal dialog built on the native <dialog> and showModal(), with s
 import Example from '@/components/Example.astro';
 import DialogBasics from '@/examples/dialog-basics';
 import DialogForm from '@/examples/dialog-form';
+import DialogEvents from '@/examples/dialog-events';
 import PropTable from '@/components/PropTable.astro';
 import { Aside } from '@astrojs/starlight/components';
 
@@ -80,6 +81,45 @@ does on a plain `<dialog>`. `event.preventComponentHandler()` instead hands Esc 
 platform, which closes the element; the Root is still told.
 
 </Aside>
+
+## Events
+
+**Where to attach them.** Each part renders a real element and passes your props on to it, so any
+event that element fires — not only those listed here — is a prop on that part. `Dialog.Root`
+renders nothing, so it has only `onOpenChange`.
+
+| Part                             | Renders    | Its events, for example                                                             |
+| -------------------------------- | ---------- | ----------------------------------------------------------------------------------- |
+| `Dialog.Popup`                   | `<dialog>` | `onCancel`, `onClose`, `onBeforeToggle`, `onToggle`, `onKeyDown`, `onTransitionEnd` |
+| `Dialog.Trigger`, `Dialog.Close` | `<button>` | `onClick`, `onFocus`, `onKeyDown`                                                   |
+
+`onOpenChange` on the Root reports every open and close, but not what caused it. The dialog's own
+events on `Dialog.Popup` add a little more. Yours run before the component's:
+
+| Prop             | Fires                                                                    |
+| ---------------- | ------------------------------------------------------------------------ |
+| `onCancel`       | on Esc, before it closes. `event.preventDefault()` keeps it open         |
+| `onClose`        | after any close — Close, Esc, backdrop or a form                         |
+| `onBeforeToggle` | before each open and close; `event.newState` is `'open'` or `'closed'`   |
+| `onToggle`       | after each open and close — the one event for opening as well as closing |
+
+The toggle events on a dialog need Chrome 132, Firefox 133 or Safari 26. `event.preventDefault()`
+in `onBeforeToggle` stops an open, not a close; the dialog stays shut and `onOpenChange(false)`
+reports it, so the state and the Trigger follow.
+
+<Example name="dialog-events">
+  <DialogEvents client:load />
+</Example>
+
+So Esc is the close you can single out, by `onCancel`. A Close button or a form is yours, so its
+own `onClick` or `onSubmit` identifies it; a backdrop click is what remains.
+
+`onOpenChange(false)` is a request, so it can arrive before the dialog is closed: a Close button,
+Esc or the backdrop report first, then the element closes; a form closes the element first. For
+work that needs it actually closed, use `onClose`, which always comes after.
+
+Not reported: opening it by calling `showModal()` yourself — use `open` and `onOpenChange`
+instead — or unmounting it while open.
 
 ## Accessibility
 
