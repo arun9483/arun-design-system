@@ -1,0 +1,91 @@
+---
+title: Tabs
+description: Panels of content shown one at a time, chosen from a list of tabs, with the ARIA tabs keyboard pattern.
+---
+
+import Example from '@/components/Example.astro';
+import TabsBasics from '@/examples/tabs-basics';
+import TabsVertical from '@/examples/tabs-vertical';
+import PropTable from '@/components/PropTable.astro';
+
+`Tabs` shows one panel of content at a time, chosen from a list of tabs. It follows the
+[WAI-ARIA tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/): the whole list is a
+single Tab stop, and the arrow keys move between tabs.
+
+<Example name="tabs-basics">
+  <TabsBasics client:load />
+</Example>
+
+## Anatomy
+
+```tsx
+import { Tabs } from '@arun-dev/ui';
+
+<Tabs.Root defaultValue="account">
+  <Tabs.List aria-label="Settings">
+    <Tabs.Tab value="account" />
+    <Tabs.Tab value="billing" />
+  </Tabs.List>
+  <Tabs.Panel value="account" />
+  <Tabs.Panel value="billing" />
+</Tabs.Root>;
+```
+
+| Part    | Renders                 | Does                                                        |
+| ------- | ----------------------- | ----------------------------------------------------------- |
+| `Root`  | `<div>`                 | holds the selected `value`, `orientation`, `activationMode` |
+| `List`  | `<div role="tablist">`  | the arrow keys                                              |
+| `Tab`   | `<button role="tab">`   | selects its panel; `value` pairs it with one                |
+| `Panel` | `<div role="tabpanel">` | the content, labelled by its tab, `hidden` while unselected |
+
+A Tab and its Panel share a `value`; the ids that wire them together are generated. Name the
+List with `aria-label` when there is more than one set of tabs on the page.
+
+## Keyboard
+
+| Key                              | Does                                                            |
+| -------------------------------- | --------------------------------------------------------------- |
+| Tab                              | enters the list at the selected tab, then moves on to its panel |
+| → ← (horizontal), ↓ ↑ (vertical) | the next or previous tab, wrapping at the ends                  |
+| Home, End                        | the first or last tab                                           |
+| Enter, Space                     | selects the focused tab (with `activationMode="manual"`)        |
+
+Disabled tabs are skipped. In a right-to-left layout the arrows follow what you see: the next tab
+sits to the left, so ← moves to it.
+
+## Automatic or manual
+
+With `activationMode="automatic"` (the default), moving focus to a tab selects it, so the arrow
+keys change the panel as they go. Use `"manual"` when a panel is slow to show — loaded from a
+server, say — so the arrows only move focus and Enter or Space selects.
+
+<Example name="tabs-vertical">
+  <TabsVertical client:load />
+</Example>
+
+This one is also vertical: `orientation="vertical"` puts the list beside the panels, and ↓ ↑
+move between tabs.
+
+## Props
+
+### `Tabs.Root`
+
+<PropTable component="Tabs.Root" />
+
+### `Tabs.Tab`
+
+<PropTable component="Tabs.Tab" />
+
+### `Tabs.Panel`
+
+<PropTable component="Tabs.Panel" />
+
+`Tabs.List` takes the props of the `<div>` it renders, plus `render` and `ref`.
+
+## Notes
+
+- Panels stay mounted while hidden, so a form inside keeps what was typed between visits.
+- Pass a `defaultValue` or `value`: without one, no tab starts selected, and the first enabled
+  tab takes the Tab stop.
+- Every part takes its element's own events — `onClick` on a Tab, `onKeyDown` on the List.
+- Restyle every set of tabs with the `--tabs-*` tokens, e.g. `--tabs-indicator-color`.

@@ -381,6 +381,59 @@ export const PROPS = {
     },
   ],
   'Tooltip.Trigger': [],
+  'Tabs.Root': [
+    {
+      name: 'value',
+      type: 'string',
+      description:
+        'Controlled selection: the `value` of the selected Tab. Provide `onValueChange` alongside it. Never pass `undefined` — the mode is fixed at mount.',
+    },
+    {
+      name: 'defaultValue',
+      type: 'string',
+      description:
+        'Initial selection when uncontrolled. Read once, at mount. Without one, no tab is selected.',
+    },
+    {
+      name: 'onValueChange',
+      type: '(value: string) => void',
+      description: "Called with the Tab's `value` whenever the selection changes.",
+    },
+    {
+      name: 'orientation',
+      type: "'horizontal' | 'vertical'",
+      default: "'horizontal'",
+      description: 'The axis the tabs run along, and so which arrow keys move between them.',
+    },
+    {
+      name: 'activationMode',
+      type: "'automatic' | 'manual'",
+      default: "'automatic'",
+      description:
+        '`automatic` selects a tab as soon as it has focus; `manual` waits for Enter, Space or a click.',
+    },
+  ],
+  'Tabs.List': [],
+  'Tabs.Tab': [
+    {
+      name: 'value',
+      type: 'string',
+      description: 'Identifies this tab, and the Panel with the same `value`. Required.',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Skipped by the arrow keys and cannot be selected.',
+    },
+  ],
+  'Tabs.Panel': [
+    {
+      name: 'value',
+      type: 'string',
+      description: 'The `value` of the Tab this panel belongs to. Required.',
+    },
+  ],
   Badge: [
     {
       name: 'tone',

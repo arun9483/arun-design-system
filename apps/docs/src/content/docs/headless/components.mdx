@@ -1,6 +1,6 @@
 ---
 title: Components
-description: Button, Switch, Checkbox, RadioGroup, Dialog, Popover and Tooltip — what each provides, and when you need them.
+description: Button, Switch, Checkbox, RadioGroup, Dialog, Popover, Tooltip and Tabs — what each provides, and when you need them.
 ---
 
 import Diagram from '@/components/Diagram.astro';
@@ -257,3 +257,41 @@ of open tooltips, so no Provider is needed.
 The Trigger's `aria-describedby` points at the popup at all times; the description is computed
 from the hidden element too. The popup takes no `source`, so it never joins the Trigger's Tab
 order — a tooltip is never focused.
+
+## Tabs
+
+```tsx
+import { Tabs } from '@arun-dev/headless/tabs';
+
+<Tabs.Root defaultValue="account" activationMode="automatic">
+  <Tabs.List className="my-tablist" aria-label="Settings">
+    <Tabs.Tab className="my-tab" value="account">
+      Account
+    </Tabs.Tab>
+    <Tabs.Tab className="my-tab" value="billing">
+      Billing
+    </Tabs.Tab>
+  </Tabs.List>
+  <Tabs.Panel value="account">…</Tabs.Panel>
+  <Tabs.Panel value="billing">…</Tabs.Panel>
+</Tabs.Root>;
+```
+
+There is no native tabs element, so this is the first composite widget built here: a tablist of
+native `<button role="tab">`s, each paired with a `role="tabpanel"` by a shared `value`.
+
+**Roving tabindex.** Only the tab holding the group's Tab stop has `tabIndex={0}` — the selected
+one, or the first enabled tab when that is disabled or missing — so Tab enters the list once and
+leaves it on the next press. The List moves focus with the arrows along `orientation`, wrapping,
+plus Home and End, skipping disabled tabs and swapping Left and Right in a right-to-left layout.
+The key logic is an internal `core/rovingFocus` module, for Menu and Toolbar to reuse.
+
+**Tabs register from their props.** Each Tab tells the Root its `value` and `disabled` when it
+mounts, and the Root orders them by document position; nothing is read back from the DOM
+(decision 10). Elements are kept only to move focus to, so tabs can be added, removed or reordered.
+
+**Activation belongs to the Tab.** With `activationMode="automatic"`, a Tab selects itself when
+focused; with `"manual"`, Enter, Space or a click do — the button's own activation.
+
+Tabs and Panels emit `data-selected` / `data-unselected`, and a disabled Tab `data-disabled`;
+Root and List emit `data-orientation`.

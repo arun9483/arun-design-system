@@ -11,6 +11,7 @@ export default defineConfig({
     'src/popover/index.ts',
     'src/radio-group/index.ts',
     'src/switch/index.ts',
+    'src/tabs/index.ts',
     'src/tooltip/index.ts',
   ],
   format: ['esm', 'cjs'],
