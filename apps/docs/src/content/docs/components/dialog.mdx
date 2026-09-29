@@ -87,10 +87,16 @@ platform, which closes the element; the Root is still told.
 `onOpenChange` on the Root reports every open and close, but not what caused it. The dialog's own
 events on `Dialog.Popup` add a little more. Yours run before the component's:
 
-| Prop       | Fires                                                            |
-| ---------- | ---------------------------------------------------------------- |
-| `onCancel` | on Esc, before it closes. `event.preventDefault()` keeps it open |
-| `onClose`  | after any close — Close, Esc, backdrop or a form                 |
+| Prop             | Fires                                                                    |
+| ---------------- | ------------------------------------------------------------------------ |
+| `onCancel`       | on Esc, before it closes. `event.preventDefault()` keeps it open         |
+| `onClose`        | after any close — Close, Esc, backdrop or a form                         |
+| `onBeforeToggle` | before each open and close; `event.newState` is `'open'` or `'closed'`   |
+| `onToggle`       | after each open and close — the one event for opening as well as closing |
+
+The toggle events on a dialog need Chrome 132, Firefox 133 or Safari 26. `event.preventDefault()`
+in `onBeforeToggle` stops an open, not a close; the dialog stays shut and `onOpenChange(false)`
+reports it, so the state and the Trigger follow.
 
 <Example name="dialog-events">
   <DialogEvents client:load />

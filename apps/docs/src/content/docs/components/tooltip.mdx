@@ -67,6 +67,13 @@ modes. A button named only by its tooltip may be announced as just "button".
 
 Nothing essential should live only in a tooltip either: touch users never see one.
 
+## Events
+
+`onOpenChange` on the Root reports every open and close, after any delay has run.
+`Tooltip.Popup` also takes the popover events, `onBeforeToggle` and `onToggle`, which fire on each
+open and close with `event.newState` set to `'open'` or `'closed'`. Stopping an open in
+`onBeforeToggle` keeps the tooltip hidden, and `onOpenChange(false)` reports it.
+
 ## Props
 
 ### `Tooltip.Root`

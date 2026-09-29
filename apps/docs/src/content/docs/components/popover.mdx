@@ -78,6 +78,10 @@ own events on `Popover.Popup` fire on every one too. Yours run before the compon
 | `onBeforeToggle` | before each open and close. `event.preventDefault()` can stop an open only |
 | `onToggle`       | after each open and close; `event.newState` is `'open'` or `'closed'`      |
 
+Stopping an open in `onBeforeToggle` keeps the popover hidden, and `onOpenChange(false)` reports
+it, so the state and the Trigger follow. When opening, `event.nativeEvent.source` is the Trigger that opened
+it (Chrome 140, Firefox 145, Safari 26.5) — on the native event only; React's event leaves it out.
+
 <Example name="popover-events">
   <PopoverEvents client:load />
 </Example>
