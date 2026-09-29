@@ -1,0 +1,51 @@
+@layer tooltip {
+  /* Placement is set inline by @arun-dev/headless; this styles the label and spaces it from
+     the trigger with an inset on the axis it opens along — as Popover does, so a
+     `* { margin: 0 }` reset cannot remove the gap. */
+  .tooltip {
+    inset: 0;
+    margin: 0;
+    inline-size: max-content;
+    max-inline-size: min(var(--tooltip-max-width), 100vw - 2 * var(--tooltip-offset));
+    padding: var(--tooltip-padding-block) var(--tooltip-padding-inline);
+    border: none;
+    border-radius: var(--tooltip-radius);
+    background-color: var(--tooltip-bg);
+    color: var(--tooltip-color);
+    font-size: var(--tooltip-font-size);
+    line-height: var(--line-height-snug);
+    overflow: visible;
+  }
+
+  .tooltip:is([data-side='top'], [data-side='bottom']) {
+    inset-block: var(--tooltip-offset);
+  }
+
+  .tooltip:is([data-side='left'], [data-side='right']) {
+    inset-inline: var(--tooltip-offset);
+  }
+
+  .tooltip {
+    opacity: 0;
+    transition:
+      opacity var(--tooltip-duration) var(--ease-smooth),
+      display var(--tooltip-duration) allow-discrete,
+      overlay var(--tooltip-duration) allow-discrete;
+  }
+
+  .tooltip:popover-open {
+    opacity: 1;
+  }
+
+  @starting-style {
+    .tooltip:popover-open {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tooltip {
+      transition-duration: 0ms;
+    }
+  }
+}

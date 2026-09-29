@@ -93,6 +93,16 @@
         "types": "./dist/switch/index.d.cts",
         "default": "./dist/switch/index.cjs"
       }
+    },
+    "./tooltip": {
+      "import": {
+        "types": "./dist/tooltip/index.d.ts",
+        "default": "./dist/tooltip/index.js"
+      },
+      "require": {
+        "types": "./dist/tooltip/index.d.cts",
+        "default": "./dist/tooltip/index.cjs"
+      }
     }
   },
   "publishConfig": {

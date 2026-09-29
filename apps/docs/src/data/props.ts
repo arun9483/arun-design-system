@@ -327,6 +327,60 @@ export const PROPS = {
   ],
   'Popover.Trigger': [],
   'Popover.Close': [],
+  'Tooltip.Root': [
+    {
+      name: 'delay',
+      type: 'number',
+      default: '600',
+      description:
+        'Milliseconds a pointer rests on the trigger before it opens. Keyboard focus opens it at once, and moving straight from another tooltip skips the delay.',
+    },
+    {
+      name: 'closeDelay',
+      type: 'number',
+      default: '100',
+      description:
+        'Milliseconds between the pointer leaving and the tooltip closing — time to move onto the tooltip, which stays open while hovered.',
+    },
+    {
+      name: 'open',
+      type: 'boolean',
+      description:
+        'Controlled state. Provide `onOpenChange` alongside it. Never pass `undefined` — the mode is fixed at mount.',
+    },
+    {
+      name: 'defaultOpen',
+      type: 'boolean',
+      default: 'false',
+      description: 'Initial state when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onOpenChange',
+      type: '(open: boolean) => void',
+      description: 'Called on every open and close, after any delay has run.',
+    },
+    {
+      name: 'children',
+      type: 'ReactNode',
+      description: 'The other parts. Root renders no element of its own.',
+    },
+  ],
+  'Tooltip.Popup': [
+    {
+      name: 'side',
+      type: "'top' | 'bottom' | 'left' | 'right'",
+      default: "'top'",
+      description:
+        'Which side of the Trigger to show on. Flips to the opposite side when there is no room.',
+    },
+    {
+      name: 'align',
+      type: "'start' | 'center' | 'end'",
+      default: "'center'",
+      description: "Flush with the Trigger's start or end edge, or centred on it.",
+    },
+  ],
+  'Tooltip.Trigger': [],
   Badge: [
     {
       name: 'tone',

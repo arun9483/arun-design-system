@@ -1,5 +1,6 @@
 import { useCallback, useId, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { anchorNameFor } from '../core/anchoring';
 import { useControlled } from '../core/useControlled';
 import { PopoverRootContext, type PopoverRootContextValue } from './PopoverRootContext';
 
@@ -19,11 +20,6 @@ export type PopoverRootProps = {
   onOpenChange?: (open: boolean) => void;
   children?: ReactNode;
 };
-
-/** A CSS dashed-ident from React's id, which may hold characters an ident cannot. */
-function toAnchorName(id: string): string {
-  return `--hl-anchor-${id.replace(/[^a-zA-Z0-9_-]/g, '')}`;
-}
 
 /**
  * Holds a popover's state and shares it with its parts. Renders no element of its own.
@@ -60,7 +56,7 @@ export function PopoverRoot({
   const triggerRef = useRef<HTMLElement | null>(null);
 
   const context: PopoverRootContextValue = useMemo(
-    () => ({ open, setOpen, popupId: id, anchorName: toAnchorName(id), triggerRef }),
+    () => ({ open, setOpen, popupId: id, anchorName: anchorNameFor(id), triggerRef }),
     [open, setOpen, id],
   );
 
