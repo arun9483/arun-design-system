@@ -1,12 +1,19 @@
 import { useEffect, useReducer, useRef } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref, SyntheticEvent } from 'react';
+import {
+  anchoredDataAttributes,
+  anchoredPopupStyle,
+  type AnchorAlign,
+  type AnchorSide,
+  type PopoverElement,
+} from '../core/anchoring';
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
 import { usePopoverRootContext } from './PopoverRootContext';
 import { popoverDataAttributes } from './popoverDataAttributes';
 
-export type PopoverSide = 'top' | 'bottom' | 'left' | 'right';
-export type PopoverAlign = 'start' | 'center' | 'end';
+export type PopoverSide = AnchorSide;
+export type PopoverAlign = AnchorAlign;
 
 type PopoverPopupOwnProps = {
   /** Which side of the trigger to open on. Flips to the opposite side when there is no room. */
@@ -21,26 +28,6 @@ type PopoverPopupOwnProps = {
 
 export type PopoverPopupProps = PopoverPopupOwnProps &
   Omit<ComponentPropsWithRef<'div'>, keyof PopoverPopupOwnProps | 'popover'>;
-
-/**
- * `side` and `align` as a `position-area`. A single side keyword spans the whole cross axis,
- * which centres the popup on the trigger; `span-*` starts it at one of the trigger's edges.
- */
-const POSITION_AREA: Record<PopoverSide, Record<PopoverAlign, string>> = {
-  bottom: { start: 'bottom span-right', center: 'bottom', end: 'bottom span-left' },
-  top: { start: 'top span-right', center: 'top', end: 'top span-left' },
-  right: { start: 'right span-bottom', center: 'right', end: 'right span-top' },
-  left: { start: 'left span-bottom', center: 'left', end: 'left span-top' },
-};
-
-type ShowPopoverWithSource = HTMLElement & {
-  showPopover(options?: { source?: HTMLElement }): void;
-};
-
-/** Flip across the axis it opens on; the other axis is left alone. */
-function tryFallbacks(side: PopoverSide): string {
-  return side === 'top' || side === 'bottom' ? 'flip-block' : 'flip-inline';
-}
 
 /**
  * The popup: a native `popover="auto"`, shown with `showPopover({ source })` whenever the
@@ -79,8 +66,7 @@ export function PopoverPopup({
     const shown = popup.matches(':popover-open');
     // Older engines ignore the options object and show it without the invoker link.
     if (open && !shown) {
-      // TypeScript's DOM types predate the `source` option.
-      (popup as ShowPopoverWithSource).showPopover({ source: triggerRef.current ?? undefined });
+      (popup as PopoverElement).showPopover({ source: triggerRef.current ?? undefined });
     } else if (!open && shown) popup.hidePopover();
   });
 
@@ -91,14 +77,9 @@ export function PopoverPopup({
       id: popupId,
       popover: 'auto',
       role: 'dialog',
-      'data-side': side,
-      'data-align': align,
+      ...anchoredDataAttributes(side, align),
       ...popoverDataAttributes({ open }),
-      style: {
-        positionAnchor: anchorName,
-        positionArea: POSITION_AREA[side][align],
-        positionTryFallbacks: tryFallbacks(side),
-      },
+      style: anchoredPopupStyle(anchorName, side, align),
       className,
       children,
       ref: elementRef,

@@ -552,6 +552,14 @@ dismiss. If a consumer needs anchoring in browsers without anchor positioning, a
 engine can be added behind the same `side` / `align` props — the props describe intent, not
 the mechanism — but not before someone needs it.
 
+**Tooltip uses `popover="manual"`, not `hint`.** `hint` is the platform's tooltip mode — it
+does not close an open `auto` popover, and brings Esc and light dismiss — but Safari does not
+ship it (Chrome 151, Firefox 153). `manual` shares the property that matters most, not
+disturbing an open Popover, and behaves the same in every engine. What it leaves out is the
+tooltip's timing — hover delay, a grace period so the pointer can reach it, focus, blur, Esc —
+which is small, and is the component's to own anyway: `hint` has no delay either. Anchoring is
+the same inline CSS as Popover's, from one internal module.
+
 **Testing.** Browser tests run in Chromium only. Placement differs by engine in detail, so
 Popover's specs assert the wiring — the anchor names, `position-area`, open and close — and
 leave pixel positions to a check in each engine before release.
@@ -584,4 +592,4 @@ Still deferred:
 | Combobox — search over a list of options | after Popover, whose positioning it needs                               |
 | Customizable select (`base-select`)      | it ships in every engine; it swaps the system picker for an in-page one |
 
-Popover shipped on decision 12; Tooltip, Menu and Combobox follow it.
+Popover and Tooltip shipped on decision 12; Menu and Combobox follow it.

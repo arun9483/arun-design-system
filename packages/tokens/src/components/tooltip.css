@@ -1,0 +1,14 @@
+/* Tooltip component tokens — map semantic tokens onto the small label beside a trigger.
+   Inverse colours, so it reads as a label over the page rather than part of it.
+   Override any of these to restyle tooltips without moving other components. */
+:root {
+  --tooltip-offset: var(--space-2xs);
+  --tooltip-max-width: 16rem;
+  --tooltip-padding-block: var(--space-3xs);
+  --tooltip-padding-inline: var(--space-2xs);
+  --tooltip-radius: var(--radius-sm);
+  --tooltip-bg: var(--color-bg-inverse);
+  --tooltip-color: var(--color-text-inverse);
+  --tooltip-font-size: var(--text-xs);
+  --tooltip-duration: var(--duration-fast);
+}

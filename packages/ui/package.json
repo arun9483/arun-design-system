@@ -48,6 +48,7 @@
     "./css/select": "./dist/css/select.css",
     "./css/dialog": "./dist/css/dialog.css",
     "./css/popover": "./dist/css/popover.css",
+    "./css/tooltip": "./dist/css/tooltip.css",
     "./css/checkbox": "./dist/css/checkbox.css",
     "./css/radio-group": "./dist/css/radio-group.css",
     "./css/switch": "./dist/css/switch.css"
@@ -84,7 +85,7 @@
     "vitest": "4.1.11"
   },
   "peerDependencies": {
-    "@arun-dev/headless": ">=4.4.0",
+    "@arun-dev/headless": ">=4.5.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
   }

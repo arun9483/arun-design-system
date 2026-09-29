@@ -53,6 +53,7 @@ export default defineConfig({
             { label: 'Switch', slug: 'components/switch' },
             { label: 'Dialog', slug: 'components/dialog' },
             { label: 'Popover', slug: 'components/popover' },
+            { label: 'Tooltip', slug: 'components/tooltip' },
           ],
         },
         {

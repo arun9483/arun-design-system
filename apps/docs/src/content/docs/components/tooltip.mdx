@@ -1,0 +1,89 @@
+---
+title: Tooltip
+description: A short text label shown beside an element on hover or keyboard focus, anchored by CSS.
+---
+
+import Example from '@/components/Example.astro';
+import TooltipToolbar from '@/examples/tooltip-toolbar';
+import PropTable from '@/components/PropTable.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+`Tooltip` shows a short label next to an element while it is hovered or has keyboard focus — a
+button's shortcut, or the name of an icon. It is anchored like [Popover](/components/popover/),
+by CSS, and describes the element to screen readers whether it is showing or not.
+
+<Example name="tooltip-toolbar">
+  <TooltipToolbar client:load />
+</Example>
+
+## Anatomy
+
+```tsx
+import { Tooltip } from '@arun-dev/ui';
+
+<Tooltip.Root>
+  <Tooltip.Trigger />
+  <Tooltip.Popup />
+</Tooltip.Root>;
+```
+
+| Part      | Renders    | Does                                                                      |
+| --------- | ---------- | ------------------------------------------------------------------------- |
+| `Root`    | nothing    | holds `open` and the hover timers                                         |
+| `Trigger` | `<button>` | the element described; carries `aria-describedby` and the anchor          |
+| `Popup`   | `<div>`    | the label: `popover="manual"`, `role="tooltip"`, placed by `side`/`align` |
+
+The Trigger is usually an element that already exists — render it through:
+`<Tooltip.Trigger render={<Button aria-label="Bold" />}>`. It works on a
+`<Popover.Trigger>` too, and the tooltip steps aside when it is pressed.
+
+## When it shows
+
+| Input          | Opens                               | Closes                             |
+| -------------- | ----------------------------------- | ---------------------------------- |
+| mouse or pen   | after resting for `delay` (600ms)   | `closeDelay` (100ms) after leaving |
+| keyboard focus | at once                             | on blur                            |
+| touch          | never — there is no hover to end it |                                    |
+| a press on it  |                                     | at once                            |
+| Esc            |                                     | at once — and only the tooltip     |
+
+Moving straight from one tooltip to the next skips the delay, so reading along a toolbar doesn't
+mean waiting on each. The pointer can move onto the tooltip without it closing, so its text can
+be read and selected ([WCAG 1.4.13](https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus)).
+
+Esc closes the tooltip without closing a [Dialog](/components/dialog/) or Popover underneath it.
+
+## What goes in it
+
+Text only. A tooltip describes the element and is never focused, so a link or button inside it
+could not be reached by keyboard. For anything interactive, use a Popover.
+
+<Aside title="Don't put the name here">
+Give the Trigger its own accessible name — visible text, or `aria-label` on an icon button. The
+tooltip is its _description_: read after the name, and not at all by some screen readers in some
+modes. A button named only by its tooltip may be announced as just "button".
+
+</Aside>
+
+Nothing essential should live only in a tooltip either: touch users never see one.
+
+## Props
+
+### `Tooltip.Root`
+
+<PropTable component="Tooltip.Root" common={false} />
+
+### `Tooltip.Popup`
+
+<PropTable component="Tooltip.Popup" />
+
+`Tooltip.Trigger` takes the props of the `<button>` it renders, plus `render` and `ref`. An
+`aria-describedby` of yours is kept, with the tooltip's id added to it.
+
+## Notes
+
+- Placement works as for Popover: `side` defaults to `top`, it flips when there's no room, and
+  an older browser without anchor positioning shows it centred rather than beside the element.
+- A disabled `<button>` receives no pointer or focus events, so its tooltip can't show. Explain
+  why an action is unavailable in text near it instead.
+- Restyle every tooltip with the `--tooltip-*` tokens, e.g. `--tooltip-max-width`.
