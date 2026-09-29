@@ -285,6 +285,48 @@ export const PROPS = {
   'Dialog.Trigger': [],
   'Dialog.Title': [],
   'Dialog.Close': [],
+  'Popover.Root': [
+    {
+      name: 'open',
+      type: 'boolean',
+      description:
+        'Controlled state. Provide `onOpenChange` alongside it. Never pass `undefined` — the mode is fixed at mount.',
+    },
+    {
+      name: 'defaultOpen',
+      type: 'boolean',
+      default: 'false',
+      description: 'Initial state when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onOpenChange',
+      type: '(open: boolean) => void',
+      description:
+        'Called on every request to open or close: Trigger, Close, Esc or a click outside. A controlled popover moves only if you accept it.',
+    },
+    {
+      name: 'children',
+      type: 'ReactNode',
+      description: 'The other parts. Root renders no element of its own.',
+    },
+  ],
+  'Popover.Popup': [
+    {
+      name: 'side',
+      type: "'top' | 'bottom' | 'left' | 'right'",
+      default: "'bottom'",
+      description:
+        'Which side of the Trigger to open on. Flips to the opposite side when there is no room.',
+    },
+    {
+      name: 'align',
+      type: "'start' | 'center' | 'end'",
+      default: "'center'",
+      description: "Flush with the Trigger's start or end edge, or centred on it.",
+    },
+  ],
+  'Popover.Trigger': [],
+  'Popover.Close': [],
   Badge: [
     {
       name: 'tone',

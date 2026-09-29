@@ -1,6 +1,6 @@
 ---
 title: Components
-description: Button, Switch, Checkbox, RadioGroup and Dialog — what each provides, and when you need them.
+description: Button, Switch, Checkbox, RadioGroup, Dialog and Popover — what each provides, and when you need them.
 ---
 
 import Diagram from '@/components/Diagram.astro';
@@ -199,3 +199,33 @@ that id for `aria-labelledby`. There is no Portal, because the top layer needs n
 Backdrop, because `::backdrop` is not an element anyone places.
 
 Both `Trigger` and `Popup` emit `data-open` / `data-closed`.
+
+## Popover
+
+```tsx
+import { Popover } from '@arun-dev/headless/popover';
+
+<Popover.Root>
+  <Popover.Trigger className="my-button">Filters</Popover.Trigger>
+  <Popover.Popup className="my-popover" side="bottom" align="start" aria-label="Filters">
+    …
+  </Popover.Popup>
+</Popover.Root>;
+```
+
+`Popover.Popup` is a native `popover="auto"`, shown with `showPopover({ source })` so the Trigger
+becomes its invoker: Tab moves from the Trigger into it, and focus returns on close. Light
+dismiss, Esc and one-open-at-a-time are the platform's.
+
+Placement is CSS anchor positioning, set inline (decision 12). The Trigger carries a generated
+`anchor-name` (`--hl-anchor-<id>`), and the Popup gets `position-anchor` naming it,
+`position-area` from `side` and `align`, and `position-try-fallbacks` to flip across the axis it
+opens along. Nothing is measured, so nothing needs updating on scroll or resize. Your own `style`
+merges with these rather than replacing them.
+
+Light dismiss and Esc close the element before the component is asked — `beforetoggle` can
+cancel an open, not a close — so the `toggle` event reports it, and the popup reopens if a
+controlled parent keeps it open. It is Dialog's `<form method="dialog">` path again.
+
+Both `Trigger` and `Popup` emit `data-open` / `data-closed`; the Popup also `data-side` and
+`data-align`, repeating the request rather than where a fallback moved it.

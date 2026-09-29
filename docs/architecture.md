@@ -255,7 +255,7 @@ platform _and_ what you lose can be rebuilt in userland.
 | `Checkbox`   | an indicator holding JSX; three states as one typed prop | `register()`                                                               | yes — one `Controller`                                           |
 | `Switch`     | a thumb holding an icon or a spinner                     | `register()`                                                               | yes — one `Controller`                                           |
 | `Button`     | —                                                        | focus, `Space`/`Enter`, `disabled`                                         | in principle; `useButton` reached 172 lines before being deleted |
-| `Radio`      | an indicator holding JSX — a dot needs only `::before`   | arrow-key selection, roving Tab stop, `required`, the form protocol        | only by building roving tabindex, still deferred (decision 12)   |
+| `Radio`      | an indicator holding JSX — a dot needs only `::before`   | arrow-key selection, roving Tab stop, `required`, the form protocol        | only by building roving tabindex, still deferred (decision 13)   |
 | a text field | —                                                        | autofill, IME composition, spellcheck, mobile keyboards, password managers | **no, at any price**                                             |
 
 That asymmetry is what makes Checkbox and Switch defensible rather than merely convenient:
@@ -493,30 +493,95 @@ exposing an element the component can place itself.
 
 ---
 
-## 12. Deferred, with reasons
+## 12. Anchored popups: native `popover`, positioned by CSS
+
+Decided before Popover's code exists, as the deferred list asked. It covers every popup that
+opens next to the element that opened it — Popover first, then Tooltip, Menu and Combobox.
+
+**The element is a native `popover`, shown with `showPopover({ source })`.** `popover="auto"`
+supplies the top layer, light dismiss, Esc, and closing sibling popups when another opens. The
+`source` option makes the trigger the popup's invoker, so Tab moves from the trigger into the
+popup and focus returns to it on close. None of that is written here.
+
+**Placement is CSS anchor positioning, with no JavaScript engine.** Headless links the two
+elements with inline styles — `anchor-name` on the trigger, `position-anchor` on the popup —
+and turns `side` and `align` props into `position-area`, with `position-try-fallbacks` flipping
+it when there is no room. The browser keeps it attached through scroll, resize and layout
+changes. There is no measuring, no `autoUpdate`, and no dependency.
+
+Support checked against MDN's compatibility data (8.1.3, September 2026):
+
+| Feature                                                  | Chrome | Firefox | Safari |
+| -------------------------------------------------------- | ------ | ------- | ------ |
+| `popover` attribute — Baseline since January 2025        | 114    | 125     | 17     |
+| `showPopover({ source })`                                | 137    | 144     | 26     |
+| `anchor-name`, `position-area`, `position-try-fallbacks` | 125    | 147     | 26     |
+| `position-anchor` with an explicit name                  | 125    | 147     | 26     |
+| `popover="hint"` — Tooltip's concern, not Popover's      | 151    | 153     | no     |
+
+Every current engine has what Popover needs. Anchor positioning as a whole is not yet
+Baseline: engines still differ on details this design does not touch. `position-anchor`'s
+initial value changed until Chrome 151, Firefox 151 and Safari 27, which is why it is always
+set explicitly rather than left to default.
+
+**Below that support, the popup degrades rather than breaks.** A browser without anchor
+positioning ignores those properties and shows the popover where the UA stylesheet puts it —
+centred in the viewport — still in the top layer, still dismissable, still reachable by Tab.
+Unanchored, but usable. A browser without the `source` option opens it without the invoker
+link, so focus does not return by itself.
+
+**Closing is the platform's, reported through one setter.** Light dismiss and Esc close the
+element before anyone is asked — only opening is cancellable in `beforetoggle` — so the popup
+reports the close through `onOpenChange(false)`, and reopens if a controlled parent keeps it
+open. This is Dialog's `<form method="dialog">` path, not a new mechanism.
+
+**No runtime layout variables.** The deferred `--hl-*` layout vars were for a JavaScript
+engine to publish measurements to CSS. Anchor positioning makes them unnecessary: the trigger's
+width is `anchor-size(width)`, and inside a `position-area` the available height is
+`max-block-size: 100%`. The `--hl-` prefix survives for one thing: generated anchor names are
+`--hl-anchor-<id>`, so they cannot collide with a consumer's own.
+
+**Parts, fewest first (decision 11):** `Root`, `Trigger`, `Popup`, `Close`. No Portal, since
+the top layer needs none; no Arrow yet, since which side a fallback flipped to is not
+observable from script; no Title until a consumer needs the popup named by its heading —
+`aria-label` or `aria-labelledby` do that meanwhile.
+
+**Rules out:** Floating UI or any measuring engine as a dependency; a Portal part; runtime
+layout variables; and `popover="manual"` as the default, which would mean rebuilding light
+dismiss. If a consumer needs anchoring in browsers without anchor positioning, a JavaScript
+engine can be added behind the same `side` / `align` props — the props describe intent, not
+the mechanism — but not before someone needs it.
+
+**Testing.** Browser tests run in Chromium only. Placement differs by engine in detail, so
+Popover's specs assert the wiring — the anchor names, `position-area`, open and close — and
+leave pixel positions to a check in each engine before release.
+
+---
+
+## 13. Deferred, with reasons
 
 Shipped since this list was written:
 
-| Was deferred                    | Landed in                                                                 |
-| ------------------------------- | ------------------------------------------------------------------------- |
-| `@arun-dev/headless` package    | `0.1.0` — the render engine and state plumbing                            |
-| `data-*` state attributes       | `0.2.0`, with Switch — the first component with state                     |
-| `useRender` moved out of `ui`   | `0.1.0` — now `@arun-dev/headless` `core/`, exported                      |
-| Shared `data-disabled` spelling | emitted directly by each component; React drops the `undefined` case      |
-| `mergeProps` handler order      | consumer first, cancellable with `preventComponentHandler()` — decision 8 |
-| Button's non-native behaviour   | removed — `Button` always renders a native `<button>` — decision 7        |
-| Vitest browser mode             | with Dialog: `*.browser.spec.tsx` in Chromium, for what jsdom lacks       |
+| Was deferred                          | Landed in                                                                 |
+| ------------------------------------- | ------------------------------------------------------------------------- |
+| `@arun-dev/headless` package          | `0.1.0` — the render engine and state plumbing                            |
+| `data-*` state attributes             | `0.2.0`, with Switch — the first component with state                     |
+| `useRender` moved out of `ui`         | `0.1.0` — now `@arun-dev/headless` `core/`, exported                      |
+| Shared `data-disabled` spelling       | emitted directly by each component; React drops the `undefined` case      |
+| `mergeProps` handler order            | consumer first, cancellable with `preventComponentHandler()` — decision 8 |
+| Button's non-native behaviour         | removed — `Button` always renders a native `<button>` — decision 7        |
+| Vitest browser mode                   | with Dialog: `*.browser.spec.tsx` in Chromium, for what jsdom lacks       |
+| Positioning engine, Floating UI       | decided: CSS anchor positioning, no JavaScript engine — decision 12       |
+| Runtime layout vars + `--hl-*` prefix | not needed; `--hl-` kept for generated anchor names — decision 12         |
 
 Still deferred:
 
 | Deferred                                 | Revisit when                                                            |
 | ---------------------------------------- | ----------------------------------------------------------------------- |
-| Runtime layout vars + `--hl-*` prefix    | the first anchored/positioned component (Popover)                       |
-| Positioning engine, Floating UI          | Popover; the engine is a port so it can be swapped later                |
 | Memoisation inside `useRender`           | profiling shows the per-render merge costs something                    |
 | `focusableWhenDisabled`, roving tabindex | the first composite widget — Toolbar, Menu, Tabs                        |
 | `Link` — navigation, split out of Button | a consumer needs a styled link                                          |
 | Combobox — search over a list of options | after Popover, whose positioning it needs                               |
 | Customizable select (`base-select`)      | it ships in every engine; it swaps the system picker for an in-page one |
 
-Popover triggers the first two at once, so its decisions belong here before its code exists.
+Popover shipped on decision 12; Tooltip, Menu and Combobox follow it.

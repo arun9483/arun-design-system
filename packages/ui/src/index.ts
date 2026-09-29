@@ -13,9 +13,10 @@ export type { TextareaProps } from './components/textarea';
 export { Select } from './components/select';
 export type { SelectProps } from './components/select';
 
-// Checkbox, RadioGroup, Switch and Dialog are backed by @arun-dev/headless, which owns its props
+// Checkbox, RadioGroup, Switch, Dialog and Popover are backed by @arun-dev/headless, which owns its props
 // types. See docs/architecture.md decision 6 — consumers derive them with ComponentProps.
 export { Checkbox } from './components/checkbox';
 export { RadioGroup } from './components/radio-group';
 export { Switch } from './components/switch';
 export { Dialog } from './components/dialog';
+export { Popover } from './components/popover';

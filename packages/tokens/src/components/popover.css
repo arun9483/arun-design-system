@@ -1,0 +1,15 @@
+/* Popover component tokens — map semantic tokens onto the anchored panel.
+   Override any of these to restyle popovers without moving other components. */
+:root {
+  --popover-offset: var(--space-2xs);
+  --popover-max-width: 20rem;
+  --popover-padding: var(--space-sm);
+  --popover-radius: var(--radius-md);
+  --popover-bg: var(--color-bg-primary);
+  --popover-color: var(--color-text-primary);
+  --popover-border-width: var(--space-px);
+  --popover-border-color: var(--color-border-default);
+  --popover-shadow: var(--shadow-lg);
+  --popover-font-size: var(--text-sm);
+  --popover-duration: var(--duration-fast);
+}

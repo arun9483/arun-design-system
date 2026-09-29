@@ -24,6 +24,12 @@ import type {
   DialogTitleProps,
   DialogTriggerProps,
 } from '@arun-dev/headless/dialog';
+import type {
+  PopoverCloseProps,
+  PopoverPopupProps,
+  PopoverRootProps,
+  PopoverTriggerProps,
+} from '@arun-dev/headless/popover';
 import type { COMMON, PROPS } from './props';
 
 type Documented<Key extends keyof typeof PROPS> = (typeof PROPS)[Key][number]['name'];
@@ -55,7 +61,11 @@ type Unknown =
   | OnlyRealProps<Documented<'Dialog.Popup'>, DialogPopupProps>
   | OnlyRealProps<Documented<'Dialog.Trigger'>, DialogTriggerProps>
   | OnlyRealProps<Documented<'Dialog.Title'>, DialogTitleProps>
-  | OnlyRealProps<Documented<'Dialog.Close'>, DialogCloseProps>;
+  | OnlyRealProps<Documented<'Dialog.Close'>, DialogCloseProps>
+  | OnlyRealProps<Documented<'Popover.Root'>, PopoverRootProps>
+  | OnlyRealProps<Documented<'Popover.Popup'>, PopoverPopupProps>
+  | OnlyRealProps<Documented<'Popover.Trigger'>, PopoverTriggerProps>
+  | OnlyRealProps<Documented<'Popover.Close'>, PopoverCloseProps>;
 
 /**
  * `never` means every documented name resolves. Anything else is the name that does
