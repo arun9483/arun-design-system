@@ -1,5 +1,14 @@
 # @arun-dev/docs
 
+## 0.0.23
+
+### Patch Changes
+
+- Updated dependencies [b6222e6]
+  - @arun-dev/headless@4.6.0
+  - @arun-dev/tokens@0.15.0
+  - @arun-dev/ui@4.10.0
+
 ## 0.0.22
 
 ### Patch Changes
