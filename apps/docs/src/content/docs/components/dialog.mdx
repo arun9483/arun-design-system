@@ -6,6 +6,7 @@ description: A modal dialog built on the native <dialog> and showModal(), with s
 import Example from '@/components/Example.astro';
 import DialogBasics from '@/examples/dialog-basics';
 import DialogForm from '@/examples/dialog-form';
+import DialogEvents from '@/examples/dialog-events';
 import PropTable from '@/components/PropTable.astro';
 import { Aside } from '@astrojs/starlight/components';
 
@@ -80,6 +81,30 @@ does on a plain `<dialog>`. `event.preventComponentHandler()` instead hands Esc 
 platform, which closes the element; the Root is still told.
 
 </Aside>
+
+## Events
+
+`onOpenChange` on the Root reports every open and close, but not what caused it. The dialog's own
+events on `Dialog.Popup` add a little more. Yours run before the component's:
+
+| Prop       | Fires                                                            |
+| ---------- | ---------------------------------------------------------------- |
+| `onCancel` | on Esc, before it closes. `event.preventDefault()` keeps it open |
+| `onClose`  | after any close — Close, Esc, backdrop or a form                 |
+
+<Example name="dialog-events">
+  <DialogEvents client:load />
+</Example>
+
+So Esc is the close you can single out, by `onCancel`. A Close button or a form is yours, so its
+own `onClick` or `onSubmit` identifies it; a backdrop click is what remains.
+
+`onOpenChange(false)` is a request, so it can arrive before the dialog is closed: a Close button,
+Esc or the backdrop report first, then the element closes; a form closes the element first. For
+work that needs it actually closed, use `onClose`, which always comes after.
+
+Not reported: opening it by calling `showModal()` yourself — use `open` and `onOpenChange`
+instead — or unmounting it while open.
 
 ## Accessibility
 
