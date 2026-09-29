@@ -65,8 +65,12 @@ export function DialogPopup({ className, children, render, ...rest }: DialogPopu
     // A `render` element that is not a <dialog> has neither method; nothing to drive.
     if (!dialog || typeof dialog.showModal !== 'function') return;
 
-    if (open && !dialog.open) dialog.showModal();
-    else if (!open && dialog.open) dialog.close();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      // A `beforetoggle` listener can cancel the open. Then it is a refused open: report
+      // it, so the state — and the Trigger's aria-expanded — follow the element.
+      if (!dialog.open) setOpen(false);
+    } else if (!open && dialog.open) dialog.close();
   });
 
   const element = useRender({

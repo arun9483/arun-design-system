@@ -67,6 +67,9 @@ export function PopoverPopup({
     // Older engines ignore the options object and show it without the invoker link.
     if (open && !shown) {
       (popup as PopoverElement).showPopover({ source: triggerRef.current ?? undefined });
+      // A `beforetoggle` listener can cancel the open. Then it is a refused open: report
+      // it, so the state — and the Trigger's aria-expanded — follow the element.
+      if (!popup.matches(':popover-open')) setOpen(false);
     } else if (!open && shown) popup.hidePopover();
   });
 

@@ -271,4 +271,48 @@ describe('Dialog', () => {
     await userEvent.keyboard('{Escape}');
     expect(popup().open).toBe(false);
   });
+
+  it('reports an open cancelled in onBeforeToggle as a close, and stays in step', async () => {
+    const onOpenChange = vi.fn();
+    render(
+      <Dialog.Root onOpenChange={onOpenChange}>
+        <Dialog.Trigger>Open</Dialog.Trigger>
+        <Dialog.Popup
+          data-testid="popup"
+          aria-label="Blocked"
+          onBeforeToggle={(event) => {
+            if (event.newState === 'open') event.preventDefault();
+          }}
+        >
+          <Dialog.Close>Close</Dialog.Close>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Open' });
+    await userEvent.click(trigger);
+
+    expect(popup().open).toBe(false);
+    expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(popup()).toHaveAttribute('data-closed');
+  });
+
+  it('tells a controlled parent once when an open is cancelled, without looping', async () => {
+    const onOpenChange = vi.fn();
+    const onBeforeToggle = vi.fn((event: { newState: string; preventDefault(): void }) => {
+      if (event.newState === 'open') event.preventDefault();
+    });
+    render(
+      <Dialog.Root open onOpenChange={onOpenChange}>
+        <Dialog.Popup data-testid="popup" aria-label="Blocked" onBeforeToggle={onBeforeToggle}>
+          Content
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    // The parent keeps open={true}: it was told once, and nothing retried the open.
+    expect(onOpenChange.mock.calls).toEqual([[false]]);
+    expect(onBeforeToggle).toHaveBeenCalledOnce();
+    expect(popup().open).toBe(false);
+  });
 });
