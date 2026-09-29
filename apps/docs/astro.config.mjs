@@ -52,6 +52,7 @@ export default defineConfig({
             { label: 'Radio group', slug: 'components/radio-group' },
             { label: 'Switch', slug: 'components/switch' },
             { label: 'Dialog', slug: 'components/dialog' },
+            { label: 'Popover', slug: 'components/popover' },
           ],
         },
         {

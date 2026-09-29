@@ -64,6 +64,16 @@
         "default": "./dist/dialog/index.cjs"
       }
     },
+    "./popover": {
+      "import": {
+        "types": "./dist/popover/index.d.ts",
+        "default": "./dist/popover/index.js"
+      },
+      "require": {
+        "types": "./dist/popover/index.d.cts",
+        "default": "./dist/popover/index.cjs"
+      }
+    },
     "./radio-group": {
       "import": {
         "types": "./dist/radio-group/index.d.ts",

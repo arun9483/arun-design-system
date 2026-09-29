@@ -46,8 +46,12 @@ const USAGE = /\[\s*(data-[a-z0-9-]+)/g;
  * attribute instead: `display` follows `[open]` in the UA sheet, and a `<form
  * method="dialog">` removes it before React re-renders, so animating from the same
  * attribute keeps the two in step. The data pair is there for a Trigger, or for consumers.
+ * Popover's popup is styled from `:popover-open` for the same reason.
+ *
+ * `data-align` is Popover's. Alignment is placement, which headless sets inline as
+ * `position-area`, so ui has nothing to add; `data-side` is styled, for the offset's axis.
  */
-const UNSTYLED_HERE = ['data-closed', 'data-open', 'data-unchecked'];
+const UNSTYLED_HERE = ['data-align', 'data-closed', 'data-open', 'data-unchecked'];
 
 function filesIn(dir: string, extension: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
