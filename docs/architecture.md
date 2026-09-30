@@ -588,9 +588,32 @@ Still deferred:
 | Deferred                                 | Revisit when                                                            |
 | ---------------------------------------- | ----------------------------------------------------------------------- |
 | Memoisation inside `useRender`           | profiling shows the per-render merge costs something                    |
-| `focusableWhenDisabled`                  | Menu, whose pattern keeps disabled items focusable; Tabs skips them     |
+| `focusableWhenDisabled`                  | Menu; an opt-in on Tabs and Menu alike, skipping by default — below     |
 | `Link` — navigation, split out of Button | a consumer needs a styled link                                          |
 | Combobox — search over a list of options | after Popover, whose positioning it needs                               |
 | Customizable select (`base-select`)      | it ships in every engine; it swaps the system picker for an in-page one |
 
 Popover and Tooltip shipped on decision 12; Menu and Combobox follow it.
+
+**Disabled items in a roving group are skipped by default, in every component.** APG allows
+disabled tabs, menu items, options and tree items to stay focusable — so a screen reader can
+announce an action that exists but is unavailable — but frames it as "can be helpful", not a
+requirement. No established library splits the answer by widget; each picks one rule for Tabs
+and Menu alike (checked in source, September 2026):
+
+| Library    | Tabs           | Menu      | Opt-in                                    |
+| ---------- | -------------- | --------- | ----------------------------------------- |
+| Radix      | skips          | skips     | none — `focusable={!disabled}` on both    |
+| React Aria | skips          | skips     | `disabledBehavior: 'selection'` on lists  |
+| MUI        | skips (native) | skips     | `disabledItemsFocusable` on `MenuList`    |
+| Base UI    | focusable      | focusable | always on — `focusableWhenDisabled: true` |
+
+This library follows React Aria and MUI: Tabs keeps skipping, as it does today, and Menu skips
+too. `focusableWhenDisabled` lands with Menu as an opt-in on both. When set, a disabled item
+stays in the arrow-key sequence, is marked `aria-disabled` rather than `disabled` — which
+would take it out of focus — and the component blocks its activation.
+
+**On Tabs, the opt-in exists only with `activationMode="manual"`.** Under `"automatic"` focus
+selects, so a focusable disabled tab would leave focus on one tab and the panel on another.
+With `activationMode="automatic"`, Tabs ignores `focusableWhenDisabled` and skips disabled
+tabs as usual.
