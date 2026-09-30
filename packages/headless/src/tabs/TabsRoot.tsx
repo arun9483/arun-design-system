@@ -1,6 +1,6 @@
 import { useCallback, useId, useMemo, useState } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
-import type { Orientation } from '../core/rovingFocus';
+import { byDocumentOrder, type Orientation } from '../core/rovingFocus';
 import { useControlled } from '../core/useControlled';
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
@@ -30,6 +30,13 @@ type TabsRootOwnProps = {
    * click. Manual suits panels that are slow to show.
    */
   activationMode?: TabsActivationMode;
+  /**
+   * Keeps disabled tabs in the arrow-key sequence, so a screen reader announces them as
+   * unavailable. They still cannot be selected. Only with `activationMode="manual"`: under
+   * `"automatic"` moving focus to a tab selects it, so disabled tabs are always skipped and
+   * this has no effect.
+   */
+  focusableWhenDisabled?: boolean;
   /** Element to render instead of the default `<div>`. Props and ref are merged onto it. */
   render?: ReactElement;
   /** Ref to the rendered element. Merged with any ref on the `render` element. */
@@ -42,13 +49,6 @@ export type TabsRootProps = TabsRootOwnProps &
 /** An ID-safe form of a tab's value: ids and ID-reference lists split on whitespace. */
 function idPart(value: string): string {
   return value.replace(/\s+/g, '_');
-}
-
-function documentOrder(a: TabEntry, b: TabEntry): number {
-  const x = a.ref.current;
-  const y = b.ref.current;
-  if (!x || !y) return 0;
-  return x.compareDocumentPosition(y) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
 }
 
 /**
@@ -67,6 +67,7 @@ export function TabsRoot({
   onValueChange,
   orientation = 'horizontal',
   activationMode = 'automatic',
+  focusableWhenDisabled: focusableWhenDisabledProp = false,
   className,
   children,
   render,
@@ -92,20 +93,25 @@ export function TabsRoot({
   const [tabs, setTabs] = useState<TabEntry[]>([]);
   const register = useCallback((entry: TabEntry) => {
     setTabs((current) =>
-      [...current.filter((t) => t.value !== entry.value), entry].sort(documentOrder),
+      [...current.filter((t) => t.value !== entry.value), entry].sort(byDocumentOrder),
     );
     return () => setTabs((current) => current.filter((t) => t !== entry));
   }, []);
 
-  const enabledTabs = useMemo(() => tabs.filter((t) => !t.disabled), [tabs]);
+  // Ignored under automatic activation, where focus selects: a disabled tab must never be.
+  const focusableWhenDisabled = focusableWhenDisabledProp && activationMode === 'manual';
+  const navigableTabs = useMemo(
+    () => (focusableWhenDisabled ? tabs : tabs.filter((t) => !t.disabled)),
+    [tabs, focusableWhenDisabled],
+  );
 
-  // The selected tab holds the Tab stop; if it is disabled or missing, the first enabled one
-  // does, so the group is always reachable. Before any tab registers — the first render —
+  // The selected tab holds the Tab stop; if it is unreachable or missing, the first reachable
+  // one does, so the group is always reachable. Before any tab registers — the first render —
   // the selection is the best guess.
   const tabStopValue =
     tabs.length === 0
       ? value
-      : (enabledTabs.find((t) => t.value === value) ?? enabledTabs[0])?.value;
+      : (navigableTabs.find((t) => t.value === value) ?? navigableTabs[0])?.value;
 
   const baseId = useId();
   const context: TabsRootContextValue = useMemo(
@@ -114,13 +120,24 @@ export function TabsRoot({
       setValue,
       orientation,
       activationMode,
-      enabledTabs,
+      navigableTabs,
+      focusableWhenDisabled,
       tabStopValue,
       register,
       tabId: (v: string) => `${baseId}-tab-${idPart(v)}`,
       panelId: (v: string) => `${baseId}-panel-${idPart(v)}`,
     }),
-    [value, setValue, orientation, activationMode, enabledTabs, tabStopValue, register, baseId],
+    [
+      value,
+      setValue,
+      orientation,
+      activationMode,
+      navigableTabs,
+      focusableWhenDisabled,
+      tabStopValue,
+      register,
+      baseId,
+    ],
   );
 
   const element = useRender({

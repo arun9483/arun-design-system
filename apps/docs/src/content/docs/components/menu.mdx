@@ -1,0 +1,86 @@
+---
+title: Menu
+description: A list of actions opened from a button, with the ARIA menu button keyboard pattern.
+---
+
+import Example from '@/components/Example.astro';
+import MenuBasics from '@/examples/menu-basics';
+import PropTable from '@/components/PropTable.astro';
+
+`Menu` opens a list of actions next to the button that opened it. It follows the
+[WAI-ARIA menu button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/), and is a
+native `popover` anchored like [Popover](/components/popover/): Esc, a click outside and focus
+returning to the button are the platform's.
+
+<Example name="menu-basics">
+  <MenuBasics client:load />
+</Example>
+
+## Anatomy
+
+```tsx
+import { Menu } from '@arun-dev/ui';
+
+<Menu.Root>
+  <Menu.Trigger />
+  <Menu.Popup>
+    <Menu.Item />
+  </Menu.Popup>
+</Menu.Root>;
+```
+
+| Part      | Renders                    | Does                                                       |
+| --------- | -------------------------- | ---------------------------------------------------------- |
+| `Root`    | nothing                    | holds `open`, and the setter every other part goes through |
+| `Trigger` | `<button>`                 | opens it; the element it is anchored to, and its label     |
+| `Popup`   | `<div>`                    | the list: `popover="auto"`, `role="menu"`                  |
+| `Item`    | `<button role="menuitem">` | one action; activating it closes the menu                  |
+
+`Trigger` is an unstyled button, so render a [Button](/components/button/) to style it.
+
+## Keyboard
+
+| Key                        | Does                                                 |
+| -------------------------- | ---------------------------------------------------- |
+| Enter, Space, ↓ on Trigger | opens the menu at the first item                     |
+| ↑ on Trigger               | opens the menu at the last item                      |
+| ↓ ↑                        | the next or previous item, wrapping at the ends      |
+| Home, End                  | the first or last item                               |
+| Enter, Space on an item    | activates it and closes the menu                     |
+| Esc                        | closes the menu, focus back on the Trigger           |
+| Tab                        | closes the menu, and focus moves on past the Trigger |
+
+## Items
+
+Put the action in the Item's `onClick`. Activating an item closes the menu; to keep it open —
+a toggle, say — call `event.preventComponentHandler()` in your `onClick`.
+
+Disabled items are skipped by the arrow keys. Set `focusableWhenDisabled` on the Root to keep them
+in the sequence, so a screen reader announces them as unavailable. They still can't be activated:
+the item is `aria-disabled` instead of `disabled`, and your `onClick` isn't called.
+
+## Props
+
+### `Menu.Root`
+
+<PropTable component="Menu.Root" common={false} />
+
+### `Menu.Popup`
+
+<PropTable component="Menu.Popup" />
+
+### `Menu.Item`
+
+<PropTable component="Menu.Item" />
+
+`Menu.Trigger` takes the props of the `<button>` it renders, plus `render` and `ref`.
+
+## Notes
+
+- The popup is named by the Trigger through `aria-labelledby`. If you give the Trigger your own
+  `id`, name the popup yourself with `aria-label`.
+- Not yet: typeahead, submenus, checkbox and radio items, and groups.
+- Restyle every menu with the `--menu-*` tokens, e.g. `--menu-min-width`.
+- Types come from the package that owns them:
+  `import type { MenuItemProps } from '@arun-dev/headless/menu'`, or
+  `ComponentProps<typeof Menu.Item>`.

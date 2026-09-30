@@ -57,6 +57,26 @@ describe('Tabs (browser)', () => {
     expect(focused()).toBe(tab('Security'));
   });
 
+  it('reaches disabled tabs with focusableWhenDisabled when manual, without selecting', async () => {
+    const onValueChange = vi.fn();
+    render(<Basic activationMode="manual" focusableWhenDisabled onValueChange={onValueChange} />);
+    tab('Billing').focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(focused()).toBe(tab('Team'));
+    await userEvent.keyboard('{Enter}{ }');
+    expect(tab('Team')).toHaveAttribute('aria-selected', 'false');
+    expect(onValueChange).not.toHaveBeenCalled();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(focused()).toBe(tab('Security'));
+  });
+
+  it('still skips disabled tabs with focusableWhenDisabled when automatic', async () => {
+    render(<Basic focusableWhenDisabled />);
+    tab('Billing').focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(focused()).toBe(tab('Security'));
+  });
+
   it('goes to the ends with Home and End', async () => {
     render(<Basic activationMode="manual" />);
     tab('Billing').focus();

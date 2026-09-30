@@ -21,6 +21,7 @@ const CSS_LAYERS = [
   { layer: 'select', src: 'src/components/select/select.css' },
   { layer: 'dialog', src: 'src/components/dialog/dialog.css' },
   { layer: 'popover', src: 'src/components/popover/popover.css' },
+  { layer: 'menu', src: 'src/components/menu/menu.css' },
   { layer: 'tooltip', src: 'src/components/tooltip/tooltip.css' },
   { layer: 'tabs', src: 'src/components/tabs/tabs.css' },
   { layer: 'checkbox', src: 'src/components/checkbox/checkbox.css' },

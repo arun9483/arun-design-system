@@ -20,8 +20,10 @@ export type TabEntry = {
 export type TabsRootContextValue = TabsState & {
   setValue: (value: string) => void;
   activationMode: TabsActivationMode;
-  /** The enabled tabs, in document order. */
-  enabledTabs: TabEntry[];
+  /** The tabs the arrow keys reach, in document order. */
+  navigableTabs: TabEntry[];
+  /** Already `false` under automatic activation. */
+  focusableWhenDisabled: boolean;
   /** The tab that takes the group's single Tab stop. */
   tabStopValue: string | undefined;
   register: (entry: TabEntry) => () => void;

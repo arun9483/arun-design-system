@@ -23,13 +23,14 @@ export type TabsListProps = TabsListOwnProps &
 
 /**
  * The tablist. Holds the keyboard: arrows along the orientation, wrapping at the ends,
- * Home and End — moving focus among the enabled tabs only. Whether focusing a tab also
+ * Home and End — moving focus among the enabled tabs, and the disabled ones too with
+ * `focusableWhenDisabled`. Whether focusing a tab also
  * selects it is the Tab's to decide, by `activationMode`.
  *
  * Name it with `aria-label` or `aria-labelledby` when the page has more than one.
  */
 export function TabsList({ className, children, render, ...rest }: TabsListProps) {
-  const { orientation, enabledTabs } = useTabsRootContext('List');
+  const { orientation, navigableTabs } = useTabsRootContext('List');
   const elementRef = useRef<HTMLElement | null>(null);
 
   return useRender({
@@ -44,20 +45,20 @@ export function TabsList({ className, children, render, ...rest }: TabsListProps
       children,
       ref: elementRef,
       onKeyDown(event: ReactKeyboardEvent) {
-        const current = enabledTabs.findIndex((t) => t.ref.current === event.target);
+        const current = navigableTabs.findIndex((t) => t.ref.current === event.target);
         // Only from a tab of this list: a nested widget's keys are its own.
         if (current < 0) return;
         const list = elementRef.current;
         const rtl = list ? getComputedStyle(list).direction === 'rtl' : false;
         const next = rovingIndex(event.key, {
-          count: enabledTabs.length,
+          count: navigableTabs.length,
           current,
           orientation,
           rtl,
         });
         if (next === null) return;
         event.preventDefault();
-        enabledTabs[next]?.ref.current?.focus();
+        navigableTabs[next]?.ref.current?.focus();
       },
     },
     consumerProps: rest as UnknownProps,

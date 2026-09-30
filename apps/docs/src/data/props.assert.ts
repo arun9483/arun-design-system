@@ -31,6 +31,12 @@ import type {
   PopoverTriggerProps,
 } from '@arun-dev/headless/popover';
 import type {
+  MenuItemProps,
+  MenuPopupProps,
+  MenuRootProps,
+  MenuTriggerProps,
+} from '@arun-dev/headless/menu';
+import type {
   TooltipPopupProps,
   TooltipRootProps,
   TooltipTriggerProps,
@@ -74,6 +80,10 @@ type Unknown =
   | OnlyRealProps<Documented<'Popover.Popup'>, PopoverPopupProps>
   | OnlyRealProps<Documented<'Popover.Trigger'>, PopoverTriggerProps>
   | OnlyRealProps<Documented<'Popover.Close'>, PopoverCloseProps>
+  | OnlyRealProps<Documented<'Menu.Root'>, MenuRootProps>
+  | OnlyRealProps<Documented<'Menu.Popup'>, MenuPopupProps>
+  | OnlyRealProps<Documented<'Menu.Trigger'>, MenuTriggerProps>
+  | OnlyRealProps<Documented<'Menu.Item'>, MenuItemProps>
   | OnlyRealProps<Documented<'Tooltip.Root'>, TooltipRootProps>
   | OnlyRealProps<Documented<'Tooltip.Popup'>, TooltipPopupProps>
   | OnlyRealProps<Documented<'Tooltip.Trigger'>, TooltipTriggerProps>

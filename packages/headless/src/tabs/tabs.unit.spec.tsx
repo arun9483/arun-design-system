@@ -79,6 +79,40 @@ describe('Tabs', () => {
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
+  it('with focusableWhenDisabled and manual activation, marks it aria-disabled', () => {
+    const onValueChange = vi.fn();
+    const onClick = vi.fn();
+    render(
+      <Tabs.Root
+        defaultValue="a"
+        activationMode="manual"
+        focusableWhenDisabled
+        onValueChange={onValueChange}
+      >
+        <Tabs.List>
+          <Tabs.Tab value="a">A</Tabs.Tab>
+          <Tabs.Tab value="b" disabled onClick={onClick}>
+            B
+          </Tabs.Tab>
+        </Tabs.List>
+      </Tabs.Root>,
+    );
+    const b = screen.getByRole('tab', { name: 'B' });
+    expect(b).not.toBeDisabled();
+    expect(b).toHaveAttribute('aria-disabled', 'true');
+    expect(b).toHaveAttribute('data-disabled');
+    fireEvent.click(b);
+    expect(onClick).not.toHaveBeenCalled();
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('ignores focusableWhenDisabled under automatic activation', () => {
+    render(<Basic focusableWhenDisabled />);
+    const team = screen.getByRole('tab', { name: 'Team' });
+    expect(team).toBeDisabled();
+    expect(team).not.toHaveAttribute('aria-disabled');
+  });
+
   it('is controlled by value', () => {
     const onValueChange = vi.fn();
     render(<Basic value="account" onValueChange={onValueChange} />);
