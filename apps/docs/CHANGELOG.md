@@ -1,5 +1,12 @@
 # @arun-dev/docs
 
+## 0.0.24
+
+### Patch Changes
+
+- Updated dependencies [1316601]
+  - @arun-dev/ui@4.11.0
+
 ## 0.0.23
 
 ### Patch Changes
