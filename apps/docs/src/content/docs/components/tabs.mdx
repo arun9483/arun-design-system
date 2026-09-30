@@ -54,6 +54,11 @@ List with `aria-label` when there is more than one set of tabs on the page.
 Disabled tabs are skipped. In a right-to-left layout the arrows follow what you see: the next tab
 sits to the left, so ← moves to it.
 
+With `activationMode="manual"`, set `focusableWhenDisabled` on the Root to keep disabled tabs in
+the arrow-key sequence, so a screen reader announces them as unavailable. They still can't be
+selected. Under `"automatic"` it has no effect: moving focus to a tab selects it, and a disabled
+tab must never be selected.
+
 ## Automatic or manual
 
 With `activationMode="automatic"` (the default), moving focus to a tab selects it, so the arrow

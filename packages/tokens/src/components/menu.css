@@ -1,0 +1,24 @@
+/* Menu component tokens — map semantic tokens onto the anchored list and its items.
+   The panel matches Popover's, but maps from the semantic tier directly: overriding
+   --popover-* moves only popovers, and these move only menus. */
+:root {
+  --menu-offset: var(--space-2xs);
+  --menu-min-width: 10rem;
+  --menu-max-width: 20rem;
+  --menu-padding: var(--space-3xs);
+  --menu-radius: var(--radius-md);
+  --menu-bg: var(--color-bg-primary);
+  --menu-color: var(--color-text-primary);
+  --menu-border-width: var(--space-px);
+  --menu-border-color: var(--color-border-default);
+  --menu-shadow: var(--shadow-lg);
+  --menu-font-size: var(--text-sm);
+  --menu-duration: var(--duration-fast);
+
+  /* Item */
+  --menu-item-padding-block: var(--space-2xs);
+  --menu-item-padding-inline: var(--space-xs);
+  --menu-item-radius: var(--radius-sm);
+  --menu-item-bg-highlight: var(--color-bg-secondary);
+  --menu-disabled-opacity: 0.5;
+}

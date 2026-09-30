@@ -230,6 +230,43 @@ controlled parent keeps it open. It is Dialog's `<form method="dialog">` path ag
 Both `Trigger` and `Popup` emit `data-open` / `data-closed`; the Popup also `data-side` and
 `data-align`, repeating the request rather than where a fallback moved it.
 
+## Menu
+
+```tsx
+import { Menu } from '@arun-dev/headless/menu';
+
+<Menu.Root>
+  <Menu.Trigger className="my-button">Actions</Menu.Trigger>
+  <Menu.Popup className="my-menu">
+    <Menu.Item className="my-item" onClick={edit}>
+      Edit
+    </Menu.Item>
+    <Menu.Item className="my-item" disabled>
+      Archive
+    </Menu.Item>
+  </Menu.Popup>
+</Menu.Root>;
+```
+
+A menu button, by the WAI-ARIA pattern. `Menu.Popup` is a native `popover="auto"` with
+`role="menu"`, labelled by the Trigger and anchored to it exactly as Popover is (decision 12), so
+light dismiss, Esc, one-open-at-a-time and focus return are the platform's.
+
+**Focus moves into the menu.** A click, Enter, Space or Down on the Trigger opens it at the first
+item; Up opens it at the last. Items are native `<button role="menuitem">`s with `tabIndex={-1}`:
+Up and Down move between them, wrapping, with Home and End, through the same `core/rovingFocus`
+as Tabs. Tab closes the menu and lets focus move on from the Trigger.
+
+**An Item is activated as a button.** Put the action in `onClick`; the component then closes the
+menu. Call `event.preventComponentHandler()` to keep it open.
+
+**Disabled items are skipped by default.** With `focusableWhenDisabled` on the Root they stay in
+the arrow-key sequence, as `aria-disabled` rather than `disabled`, and the component blocks their
+activation — your `onClick` is not attached while an item is disabled.
+
+`Trigger` and `Popup` emit `data-open` / `data-closed`; the Popup also `data-side` and
+`data-align`, and a disabled Item `data-disabled`.
+
 ## Tooltip
 
 ```tsx
@@ -284,7 +321,12 @@ native `<button role="tab">`s, each paired with a `role="tabpanel"` by a shared 
 one, or the first enabled tab when that is disabled or missing — so Tab enters the list once and
 leaves it on the next press. The List moves focus with the arrows along `orientation`, wrapping,
 plus Home and End, skipping disabled tabs and swapping Left and Right in a right-to-left layout.
-The key logic is an internal `core/rovingFocus` module, for Menu and Toolbar to reuse.
+The key logic is an internal `core/rovingFocus` module, shared with Menu.
+
+**Disabled tabs are skipped by default.** With `focusableWhenDisabled` on the Root and
+`activationMode="manual"`, they stay in the arrow-key sequence: a disabled Tab is then
+`aria-disabled` rather than `disabled`, and the component blocks its selection and your
+`onClick`. Under `"automatic"` the prop has no effect, since focusing a tab selects it.
 
 **Tabs register from their props.** Each Tab tells the Root its `value` and `disabled` when it
 mounts, and the Root orders them by document position; nothing is read back from the DOM

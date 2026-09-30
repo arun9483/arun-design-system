@@ -560,6 +560,14 @@ tooltip's timing — hover delay, a grace period so the pointer can reach it, fo
 which is small, and is the component's to own anyway: `hint` has no delay either. Anchoring is
 the same inline CSS as Popover's, from one internal module.
 
+**Menu is Popover's popup with `role="menu"`.** Same `popover="auto"`, same `source`, same
+anchoring; what it adds is focus. Opening moves focus to the first item (the last, from Up on
+the Trigger), items move with Up and Down through `core/rovingFocus`, and Tab closes the menu.
+Items are native `<button role="menuitem">`s, so Enter, Space and a click activate them with no
+key handling, and activating one closes the menu through the Root's setter. Parts, fewest
+first: `Root`, `Trigger`, `Popup`, `Item`. A separator is the consumer's own
+`role="separator"` element, since it needs nothing from the Root (decision 11).
+
 **Testing.** Browser tests run in Chromium only. Placement differs by engine in detail, so
 Popover's specs assert the wiring — the anchor names, `position-area`, open and close — and
 leave pixel positions to a check in each engine before release.
@@ -582,18 +590,21 @@ Shipped since this list was written:
 | Positioning engine, Floating UI       | decided: CSS anchor positioning, no JavaScript engine — decision 12       |
 | Runtime layout vars + `--hl-*` prefix | not needed; `--hl-` kept for generated anchor names — decision 12         |
 | Roving tabindex                       | with Tabs: internal `core/rovingFocus`, for Menu and Toolbar to reuse     |
+| `focusableWhenDisabled`               | with Menu: an opt-in on Menu and Tabs, skipping by default — below        |
 
 Still deferred:
 
 | Deferred                                 | Revisit when                                                            |
 | ---------------------------------------- | ----------------------------------------------------------------------- |
 | Memoisation inside `useRender`           | profiling shows the per-render merge costs something                    |
-| `focusableWhenDisabled`                  | Menu; an opt-in on Tabs and Menu alike, skipping by default — below     |
 | `Link` — navigation, split out of Button | a consumer needs a styled link                                          |
 | Combobox — search over a list of options | after Popover, whose positioning it needs                               |
 | Customizable select (`base-select`)      | it ships in every engine; it swaps the system picker for an in-page one |
+| Menu typeahead                           | a menu long enough to need it; items would need a `textValue` prop      |
+| Submenus                                 | a consumer needs nesting; it needs pointer intent and a second anchor   |
+| Checkbox and radio menu items, groups    | a consumer needs a menu that holds state rather than runs actions       |
 
-Popover and Tooltip shipped on decision 12; Menu and Combobox follow it.
+Popover, Tooltip and Menu shipped on decision 12; Combobox follows it.
 
 **Disabled items in a roving group are skipped by default, in every component.** APG allows
 disabled tabs, menu items, options and tree items to stay focusable — so a screen reader can
@@ -609,9 +620,10 @@ and Menu alike (checked in source, September 2026):
 | Base UI    | focusable      | focusable | always on — `focusableWhenDisabled: true` |
 
 This library follows React Aria and MUI: Tabs keeps skipping, as it does today, and Menu skips
-too. `focusableWhenDisabled` lands with Menu as an opt-in on both. When set, a disabled item
+too. `focusableWhenDisabled` landed with Menu as an opt-in on both Roots. When set, a disabled item
 stays in the arrow-key sequence, is marked `aria-disabled` rather than `disabled` — which
-would take it out of focus — and the component blocks its activation.
+would take it out of focus — and the component blocks its activation, including the
+consumer's `onClick`, which a native `disabled` would have blocked too.
 
 **On Tabs, `focusableWhenDisabled` works only with `activationMode="manual"`.** With
 `"automatic"`, moving focus to a tab also selects it, and a disabled tab must never be

@@ -8,7 +8,10 @@ import { selectedDataAttributes } from './tabsDataAttributes';
 type TabsTabOwnProps = {
   /** Identifies this tab, and the Panel with the same `value`. */
   value: string;
-  /** Skipped by the arrow keys and cannot be selected. */
+  /**
+   * Cannot be selected. Skipped by the arrow keys, unless the Root sets
+   * `focusableWhenDisabled` with `activationMode="manual"`.
+   */
   disabled?: boolean;
   /** Element to render instead of the default `<button>`. Props and ref are merged onto it. */
   render?: ReactElement;
@@ -30,6 +33,7 @@ export type TabsTabProps = TabsTabOwnProps &
 export function TabsTab({
   value,
   disabled = false,
+  onClick,
   className,
   children,
   render,
@@ -39,6 +43,7 @@ export function TabsTab({
     value: selectedValue,
     setValue,
     activationMode,
+    focusableWhenDisabled,
     tabStopValue,
     register,
     tabId,
@@ -63,8 +68,10 @@ export function TabsTab({
       'aria-selected': selected,
       'aria-controls': panelId(value),
       tabIndex: value === tabStopValue ? 0 : -1,
-      // The platform keeps a disabled button out of focus and activation.
-      disabled: disabled || undefined,
+      // The platform keeps a disabled button out of focus and activation. Focusable when
+      // disabled, it is aria-disabled instead, and activation is blocked here.
+      disabled: (disabled && !focusableWhenDisabled) || undefined,
+      'aria-disabled': (disabled && focusableWhenDisabled) || undefined,
       ...selectedDataAttributes(selected, disabled),
       className,
       children,
@@ -77,6 +84,7 @@ export function TabsTab({
         if (activationMode === 'automatic' && !disabled) setValue(value);
       },
     },
-    consumerProps: rest as UnknownProps,
+    // A native `disabled` would block your onClick; aria-disabled does not, so it is left off.
+    consumerProps: (disabled ? rest : { ...rest, onClick }) as UnknownProps,
   });
 }

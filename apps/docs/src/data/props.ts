@@ -327,6 +327,63 @@ export const PROPS = {
   ],
   'Popover.Trigger': [],
   'Popover.Close': [],
+  'Menu.Root': [
+    {
+      name: 'open',
+      type: 'boolean',
+      description:
+        'Controlled state. Provide `onOpenChange` alongside it. Never pass `undefined` — the mode is fixed at mount.',
+    },
+    {
+      name: 'defaultOpen',
+      type: 'boolean',
+      default: 'false',
+      description: 'Initial state when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onOpenChange',
+      type: '(open: boolean) => void',
+      description:
+        'Called on every request to open or close: Trigger, an Item, Tab, Esc or a click outside. A controlled menu moves only if you accept it.',
+    },
+    {
+      name: 'focusableWhenDisabled',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Keeps disabled items in the arrow-key sequence, so a screen reader announces them as unavailable. They still cannot be activated.',
+    },
+    {
+      name: 'children',
+      type: 'ReactNode',
+      description: 'The other parts. Root renders no element of its own.',
+    },
+  ],
+  'Menu.Popup': [
+    {
+      name: 'side',
+      type: "'top' | 'bottom' | 'left' | 'right'",
+      default: "'bottom'",
+      description:
+        'Which side of the Trigger to open on. Flips to the opposite side when there is no room.',
+    },
+    {
+      name: 'align',
+      type: "'start' | 'center' | 'end'",
+      default: "'start'",
+      description: "Flush with the Trigger's start or end edge, or centred on it.",
+    },
+  ],
+  'Menu.Trigger': [],
+  'Menu.Item': [
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Cannot be activated. Skipped by the arrow keys, unless the Root sets `focusableWhenDisabled`.',
+    },
+  ],
   'Tooltip.Root': [
     {
       name: 'delay',
@@ -419,6 +476,13 @@ export const PROPS = {
       description:
         '`automatic` selects a tab as soon as it has focus; `manual` waits for Enter, Space or a click.',
     },
+    {
+      name: 'focusableWhenDisabled',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Keeps disabled tabs in the arrow-key sequence, so a screen reader announces them as unavailable; they still cannot be selected. Only with `activationMode="manual"` — under `"automatic"` moving focus selects, so disabled tabs are always skipped.',
+    },
   ],
   'Tabs.List': [],
   'Tabs.Tab': [
@@ -431,7 +495,8 @@ export const PROPS = {
       name: 'disabled',
       type: 'boolean',
       default: 'false',
-      description: 'Skipped by the arrow keys and cannot be selected.',
+      description:
+        'Cannot be selected. Skipped by the arrow keys, unless the Root sets `focusableWhenDisabled` with manual activation.',
     },
   ],
   'Tabs.Panel': [

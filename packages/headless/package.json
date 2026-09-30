@@ -64,6 +64,16 @@
         "default": "./dist/dialog/index.cjs"
       }
     },
+    "./menu": {
+      "import": {
+        "types": "./dist/menu/index.d.ts",
+        "default": "./dist/menu/index.js"
+      },
+      "require": {
+        "types": "./dist/menu/index.d.cts",
+        "default": "./dist/menu/index.cjs"
+      }
+    },
     "./popover": {
       "import": {
         "types": "./dist/popover/index.d.ts",

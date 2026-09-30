@@ -10,6 +10,20 @@
 export type Orientation = 'horizontal' | 'vertical';
 
 /**
+ * Sorts registered items into document order. Items register from effects, which can run
+ * out of order — an item inserted later registers last but may sit between two others.
+ */
+export function byDocumentOrder(
+  a: { ref: { current: HTMLElement | null } },
+  b: { ref: { current: HTMLElement | null } },
+): number {
+  const x = a.ref.current;
+  const y = b.ref.current;
+  if (!x || !y) return 0;
+  return x.compareDocumentPosition(y) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+}
+
+/**
  * The index a key moves focus to, among `count` enabled items, from `current` (-1 when
  * focus is on none of them), or `null` when the key is not a navigation key here.
  *
