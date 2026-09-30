@@ -7,6 +7,7 @@ import Example from '@/components/Example.astro';
 import TabsBasics from '@/examples/tabs-basics';
 import TabsVertical from '@/examples/tabs-vertical';
 import PropTable from '@/components/PropTable.astro';
+import { TabsPlayground } from '@/components/playgrounds';
 
 `Tabs` shows one panel of content at a time, chosen from a list of tabs. It follows the
 [WAI-ARIA tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/): the whole list is a
@@ -65,6 +66,30 @@ server, say — so the arrows only move focus and Enter or Space selects.
 
 This one is also vertical: `orientation="vertical"` puts the list beside the panels, and ↓ ↑
 move between tabs.
+
+## Position
+
+`position` sets which side of the panels the list sits on, along the axis `orientation` chooses.
+It is logical, so `end` swaps sides in a right-to-left layout.
+
+| `orientation` | `position`        | List (wide) | Panel (wide)   | List (narrow)             | Panel (narrow) |
+| ------------- | ----------------- | ----------- | -------------- | ------------------------- | -------------- |
+| `horizontal`  | `start` (default) | above       | below the list | above, scrolls            | below          |
+| `horizontal`  | `end`             | below       | above the list | below, scrolls            | above          |
+| `vertical`    | `start` (default) | left        | right          | stacked above, full width | below          |
+| `vertical`    | `end`             | right       | left           | stacked below, full width | above          |
+
+- A horizontal list never wraps: when the tabs outgrow the row it scrolls sideways.
+- A vertical list stacks under about 30rem. The test is the width of the `Tabs.Root`, not the
+  viewport's, so tabs in a narrow sidebar stack on a wide screen too. It is still a vertical list:
+  ↓ ↑ still move between tabs. Give a vertical `Tabs.Root` a width (a block in normal flow has
+  one) — it is a size container, so it would collapse to nothing in a shrink-to-fit parent.
+- The list stays first in the DOM, so Tab and screen readers reach it before the panels even when
+  `position="end"` draws it last — the same as a bottom navigation bar.
+
+## Playground
+
+<TabsPlayground client:load />
 
 ## Props
 

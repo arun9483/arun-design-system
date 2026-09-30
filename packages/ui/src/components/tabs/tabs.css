@@ -1,26 +1,52 @@
 @layer tabs {
   /* State comes from data-* attributes emitted by @arun-dev/headless: data-orientation on
-     the root and list, data-selected / data-disabled on each tab. */
+     the root and list, data-selected / data-disabled on each tab. Where the list sits is the
+     `position` prop, a class on the root (.tabs-position-end) — pure layout, so it lives here.
+     The list stays first in the DOM; `end` only moves it visually. */
   .tabs {
     display: flex;
     flex-direction: column;
     gap: var(--tabs-panel-gap);
   }
 
+  .tabs-position-end {
+    flex-direction: column-reverse;
+  }
+
+  /* Vertical runs list and panels as a row that may wrap, so a narrow container can stack
+     them (see the container query below). The root is the container, so it can only restyle
+     its children — wrapping is what lets the children do the stacking. */
   .tabs[data-orientation='vertical'] {
     flex-direction: row;
+    flex-wrap: wrap;
+    container-type: inline-size;
+  }
+
+  .tabs-position-end[data-orientation='vertical'] {
+    flex-direction: row-reverse;
   }
 
   .tabs-list {
     display: flex;
     gap: var(--tabs-gap);
-    border-block-end: var(--tabs-border-width) solid var(--tabs-border-color);
+  }
+
+  /* Horizontal scrolls when the tabs outgrow the row. The rule under the tabs is an inset
+     shadow rather than a border: a scroll container clips the indicator where it overlaps
+     a border, and the shadow sits inside the padding box, under the indicator. */
+  .tabs-list[data-orientation='horizontal'] {
+    overflow-x: auto;
+    scrollbar-width: none;
+    box-shadow: inset 0 calc(-1 * var(--tabs-border-width)) 0 0 var(--tabs-border-color);
+  }
+
+  .tabs-list[data-orientation='horizontal']::-webkit-scrollbar {
+    display: none;
   }
 
   .tabs-list[data-orientation='vertical'] {
     flex-direction: column;
     flex-shrink: 0;
-    border-block-end: none;
     border-inline-end: var(--tabs-border-width) solid var(--tabs-border-color);
   }
 
@@ -52,21 +78,23 @@
     color: var(--tabs-tab-color-selected);
   }
 
-  /* The indicator sits on the list's border, on the side the panels are. */
+  /* The indicator sits on the list's rule, on the side the panels are. */
   .tabs-tab[data-selected]::after {
     content: '';
     position: absolute;
-    inset-inline: 0;
-    inset-block-end: calc(-1 * var(--tabs-border-width));
-    block-size: var(--tabs-indicator-size);
     background-color: var(--tabs-indicator-color);
+  }
+
+  .tabs-list[data-orientation='horizontal'] .tabs-tab[data-selected]::after {
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: var(--tabs-indicator-size);
   }
 
   .tabs-list[data-orientation='vertical'] .tabs-tab[data-selected]::after {
     inset-block: 0;
     inset-inline: auto calc(-1 * var(--tabs-border-width));
     inline-size: var(--tabs-indicator-size);
-    block-size: auto;
   }
 
   .tabs-tab:focus-visible {
@@ -92,6 +120,70 @@
     outline: var(--space-2px) solid var(--tabs-focus-color);
     outline-offset: var(--space-2px);
     border-radius: var(--tabs-tab-radius);
+  }
+
+  /* position="end": the list is on the far side of the panels, so its rule, its indicator
+     and its tabs' rounded corners all move to the edge that now faces away from them. The
+     child combinator keeps a nested set of tabs from picking these up. */
+  .tabs-position-end > .tabs-list[data-orientation='horizontal'] {
+    box-shadow: inset 0 var(--tabs-border-width) 0 0 var(--tabs-border-color);
+  }
+
+  .tabs-position-end > .tabs-list[data-orientation='horizontal'] .tabs-tab {
+    border-radius: 0 0 var(--tabs-tab-radius) var(--tabs-tab-radius);
+  }
+
+  .tabs-position-end > .tabs-list[data-orientation='horizontal'] .tabs-tab[data-selected]::after {
+    inset-block: 0 auto;
+  }
+
+  .tabs-position-end > .tabs-list[data-orientation='vertical'] {
+    border-inline-end: none;
+    border-inline-start: var(--tabs-border-width) solid var(--tabs-border-color);
+  }
+
+  .tabs-position-end > .tabs-list[data-orientation='vertical'] .tabs-tab {
+    border-radius: 0 var(--tabs-tab-radius) var(--tabs-tab-radius) 0;
+  }
+
+  .tabs-position-end > .tabs-list[data-orientation='vertical'] .tabs-tab[data-selected]::after {
+    inset-inline: calc(-1 * var(--tabs-border-width)) auto;
+  }
+
+  /* A narrow vertical set stacks: the list goes above the panels (start) or below them
+     (end), each taking the full width. It is still a vertical list — aria-orientation and
+     the Up / Down keys are unchanged — so it is the layout that adapts, not the semantics.
+     Container, not viewport: tabs in a narrow sidebar on a wide screen stack too. */
+  @container (inline-size < 30rem) {
+    .tabs[data-orientation='vertical'] > .tabs-list,
+    .tabs[data-orientation='vertical'] > .tabs-panel {
+      flex: 0 0 100%;
+    }
+
+    .tabs-position-end[data-orientation='vertical'] > .tabs-list {
+      order: 1;
+    }
+
+    /* The rule moves to the edge facing the panels, and the indicator to the start edge. */
+    .tabs[data-orientation='vertical'] > .tabs-list[data-orientation='vertical'] {
+      border-inline: none;
+      border-block-end: var(--tabs-border-width) solid var(--tabs-border-color);
+    }
+
+    .tabs-position-end[data-orientation='vertical'] > .tabs-list[data-orientation='vertical'] {
+      border-block-end: none;
+      border-block-start: var(--tabs-border-width) solid var(--tabs-border-color);
+    }
+
+    .tabs[data-orientation='vertical'] > .tabs-list[data-orientation='vertical'] .tabs-tab {
+      border-radius: var(--tabs-tab-radius);
+    }
+
+    .tabs[data-orientation='vertical']
+      > .tabs-list[data-orientation='vertical']
+      .tabs-tab[data-selected]::after {
+      inset-inline: 0 auto;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

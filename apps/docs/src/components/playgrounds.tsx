@@ -13,6 +13,7 @@ import {
   RadioGroup,
   Select,
   Switch,
+  Tabs,
   Textarea,
 } from '@arun-dev/ui';
 import { Playground, type Control } from './Playground';
@@ -241,6 +242,61 @@ export function RadioGroupPlayground() {
             </label>
           ))}
         </RadioGroup.Root>
+      )}
+    />
+  );
+}
+
+const TABS_CONTROLS: Control[] = [
+  {
+    name: 'orientation',
+    type: 'select',
+    options: ['horizontal', 'vertical'],
+    initial: 'horizontal',
+  },
+  { name: 'position', type: 'select', options: ['start', 'end'], initial: 'start' },
+];
+
+export function TabsPlayground() {
+  return (
+    <Playground
+      component="Tabs.Root"
+      controls={TABS_CONTROLS}
+      children="<Tabs.List /> …"
+      render={({ children: _snippet, ...props }: ComponentProps<typeof Tabs.Root>) => (
+        // `resize` makes the frame draggable, so the narrow layout can be tried without
+        // resizing the window — the tabs react to their container's width, not the viewport's.
+        // The frame and its hint are playground devices and are not part of the snippet.
+        <div style={{ inlineSize: '100%' }}>
+          <div
+            style={{
+              resize: 'horizontal',
+              overflow: 'auto',
+              minInlineSize: '12rem',
+              maxInlineSize: '100%',
+              padding: 'var(--space-sm)',
+              border: '1px dashed var(--color-border-default)',
+            }}
+          >
+            <Tabs.Root defaultValue="account" {...props}>
+              <Tabs.List aria-label="Settings">
+                <Tabs.Tab value="account">Account</Tabs.Tab>
+                <Tabs.Tab value="billing">Billing</Tabs.Tab>
+                <Tabs.Tab value="team" disabled>
+                  Team
+                </Tabs.Tab>
+                <Tabs.Tab value="security">Security</Tabs.Tab>
+              </Tabs.List>
+              <Tabs.Panel value="account">Name, email and avatar.</Tabs.Panel>
+              <Tabs.Panel value="billing">Plan, invoices and payment method.</Tabs.Panel>
+              <Tabs.Panel value="team">Members and roles.</Tabs.Panel>
+              <Tabs.Panel value="security">Password and two-factor authentication.</Tabs.Panel>
+            </Tabs.Root>
+          </div>
+          <p style={{ margin: 'var(--space-xs) 0 0', fontSize: 'var(--text-sm)' }}>
+            Drag the frame's bottom-right corner to narrow it.
+          </p>
+        </div>
       )}
     />
   );

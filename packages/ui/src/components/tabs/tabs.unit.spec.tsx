@@ -23,4 +23,50 @@ describe('Tabs (ui)', () => {
     expect(screen.getByRole('tab')).toHaveClass('tabs-tab', 'tab');
     expect(screen.getByRole('tabpanel')).toHaveClass('tabs-panel', 'panel');
   });
+
+  it('puts the list at the start unless position is end', () => {
+    const { rerender } = render(
+      <Tabs.Root defaultValue="a" data-testid="root">
+        <Tabs.List aria-label="Sections">
+          <Tabs.Tab value="a">A</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel value="a">Panel</Tabs.Panel>
+      </Tabs.Root>,
+    );
+    expect(screen.getByTestId('root')).not.toHaveClass('tabs-position-end');
+
+    rerender(
+      <Tabs.Root defaultValue="a" position="end" data-testid="root">
+        <Tabs.List aria-label="Sections">
+          <Tabs.Tab value="a">A</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel value="a">Panel</Tabs.Panel>
+      </Tabs.Root>,
+    );
+    expect(screen.getByTestId('root')).toHaveClass('tabs', 'tabs-position-end');
+  });
+
+  it('keeps the list first in the DOM whatever the position', () => {
+    render(
+      <Tabs.Root defaultValue="a" position="end" orientation="vertical" data-testid="root">
+        <Tabs.List aria-label="Sections">
+          <Tabs.Tab value="a">A</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel value="a">Panel</Tabs.Panel>
+      </Tabs.Root>,
+    );
+    expect(screen.getByTestId('root').firstElementChild).toBe(screen.getByRole('tablist'));
+  });
+
+  it('does not pass position to the element', () => {
+    render(
+      <Tabs.Root defaultValue="a" position="end" data-testid="root">
+        <Tabs.List aria-label="Sections">
+          <Tabs.Tab value="a">A</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel value="a">Panel</Tabs.Panel>
+      </Tabs.Root>,
+    );
+    expect(screen.getByTestId('root')).not.toHaveAttribute('position');
+  });
 });
