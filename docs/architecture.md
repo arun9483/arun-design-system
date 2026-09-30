@@ -613,7 +613,7 @@ too. `focusableWhenDisabled` lands with Menu as an opt-in on both. When set, a d
 stays in the arrow-key sequence, is marked `aria-disabled` rather than `disabled` — which
 would take it out of focus — and the component blocks its activation.
 
-**On Tabs, the opt-in exists only with `activationMode="manual"`.** Under `"automatic"` focus
-selects, so a focusable disabled tab would leave focus on one tab and the panel on another.
-With `activationMode="automatic"`, Tabs ignores `focusableWhenDisabled` and skips disabled
-tabs as usual.
+**On Tabs, `focusableWhenDisabled` works only with `activationMode="manual"`.** With
+`"automatic"`, moving focus to a tab also selects it, and a disabled tab must never be
+selected. So the arrow keys always skip disabled tabs, and `focusableWhenDisabled` has no
+effect.
