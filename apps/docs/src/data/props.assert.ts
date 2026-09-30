@@ -35,12 +35,9 @@ import type {
   TooltipRootProps,
   TooltipTriggerProps,
 } from '@arun-dev/headless/tooltip';
-import type {
-  TabsListProps,
-  TabsPanelProps,
-  TabsRootProps,
-  TabsTabProps,
-} from '@arun-dev/headless/tabs';
+import type { ComponentProps } from 'react';
+import type { Tabs } from '@arun-dev/ui';
+import type { TabsListProps, TabsPanelProps, TabsTabProps } from '@arun-dev/headless/tabs';
 import type { COMMON, PROPS } from './props';
 
 type Documented<Key extends keyof typeof PROPS> = (typeof PROPS)[Key][number]['name'];
@@ -80,7 +77,7 @@ type Unknown =
   | OnlyRealProps<Documented<'Tooltip.Root'>, TooltipRootProps>
   | OnlyRealProps<Documented<'Tooltip.Popup'>, TooltipPopupProps>
   | OnlyRealProps<Documented<'Tooltip.Trigger'>, TooltipTriggerProps>
-  | OnlyRealProps<Documented<'Tabs.Root'>, TabsRootProps>
+  | OnlyRealProps<Documented<'Tabs.Root'>, ComponentProps<typeof Tabs.Root>>
   | OnlyRealProps<Documented<'Tabs.List'>, TabsListProps>
   | OnlyRealProps<Documented<'Tabs.Tab'>, TabsTabProps>
   | OnlyRealProps<Documented<'Tabs.Panel'>, TabsPanelProps>;

@@ -406,6 +406,13 @@ export const PROPS = {
       description: 'The axis the tabs run along, and so which arrow keys move between them.',
     },
     {
+      name: 'position',
+      type: "'start' | 'end'",
+      default: "'start'",
+      description:
+        'Which side of the panels the list sits on, along the `orientation` axis: `start` is above (horizontal) or before (vertical), `end` is below or after. Logical, so it swaps sides in a right-to-left layout. The list stays first in the DOM.',
+    },
+    {
       name: 'activationMode',
       type: "'automatic' | 'manual'",
       default: "'automatic'",
