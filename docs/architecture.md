@@ -650,17 +650,19 @@ its identity.
 that no longer returns it: pick books, search for pens, and the books stay selected, labelled
 and submitted.
 
-**Search.** `filter?: (items, query) => T[] | null`.
+**Search.** `filter?: (items, query, itemToString) => T[]`, or `null`.
 
-| `filter`   | Filtering                                                                |
-| ---------- | ------------------------------------------------------------------------ |
-| omitted    | the default: case- and accent-insensitive "contains", by `Intl.Collator` |
-| a function | the consumer's — it takes the whole list, so a fuzzy search can rank it  |
-| `null`     | none: `items` are shown as given — server search fills them per query    |
+| `filter`   | Filtering                                                               |
+| ---------- | ----------------------------------------------------------------------- |
+| omitted    | the default: case- and accent-insensitive "contains"                    |
+| a function | the consumer's — it takes the whole list, so a fuzzy search can rank it |
+| `null`     | none: `items` are shown as given — server search fills them per query   |
 
 It takes the whole list rather than one item at a time, as Base UI's `filter` does, because
 ranking needs every candidate at once. The default is exported, so a consumer's filter can wrap
-it (decision 9). Filtering is memoised on `items` and the query, and the query is read through
+it (decision 9). The default folds case and accents (`normalize('NFD')`, marks dropped) rather
+than comparing with `Intl.Collator`, which cannot test containment without a comparison per
+substring. Filtering is memoised on `items` and the query, and the query is read through
 `useDeferredValue`, so typing stays responsive over a long list.
 
 **Behaviour, from Base UI** (checked in its source, October 2026):
@@ -678,19 +680,21 @@ it (decision 9). Filtering is memoised on `items` and the query, and the query i
 `data-visible`; the styled component hides it otherwise. Focus stays in the input throughout:
 the highlighted option is `aria-activedescendant`, not focused, so `core/rovingFocus` does not
 apply to the list. Up and Down move the highlight, Home and End jump, Enter picks, Alt+Down
-opens. With `multiple`, Left Arrow at the start of the input moves into the chips, which rove
-among themselves through `core/rovingFocus`; Backspace or Delete on a chip removes it.
+opens. With `multiple`, Left Arrow at the start of the input moves into the chips; Left and
+Right move between them, and Backspace or Delete on a chip removes it. Tab, or any other move
+of focus out of the input, closes the list as a press outside does.
 
 **Callbacks report a reason.** `onValueChange`, `onInputValueChange` and `onOpenChange` take a
-second argument, `{ reason }`: `'input'`, `'item-press'`, `'clear'`, `'chip-remove'`,
-`'escape'` or `'outside-press'`. A server search tells typing from a clear; a consumer who wants
+second argument, `{ reason }`: `'input'`, `'input-press'`, `'trigger-press'`, `'item-press'`,
+`'keyboard'`, `'clear'`, `'chip-remove'`, `'escape'`, `'outside-press'`, `'blur'` or
+`'form-reset'`. A server search tells typing from a clear; a consumer who wants
 to keep the query after a pick controls `inputValue` and ignores `'item-press'`. There is no
 `cancel()` as in Base UI: the controlled props already give that control, and a cancellable
 event is a convention for every component, not one — decided when a consumer needs it. The
 argument is new to this library and is additive; other components gain it when they need it.
 
 **Lazy loading.** `onLoadMore` fires when a sentinel at the end of the list scrolls into view
-(`IntersectionObserver`, rooted on the list), and `loading` sets `aria-busy` on it. Base UI has
+(`IntersectionObserver`), and `loading` sets `aria-busy` on it. Base UI has
 neither. `Status` is the live region for "Searching…" or a result count; `Empty` shows when
 the filtered list is empty and nothing is `loading`.
 
@@ -699,9 +703,17 @@ TanStack Virtual decide which items mount. `onItemHighlighted(item, { index, rea
 Base UI, tells it which row to scroll to, since the highlighted option has to be rendered for
 `aria-activedescendant` to point at it. No virtualizer ships here.
 
-**The popup is decision 12's.** Native `popover="auto"`, anchored to the input with CSS anchor
-positioning through `core/anchoring`, sized with `anchor-size(width)`. Base UI's `Portal`,
-`Positioner`, `Backdrop` and `Arrow` have no counterpart.
+**The popup is decision 12's, but `popover="manual"`.** Anchored to the input with CSS anchor
+positioning through `core/anchoring`, sized with `anchor-size(width)`, in the top layer. Base
+UI's `Portal`, `Positioner`, `Backdrop` and `Arrow` have no counterpart.
+
+`auto` was the plan, and failed in Chromium: its light dismiss closes the list on a press of the
+input itself, though the input is the popup's `source`, and on the Trigger and Clear beside it.
+Focus never enters the list, so `auto`'s Esc and focus return bring nothing either. So the
+popup is `manual`, as Tooltip's is, and the component does the rest: a `pointerdown` outside
+the input, popup, Trigger, Clear and chips closes it as `'outside-press'`, and Esc is handled
+on the input. A press inside an open Popover's Combobox still does not light-dismiss the
+Popover, since the list is that Popover's descendant in the DOM.
 
 **Parts, fewest first (decision 11):** `Root`, `Input`, `Trigger`, `Clear`, `Popup`, `List`,
 `Item`, `Empty`, `Status`, `Chip`, `ChipRemove`. `Chip` and `ChipRemove` are parts because
