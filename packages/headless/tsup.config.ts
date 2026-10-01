@@ -7,6 +7,7 @@ export default defineConfig({
     'src/index.ts',
     'src/button/index.ts',
     'src/checkbox/index.ts',
+    'src/combobox/index.ts',
     'src/dialog/index.ts',
     'src/menu/index.ts',
     'src/popover/index.ts',

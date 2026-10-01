@@ -52,13 +52,18 @@ const USAGE = /\[\s*(data-[a-z0-9-]+)/g;
  *
  * `data-align` is Popover's. Alignment is placement, which headless sets inline as
  * `position-area`, so ui has nothing to add; `data-side` is styled, for the offset's axis.
+ *
+ * `data-highlighted` and `data-visible` are Combobox's, emitted by headless ahead of ui's
+ * styled Combobox. Both leave this list when that lands.
  */
 const UNSTYLED_HERE = [
   'data-align',
   'data-closed',
+  'data-highlighted',
   'data-open',
   'data-unchecked',
   'data-unselected',
+  'data-visible',
 ];
 
 function filesIn(dir: string, extension: string): string[] {
