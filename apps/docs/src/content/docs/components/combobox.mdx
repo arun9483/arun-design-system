@@ -1,0 +1,234 @@
+---
+title: Combobox
+description: A text input that filters a list of options, with single or multiple selection, your own search, and loading as the list scrolls.
+---
+
+import Example from '@/components/Example.astro';
+import ComboboxBasics from '@/examples/combobox-basics';
+import ComboboxMultiple from '@/examples/combobox-multiple';
+import ComboboxFuzzy from '@/examples/combobox-fuzzy';
+import ComboboxAsync from '@/examples/combobox-async';
+import ComboboxLazy from '@/examples/combobox-lazy';
+import PropTable from '@/components/PropTable.astro';
+
+`Combobox` is a text input that filters a list as you type. It follows the
+[WAI-ARIA combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/), and behaves as
+[Base UI's Combobox](https://base-ui.com/react/components/combobox) does. The list is a native
+`popover`, anchored to the field with CSS like [Popover](/components/popover/).
+
+Use [Select](/components/select/) for a short list nobody needs to search.
+
+<Example name="combobox-basics">
+  <ComboboxBasics client:load />
+</Example>
+
+## Anatomy
+
+```tsx
+import { Combobox } from '@arun-dev/ui';
+
+<Combobox.Root items={items}>
+  <Combobox.Input />
+  <Combobox.Popup>
+    <Combobox.Status />
+    <Combobox.Empty />
+    <Combobox.List>{(item) => <Combobox.Item key={item} value={item} />}</Combobox.List>
+  </Combobox.Popup>
+</Combobox.Root>;
+```
+
+| Part     | Renders                     | Does                                                                             |
+| -------- | --------------------------- | -------------------------------------------------------------------------------- |
+| `Root`   | hidden inputs, with `name`  | holds the items, the selection, the text and `open`; filters the items           |
+| `Input`  | `<div>` around an `<input>` | the field: chips, the text, Clear and a chevron, and what the list lines up with |
+| `Popup`  | `<div>`                     | the box the list opens in: `popover="manual"`, as wide as the field              |
+| `List`   | `<div role="listbox">`      | renders its function once per item the filter left                               |
+| `Item`   | `<div role="option">`       | one option, with a check while selected                                          |
+| `Empty`  | `<div>`                     | shown when nothing matches and nothing is loading                                |
+| `Status` | `<div role="status">`       | a live region for "Searching…" or a result count                                 |
+
+**Items are data, not children.** Pass every option to the Root as `items`. The Root filters them, and `List`
+renders what is left. An item can be a string, or an object with a `label`. Otherwise, give
+`itemToString` for its label and `itemToKey` for its identity.
+
+## Keyboard
+
+Focus stays in the input. The highlighted option is announced through `aria-activedescendant`.
+
+| Key                         | Does                                                                                     |
+| --------------------------- | ---------------------------------------------------------------------------------------- |
+| typing                      | opens the list and filters it                                                            |
+| ↓ ↑                         | opens the list at the selected or first item, then moves, wrapping                       |
+| Alt+↓                       | opens the list without highlighting                                                      |
+| Home, End                   | the first or last item, while open                                                       |
+| Enter                       | picks the highlighted item                                                               |
+| Esc                         | closes the list, putting the text back                                                   |
+| Tab                         | closes the list, and focus moves on                                                      |
+| Backspace in an empty input | with `multiple`, removes the last item                                                   |
+| ← at the start of the text  | with `multiple`, moves into the chips: ← → between them, Backspace or Delete removes one |
+
+## Single and multiple
+
+<Example name="combobox-multiple" layout="stack">
+  <ComboboxMultiple client:load />
+</Example>
+
+| Interaction             | Single                                            | `multiple`                                        |
+| ----------------------- | ------------------------------------------------- | ------------------------------------------------- |
+| Pick an item            | the input shows its label; the list closes        | added as a chip; the text clears; the list closes |
+| Pick a selected item    | stays selected                                    | removed                                           |
+| Empty the input         | the selection clears                              | the selection stays                               |
+| Esc, or a press outside | closes; the input goes back to the selected label | closes; the text clears                           |
+| Clear (×)               | clears the text and the selection                 | clears the text and every item                    |
+
+**A selection survives a search that no longer returns it.** `value` holds the items
+themselves, not their keys. So search "book" and pick, then search "pen" and pick: the books stay
+selected, keep their chips and labels, and are still submitted with the form.
+
+## Search
+
+By default, an item matches when its label contains the text, ignoring case and accents: "cote"
+finds "Côte d’Ivoire". To search another way, pass `filter`. It receives the whole list, so it
+can rank as well as narrow.
+
+```ts
+filter?: (items: T[], query: string, itemToString: (item: T) => string) => T[]
+```
+
+### Fuzzy search
+
+<Example name="combobox-fuzzy">
+  <ComboboxFuzzy client:load />
+</Example>
+
+A library like `match-sorter` or `Fuse.js` plugs in the same way. To narrow with the default
+first, import it as `defaultFilter` from `@arun-dev/headless/combobox`.
+
+### Server search
+
+Set `filter={null}` to turn local filtering off. Fetch in `onInputValueChange`, pass the
+results as `items`, and set `loading` while a request is in flight. Selected items do not have
+to be in `items`.
+
+<Example name="combobox-async" layout="stack">
+  <ComboboxAsync client:load />
+</Example>
+
+`onInputValueChange` receives a reason as its second argument: `'input'` when someone typed,
+`'item-press'`, `'clear'` or `'blur'` when the component reset the text. Use it to skip a
+request you don't need.
+
+## Lazy loading
+
+Give the Root `onLoadMore`. It is called when the end of the list scrolls into view, and not
+while `loading` is set. While loading, the list is `aria-busy` and `Empty` stays hidden.
+
+<Example name="combobox-lazy" layout="stack">
+  <ComboboxLazy client:load />
+</Example>
+
+## Virtualization
+
+For thousands of items, render only the visible rows with a virtualizer such as
+[TanStack Virtual](https://tanstack.com/virtual). The virtualizer needs to know how many rows
+there are, so filter the items yourself, with `defaultFilter` or your own, and pass them with
+`filter={null}`. `onItemHighlighted` tells it which row to scroll to. The highlighted option has
+to be rendered for `aria-activedescendant` to reach it.
+
+```tsx
+import { useMemo, useRef, useState } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { Combobox } from '@arun-dev/ui';
+import { defaultFilter } from '@arun-dev/headless/combobox';
+
+function BigCombobox({ all }: { all: string[] }) {
+  const [query, setQuery] = useState('');
+  const items = useMemo(() => defaultFilter(all, query, String), [all, query]);
+  const scrollRef = useRef<HTMLElement>(null);
+  const virtualizer = useVirtualizer({
+    count: items.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 32,
+  });
+
+  return (
+    <Combobox.Root
+      items={items}
+      filter={null}
+      // Only typed text filters; a picked label or a reset shows everything.
+      onInputValueChange={(text, { reason }) => setQuery(reason === 'input' ? text : '')}
+      onItemHighlighted={(_, { index, reason }) => {
+        if (reason === 'keyboard') virtualizer.scrollToIndex(index);
+      }}
+    >
+      <Combobox.Input aria-label="Item" />
+      <Combobox.Popup ref={scrollRef}>
+        <Combobox.List style={{ blockSize: virtualizer.getTotalSize(), position: 'relative' }}>
+          {virtualizer.getVirtualItems().map((row) => {
+            const item = items[row.index];
+            return (
+              <Combobox.Item
+                key={item}
+                value={item}
+                style={{ position: 'absolute', insetBlockStart: row.start, inlineSize: '100%' }}
+              >
+                {item}
+              </Combobox.Item>
+            );
+          })}
+        </Combobox.List>
+      </Combobox.Popup>
+    </Combobox.Root>
+  );
+}
+```
+
+Below about a thousand items, you rarely need this. Filtering runs behind `useDeferredValue`, so
+typing stays responsive, and moving the highlight re-renders only the two items it moves
+between.
+
+## Forms
+
+Give the Root a `name`. It renders one hidden input per selected item, holding the item's key
+(`itemToKey`), so the form submits `name=key` once per item. `form.reset()` returns the
+selection and the text to what they were at mount.
+
+## Props
+
+### `Combobox.Root`
+
+<PropTable component="Combobox.Root" common={false} />
+
+### `Combobox.Input`
+
+<PropTable component="Combobox.Input" />
+
+Every other prop goes to the `<input>`: `id`, `placeholder`, `aria-*`, handlers.
+
+### `Combobox.Popup`
+
+<PropTable component="Combobox.Popup" />
+
+### `Combobox.List`
+
+<PropTable component="Combobox.List" />
+
+### `Combobox.Item`
+
+<PropTable component="Combobox.Item" />
+
+`Combobox.Empty` and `Combobox.Status` take the props of the `<div>` they render, plus `render`
+and `ref`.
+
+## Notes
+
+- Keep `itemToString`, `itemToKey` and `filter` stable: define them outside the component, or
+  wrap them in `useCallback`. A new function each render filters the list again on every
+  render.
+- Label the field with a `<label htmlFor>` pointing at the Input's `id`, or with `aria-label`.
+- Not yet: groups, creating an item that isn't in the list, the input inside the popup, and
+  `required`.
+- Restyle every combobox with the `--combobox-*` tokens, e.g. `--combobox-popup-max-height`.
+- Types come from the package that owns them. `ComboboxInputProps` comes from
+  `@arun-dev/ui`; the other parts' props come from `@arun-dev/headless/combobox`, or use
+  `ComponentProps<typeof Combobox.Item>`.

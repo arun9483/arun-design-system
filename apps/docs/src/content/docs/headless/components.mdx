@@ -267,6 +267,63 @@ activation — your `onClick` is not attached while an item is disabled.
 `Trigger` and `Popup` emit `data-open` / `data-closed`; the Popup also `data-side` and
 `data-align`, and a disabled Item `data-disabled`.
 
+## Combobox
+
+```tsx
+import { Combobox } from '@arun-dev/headless/combobox';
+
+<Combobox.Root items={products} itemToKey={(p) => p.id} multiple name="products">
+  <Combobox.InputGroup className="my-field">
+    <Combobox.Value>
+      {(value, { itemToString }) =>
+        value.map((item) => (
+          <Combobox.Chip key={item.id} value={item} className="my-chip">
+            {itemToString(item)}
+            <Combobox.ChipRemove aria-label={`Remove ${itemToString(item)}`} />
+          </Combobox.Chip>
+        ))
+      }
+    </Combobox.Value>
+    <Combobox.Input aria-label="Products" />
+    <Combobox.Clear aria-label="Clear" />
+    <Combobox.Trigger aria-label="Show products" />
+  </Combobox.InputGroup>
+  <Combobox.Popup className="my-list">
+    <Combobox.Empty>No products</Combobox.Empty>
+    <Combobox.List>
+      {(item) => (
+        <Combobox.Item key={item.id} value={item}>
+          {item.label}
+        </Combobox.Item>
+      )}
+    </Combobox.List>
+  </Combobox.Popup>
+</Combobox.Root>;
+```
+
+A text input that filters a list, by the WAI-ARIA combobox pattern, with Base UI's behaviour
+(decision 14). **Items are data:** the Root takes `items` and filters them with `filter`, and
+`List` renders what is left through a function. `value` holds the items themselves, so a
+selection survives a search that no longer returns it.
+
+**Focus stays in the input.** The highlighted option is its `aria-activedescendant`, moved by Up
+and Down. The highlight lives outside React state, so moving it re-renders only the two items it
+moves between. Trigger, Clear and ChipRemove are out of the tab order, and a press on them keeps
+focus in the input.
+
+**The popup is `popover="manual"`**, anchored to the InputGroup if there is one, else to the
+Input. `auto`'s light dismiss would close the list on a press of the input itself, so the
+component closes it on a press outside its own elements, and on Esc and blur.
+
+**Parts the consumer places:** `InputGroup` (optional) takes over as the anchor; `Value`
+renders the selection, for chips; `Chip` and `ChipRemove` remove an item, and the arrow keys
+reach chips from the start of the input. `Empty` shows when nothing matches and nothing is
+`loading`; `Status` is a polite live region.
+
+Every change callback receives `{ reason }`. The Input, Trigger, Popup and InputGroup emit
+`data-open` / `data-closed`; an Item `data-selected`, `data-highlighted` and `data-disabled`;
+Clear `data-visible` while there is a selection to clear.
+
 ## Tooltip
 
 ```tsx
