@@ -591,6 +591,7 @@ Shipped since this list was written:
 | Runtime layout vars + `--hl-*` prefix | not needed; `--hl-` kept for generated anchor names — decision 12         |
 | Roving tabindex                       | with Tabs: internal `core/rovingFocus`, for Menu and Toolbar to reuse     |
 | `focusableWhenDisabled`               | with Menu: an opt-in on Menu and Tabs, skipping by default — below        |
+| Combobox                              | decided: driven by data, Base UI's behaviour — decision 14                |
 
 Still deferred:
 
@@ -598,13 +599,12 @@ Still deferred:
 | ---------------------------------------- | ----------------------------------------------------------------------- |
 | Memoisation inside `useRender`           | profiling shows the per-render merge costs something                    |
 | `Link` — navigation, split out of Button | a consumer needs a styled link                                          |
-| Combobox — search over a list of options | after Popover, whose positioning it needs                               |
 | Customizable select (`base-select`)      | it ships in every engine; it swaps the system picker for an in-page one |
 | Menu typeahead                           | a menu long enough to need it; items would need a `textValue` prop      |
 | Submenus                                 | a consumer needs nesting; it needs pointer intent and a second anchor   |
 | Checkbox and radio menu items, groups    | a consumer needs a menu that holds state rather than runs actions       |
 
-Popover, Tooltip and Menu shipped on decision 12; Combobox follows it.
+Popover, Tooltip and Menu shipped on decision 12; Combobox follows it — decision 14.
 
 **Disabled items in a roving group are skipped by default, in every component.** APG allows
 disabled tabs, menu items, options and tree items to stay focusable — so a screen reader can
@@ -629,3 +629,89 @@ consumer's `onClick`, which a native `disabled` would have blocked too.
 `"automatic"`, moving focus to a tab also selects it, and a disabled tab must never be
 selected. So the arrow keys always skip disabled tabs, and `focusableWhenDisabled` has no
 effect.
+
+---
+
+## 14. Combobox: driven by data, Base UI's behaviour
+
+Decided before Combobox's code exists, as the deferred list asked. A text input that filters a
+list of options, with single or multiple selection. Behaviour follows Base UI's Combobox;
+structure follows this library's decisions.
+
+**Items are data, not children.** The Root takes `items: T[]`, and `Combobox.List` takes a
+function that renders one item. Menu's items register themselves as JSX children; that cannot
+work here, because the filter runs over data the list has not rendered, and a lazily loaded or
+virtualized list never mounts most of it. `itemToString` gives an item's label and `itemToKey`
+its identity.
+
+**`value` holds items, not keys.** `value` is `T | null`, or `T[]` with `multiple`, through
+`useControlled`. Selected state, the input's label and the hidden form inputs all come from
+`value` and `itemToKey` — never from `items` (decision 10). So a selection survives a search
+that no longer returns it: pick books, search for pens, and the books stay selected, labelled
+and submitted.
+
+**Search.** `filter?: (items, query) => T[] | null`.
+
+| `filter`   | Filtering                                                                |
+| ---------- | ------------------------------------------------------------------------ |
+| omitted    | the default: case- and accent-insensitive "contains", by `Intl.Collator` |
+| a function | the consumer's — it takes the whole list, so a fuzzy search can rank it  |
+| `null`     | none: `items` are shown as given — server search fills them per query    |
+
+It takes the whole list rather than one item at a time, as Base UI's `filter` does, because
+ranking needs every candidate at once. The default is exported, so a consumer's filter can wrap
+it (decision 9). Filtering is memoised on `items` and the query, and the query is read through
+`useDeferredValue`, so typing stays responsive over a long list.
+
+**Behaviour, from Base UI** (checked in its source, October 2026):
+
+| Interaction              | Single                                        | Multiple                           |
+| ------------------------ | --------------------------------------------- | ---------------------------------- |
+| Pick an item             | input shows its label; popup closes           | added; query cleared; popup closes |
+| Pick the selected item   | stays selected                                | removed                            |
+| Empty the input          | value becomes `null`                          | value unchanged                    |
+| Esc, or press outside    | closes; input goes back to the selected label | closes; query cleared              |
+| `Clear`                  | query and value cleared                       | query cleared; value becomes `[]`  |
+| Backspace on empty input | —                                             | removes the last item              |
+
+`Clear` is present only while there is something to clear — a selection — and marks it with
+`data-visible`; the styled component hides it otherwise. Focus stays in the input throughout:
+the highlighted option is `aria-activedescendant`, not focused, so `core/rovingFocus` does not
+apply to the list. Up and Down move the highlight, Home and End jump, Enter picks, Alt+Down
+opens. With `multiple`, Left Arrow at the start of the input moves into the chips, which rove
+among themselves through `core/rovingFocus`; Backspace or Delete on a chip removes it.
+
+**Callbacks report a reason.** `onValueChange`, `onInputValueChange` and `onOpenChange` take a
+second argument, `{ reason }`: `'input'`, `'item-press'`, `'clear'`, `'chip-remove'`,
+`'escape'` or `'outside-press'`. A server search tells typing from a clear; a consumer who wants
+to keep the query after a pick controls `inputValue` and ignores `'item-press'`. There is no
+`cancel()` as in Base UI: the controlled props already give that control, and a cancellable
+event is a convention for every component, not one — decided when a consumer needs it. The
+argument is new to this library and is additive; other components gain it when they need it.
+
+**Lazy loading.** `onLoadMore` fires when a sentinel at the end of the list scrolls into view
+(`IntersectionObserver`, rooted on the list), and `loading` sets `aria-busy` on it. Base UI has
+neither. `Status` is the live region for "Searching…" or a result count; `Empty` shows when
+the filtered list is empty and nothing is `loading`.
+
+**Virtualization is the consumer's.** `List`'s render function lets a virtualizer such as
+TanStack Virtual decide which items mount. `onItemHighlighted(item, { index, reason })`, as in
+Base UI, tells it which row to scroll to, since the highlighted option has to be rendered for
+`aria-activedescendant` to point at it. No virtualizer ships here.
+
+**The popup is decision 12's.** Native `popover="auto"`, anchored to the input with CSS anchor
+positioning through `core/anchoring`, sized with `anchor-size(width)`. Base UI's `Portal`,
+`Positioner`, `Backdrop` and `Arrow` have no counterpart.
+
+**Parts, fewest first (decision 11):** `Root`, `Input`, `Trigger`, `Clear`, `Popup`, `List`,
+`Item`, `Empty`, `Status`, `Chip`, `ChipRemove`. `Chip` and `ChipRemove` are parts because
+removing an item needs the Root's setter and chip navigation needs the Root's focus handling.
+The selected check is `data-selected` on `Item` and CSS, so there is no `ItemIndicator` yet;
+nor `Label`, since a `<label>` is the consumer's element linked by `id`. `@arun-dev/ui`'s
+Combobox renders the chips itself, styled as `Chip`.
+
+**Deferred:** groups and separators, creating an item that is not in the list, the input inside
+the popup, an inline list, grid navigation, and a built-in virtualizer.
+
+**Rules out:** items registered as children; selection read from `items` or the DOM; a
+JavaScript positioning engine or a Portal (decision 12); and `cancel()` on change events.
