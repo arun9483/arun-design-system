@@ -149,6 +149,19 @@ describe('Combobox', () => {
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
+  it('renders the selection through Value, with labels', () => {
+    render(
+      <Combobox.Root items={fruits} multiple defaultValue={['Apple', 'Cherry']}>
+        <Combobox.Value>
+          {(value: string[], { itemToString }) => (
+            <output>{value.map((item) => itemToString(item)).join(', ')}</output>
+          )}
+        </Combobox.Value>
+      </Combobox.Root>,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('Apple, Cherry');
+  });
+
   it('throws a part outside its Root', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => render(<Combobox.Input />)).toThrow(

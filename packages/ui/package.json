@@ -49,6 +49,7 @@
     "./css/dialog": "./dist/css/dialog.css",
     "./css/popover": "./dist/css/popover.css",
     "./css/menu": "./dist/css/menu.css",
+    "./css/combobox": "./dist/css/combobox.css",
     "./css/tooltip": "./dist/css/tooltip.css",
     "./css/tabs": "./dist/css/tabs.css",
     "./css/checkbox": "./dist/css/checkbox.css",
@@ -87,7 +88,7 @@
     "vitest": "4.1.11"
   },
   "peerDependencies": {
-    "@arun-dev/headless": ">=4.7.0",
+    "@arun-dev/headless": ">=4.9.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
   }

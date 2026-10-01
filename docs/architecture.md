@@ -718,7 +718,12 @@ Popover, since the list is that Popover's descendant in the DOM.
 **Parts, fewest first (decision 11):** `Root`, `Input`, `Trigger`, `Clear`, `Popup`, `List`,
 `Item`, `Empty`, `Status`, `Chip`, `ChipRemove`. `Chip` and `ChipRemove` are parts because
 removing an item needs the Root's setter and chip navigation needs the Root's focus handling.
-The selected check is `data-selected` on `Item` and CSS, so there is no `ItemIndicator` yet;
+Two more landed with `@arun-dev/ui`'s Combobox, which earned them: `InputGroup`, the box around
+the input, chips and buttons, which takes over as the popup's anchor so the list lines up with
+the whole field; and `Value`, which renders the selection through a function and no element of
+its own, so a separate package can draw chips without keeping a copy of the value (decision 9).
+Base UI has both. The selected check is `data-selected` on `Item` and CSS, so there is no
+`ItemIndicator` yet;
 nor `Label`, since a `<label>` is the consumer's element linked by `id`. `@arun-dev/ui`'s
 Combobox renders the chips itself, styled as `Chip`.
 

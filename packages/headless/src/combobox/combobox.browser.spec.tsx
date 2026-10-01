@@ -108,6 +108,24 @@ describe('Combobox (browser)', () => {
     expect(popup()).toHaveAttribute('popover', 'manual');
   });
 
+  it('anchors to an InputGroup when one wraps the input, and a press on it focuses the input', async () => {
+    render(
+      <Combobox.Root items={products} itemToKey={(p: Product) => p.id}>
+        <Combobox.InputGroup data-testid="group">
+          <Combobox.Input aria-label="Product" />
+        </Combobox.InputGroup>
+        <Combobox.Popup data-testid="popup" />
+      </Combobox.Root>,
+    );
+    const group = screen.getByTestId('group');
+    const anchor = getComputedStyle(group).getPropertyValue('anchor-name');
+    expect(anchor).toMatch(/^--hl-anchor-/);
+    expect(getComputedStyle(input()).getPropertyValue('anchor-name')).toBe('none');
+    expect(getComputedStyle(popup()).getPropertyValue('position-anchor')).toBe(anchor);
+    await userEvent.click(group, { position: { x: 1, y: 1 } });
+    expect(document.activeElement).toBe(input());
+  });
+
   it('opens and filters as you type, ignoring case and accents', async () => {
     render(<Basic />);
     await userEvent.type(input(), 'cafe');

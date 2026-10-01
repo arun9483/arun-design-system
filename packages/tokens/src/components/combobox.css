@@ -1,0 +1,49 @@
+/* Combobox component tokens — map semantic tokens onto the field, its chips and the list.
+   The field matches Input's and the list matches Menu's, but both map from the semantic tier
+   directly: overriding --input-* or --menu-* moves only those, and these move only comboboxes. */
+:root {
+  /* Field — the bordered box around chips, text, Clear and the chevron */
+  --combobox-height: 2.25rem;
+  --combobox-padding-inline: var(--space-xs);
+  --combobox-padding-block: var(--space-3xs);
+  --combobox-gap: var(--space-3xs);
+  --combobox-radius: var(--radius-md);
+  --combobox-bg: var(--color-bg-primary);
+  --combobox-color: var(--color-text-primary);
+  --combobox-font-size: var(--text-sm);
+  --combobox-placeholder-color: var(--color-text-muted);
+  --combobox-border-width: var(--space-px);
+  --combobox-border-color: var(--color-border-default);
+  --combobox-border-color-hover: var(--color-border-strong);
+  --combobox-border-color-focus: var(--color-text-accent);
+  --combobox-border-color-invalid: var(--color-status-error);
+  --combobox-icon-color: var(--color-text-secondary);
+  --combobox-input-min-width: 4rem;
+  --combobox-disabled-opacity: 0.5;
+  --combobox-duration: var(--duration-fast);
+
+  /* Chips — one per selected item, with multiple */
+  --combobox-chip-remove-size: 1rem;
+  --combobox-chip-remove-radius: var(--radius-full);
+  --combobox-chip-remove-bg-hover: var(--color-bg-secondary);
+
+  /* List */
+  --combobox-popup-offset: var(--space-2xs);
+  --combobox-popup-max-height: 20rem;
+  --combobox-popup-padding: var(--space-3xs);
+  --combobox-popup-radius: var(--radius-md);
+  --combobox-popup-bg: var(--color-bg-primary);
+  --combobox-popup-color: var(--color-text-primary);
+  --combobox-popup-border-color: var(--color-border-default);
+  --combobox-popup-shadow: var(--shadow-lg);
+
+  /* Item */
+  --combobox-item-padding-block: var(--space-2xs);
+  --combobox-item-padding-inline: var(--space-xs);
+  --combobox-item-radius: var(--radius-sm);
+  --combobox-item-bg-highlight: var(--color-bg-secondary);
+  --combobox-item-check-color: var(--color-text-accent);
+
+  /* Empty and Status */
+  --combobox-message-color: var(--color-text-muted);
+}

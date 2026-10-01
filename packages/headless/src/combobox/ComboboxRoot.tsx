@@ -311,6 +311,12 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
     [insideRefs],
   );
 
+  const [hasGroup, setHasGroup] = useState(false);
+  const registerGroup = useCallback(() => {
+    setHasGroup(true);
+    return () => setHasGroup(false);
+  }, []);
+
   const inputRef = useRef<HTMLInputElement | null>(null);
   const popupRef = useRef<HTMLElement | null>(null);
 
@@ -372,6 +378,8 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       chips,
       registerInside,
       isInside,
+      hasGroup,
+      registerGroup,
       onLoadMore,
       inputId: `${id}-input`,
       listId: `${id}-list`,
@@ -406,6 +414,8 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       chips,
       registerInside,
       isInside,
+      hasGroup,
+      registerGroup,
       onLoadMore,
       id,
     ],
