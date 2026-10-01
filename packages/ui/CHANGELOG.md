@@ -1,5 +1,27 @@
 # @arun-dev/ui
 
+## 4.13.0
+
+### Minor Changes
+
+- d6ea03b: Add the styled Combobox to `@arun-dev/ui`, its tokens, and two headless parts it needs.
+
+  `@arun-dev/ui` exports `Combobox.Root`, `Input`, `Popup`, `List`, `Item`, `Empty` and `Status`.
+  `Combobox.Input` is the whole field drawn as one box: with `multiple`, a `Chip` with a remove button
+  per selected item, then the text, a Clear button while something is selected, and a chevron. The
+  list is as wide as the field; the selected item shows a check. Labels for Clear, the chevron and
+  each chip's remove button are props. Styles are in `@arun-dev/ui/css/combobox`.
+
+  `@arun-dev/tokens` adds `--combobox-*` tokens for the field, chips, list and items.
+
+  `@arun-dev/headless/combobox` adds `Combobox.InputGroup`, a box around the input that becomes the
+  popup's anchor, and `Combobox.Value`, which renders the selection through a function.
+
+### Patch Changes
+
+- Updated dependencies [d6ea03b]
+  - @arun-dev/tokens@0.17.0
+
 ## 4.12.0
 
 ### Minor Changes
