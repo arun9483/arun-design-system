@@ -85,6 +85,15 @@ Focus stays in the input. The highlighted option is announced through `aria-acti
 themselves, not their keys. So search "book" and pick, then search "pen" and pick: the books stay
 selected, keep their chips and labels, and are still submitted with the form.
 
+### Pre-selected and disabled items
+
+Start with a selection through `defaultValue`, or `value` when controlled. A single combobox
+shows the label in the input, and `multiple` shows a chip per item. Both examples above start
+with one.
+
+Mark an option `disabled` on its `Item`. It can't be picked, and the arrow keys skip it. It is
+announced as unavailable through `aria-disabled`, and styled from `data-disabled`.
+
 ## Search
 
 By default, an item matches when its label contains the text, ignoring case and accents: "cote"

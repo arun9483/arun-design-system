@@ -3,7 +3,7 @@ import { Combobox } from '@arun-dev/ui';
 
 const field = { display: 'grid', gap: 'var(--space-3xs)', maxInlineSize: '24rem' };
 
-type Product = { id: string; label: string };
+type Product = { id: string; label: string; outOfStock?: boolean };
 
 const products: Product[] = [
   { id: 'book-atlas', label: 'Book: Atlas of Remote Islands' },
@@ -11,13 +11,14 @@ const products: Product[] = [
   { id: 'book-sapiens', label: 'Book: Sapiens' },
   { id: 'pen-ballpoint', label: 'Pen: Ballpoint' },
   { id: 'pen-fountain', label: 'Pen: Fountain' },
-  { id: 'pen-gel', label: 'Pen: Gel' },
+  { id: 'pen-gel', label: 'Pen: Gel', outOfStock: true },
   { id: 'notebook-a5', label: 'Notebook: A5 dotted' },
 ];
 
 // Search "book", pick some; search "pen", pick some. Every pick stays selected.
 export default function ComboboxMultiple() {
-  const [value, setValue] = useState<Product[]>([]);
+  // Pre-selected: Dune starts as a chip. Out-of-stock items can't be picked.
+  const [value, setValue] = useState<Product[]>(() => products.filter((p) => p.id === 'book-dune'));
 
   return (
     <div style={field}>
@@ -38,8 +39,9 @@ export default function ComboboxMultiple() {
           <Combobox.Empty>No products found.</Combobox.Empty>
           <Combobox.List>
             {(product: Product) => (
-              <Combobox.Item key={product.id} value={product}>
+              <Combobox.Item key={product.id} value={product} disabled={product.outOfStock}>
                 {product.label}
+                {product.outOfStock && ' (out of stock)'}
               </Combobox.Item>
             )}
           </Combobox.List>
