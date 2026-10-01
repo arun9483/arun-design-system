@@ -1,5 +1,6 @@
 export { ComboboxRoot as Root } from './ComboboxRoot';
 export { ComboboxInput as Input } from './ComboboxInput';
+export { ComboboxInputGroup as InputGroup } from './ComboboxInputGroup';
 export { ComboboxTrigger as Trigger } from './ComboboxTrigger';
 export { ComboboxClear as Clear } from './ComboboxClear';
 export { ComboboxPopup as Popup } from './ComboboxPopup';
@@ -9,3 +10,4 @@ export { ComboboxEmpty as Empty } from './ComboboxEmpty';
 export { ComboboxStatus as Status } from './ComboboxStatus';
 export { ComboboxChip as Chip } from './ComboboxChip';
 export { ComboboxChipRemove as ChipRemove } from './ComboboxChipRemove';
+export { ComboboxValue as Value } from './ComboboxValue';

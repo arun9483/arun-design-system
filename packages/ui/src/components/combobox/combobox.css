@@ -1,0 +1,246 @@
+@layer combobox {
+  /* The field: one box around chips, text and buttons, as Input draws its own. State is read
+     from the text control with :has(), as Input's is. Chips wrap onto new lines; the text
+     takes what space is left on the last one. */
+  .combobox {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--combobox-gap);
+    min-block-size: var(--combobox-height);
+    padding: var(--combobox-padding-block) var(--combobox-padding-inline);
+    border: var(--combobox-border-width) solid var(--combobox-border-color);
+    border-radius: var(--combobox-radius);
+    background-color: var(--combobox-bg);
+    color: var(--combobox-color);
+    font-size: var(--combobox-font-size);
+    cursor: text;
+    transition: border-color var(--combobox-duration) var(--ease-smooth);
+  }
+
+  .combobox:hover {
+    border-color: var(--combobox-border-color-hover);
+  }
+
+  .combobox:has(> .combobox-input[aria-invalid='true']) {
+    border-color: var(--combobox-border-color-invalid);
+  }
+
+  /* The ring follows the text, which keeps focus while the list is open. */
+  .combobox:has(> .combobox-input:focus-visible) {
+    border-color: var(--combobox-border-color-focus);
+    outline: var(--combobox-border-width) solid var(--combobox-border-color-focus);
+  }
+
+  .combobox[data-disabled] {
+    opacity: var(--combobox-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  .combobox[data-disabled]:hover {
+    border-color: var(--combobox-border-color);
+  }
+
+  .combobox-input {
+    flex: 1;
+    min-inline-size: var(--combobox-input-min-width);
+    align-self: stretch;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+
+  .combobox-input::placeholder {
+    color: var(--combobox-placeholder-color);
+    opacity: 1;
+  }
+
+  .combobox-input:disabled {
+    cursor: not-allowed;
+  }
+
+  .combobox-slot {
+    display: inline-flex;
+    align-items: center;
+    color: var(--combobox-icon-color);
+    cursor: default;
+  }
+
+  /* Clear and the chevron: icon buttons that never take focus. */
+  .combobox-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--combobox-icon-color);
+    cursor: pointer;
+  }
+
+  .combobox-button:disabled {
+    cursor: not-allowed;
+  }
+
+  .combobox svg {
+    inline-size: 1em;
+    block-size: 1em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Clear only while there is a selection to clear. */
+  .combobox-clear:not([data-visible]) {
+    display: none;
+  }
+
+  .combobox-trigger svg {
+    transition: rotate var(--combobox-duration) var(--ease-smooth);
+  }
+
+  .combobox-trigger[data-open] svg {
+    rotate: 180deg;
+  }
+
+  /* Chips are Chips: these only fit one inside the field, with its remove button. */
+  .combobox-chip {
+    gap: var(--combobox-gap);
+    max-inline-size: 100%;
+  }
+
+  .combobox-chip:focus-visible {
+    outline: var(--combobox-border-width) solid var(--combobox-border-color-focus);
+    outline-offset: var(--combobox-border-width);
+  }
+
+  .combobox-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--combobox-chip-remove-size);
+    block-size: var(--combobox-chip-remove-size);
+    padding: 0;
+    border: none;
+    border-radius: var(--combobox-chip-remove-radius);
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .combobox-chip-remove:hover {
+    background-color: var(--combobox-chip-remove-bg-hover);
+  }
+
+  /* The list. Placement is set inline by @arun-dev/headless; the gap to the field is an inset
+     on the axis it opens along, as for Menu and Popover. */
+  .combobox-popup {
+    inset: 0;
+    margin: 0;
+    inline-size: anchor-size(width);
+    max-block-size: min(var(--combobox-popup-max-height), 100%);
+    padding: var(--combobox-popup-padding);
+    border: var(--combobox-border-width) solid var(--combobox-popup-border-color);
+    border-radius: var(--combobox-popup-radius);
+    background-color: var(--combobox-popup-bg);
+    color: var(--combobox-popup-color);
+    box-shadow: var(--combobox-popup-shadow);
+    font-size: var(--combobox-font-size);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  .combobox-popup:popover-open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .combobox-popup:is([data-side='top'], [data-side='bottom']) {
+    inset-block: var(--combobox-popup-offset);
+  }
+
+  .combobox-popup:is([data-side='left'], [data-side='right']) {
+    inset-inline: var(--combobox-popup-offset);
+  }
+
+  .combobox-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* The highlight is data-highlighted, not :focus — focus stays in the input. */
+  .combobox-item {
+    display: flex;
+    align-items: center;
+    gap: var(--combobox-item-padding-inline);
+    padding: var(--combobox-item-padding-block) var(--combobox-item-padding-inline);
+    border-radius: var(--combobox-item-radius);
+    cursor: pointer;
+  }
+
+  .combobox-item[data-highlighted] {
+    background-color: var(--combobox-item-bg-highlight);
+  }
+
+  .combobox-item[data-disabled] {
+    opacity: var(--combobox-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  .combobox-item-check {
+    flex-shrink: 0;
+    inline-size: 1em;
+    block-size: 1em;
+    fill: none;
+    stroke: var(--combobox-item-check-color);
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    visibility: hidden;
+  }
+
+  .combobox-item[data-selected] .combobox-item-check {
+    visibility: visible;
+  }
+
+  .combobox-message {
+    padding: var(--combobox-item-padding-block) var(--combobox-item-padding-inline);
+    color: var(--combobox-message-color);
+  }
+
+  .combobox-message:empty {
+    display: none;
+  }
+
+  /* Fade in and out, as Menu does, and for the same reason: opacity only. */
+  .combobox-popup {
+    opacity: 0;
+    transition:
+      opacity var(--combobox-duration) var(--ease-smooth),
+      display var(--combobox-duration) allow-discrete,
+      overlay var(--combobox-duration) allow-discrete;
+  }
+
+  .combobox-popup:popover-open {
+    opacity: 1;
+  }
+
+  @starting-style {
+    .combobox-popup:popover-open {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .combobox,
+    .combobox-popup,
+    .combobox-trigger svg {
+      transition-duration: 0ms;
+    }
+  }
+}

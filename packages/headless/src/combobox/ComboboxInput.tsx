@@ -25,7 +25,7 @@ export type ComboboxInputProps = ComboboxInputOwnProps &
 
 /**
  * The text input: `role="combobox"`, and the element focus stays on. Its text is the Root's
- * `inputValue`. It is what the popup is anchored to.
+ * `inputValue`. It is what the popup is anchored to, unless an InputGroup wraps it.
  *
  * Typing opens the list and filters it. Up and Down open it, or move the highlight, wrapping;
  * Home and End jump to the ends while it is open; Alt+Down opens it without highlighting.
@@ -59,6 +59,7 @@ export function ComboboxInput({ className, render, ...rest }: ComboboxInputProps
     listId,
     optionId,
     anchorName,
+    hasGroup,
     inputRef,
     popupRef,
   } = useComboboxRootContext('Input');
@@ -113,7 +114,8 @@ export function ComboboxInput({ className, render, ...rest }: ComboboxInputProps
       disabled: disabled || undefined,
       value: inputValue,
       ...comboboxDataAttributes({ open, multiple, disabled }),
-      style: { anchorName },
+      // The anchor, unless an InputGroup around it is.
+      style: hasGroup ? undefined : { anchorName },
       className,
       ref: inputRef,
       onChange(event: ChangeEvent<HTMLInputElement>) {

@@ -48,23 +48,14 @@ const USAGE = /\[\s*(data-[a-z0-9-]+)/g;
  * attribute instead: `display` follows `[open]` in the UA sheet, and a `<form
  * method="dialog">` removes it before React re-renders, so animating from the same
  * attribute keeps the two in step. The data pair is there for a Trigger, or for consumers.
- * Popover's popup is styled from `:popover-open` for the same reason.
+ * Popover's popup is styled from `:popover-open` for the same reason. `data-open` is styled
+ * once, on Combobox's chevron, which turns while the list is open; `data-closed` is not.
  *
  * `data-align` is Popover's. Alignment is placement, which headless sets inline as
  * `position-area`, so ui has nothing to add; `data-side` is styled, for the offset's axis.
- *
- * `data-highlighted` and `data-visible` are Combobox's, emitted by headless ahead of ui's
- * styled Combobox. Both leave this list when that lands.
+
  */
-const UNSTYLED_HERE = [
-  'data-align',
-  'data-closed',
-  'data-highlighted',
-  'data-open',
-  'data-unchecked',
-  'data-unselected',
-  'data-visible',
-];
+const UNSTYLED_HERE = ['data-align', 'data-closed', 'data-unchecked', 'data-unselected'];
 
 function filesIn(dir: string, extension: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

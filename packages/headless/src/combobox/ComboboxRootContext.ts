@@ -102,6 +102,9 @@ export type ComboboxRootContextValue = ComboboxState & {
    */
   registerInside: (ref: RefObject<HTMLElement | null>) => () => void;
   isInside: (node: Node) => boolean;
+  /** Whether an InputGroup is the anchor; without one, the Input is. */
+  hasGroup: boolean;
+  registerGroup: () => () => void;
   chips: ComboboxChipEntry[];
   onLoadMore: (() => void) | undefined;
   inputId: string;
