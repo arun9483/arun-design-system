@@ -31,6 +31,12 @@ import type {
   PopoverTriggerProps,
 } from '@arun-dev/headless/popover';
 import type {
+  ComboboxItemProps,
+  ComboboxListProps,
+  ComboboxPopupProps,
+  ComboboxRootProps,
+} from '@arun-dev/headless/combobox';
+import type {
   MenuItemProps,
   MenuPopupProps,
   MenuRootProps,
@@ -42,7 +48,7 @@ import type {
   TooltipTriggerProps,
 } from '@arun-dev/headless/tooltip';
 import type { ComponentProps } from 'react';
-import type { Tabs } from '@arun-dev/ui';
+import type { ComboboxInputProps, Tabs } from '@arun-dev/ui';
 import type { TabsListProps, TabsPanelProps, TabsTabProps } from '@arun-dev/headless/tabs';
 import type { COMMON, PROPS } from './props';
 
@@ -80,6 +86,14 @@ type Unknown =
   | OnlyRealProps<Documented<'Popover.Popup'>, PopoverPopupProps>
   | OnlyRealProps<Documented<'Popover.Trigger'>, PopoverTriggerProps>
   | OnlyRealProps<Documented<'Popover.Close'>, PopoverCloseProps>
+  | OnlyRealProps<Documented<'Combobox.Root'>, ComboboxRootProps<unknown, boolean>>
+  | OnlyRealProps<
+      Documented<'Combobox.Input'> | (typeof COMMON)[number]['name'],
+      ComboboxInputProps
+    >
+  | OnlyRealProps<Documented<'Combobox.Popup'>, ComboboxPopupProps>
+  | OnlyRealProps<Documented<'Combobox.List'>, ComboboxListProps>
+  | OnlyRealProps<Documented<'Combobox.Item'>, ComboboxItemProps>
   | OnlyRealProps<Documented<'Menu.Root'>, MenuRootProps>
   | OnlyRealProps<Documented<'Menu.Popup'>, MenuPopupProps>
   | OnlyRealProps<Documented<'Menu.Trigger'>, MenuTriggerProps>

@@ -327,6 +327,189 @@ export const PROPS = {
   ],
   'Popover.Trigger': [],
   'Popover.Close': [],
+  'Combobox.Root': [
+    {
+      name: 'items',
+      type: 'T[]',
+      description:
+        'Every item the list can show. With server search, the current results. Selected items need not be among them.',
+    },
+    {
+      name: 'itemToString',
+      type: '(item: T) => string',
+      description:
+        "An item's label: what the input shows once it is picked, and what the default filter matches. Defaults to a string item itself, else its `label`.",
+    },
+    {
+      name: 'itemToKey',
+      type: '(item: T) => string',
+      description:
+        "An item's identity, and the value the form submits. Defaults to `itemToString`.",
+    },
+    {
+      name: 'filter',
+      type: '((items: T[], query: string, itemToString) => T[]) | null',
+      description:
+        'Narrows, and may rank, the items for the typed text. Omitted: a case- and accent-insensitive "contains". `null`: no filtering, for server search.',
+    },
+    {
+      name: 'multiple',
+      type: 'boolean',
+      default: 'false',
+      description: 'Lets more than one item be selected. `value` is then an array.',
+    },
+    {
+      name: 'value',
+      type: 'T | null | T[]',
+      description:
+        'Controlled selection. Provide `onValueChange` alongside it. Use `null`, or `[]` with `multiple`, for none — never `undefined`.',
+    },
+    {
+      name: 'defaultValue',
+      type: 'T | null | T[]',
+      description: 'Initial selection when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onValueChange',
+      type: '(value, { reason }) => void',
+      description:
+        "Called on every change of the selection, with why: `'item-press'`, `'clear'`, `'chip-remove'`, `'input'` or `'form-reset'`.",
+    },
+    {
+      name: 'inputValue',
+      type: 'string',
+      description: 'Controlled text of the input. Provide `onInputValueChange` alongside it.',
+    },
+    {
+      name: 'defaultInputValue',
+      type: 'string',
+      description:
+        "Initial text when uncontrolled. Defaults to the selected item's label, without `multiple`.",
+    },
+    {
+      name: 'onInputValueChange',
+      type: '(text, { reason }) => void',
+      description:
+        "Called on every change of the text, with why: `'input'` when typed, or `'item-press'`, `'clear'`, `'escape'`, `'outside-press'` or `'blur'` when the component reset it.",
+    },
+    {
+      name: 'open',
+      type: 'boolean',
+      description: 'Controlled open state. Provide `onOpenChange` alongside it.',
+    },
+    {
+      name: 'defaultOpen',
+      type: 'boolean',
+      default: 'false',
+      description: 'Initial open state when uncontrolled.',
+    },
+    {
+      name: 'onOpenChange',
+      type: '(open, { reason }) => void',
+      description: 'Called on every request to open or close, with why.',
+    },
+    {
+      name: 'onItemHighlighted',
+      type: '(item: T | undefined, { index, reason }) => void',
+      description:
+        'Called when the highlight moves, with its index in the filtered list — for a virtualizer to scroll to.',
+    },
+    {
+      name: 'onLoadMore',
+      type: '() => void',
+      description: 'Called when the end of the list scrolls into view and `loading` is not set.',
+    },
+    {
+      name: 'loading',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'More items are on their way: the list is `aria-busy`, and `Empty` stays hidden.',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Disables the input and every button.',
+    },
+    {
+      name: 'name',
+      type: 'string',
+      description: "Submits each selected item's key under this name, from hidden inputs.",
+    },
+    {
+      name: 'form',
+      type: 'string',
+      description: 'Associates the hidden inputs with a `<form>` by id, when rendered outside it.',
+    },
+    {
+      name: 'children',
+      type: 'ReactNode',
+      description: 'The other parts.',
+    },
+  ],
+  'Combobox.Input': [
+    {
+      name: 'startSlot',
+      type: 'ReactNode',
+      description:
+        'Content before the chips and text, inside the box — a search icon. Mark it `aria-hidden`.',
+    },
+    {
+      name: 'clearLabel',
+      type: 'string',
+      default: "'Clear'",
+      description: 'Accessible name of the Clear button.',
+    },
+    {
+      name: 'triggerLabel',
+      type: 'string',
+      default: "'Show options'",
+      description: 'Accessible name of the chevron that opens the list.',
+    },
+    {
+      name: 'removeLabel',
+      type: '(label: string) => string',
+      default: '(label) => `Remove ${label}`',
+      description: "Accessible name of a chip's remove button, from the item's label.",
+    },
+  ],
+  'Combobox.Popup': [
+    {
+      name: 'side',
+      type: "'top' | 'bottom' | 'left' | 'right'",
+      default: "'bottom'",
+      description:
+        'Which side of the field to open on. Flips to the opposite side when there is no room.',
+    },
+    {
+      name: 'align',
+      type: "'start' | 'center' | 'end'",
+      default: "'start'",
+      description: "Flush with the field's start or end edge, or centred on it.",
+    },
+  ],
+  'Combobox.List': [
+    {
+      name: 'children',
+      type: 'ReactNode | ((item: T, index: number) => ReactNode)',
+      description:
+        'A function rendering one `Combobox.Item` per filtered item, or the items yourself — with a virtualizer.',
+    },
+  ],
+  'Combobox.Item': [
+    {
+      name: 'value',
+      type: 'T',
+      description: "The item this option stands for — one of the Root's `items`.",
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Cannot be picked, and the arrow keys skip it.',
+    },
+  ],
   'Menu.Root': [
     {
       name: 'open',
