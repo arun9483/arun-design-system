@@ -9,6 +9,8 @@ import ComboboxMultiple from '@/examples/combobox-multiple';
 import ComboboxFuzzy from '@/examples/combobox-fuzzy';
 import ComboboxAsync from '@/examples/combobox-async';
 import ComboboxLazy from '@/examples/combobox-lazy';
+import ComboboxDisabled from '@/examples/combobox-disabled';
+import ComboboxGrouped from '@/examples/combobox-grouped';
 import PropTable from '@/components/PropTable.astro';
 
 `Combobox` is a text input that filters a list as you type. It follows the
@@ -37,15 +39,17 @@ import { Combobox } from '@arun-dev/ui';
 </Combobox.Root>;
 ```
 
-| Part     | Renders                     | Does                                                                             |
-| -------- | --------------------------- | -------------------------------------------------------------------------------- |
-| `Root`   | hidden inputs, with `name`  | holds the items, the selection, the text and `open`; filters the items           |
-| `Input`  | `<div>` around an `<input>` | the field: chips, the text, Clear and a chevron, and what the list lines up with |
-| `Popup`  | `<div>`                     | the box the list opens in: `popover="manual"`, as wide as the field              |
-| `List`   | `<div role="listbox">`      | renders its function once per item the filter left                               |
-| `Item`   | `<div role="option">`       | one option, with a check while selected                                          |
-| `Empty`  | `<div>`                     | shown when nothing matches and nothing is loading                                |
-| `Status` | `<div role="status">`       | a live region for "Searching…" or a result count                                 |
+| Part         | Renders                     | Does                                                                             |
+| ------------ | --------------------------- | -------------------------------------------------------------------------------- |
+| `Root`       | hidden inputs, with `name`  | holds the items, the selection, the text and `open`; filters the items           |
+| `Input`      | `<div>` around an `<input>` | the field: chips, the text, Clear and a chevron, and what the list lines up with |
+| `Popup`      | `<div>`                     | the box the list opens in: `popover="manual"`, as wide as the field              |
+| `List`       | `<div role="listbox">`      | renders its function once per item the filter left                               |
+| `Item`       | `<div role="option">`       | one option, with a check while selected                                          |
+| `Group`      | `<div role="group">`        | items under a label, as an `<optgroup>`; optional                                |
+| `GroupLabel` | `<div>`                     | the group's name, shown but not an option                                        |
+| `Empty`      | `<div>`                     | shown when nothing matches and nothing is loading                                |
+| `Status`     | `<div role="status">`       | a live region for "Searching…" or a result count                                 |
 
 **Items are data, not children.** Pass every option to the Root as `items`. The Root filters them, and `List`
 renders what is left. An item can be a string, or an object with a `label`. Otherwise, give
@@ -85,14 +89,78 @@ Focus stays in the input. The highlighted option is announced through `aria-acti
 themselves, not their keys. So search "book" and pick, then search "pen" and pick: the books stay
 selected, keep their chips and labels, and are still submitted with the form.
 
-### Pre-selected and disabled items
+### Pre-selected items
 
 Start with a selection through `defaultValue`, or `value` when controlled. A single combobox
 shows the label in the input, and `multiple` shows a chip per item. Both examples above start
 with one.
 
+### Disabled items: can't be selected
+
+<Example name="combobox-disabled" layout="stack">
+  <ComboboxDisabled client:load />
+</Example>
+
 Mark an option `disabled` on its `Item`. It can't be picked, and the arrow keys skip it. It is
-announced as unavailable through `aria-disabled`, and styled from `data-disabled`.
+announced as unavailable through `aria-disabled`, and styled from `data-disabled`. This works
+the same in single and multiple select, as `disabled` on a native `<option>` does: it stops a
+pick only, and an item that is already selected can still be removed.
+
+### Selections can always be removed
+
+As with a native `<select multiple>`, every selected item can be removed, `disabled` or not.
+There is no locked item. If your app needs one to stay, such as a code owner among reviewers,
+control `value` and put it back in `onValueChange`:
+
+```tsx
+<Combobox.Root
+  multiple
+  value={reviewers}
+  onValueChange={(next) => setReviewers([...owners, ...next.filter((r) => !owners.includes(r))])}
+>
+```
+
+To fix a single selection, disable the whole field with `disabled` on the Root.
+
+## Groups
+
+<Example name="combobox-grouped" layout="stack">
+  <ComboboxGrouped client:load />
+</Example>
+
+Group items as a native `<optgroup>` does. Pass groups as `items`: each an object with an
+`items` array, plus whatever you render for it, such as a `label`. The List's function then gets
+one group at a time. Render a `Group` with its `GroupLabel` and an `Item` per item:
+
+```tsx
+<Combobox.Root items={regions}>
+  <Combobox.Input />
+  <Combobox.Popup>
+    <Combobox.Empty>No countries found.</Combobox.Empty>
+    <Combobox.List>
+      {(region: Region) => (
+        <Combobox.Group key={region.label} disabled={region.comingSoon}>
+          <Combobox.GroupLabel>{region.label}</Combobox.GroupLabel>
+          {region.items.map((country) => (
+            <Combobox.Item key={country} value={country}>
+              {country}
+            </Combobox.Item>
+          ))}
+        </Combobox.Group>
+      )}
+    </Combobox.List>
+  </Combobox.Popup>
+</Combobox.Root>
+```
+
+- **Search** runs inside each group, and a group with no match is left out. `region.items`
+  already holds only the matches.
+- **The arrow keys** move through every group as one list. They skip the labels and disabled
+  items.
+- **`disabled` on a Group** disables every item in it, as `<optgroup disabled>` does.
+- **The value** is still an item, never a group. A group is any object with an `items` array,
+  so an item type with its own `items` array can't be listed ungrouped.
+- Groups don't nest, as with `<optgroup>`, and there is no separator.
 
 ## Search
 
@@ -202,6 +270,18 @@ Give the Root a `name`. It renders one hidden input per selected item, holding t
 (`itemToKey`), so the form submits `name=key` once per item. `form.reset()` returns the
 selection and the text to what they were at mount.
 
+Add `required` and the form won't submit until something is selected. The browser reports it
+with its own message, the input matches `:invalid`, and `form.checkValidity()` returns
+`false`. Text that was typed but never picked counts as nothing selected. With `multiple`, one
+chip is enough.
+
+```tsx
+<Combobox.Root items={countries} name="country" required>
+```
+
+With react-hook-form, bind it through `Controller` and its `rules={{ required: true }}`, and pass
+`aria-invalid` to `Combobox.Input`. The field's border turns red from it.
+
 ## Props
 
 ### `Combobox.Root`
@@ -226,6 +306,12 @@ Every other prop goes to the `<input>`: `id`, `placeholder`, `aria-*`, handlers.
 
 <PropTable component="Combobox.Item" />
 
+### `Combobox.Group`
+
+<PropTable component="Combobox.Group" />
+
+`Combobox.GroupLabel` takes the props of the `<div>` it renders, plus `render` and `ref`.
+
 `Combobox.Empty` and `Combobox.Status` take the props of the `<div>` they render, plus `render`
 and `ref`.
 
@@ -235,8 +321,8 @@ and `ref`.
   wrap them in `useCallback`. A new function each render filters the list again on every
   render.
 - Label the field with a `<label htmlFor>` pointing at the Input's `id`, or with `aria-label`.
-- Not yet: groups, creating an item that isn't in the list, the input inside the popup, and
-  `required`.
+- Not yet: separators, groups in a virtualized list, creating an item that isn't in the list, and
+  the input inside the popup.
 - Restyle every combobox with the `--combobox-*` tokens, e.g. `--combobox-popup-max-height`.
 - Types come from the package that owns them. `ComboboxInputProps` comes from
   `@arun-dev/ui`; the other parts' props come from `@arun-dev/headless/combobox`, or use

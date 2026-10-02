@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react';
+import { useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 import type {
   ChangeEvent,
   ComponentPropsWithRef,
@@ -32,6 +32,11 @@ export type ComboboxInputProps = ComboboxInputOwnProps &
  * Enter picks the highlighted item; Esc closes. With `multiple`, Backspace in an empty input
  * removes the last selected item, and Left at the start of the text moves into the chips.
  *
+ * With the Root's `required`, the input is `required` while nothing is selected, so the
+ * browser's validation reports it, `:invalid` matches it, and `form.checkValidity()` fails.
+ * Text typed but not picked is still nothing selected: the input reports `valueMissing`'s
+ * message then, through `setCustomValidity`.
+ *
  * Leaving the input closes the list and puts the text back: the selected label, or empty
  * with `multiple`.
  */
@@ -40,6 +45,7 @@ export function ComboboxInput({ className, render, ...rest }: ComboboxInputProps
     open,
     multiple,
     disabled,
+    required,
     inputValue,
     filteredItems,
     itemToKey,
@@ -69,6 +75,23 @@ export function ComboboxInput({ className, render, ...rest }: ComboboxInputProps
     () => highlight.get().index,
     () => -1,
   );
+
+  // `required` alone passes once there is text; text that picked nothing must not.
+  const missing = required && selectedItems.length === 0;
+  const textOnly = missing && inputValue !== '';
+  const customValidityRef = useRef(false);
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    if (!input || typeof input.setCustomValidity !== 'function') return;
+    if (textOnly) {
+      input.setCustomValidity(valueMissingMessage());
+      customValidityRef.current = true;
+    } else if (customValidityRef.current) {
+      // Only undo our own message, never one the consumer set.
+      input.setCustomValidity('');
+      customValidityRef.current = false;
+    }
+  }, [textOnly, inputRef]);
 
   /** Indices of the items the arrow keys reach: every filtered item that is not disabled. */
   function enabledIndices(): number[] {
@@ -112,6 +135,9 @@ export function ComboboxInput({ className, render, ...rest }: ComboboxInputProps
       'aria-controls': listId,
       'aria-activedescendant': open && highlighted >= 0 ? optionId(highlighted) : undefined,
       disabled: disabled || undefined,
+      required: missing || undefined,
+      // Stays when a selection lifts `required`: the field is still required.
+      'aria-required': required || undefined,
       value: inputValue,
       ...comboboxDataAttributes({ open, multiple, disabled }),
       // The anchor, unless an InputGroup around it is.
@@ -196,4 +222,11 @@ export function ComboboxInput({ className, render, ...rest }: ComboboxInputProps
     },
     consumerProps: rest as UnknownProps,
   });
+}
+
+/** The browser's own "fill out this field", in the page's language. */
+function valueMissingMessage(): string {
+  const probe = document.createElement('input');
+  probe.required = true;
+  return probe.validationMessage || 'Please select an item in the list.';
 }

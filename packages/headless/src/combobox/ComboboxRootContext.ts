@@ -67,10 +67,13 @@ export type ComboboxChipEntry = {
 
 /** What the parts need from the Root beyond its state. Items are `unknown` here: `T` is the consumer's. */
 export type ComboboxRootContextValue = ComboboxState & {
+  required: boolean;
   inputValue: string;
   loading: boolean;
-  /** The items the List renders, after filtering. */
+  /** The items the List renders, after filtering — with groups, all of theirs, in order. */
   filteredItems: readonly unknown[];
+  /** With groups, those the filter left an item in, each holding only those items. */
+  filteredGroups: readonly { readonly items: readonly unknown[] }[] | null;
   itemToString: (item: unknown) => string;
   itemToKey: (item: unknown) => string;
   /** Index of each filtered item by key, so an Item finds its own without a search. */

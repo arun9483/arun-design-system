@@ -677,7 +677,25 @@ substring. Filtering is memoised on `items` and the query, and the query is read
 | Backspace on empty input | —                                             | removes the last item              |
 
 `Clear` is present only while there is something to clear — a selection — and marks it with
-`data-visible`; the styled component hides it otherwise. Focus stays in the input throughout:
+`data-visible`; the styled component hides it otherwise.
+
+**There is no locked selection: every selected item can be removed.** `disabled` on an `Item`
+stops a pick only, in either mode, as `disabled` on a native `<option>` does — in Chromium a
+plain click in a `<select multiple>` deselects a selected disabled option. An `isLocked` on
+`Item` was built and dropped: native `<select>` has no such state, none of Base UI, MUI or
+Ark/Zag locks a selection itself (October 2026), and knowing a lock before a server search
+returns the item meant List rendering every selected Item, hidden, outside the listbox. An app
+that needs a fixed item controls `value` and puts it back in `onValueChange`; a single
+selection is fixed with `disabled` on the Root. Revisit with a real case, and a Root-level
+`isItemLocked(item)` then, which needs no hidden render.
+
+**`required` is the platform's, on the input.** The hidden inputs cannot carry it — a hidden
+input is barred from constraint validation — so the visible input is `required` while the
+selection is empty: the browser's message, `:invalid` and `checkValidity()` all come with it.
+With chips it would fail on an empty text, hence "while the selection is empty", with
+`aria-required` kept throughout. Typed text that picked nothing would pass `required`, so the
+input then sets `valueMissing`'s own message through `setCustomValidity`, and clears only a
+message it set. Focus stays in the input throughout:
 the highlighted option is `aria-activedescendant`, not focused, so `core/rovingFocus` does not
 apply to the list. Up and Down move the highlight, Home and End jump, Enter picks, Alt+Down
 opens. With `multiple`, Left Arrow at the start of the input moves into the chips; Left and
@@ -716,7 +734,7 @@ on the input. A press inside an open Popover's Combobox still does not light-dis
 Popover, since the list is that Popover's descendant in the DOM.
 
 **Parts, fewest first (decision 11):** `Root`, `Input`, `Trigger`, `Clear`, `Popup`, `List`,
-`Item`, `Empty`, `Status`, `Chip`, `ChipRemove`. `Chip` and `ChipRemove` are parts because
+`Item`, `Empty`, `Status`, `Chip`, `ChipRemove` — and `Group` and `GroupLabel`, below. `Chip` and `ChipRemove` are parts because
 removing an item needs the Root's setter and chip navigation needs the Root's focus handling.
 Two more landed with `@arun-dev/ui`'s Combobox, which earned them: `InputGroup`, the box around
 the input, chips and buttons, which takes over as the popup's anchor so the list lines up with
@@ -727,8 +745,31 @@ Base UI has both. The selected check is `data-selected` on `Item` and CSS, so th
 nor `Label`, since a `<label>` is the consumer's element linked by `id`. `@arun-dev/ui`'s
 Combobox renders the chips itself, styled as `Chip`.
 
-**Deferred:** groups and separators, creating an item that is not in the list, the input inside
-the popup, an inline list, grid navigation, and a built-in virtualizer.
+**Groups, as `<optgroup>`.** Items stay data (decision 10's "from props, never the DOM"
+holds), so a group is data too: `items` is either items or groups, where a group is any object
+with an `items` array — its label, id or anything else is the consumer's. The filter runs inside
+each group and a group it empties is left out; `List`'s function is then called once per group
+left, with the group narrowed to its matches, and renders a `Group` holding a `GroupLabel` and
+an `Item` per item. The arrow keys, the highlight index, `onItemHighlighted` and `Empty` see one
+flat list in group order, so keyboard handling does not change.
+
+Two parts are earned (decision 11). `Group` is `role="group"`, named by its label through
+`aria-labelledby` — the listbox → group → option structure APG allows. Its `disabled` disables
+every `Item` inside, as `<optgroup disabled>` does; an Item reads it from context, like its own
+prop, so the arrow keys skip them. `GroupLabel` is `<optgroup>`'s `label`: shown, never an
+option, never reached by the arrow keys.
+
+Measured against the platform and Base UI (October 2026): `<optgroup>` has `label` and
+`disabled` and does not nest — this matches all three. Base UI also has `Group`, `GroupLabel`,
+plus a `Collection` that renders a group's items from context and a `Separator`. `Collection`
+is not needed here: the consumer maps the group's already-filtered `items` directly. A group is
+recognised by its shape, as in Base UI, so an item type that itself has an `items` array cannot
+be listed ungrouped; none has asked for it.
+
+**Deferred:** separators (`<hr>` in `<select>` is recent, and grouping does not need one),
+nested groups (`<optgroup>` cannot nest), groups with a virtualized list, creating an item that
+is not in the list, the input inside the popup, an inline list, grid navigation, and a built-in
+virtualizer.
 
 **Rules out:** items registered as children; selection read from `items` or the DOM; a
 JavaScript positioning engine or a Portal (decision 12); and `cancel()` on change events.
