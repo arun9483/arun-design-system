@@ -1,5 +1,12 @@
 # @arun-dev/headless
 
+## 4.10.0
+
+### Minor Changes
+
+- 29e95e4: Combobox: add `Group` and `GroupLabel`, as `<optgroup>`. Pass groups (objects with an `items` array) as `items`; the filter runs inside each group and leaves out a group with no match. A disabled Group disables its items. New `--combobox-group-*` tokens.
+- 29e95e4: Combobox: add `required`, reported by the browser's own validation. Text typed but not picked counts as nothing selected.
+
 ## 4.9.0
 
 ### Minor Changes
