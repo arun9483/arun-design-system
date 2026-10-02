@@ -37,3 +37,4 @@ CLAUDE.md
 .pnp.*
 .yarn/*
 !.yarn/patches
+.pages-assets/

@@ -58,6 +58,37 @@ jobs:
           fi
           echo "Base path applied to $(grep -oc 'href="/arun-design-system/' apps/docs/dist/index.html) references."
 
+      # GitHub Pages lets browsers cache every file, HTML included, for ten minutes
+      # (max-age=600), and each deploy replaces the hashed assets under _astro/. A page cached
+      # just before a deploy then asks for CSS and JS that are gone, and renders unstyled. So
+      # each deploy also serves the assets of the deploys of the last day, kept in the Actions
+      # cache. Hashed names never collide, so this build's files always win.
+      - name: Restore earlier deploys' assets
+        uses: actions/cache/restore@v6
+        with:
+          path: .pages-assets
+          key: pages-assets-${{ github.run_id }}
+          restore-keys: pages-assets-
+
+      - name: Carry earlier assets into this deploy
+        run: |
+          mkdir -p .pages-assets
+          # A day is far longer than the ten-minute cache, even across a burst of deploys.
+          find .pages-assets -type f -mmin +1440 -delete
+          before=$(find apps/docs/dist/_astro -type f | wc -l)
+          rsync -a --ignore-existing .pages-assets/ apps/docs/dist/_astro/
+          after=$(find apps/docs/dist/_astro -type f | wc -l)
+          # This build's assets join the archive, dated by this build; files already there keep
+          # their date, so each is pruned a day after it was first deployed.
+          rsync -a --ignore-existing apps/docs/dist/_astro/ .pages-assets/
+          echo "Carried $((after - before)) earlier assets; this build has $before."
+
+      - name: Save assets for the next deploy
+        uses: actions/cache/save@v6
+        with:
+          path: .pages-assets
+          key: pages-assets-${{ github.run_id }}
+
       - uses: actions/upload-pages-artifact@v5
         with:
           path: apps/docs/dist
