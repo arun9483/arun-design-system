@@ -1,0 +1,42 @@
+---
+title: Table
+description: A native table, styled, with a sortable column.
+---
+
+import Example from '@/components/Example.astro';
+import TableBasics from '@/examples/table-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="table-basics">
+  <TableBasics client:load />
+</Example>
+
+`Table` is a native `<table>`, styled. Its parts map onto the table's elements: `Root`
+(`<table>`), `Caption`, `Header` (`<thead>`), `Body`, `Footer`, `Row` (`<tr>`), `Head` (`<th>`)
+and `Cell` (`<td>`). It sits in a container that scrolls sideways when the table is wider than
+the page.
+
+- `Head` is `scope="col"` by default. Use `scope="row"` for the first cell of a body row, so each
+  cell is read with its row's name.
+- Give every table a `Caption`. It names the table for screen readers.
+
+## Sorting
+
+Sorting is yours. Put a `<button>` in the column's `Head`, sort your rows when it's pressed, and
+set `aria-sort` on the `Head`. The arrow follows `aria-sort`.
+
+## Props
+
+### `Table.Root`
+
+<PropTable component="Table.Root" />
+
+### `Table.Head`
+
+<PropTable component="Table.Head" common={false} />
+
+The other parts take the props of the element they render.
+
+## Notes
+
+- This is a table for reading, not a data grid. There is no cell-by-cell keyboard navigation.

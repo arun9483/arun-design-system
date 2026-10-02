@@ -1,0 +1,10 @@
+/* Breadcrumb component tokens — where the page sits, as a trail of links. */
+:root {
+  --breadcrumb-gap: var(--space-2xs);
+  --breadcrumb-font-size: var(--text-sm);
+  --breadcrumb-link-color: var(--color-text-secondary);
+  --breadcrumb-link-color-hover: var(--color-text-primary);
+  --breadcrumb-current-color: var(--color-text-primary);
+  --breadcrumb-separator-color: var(--color-text-muted);
+  --breadcrumb-focus-color: var(--color-text-accent);
+}

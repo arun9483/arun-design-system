@@ -1,0 +1,18 @@
+@layer kbd {
+  .kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: var(--kbd-min-inline-size);
+    padding: 0 var(--kbd-padding-inline);
+    border: var(--space-px) solid var(--kbd-border-color);
+    border-block-end-width: var(--space-2px);
+    border-radius: var(--kbd-radius);
+    background-color: var(--kbd-bg);
+    color: var(--kbd-color);
+    font-family: inherit;
+    font-size: var(--kbd-font-size);
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+}

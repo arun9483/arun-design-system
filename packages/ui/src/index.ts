@@ -56,3 +56,23 @@ export { Skeleton } from './components/skeleton';
 export type { SkeletonProps } from './components/skeleton';
 export { Toast, useToastManager } from './components/toast';
 export type { ToastViewportProps } from './components/toast';
+export { Breadcrumb } from './components/breadcrumb';
+export type {
+  BreadcrumbRootProps,
+  BreadcrumbItemProps,
+  BreadcrumbLinkProps,
+  BreadcrumbCurrentProps,
+} from './components/breadcrumb';
+export { Pagination, paginationRange } from './components/pagination';
+export type { PaginationProps, PaginationEntry } from './components/pagination';
+export { Table } from './components/table';
+export type {
+  TableRootProps,
+  TableSectionProps,
+  TableRowProps,
+  TableHeadProps,
+  TableCellProps,
+  TableCaptionProps,
+} from './components/table';
+export { Kbd } from './components/kbd';
+export type { KbdProps } from './components/kbd';

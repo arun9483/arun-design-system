@@ -42,6 +42,50 @@ export const COMMON = [
 ] as const satisfies readonly PropDoc[];
 
 export const PROPS = {
+  'Breadcrumb.Root': [],
+  Pagination: [
+    { name: 'page', type: 'number', description: 'The current page, from 1. Required.' },
+    { name: 'count', type: 'number', description: 'How many pages there are. Required.' },
+    {
+      name: 'siblings',
+      type: 'number',
+      default: '1',
+      description: 'Pages shown either side of the current one.',
+    },
+    {
+      name: 'getHref',
+      type: '(page: number) => string',
+      description: "Each page's address: pages become links. The right choice when pages are URLs.",
+    },
+    {
+      name: 'onPageChange',
+      type: '(page: number) => void',
+      description:
+        'Called with the page to go to. Without `getHref`, pages are buttons that call it.',
+    },
+    {
+      name: 'labels',
+      type: '{ previous?, next?, page? }',
+      description:
+        "Text of Previous and Next, and each page's accessible name — `(p) => 'Page ' + p` by default.",
+    },
+  ],
+  'Table.Root': [
+    {
+      name: 'containerClassName',
+      type: 'string',
+      description: 'Classes for the scrolling container around the table.',
+    },
+  ],
+  'Table.Head': [
+    {
+      name: 'scope',
+      type: "'col' | 'row'",
+      default: "'col'",
+      description: 'What the header labels. `row` for the first cell of a body row.',
+    },
+  ],
+  Kbd: [],
   'Accordion.Root': [
     {
       name: 'exclusive',

@@ -1,0 +1,13 @@
+/* Pagination component tokens — page links or buttons in a row. */
+:root {
+  --pagination-gap: var(--space-3xs);
+  --pagination-item-size: 2.25rem;
+  --pagination-item-radius: var(--radius-md);
+  --pagination-font-size: var(--text-sm);
+  --pagination-color: var(--color-text-primary);
+  --pagination-bg-hover: var(--color-bg-secondary);
+  --pagination-current-bg: var(--color-text-accent);
+  --pagination-current-color: var(--color-text-on-accent);
+  --pagination-disabled-color: var(--color-text-muted);
+  --pagination-focus-color: var(--color-text-accent);
+}

@@ -54,7 +54,12 @@ import type {
   AccordionItemProps,
   AccordionRootProps,
   AlertRootProps,
+  BreadcrumbRootProps,
+  KbdProps,
   LinkProps,
+  PaginationProps,
+  TableHeadProps,
+  TableRootProps,
   SkeletonProps,
   SpinnerProps,
   ToastViewportProps,
@@ -84,6 +89,11 @@ type Unknown =
   | OnlyRealProps<Documented<'Button'> | (typeof COMMON)[number]['name'], ButtonProps>
   | OnlyRealProps<Documented<'Card'>, CardProps>
   | OnlyRealProps<Documented<'Link'>, LinkProps>
+  | OnlyRealProps<Documented<'Breadcrumb.Root'>, BreadcrumbRootProps>
+  | OnlyRealProps<Documented<'Pagination'>, PaginationProps>
+  | OnlyRealProps<Documented<'Table.Root'>, TableRootProps>
+  | OnlyRealProps<Documented<'Table.Head'>, TableHeadProps>
+  | OnlyRealProps<Documented<'Kbd'>, KbdProps>
   | OnlyRealProps<Documented<'Accordion.Root'>, AccordionRootProps>
   | OnlyRealProps<Documented<'Accordion.Item'>, AccordionItemProps>
   | OnlyRealProps<Documented<'Alert.Root'>, AlertRootProps>
