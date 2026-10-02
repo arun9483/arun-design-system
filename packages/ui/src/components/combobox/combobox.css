@@ -220,6 +220,12 @@
     cursor: default;
   }
 
+  .combobox-separator {
+    block-size: var(--space-px);
+    margin-block: var(--combobox-separator-margin-block);
+    background-color: var(--combobox-separator-color);
+  }
+
   .combobox-message {
     padding: var(--combobox-item-padding-block) var(--combobox-item-padding-inline);
     color: var(--combobox-message-color);

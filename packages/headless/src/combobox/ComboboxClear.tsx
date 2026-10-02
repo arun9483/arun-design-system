@@ -24,7 +24,8 @@ export type ComboboxClearProps = ComboboxClearOwnProps &
  * Empties the input and the selection — every selected item, with `multiple`. Give it an
  * `aria-label`.
  *
- * `data-visible` is present while there is a selection to clear; style it hidden otherwise.
+ * `data-visible` is present while there is a selection to clear and the Root is not disabled;
+ * style it hidden otherwise.
  * Out of the tab order, and a press keeps focus in the input.
  */
 export function ComboboxClear({ className, children, render, ...rest }: ComboboxClearProps) {
@@ -41,7 +42,8 @@ export function ComboboxClear({ className, children, render, ...rest }: Combobox
       type: 'button',
       tabIndex: -1,
       disabled: disabled || undefined,
-      ...comboboxClearDataAttributes(selectedItems.length > 0),
+      // Nothing to clear while disabled: a disabled field hides it, as it has no effect.
+      ...comboboxClearDataAttributes(!disabled && selectedItems.length > 0),
       className,
       children,
       ref: elementRef,

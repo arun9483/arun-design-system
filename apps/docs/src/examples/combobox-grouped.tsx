@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { Combobox } from '@arun-dev/ui';
 
 const field = { display: 'grid', gap: 'var(--space-3xs)', maxInlineSize: '20rem' };
@@ -24,15 +25,19 @@ export default function ComboboxGrouped() {
         <Combobox.Popup>
           <Combobox.Empty>No countries found.</Combobox.Empty>
           <Combobox.List>
-            {(region: Region) => (
-              <Combobox.Group key={region.label} disabled={region.comingSoon}>
-                <Combobox.GroupLabel>{region.label}</Combobox.GroupLabel>
-                {region.items.map((country) => (
-                  <Combobox.Item key={country} value={country}>
-                    {country}
-                  </Combobox.Item>
-                ))}
-              </Combobox.Group>
+            {(region: Region, index) => (
+              <Fragment key={region.label}>
+                {/* A line between regions, as an <hr> in a <select>. */}
+                {index > 0 && <Combobox.Separator />}
+                <Combobox.Group disabled={region.comingSoon}>
+                  <Combobox.GroupLabel>{region.label}</Combobox.GroupLabel>
+                  {region.items.map((country) => (
+                    <Combobox.Item key={country} value={country}>
+                      {country}
+                    </Combobox.Item>
+                  ))}
+                </Combobox.Group>
+              </Fragment>
             )}
           </Combobox.List>
         </Combobox.Popup>

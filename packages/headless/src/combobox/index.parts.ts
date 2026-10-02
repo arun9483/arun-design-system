@@ -8,6 +8,7 @@ export { ComboboxList as List } from './ComboboxList';
 export { ComboboxItem as Item } from './ComboboxItem';
 export { ComboboxGroup as Group } from './ComboboxGroup';
 export { ComboboxGroupLabel as GroupLabel } from './ComboboxGroupLabel';
+export { ComboboxSeparator as Separator } from './ComboboxSeparator';
 export { ComboboxEmpty as Empty } from './ComboboxEmpty';
 export { ComboboxStatus as Status } from './ComboboxStatus';
 export { ComboboxChip as Chip } from './ComboboxChip';

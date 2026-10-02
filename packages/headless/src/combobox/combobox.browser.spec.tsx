@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { describe, it, expect, vi } from 'vitest';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Combobox } from './index';
 import { Dialog } from '../dialog';
 import { Popover } from '../popover';
@@ -99,6 +99,7 @@ const highlighted = () =>
 const submitted = () =>
   new FormData(screen.getByTestId('form') as HTMLFormElement).getAll('product');
 const form = () => screen.getByTestId('form') as HTMLFormElement;
+const byId = (id: string) => products.find((p) => p.id === id) as Product;
 
 type Country = { code: string; label: string };
 type Continent = { label: string; disabled?: boolean; items: Country[] };
@@ -142,20 +143,82 @@ function Grouped({ onPick }: { onPick?: (code: string | undefined) => void }) {
         <Combobox.Popup data-testid="popup">
           <Combobox.Empty>No countries</Combobox.Empty>
           <Combobox.List>
-            {(group: Continent) => (
-              <Combobox.Group key={group.label} disabled={group.disabled}>
-                <Combobox.GroupLabel>{group.label}</Combobox.GroupLabel>
-                {group.items.map((country) => (
-                  <Combobox.Item key={country.code} value={country}>
-                    {country.label}
-                  </Combobox.Item>
-                ))}
-              </Combobox.Group>
+            {(group: Continent, index) => (
+              <Fragment key={group.label}>
+                {index > 0 && <Combobox.Separator data-testid="separator" />}
+                <Combobox.Group disabled={group.disabled}>
+                  <Combobox.GroupLabel>{group.label}</Combobox.GroupLabel>
+                  {group.items.map((country) => (
+                    <Combobox.Item key={country.code} value={country}>
+                      {country.label}
+                    </Combobox.Item>
+                  ))}
+                </Combobox.Group>
+              </Fragment>
             )}
           </Combobox.List>
         </Combobox.Popup>
       </Combobox.Root>
     </form>
+  );
+}
+
+// Groups in a virtualized list: a window of `size` rows over every label and item, as a
+// virtualizer would render, filtered by the consumer and passed with `filter={null}`.
+// Stable, as a virtualizer's memoised list is: a new array each render is a new result list,
+// which clears the highlight.
+const shown = continents.filter((c) => !c.disabled);
+type Row = { group: Continent; country?: Country };
+const rows: Row[] = shown.flatMap((group) => [
+  { group },
+  ...group.items.map((country) => ({ group, country })),
+]);
+// The flat index onItemHighlighted reports, mapped to its row.
+const rowOfItem = rows.flatMap((row, i) => (row.country ? [i] : []));
+
+function WindowedGroups({ size = 3 }: { size?: number }) {
+  const [start, setStart] = useState(0);
+  const visible = rows.slice(start, start + size);
+  const buckets: { group: Continent; rows: Row[] }[] = [];
+  for (const row of visible) {
+    if (buckets.at(-1)?.group !== row.group) buckets.push({ group: row.group, rows: [] });
+    buckets.at(-1)?.rows.push(row);
+  }
+  return (
+    <Combobox.Root
+      items={shown}
+      filter={null}
+      itemToKey={(c: Country) => c.code}
+      onItemHighlighted={(_, { index }) => {
+        const row = rowOfItem[index];
+        if (row === undefined) return;
+        if (row < start) setStart(row);
+        else if (row >= start + size) setStart(row - size + 1);
+      }}
+    >
+      <Combobox.Input aria-label="Product" />
+      <Combobox.Popup data-testid="popup">
+        <Combobox.List>
+          {buckets.map(({ group, rows: inView }) => (
+            <Combobox.Group key={group.label}>
+              {/* Scrolled out, the label still names the group, unseen. */}
+              <Combobox.GroupLabel hidden={inView[0]?.country !== undefined}>
+                {group.label}
+              </Combobox.GroupLabel>
+              {inView.flatMap(({ country }) =>
+                country
+                  ? [
+                      <Combobox.Item key={country.code} value={country}>
+                        {country.label}
+                      </Combobox.Item>,
+                    ]
+                  : [],
+              )}
+            </Combobox.Group>
+          ))}
+        </Combobox.List>
+      </Combobox.Popup>
+    </Combobox.Root>
   );
 }
 
@@ -477,6 +540,38 @@ describe('Combobox (browser)', () => {
       expect(onPick).not.toHaveBeenCalled();
     });
 
+    it('draws a Separator between groups, hidden from the accessibility tree', async () => {
+      render(<Grouped />);
+      await userEvent.click(input());
+      const separators = screen.getAllByTestId('separator');
+      expect(separators).toHaveLength(3);
+      for (const separator of separators) {
+        expect(separator).toHaveAttribute('aria-hidden', 'true');
+        expect(separator).not.toHaveAttribute('role');
+      }
+      expect(
+        [...screen.getByRole('listbox', { hidden: true }).children].map(
+          (child) => child.getAttribute('role') ?? child.getAttribute('aria-hidden'),
+        ),
+      ).toEqual(['group', 'true', 'group', 'true', 'group', 'true', 'group']);
+    });
+
+    it('works in a virtualized list: the arrow keys reach rows not yet rendered', async () => {
+      render(<WindowedGroups />);
+      await userEvent.click(input());
+      expect(options()).toEqual(['Egypt', 'Kenya']);
+      const seen: (string | null | undefined)[] = [];
+      for (let i = 0; i < 6; i++) {
+        await userEvent.keyboard('{ArrowDown}');
+        await vi.waitFor(() => expect(highlighted()).not.toBeNull());
+        seen.push(highlighted()?.textContent);
+      }
+      expect(seen).toEqual(['Egypt', 'Kenya', 'India', 'Japan', 'France', 'Germany']);
+      // Its label scrolled out, Europe is still named.
+      expect(groupNames()).toContain('Europe');
+      expect(options()).toEqual(['France', 'Germany']);
+    });
+
     it('picks and submits an item from a group', async () => {
       const onPick = vi.fn();
       render(<Grouped onPick={onPick} />);
@@ -514,6 +609,47 @@ describe('Combobox (browser)', () => {
       await userEvent.click(input());
       expect(options()).toEqual(['bug', 'documentation', 'feature']);
     });
+  });
+
+  describe('the input follows a change of value', () => {
+    function Swapping({ onInput }: { onInput: (text: string, reason: string) => void }) {
+      const [value, setValue] = useState<Product | null>(null);
+      return (
+        <>
+          <button type="button" onClick={() => setValue(byId('b4'))}>
+            Pick Dune
+          </button>
+          <Basic
+            value={value}
+            // Whatever is picked, the parent keeps Atlas.
+            onValueChange={(next) => setValue(next && byId('b1'))}
+            onInputValueChange={(text, { reason }) => onInput(text, reason)}
+          />
+        </>
+      );
+    }
+
+    it("reports the text when onValueChange swaps the picked item, with reason 'value-change'", async () => {
+      const onInput = vi.fn();
+      render(<Swapping onInput={onInput} />);
+      await userEvent.click(input());
+      await userEvent.click(option('Pen: Fountain'));
+      expect(input().value).toBe('Book: Atlas');
+      expect(onInput).toHaveBeenLastCalledWith('Book: Atlas', 'value-change');
+    });
+
+    it('reports the text when the parent sets value', async () => {
+      const onInput = vi.fn();
+      render(<Swapping onInput={onInput} />);
+      await userEvent.click(screen.getByRole('button', { name: 'Pick Dune' }));
+      expect(input().value).toBe('Book: Dune');
+      expect(onInput).toHaveBeenCalledExactlyOnceWith('Book: Dune', 'value-change');
+    });
+  });
+
+  it('hides Clear while disabled, though something is selected', () => {
+    render(<Basic disabled defaultValue={products[0]} />);
+    expect(screen.getByRole('button', { name: 'Clear' })).not.toHaveAttribute('data-visible');
   });
 
   describe('required', () => {

@@ -13,7 +13,9 @@ export type ComboboxChangeReason =
   | 'escape'
   | 'outside-press'
   | 'blur'
-  | 'form-reset';
+  | 'form-reset'
+  /** The input's text followed a change of `value` — the parent's, not the user's. */
+  | 'value-change';
 
 export type ComboboxChangeDetails = { reason: ComboboxChangeReason };
 

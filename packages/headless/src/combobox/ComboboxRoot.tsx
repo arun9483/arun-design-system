@@ -324,14 +324,15 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
     setHighlight(-1, 'none');
   }, [setInputValue, clearSelection, setHighlight]);
 
-  // A controlled parent can change a single selection directly; the input follows, as it
-  // does after a pick. Not reported — no one typed.
+  // A controlled parent can change a single selection directly — or swap the item just picked,
+  // in onValueChange — and the input follows, as it does after a pick. Reported, with its own
+  // reason, so whoever tracks the text through onInputValueChange stays in step.
   const selectedKey = !multiple && selectedItems[0] != null ? itemToKey(selectedItems[0]) : null;
   const lastSelectedKeyRef = useRef(selectedKey);
   useEffect(() => {
     if (lastSelectedKeyRef.current === selectedKey) return;
     lastSelectedKeyRef.current = selectedKey;
-    setInputValueState(selectedLabel);
+    setInputValue(selectedLabel, 'value-change');
     // Only when the selection changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedKey]);

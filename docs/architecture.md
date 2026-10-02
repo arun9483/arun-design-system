@@ -704,8 +704,11 @@ of focus out of the input, closes the list as a press outside does.
 
 **Callbacks report a reason.** `onValueChange`, `onInputValueChange` and `onOpenChange` take a
 second argument, `{ reason }`: `'input'`, `'input-press'`, `'trigger-press'`, `'item-press'`,
-`'keyboard'`, `'clear'`, `'chip-remove'`, `'escape'`, `'outside-press'`, `'blur'` or
-`'form-reset'`. A server search tells typing from a clear; a consumer who wants
+`'keyboard'`, `'clear'`, `'chip-remove'`, `'escape'`, `'outside-press'`, `'blur'`,
+`'form-reset'` or `'value-change'`. The last is the input following a new single `value` — set
+by the parent, or swapped in `onValueChange` for the item just picked. It was silent at first
+("no one typed"), which broke the promise of a call on every change of the text: a consumer
+tracking the query through `onInputValueChange` went stale. A server search tells typing from a clear; a consumer who wants
 to keep the query after a pick controls `inputValue` and ignores `'item-press'`. There is no
 `cancel()` as in Base UI: the controlled props already give that control, and a cancellable
 event is a convention for every component, not one — decided when a consumer needs it. The
@@ -783,10 +786,28 @@ for now: the pattern needs no new API, keeps creation (async, a Dialog for colou
 description, a server-assigned id) wholly the consumer's, and adds nothing to every combobox that
 never creates. Revisit if the pattern proves error-prone in real screens.
 
-**Deferred:** separators (`<hr>` in `<select>` is recent, and grouping does not need one),
-nested groups (`<optgroup>` cannot nest), groups with a virtualized list, the input inside the
-popup, action rows that are not options (GitHub's "Edit labels"), an inline list, grid
-navigation, and a built-in virtualizer.
+**`Separator` is visual only.** A line between items or groups, as an `<hr>` in a `<select>`,
+which Chromium exposes as a separator inside the listbox. Measured with axe (October 2026): a
+`role="separator"` inside `role="listbox"` fails `aria-required-children` — a listbox may own
+only options and groups — and Base UI's Separator has that role. So ours is `aria-hidden` with
+no role: it passes, and Groups, named by their labels, already tell a screen reader where one
+set ends. The arrow keys pass it, as they pass a GroupLabel.
+
+**Groups in a virtualized list are a pattern.** Virtualization is the consumer's (above), and
+groups add nothing the library must do: the consumer filters the groups, passes them with
+`filter={null}`, flattens them into rows — labels and items — for the virtualizer, and wraps the
+rows in view in their `Group`. A group whose label has scrolled out keeps a `hidden` GroupLabel,
+so it stays named. `onItemHighlighted` reports the index among items, which the consumer maps to
+its row. The browser tests drive this with a window of rows. The limit is virtualization's, not
+grouping's: a disabled item, or a disabled Group's items, are skipped by the arrow keys only once
+rendered (decision 10 — from props).
+
+**Clear hides while the Root is `disabled`.** It can clear nothing then, so `data-visible` is
+absent though there is a selection, as a disabled `<select>` offers no reset.
+
+**Deferred:** nested groups (`<optgroup>` cannot nest), the input inside the popup, action rows
+that are not options (GitHub's "Edit labels"), an inline list, grid navigation, and a built-in
+virtualizer.
 
 **Rules out:** items registered as children; selection read from `items` or the DOM; a
 JavaScript positioning engine or a Portal (decision 12); and `cancel()` on change events.
