@@ -1,4 +1,5 @@
 import { Badge, Button, Card, Chip } from '@arun-dev/ui';
+import { docsUrl } from '@/lib/url';
 
 const pad = { padding: 'var(--space-sm)', borderRadius: 'var(--radius-lg)' } as const;
 const row = {
@@ -29,7 +30,7 @@ export default function Gallery() {
         <Chip>default</Chip>
         <Chip variant="accent">accent</Chip>
         <Chip render={<button type="button" />}>button</Chip>
-        <Chip render={<a href="#gallery" />}>link</Chip>
+        <Chip render={<a href={docsUrl('/components/link/')} />}>link</Chip>
       </div>
 
       <ul style={{ ...row, listStyle: 'none', padding: 0, margin: 0 }}>

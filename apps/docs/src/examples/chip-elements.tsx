@@ -1,4 +1,5 @@
 import { Chip } from '@arun-dev/ui';
+import { docsUrl } from '@/lib/url';
 
 export default function ChipElements() {
   return (
@@ -14,7 +15,7 @@ export default function ChipElements() {
         button
       </Chip>
 
-      <Chip render={<a href="#chip" />} variant="accent">
+      <Chip render={<a href={docsUrl('/components/link/')} />} variant="accent">
         link
       </Chip>
     </>
