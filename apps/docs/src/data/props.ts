@@ -42,6 +42,55 @@ export const COMMON = [
 ] as const satisfies readonly PropDoc[];
 
 export const PROPS = {
+  'Accordion.Root': [
+    {
+      name: 'exclusive',
+      type: 'boolean',
+      default: 'false',
+      description: 'Only one Item open at a time: every Item gets the same generated `name`.',
+    },
+  ],
+  'Accordion.Item': [
+    {
+      name: 'defaultOpen',
+      type: 'boolean',
+      default: 'false',
+      description: 'Open at mount. Read once; the browser owns it after that.',
+    },
+    {
+      name: 'open',
+      type: 'boolean',
+      description:
+        'Controlled state. Pair with `onToggle`, whose event has `newState`: `"open"` or `"closed"`.',
+    },
+    {
+      name: 'name',
+      type: 'string',
+      description: "Items with the same name open one at a time, natively. Overrides the Root's.",
+    },
+  ],
+  'Alert.Root': [
+    {
+      name: 'tone',
+      type: "'neutral' | 'info' | 'success' | 'warning' | 'error'",
+      default: "'neutral'",
+      description: 'Colour, on the status tokens.',
+    },
+    {
+      name: 'icon',
+      type: 'ReactNode',
+      description: 'An icon before the text. Decorative: hidden from assistive technology.',
+    },
+  ],
+  Spinner: [
+    {
+      name: 'aria-label',
+      type: 'string',
+      default: "'Loading'",
+      description: 'What is loading. Say more than the default when you can.',
+    },
+  ],
+  Skeleton: [],
   Link: [],
   Separator: [
     {

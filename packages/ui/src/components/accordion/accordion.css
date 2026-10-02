@@ -1,0 +1,78 @@
+@layer accordion {
+  /* Lets block-size animate to auto where supported; elsewhere the panel snaps open. */
+  .accordion,
+  .accordion-item {
+    interpolate-size: allow-keywords;
+  }
+
+  .accordion-item {
+    border-block-end: var(--space-px) solid var(--accordion-border-color);
+  }
+
+  .accordion-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2xs);
+    padding: var(--accordion-trigger-padding-block) var(--accordion-trigger-padding-inline);
+    border-radius: var(--accordion-radius);
+    color: var(--accordion-trigger-color);
+    font-weight: var(--accordion-trigger-font-weight);
+    list-style: none;
+    cursor: pointer;
+  }
+
+  /* The platform's own marker, replaced by the chevron. */
+  .accordion-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .accordion-trigger:hover {
+    background-color: var(--accordion-trigger-bg-hover);
+  }
+
+  .accordion-trigger:focus-visible {
+    outline: var(--space-2px) solid var(--accordion-focus-color);
+    outline-offset: var(--space-2px);
+  }
+
+  .accordion-icon {
+    flex-shrink: 0;
+    inline-size: 1rem;
+    block-size: 1rem;
+    fill: none;
+    stroke: var(--accordion-icon-color);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: rotate var(--accordion-duration) var(--ease-smooth);
+  }
+
+  .accordion-item[open] > .accordion-trigger .accordion-icon {
+    rotate: 180deg;
+  }
+
+  .accordion-panel {
+    padding: 0 var(--accordion-trigger-padding-inline) var(--accordion-panel-padding-block-end);
+    color: var(--accordion-panel-color);
+  }
+
+  .accordion-item::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size var(--accordion-duration) var(--ease-smooth),
+      content-visibility var(--accordion-duration) allow-discrete;
+  }
+
+  .accordion-item[open]::details-content {
+    block-size: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .accordion-item::details-content,
+    .accordion-icon {
+      transition: none;
+    }
+  }
+}

@@ -1,0 +1,42 @@
+@layer spinner {
+  /* An indeterminate <progress> turned into a ring: the element is the ring, and the
+     engines' bar pseudo-elements are hidden. */
+  .spinner {
+    appearance: none;
+    display: inline-block;
+    flex-shrink: 0;
+    inline-size: var(--spinner-size);
+    block-size: var(--spinner-size);
+    border: var(--spinner-thickness) solid var(--spinner-track-color);
+    border-block-start-color: var(--spinner-color);
+    border-radius: var(--radius-full);
+    background: none;
+    vertical-align: middle;
+    animation: spinner-turn var(--spinner-duration) linear infinite;
+  }
+
+  .spinner::-webkit-progress-bar {
+    background: none;
+  }
+
+  .spinner::-webkit-progress-value {
+    background: none;
+  }
+
+  .spinner::-moz-progress-bar {
+    background: none;
+  }
+
+  @keyframes spinner-turn {
+    to {
+      rotate: 1turn;
+    }
+  }
+
+  /* Slower, not stopped: it still has to read as busy. */
+  @media (prefers-reduced-motion: reduce) {
+    .spinner {
+      animation-duration: var(--spinner-duration-reduced);
+    }
+  }
+}

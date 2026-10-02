@@ -1,0 +1,6 @@
+export {
+  AccordionRoot as Root,
+  AccordionItem as Item,
+  AccordionTrigger as Trigger,
+  AccordionPanel as Panel,
+} from './accordion';

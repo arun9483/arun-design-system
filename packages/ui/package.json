@@ -60,7 +60,11 @@
     "./css/separator": "./dist/css/separator.css",
     "./css/progress": "./dist/css/progress.css",
     "./css/meter": "./dist/css/meter.css",
-    "./css/slider": "./dist/css/slider.css"
+    "./css/slider": "./dist/css/slider.css",
+    "./css/accordion": "./dist/css/accordion.css",
+    "./css/alert": "./dist/css/alert.css",
+    "./css/spinner": "./dist/css/spinner.css",
+    "./css/skeleton": "./dist/css/skeleton.css"
   },
   "publishConfig": {
     "access": "public"

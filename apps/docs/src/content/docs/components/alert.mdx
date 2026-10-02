@@ -1,0 +1,48 @@
+---
+title: Alert
+description: A message box, in five tones.
+---
+
+import Example from '@/components/Example.astro';
+import AlertTones from '@/examples/alert-tones';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="alert-tones" layout="stack">
+  <AlertTones client:load />
+</Example>
+
+`Alert` is a message box with a tone, an optional icon, a title and a description.
+
+## Announcing it
+
+An alert that is on the page from the start is just content, so it has no live role by
+default. When it appears in response to something, add one so screen readers read it out:
+
+- `role="alert"`: urgent, read out at once. A failed save, a lost connection.
+- `role="status"`: polite, read out when the user is idle. "Saved", "3 results".
+
+```tsx
+{
+  error && (
+    <Alert.Root tone="error" role="alert">
+      <Alert.Title>Save failed</Alert.Title>
+    </Alert.Root>
+  );
+}
+```
+
+For a brief message that goes away on its own, use a Toast.
+
+## Props
+
+### `Alert.Root`
+
+<PropTable component="Alert.Root" />
+
+`Alert.Title` renders a `<p>` (pass `render={<h2 />}` if it heads a section), and
+`Alert.Description` a `<div>`.
+
+## Notes
+
+- Tones map onto the `--color-status-*` tokens, as Badge's do. Override `--alert-error-bg` and
+  the other tone tokens to restyle one tone.

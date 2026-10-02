@@ -23,3 +23,7 @@
 @import './components/progress.css';
 @import './components/separator.css';
 @import './components/slider.css';
+@import './components/accordion.css';
+@import './components/alert.css';
+@import './components/skeleton.css';
+@import './components/spinner.css';

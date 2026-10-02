@@ -1,0 +1,66 @@
+---
+title: Accordion
+description: Sections that open and close, built on native details and summary.
+---
+
+import Example from '@/components/Example.astro';
+import AccordionBasics from '@/examples/accordion-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="accordion-basics">
+  <AccordionBasics client:load />
+</Example>
+
+`Accordion` is built from native `<details>` and `<summary>`. The browser does the work:
+
+- A press, Enter or Space toggles an item.
+- Items with the same `name` open one at a time. `exclusive` on the Root gives them one.
+- In Chromium, find-in-page opens a closed item when the match is inside it.
+- Opening animates where the browser supports it (`::details-content`), and snaps elsewhere and
+  under reduced motion.
+
+## Anatomy
+
+```tsx
+import { Accordion } from '@arun-dev/ui';
+
+<Accordion.Root exclusive>
+  <Accordion.Item defaultOpen>
+    <Accordion.Trigger>Shipping</Accordion.Trigger>
+    <Accordion.Panel>Two to five working days.</Accordion.Panel>
+  </Accordion.Item>
+</Accordion.Root>;
+```
+
+| Part      | Renders     | Does                                                     |
+| --------- | ----------- | -------------------------------------------------------- |
+| `Root`    | `<div>`     | optional; `exclusive` makes its Items open one at a time |
+| `Item`    | `<details>` | one section; works alone as a single disclosure          |
+| `Trigger` | `<summary>` | the always-visible line, with a chevron                  |
+| `Panel`   | `<div>`     | what the Item reveals                                    |
+
+## Controlled
+
+`defaultOpen` sets the starting state. To control it, pass `open` and update it from
+`onToggle`:
+
+```tsx
+<Accordion.Item open={open} onToggle={(event) => setOpen(event.newState === 'open')}>
+```
+
+## Props
+
+### `Accordion.Root`
+
+<PropTable component="Accordion.Root" />
+
+### `Accordion.Item`
+
+<PropTable component="Accordion.Item" common={false} />
+
+## Notes
+
+- `<summary>` is a button to screen readers, so a heading inside it isn't reached by heading
+  navigation. That's the price of the native element. If the sections need headings, put one
+  above the accordion.
+- Restyle with the `--accordion-*` tokens.

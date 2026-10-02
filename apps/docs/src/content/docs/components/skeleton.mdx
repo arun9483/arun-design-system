@@ -1,0 +1,23 @@
+---
+title: Skeleton
+description: A placeholder shape while content loads.
+---
+
+import Example from '@/components/Example.astro';
+import SkeletonBasics from '@/examples/skeleton-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="skeleton-basics">
+  <SkeletonBasics client:load />
+</Example>
+
+`Skeleton` is a shape that stands in for content while it loads. It is hidden from screen
+readers. Mark the region it fills with `aria-busy="true"` instead, and remove that once the
+content arrives.
+
+Its size and shape are yours, set with `style` or a class. It is one line of text high by
+default. The shine stops under reduced motion.
+
+## Props
+
+<PropTable component="Skeleton" />
