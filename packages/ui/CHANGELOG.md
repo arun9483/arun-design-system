@@ -1,5 +1,16 @@
 # @arun-dev/ui
 
+## 4.16.0
+
+### Minor Changes
+
+- e62069f: Add the form basics (decision 15). Headless: `Field` (`@arun-dev/headless/field`) ties a label, a description and an error to one control. ui: `Field`, `Link`, `Separator`, `Progress`, `Meter` and `Slider`, each a native element with styling, and new tokens for each. ui now needs `@arun-dev/headless` 4.12.0 or later.
+
+### Patch Changes
+
+- Updated dependencies [e62069f]
+  - @arun-dev/tokens@0.20.0
+
 ## 4.15.0
 
 ### Minor Changes
