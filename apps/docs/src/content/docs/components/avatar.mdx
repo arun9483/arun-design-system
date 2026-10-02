@@ -1,0 +1,36 @@
+---
+title: Avatar
+description: A person's picture, or their initials until it loads.
+---
+
+import Example from '@/components/Example.astro';
+import AvatarBasics from '@/examples/avatar-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="avatar-basics">
+  <AvatarBasics client:load />
+</Example>
+
+`Avatar` shows a picture once it has loaded, and initials or an icon until then. If the picture
+fails, or there is none, the initials stay. A broken image never shows.
+
+```tsx
+<Avatar.Root>
+  <Avatar.Image src={user.photo} alt={user.name} />
+  <Avatar.Fallback delay={300}>{initials}</Avatar.Fallback>
+</Avatar.Root>
+```
+
+- `delay` holds the initials back briefly, so a picture that loads fast doesn't flash them first.
+- Initials are read out letter by letter. Give the Root `role="img"` and an `aria-label` with
+  the name, and mark the initials `aria-hidden`. Or leave them be when the name is shown beside
+  the avatar.
+- Size it with `--avatar-size`.
+
+## Props
+
+### `Avatar.Fallback`
+
+<PropTable component="Avatar.Fallback" />
+
+`Avatar.Root` and `Avatar.Image` take the props of the `<span>` and `<img>` they render.

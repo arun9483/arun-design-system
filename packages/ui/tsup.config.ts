@@ -43,6 +43,9 @@ const CSS_LAYERS = [
   { layer: 'pagination', src: 'src/components/pagination/pagination.css' },
   { layer: 'table', src: 'src/components/table/table.css' },
   { layer: 'kbd', src: 'src/components/kbd/kbd.css' },
+  { layer: 'toggle', src: 'src/components/toggle/toggle.css' },
+  { layer: 'toolbar', src: 'src/components/toolbar/toolbar.css' },
+  { layer: 'avatar', src: 'src/components/avatar/avatar.css' },
   { layer: 'metric', src: 'src/css/metric.css' },
   { layer: 'utilities', src: 'src/css/utilities.css' },
 ] as const;

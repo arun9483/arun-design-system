@@ -1,0 +1,28 @@
+---
+title: Toolbar
+description: A row of controls with one Tab stop.
+---
+
+import Example from '@/components/Example.astro';
+import ToolbarBasics from '@/examples/toolbar-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="toolbar-basics">
+  <ToolbarBasics client:load />
+</Example>
+
+`Toolbar` is `role="toolbar"`: a row of controls that is one Tab stop. Tab in, then use the
+arrow keys to move across its buttons, links, fields and toggles. Home and End jump to the ends,
+and disabled items are skipped. Tab again leaves.
+
+- `Toolbar.Button`, `Toolbar.Link` and `Toolbar.Input` are the items.
+- A [ToggleGroup](/components/toggle/) inside joins the same arrow keys.
+- `Toolbar.Input` keeps Left and Right for its caret until the caret reaches an end. Then the
+  arrow key moves on.
+- `Toolbar.Group` groups items, and `Toolbar.Separator` draws a line between them.
+
+Name it with `aria-label`.
+
+## Props
+
+<PropTable component="Toolbar.Root" />

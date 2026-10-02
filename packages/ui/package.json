@@ -69,7 +69,10 @@
     "./css/breadcrumb": "./dist/css/breadcrumb.css",
     "./css/pagination": "./dist/css/pagination.css",
     "./css/table": "./dist/css/table.css",
-    "./css/kbd": "./dist/css/kbd.css"
+    "./css/kbd": "./dist/css/kbd.css",
+    "./css/toggle": "./dist/css/toggle.css",
+    "./css/toolbar": "./dist/css/toolbar.css",
+    "./css/avatar": "./dist/css/avatar.css"
   },
   "publishConfig": {
     "access": "public"
@@ -103,7 +106,7 @@
     "vitest": "4.1.11"
   },
   "peerDependencies": {
-    "@arun-dev/headless": ">=4.13.0",
+    "@arun-dev/headless": ">=4.14.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
   }

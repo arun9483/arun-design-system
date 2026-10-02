@@ -1,0 +1,18 @@
+/* Toggle component tokens — a button that stays pressed; also the items of a ToggleGroup and
+   a Toolbar. */
+:root {
+  --toggle-height: 2.25rem;
+  --toggle-padding-inline: var(--space-xs);
+  --toggle-radius: var(--radius-md);
+  --toggle-font-size: var(--text-sm);
+  --toggle-color: var(--color-text-secondary);
+  --toggle-bg-hover: var(--color-bg-secondary);
+  --toggle-pressed-bg: var(--color-bg-accent);
+  --toggle-pressed-color: var(--color-text-accent);
+  --toggle-focus-color: var(--color-text-accent);
+  --toggle-disabled-opacity: 0.5;
+  --toggle-group-gap: var(--space-3xs);
+  --toggle-group-padding: var(--space-3xs);
+  --toggle-group-border-color: var(--color-border-default);
+  --toggle-group-radius: var(--radius-md);
+}

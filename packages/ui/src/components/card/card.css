@@ -1,5 +1,7 @@
 @layer card {
   .card {
+    /* A link in this shape is not running text: no underline. */
+    text-decoration: none;
     background-color: var(--color-bg-primary);
     border: var(--space-px) solid var(--color-border-default);
     box-shadow: var(--shadow-sm);

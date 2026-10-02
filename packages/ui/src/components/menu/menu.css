@@ -36,6 +36,8 @@
      highlighted item is the focused one — focus moves on arrow keys and is set from
      script, so :focus rather than :focus-visible, which a click-opened menu may not match. */
   .menu-item {
+    /* A link in this shape is not running text: no underline. */
+    text-decoration: none;
     display: flex;
     align-items: center;
     gap: var(--menu-item-padding-inline);

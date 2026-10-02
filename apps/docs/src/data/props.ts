@@ -42,6 +42,79 @@ export const COMMON = [
 ] as const satisfies readonly PropDoc[];
 
 export const PROPS = {
+  Toggle: [
+    {
+      name: 'pressed',
+      type: 'boolean',
+      description: 'Controlled state. Provide `onPressedChange` alongside it.',
+    },
+    {
+      name: 'defaultPressed',
+      type: 'boolean',
+      default: 'false',
+      description: 'Initial state when uncontrolled.',
+    },
+    {
+      name: 'onPressedChange',
+      type: '(pressed: boolean) => void',
+      description: 'Called on every press.',
+    },
+    {
+      name: 'value',
+      type: 'string',
+      description: 'Its value in a ToggleGroup: pressed while the group holds it.',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Not pressable, and skipped by the arrow keys.',
+    },
+  ],
+  ToggleGroup: [
+    { name: 'value', type: 'string[]', description: "Controlled: the pressed Toggles' values." },
+    {
+      name: 'defaultValue',
+      type: 'string[]',
+      default: '[]',
+      description: 'Initial value when uncontrolled.',
+    },
+    {
+      name: 'onValueChange',
+      type: '(value: string[]) => void',
+      description: 'Called on every press.',
+    },
+    {
+      name: 'multiple',
+      type: 'boolean',
+      default: 'false',
+      description: 'Lets more than one be pressed. Without it, pressing one releases the others.',
+    },
+    { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every Toggle.' },
+    {
+      name: 'orientation',
+      type: "'horizontal' | 'vertical'",
+      default: "'horizontal'",
+      description: 'Which arrow keys move between the Toggles.',
+    },
+  ],
+  'Toolbar.Root': [
+    {
+      name: 'orientation',
+      type: "'horizontal' | 'vertical'",
+      default: "'horizontal'",
+      description: 'Which arrow keys move between items.',
+    },
+  ],
+  'Avatar.Fallback': [
+    {
+      name: 'delay',
+      type: 'number',
+      default: '0',
+      description:
+        'Milliseconds before it shows, so a quick image does not flash the initials first.',
+    },
+  ],
   'Breadcrumb.Root': [],
   Pagination: [
     { name: 'page', type: 'number', description: 'The current page, from 1. Required.' },
