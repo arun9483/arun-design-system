@@ -13,11 +13,14 @@ import { comboboxItemDataAttributes } from './comboboxDataAttributes';
 type ComboboxItemOwnProps<T> = {
   /** The item this option stands for — one of the Root's `items`. */
   value: T;
-  /**
-   * Cannot be picked, and the arrow keys skip it. With `multiple`, a disabled item that is
-   * already selected cannot be removed either — its chip, Backspace and Clear leave it.
-   */
+  /** Cannot be picked, and the arrow keys skip it. */
   disabled?: boolean;
+  /**
+   * With `multiple`, once selected it cannot be removed: its chip, Backspace, Clear and a press
+   * on it here all leave it. Ignored without `multiple` — disable the Root to fix a single
+   * selection.
+   */
+  isLocked?: boolean;
   /** Element to render instead of the default `<div>`. Props and ref are merged onto it. */
   render?: ReactElement;
   /** Ref to the rendered element. Merged with any ref on the `render` element. */
@@ -37,6 +40,7 @@ export type ComboboxItemProps<T = unknown> = ComboboxItemOwnProps<T> &
 export function ComboboxItem<T = unknown>({
   value,
   disabled = false,
+  isLocked = false,
   className,
   children,
   render,
@@ -46,7 +50,8 @@ export function ComboboxItem<T = unknown>({
     itemToKey,
     indexByKey,
     selectedKeys,
-    setItemDisabled,
+    disabledKeys,
+    registerLocked,
     highlight,
     setHighlight,
     select,
@@ -63,8 +68,18 @@ export function ComboboxItem<T = unknown>({
   const elementRef = useRef<HTMLElement | null>(null);
 
   // Registered from props, so the arrow keys skip it without reading the DOM (decision 10).
-  // Not undone on unmount: a selected item stays locked after a search hides it.
-  useLayoutEffect(() => setItemDisabled(key, disabled), [setItemDisabled, key, disabled]);
+  useLayoutEffect(() => {
+    if (!disabled) return;
+    disabledKeys.add(key);
+    return () => {
+      disabledKeys.delete(key);
+    };
+  }, [disabled, disabledKeys, key]);
+
+  useLayoutEffect(
+    () => (isLocked ? registerLocked(key) : undefined),
+    [isLocked, registerLocked, key],
+  );
 
   // The arrow keys move the highlight past the edge of a scrolled list: bring it into view.
   useEffect(() => {

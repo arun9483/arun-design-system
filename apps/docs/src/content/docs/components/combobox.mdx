@@ -9,6 +9,8 @@ import ComboboxMultiple from '@/examples/combobox-multiple';
 import ComboboxFuzzy from '@/examples/combobox-fuzzy';
 import ComboboxAsync from '@/examples/combobox-async';
 import ComboboxLazy from '@/examples/combobox-lazy';
+import ComboboxDisabled from '@/examples/combobox-disabled';
+import ComboboxLocked from '@/examples/combobox-locked';
 import PropTable from '@/components/PropTable.astro';
 
 `Combobox` is a text input that filters a list as you type. It follows the
@@ -64,7 +66,7 @@ Focus stays in the input. The highlighted option is announced through `aria-acti
 | Enter                       | picks the highlighted item                                                               |
 | Esc                         | closes the list, putting the text back                                                   |
 | Tab                         | closes the list, and focus moves on                                                      |
-| Backspace in an empty input | with `multiple`, removes the last item, unless it is disabled                            |
+| Backspace in an empty input | with `multiple`, removes the last item, unless it is locked                              |
 | ← at the start of the text  | with `multiple`, moves into the chips: ← → between them, Backspace or Delete removes one |
 
 ## Single and multiple
@@ -79,28 +81,48 @@ Focus stays in the input. The highlighted option is announced through `aria-acti
 | Pick a selected item    | stays selected                                    | removed                                           |
 | Empty the input         | the selection clears                              | the selection stays                               |
 | Esc, or a press outside | closes; the input goes back to the selected label | closes; the text clears                           |
-| Clear (×)               | clears the text and the selection                 | clears the text and every item but disabled ones  |
+| Clear (×)               | clears the text and the selection                 | clears the text and every item but locked ones    |
 
 **A selection survives a search that no longer returns it.** `value` holds the items
 themselves, not their keys. So search "book" and pick, then search "pen" and pick: the books stay
 selected, keep their chips and labels, and are still submitted with the form.
 
-### Pre-selected and disabled items
+### Pre-selected items
 
 Start with a selection through `defaultValue`, or `value` when controlled. A single combobox
 shows the label in the input, and `multiple` shows a chip per item. Both examples above start
 with one.
 
+### Disabled items: can't be selected
+
+<Example name="combobox-disabled" layout="stack">
+  <ComboboxDisabled client:load />
+</Example>
+
 Mark an option `disabled` on its `Item`. It can't be picked, and the arrow keys skip it. It is
-announced as unavailable through `aria-disabled`, and styled from `data-disabled`.
+announced as unavailable through `aria-disabled`, and styled from `data-disabled`. This works
+the same in single and multiple select. `disabled` stops a pick only: an item that is already
+selected can still be removed.
 
-With `multiple`, a disabled item that is already selected **can't be removed**. Its chip has no
-remove button, Backspace and Delete leave it, and Clear removes only the other items. It stays
-locked while a search hides it. Use this for a selection the user must keep, such as a
-mandatory recipient.
+### Locked items: can't be removed
 
-The combobox learns that an item is disabled when its `Item` renders. With server search, a
-pre-selected item is locked once a result list has included it.
+<Example name="combobox-locked" layout="stack">
+  <ComboboxLocked client:load />
+</Example>
+
+With `multiple`, mark an `Item` `isLocked` and, once selected, it **can't be removed**. Its chip
+has no remove button, Backspace, Delete and a press on it in the list leave it, and Clear
+removes only the other items. Use it for a selection the user must keep, such as a code owner
+among reviewers. It can still be picked, if it isn't selected yet.
+
+The lock holds even when the item is missing from the list. In the example above, the reviewers
+come from a server search that starts empty, and the code owners are locked from the first
+render. The List keeps each selected item's `Item` mounted, hidden and outside the listbox, so
+your render function also runs for selected items the current results leave out, with index
+`-1`.
+
+Single select has no locked item. `isLocked` is ignored there. To keep a single selection
+fixed, disable the whole field with `disabled` on the Root, as the Owner field does.
 
 ## Search
 

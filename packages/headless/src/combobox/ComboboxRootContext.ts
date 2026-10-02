@@ -78,14 +78,13 @@ export type ComboboxRootContextValue = ComboboxState & {
   indexByKey: ReadonlyMap<string, number>;
   /** Keys of the selected items. */
   selectedKeys: ReadonlySet<string>;
-  /**
-   * Keys of items disabled by their Item's props, kept after it unmounts. The arrow keys skip
-   * them, and with `multiple` a selected one cannot be removed.
-   */
-  disabledKeys: ReadonlySet<string>;
-  /** Called by each Item as it renders: whether it is disabled. */
-  setItemDisabled: (key: string, disabled: boolean) => void;
-  /** Selected items that can be removed: all of them, but the disabled ones with `multiple`. */
+  /** Keys of items disabled by their Item's props — read when the arrow keys move. */
+  disabledKeys: Set<string>;
+  /** Whether the item with this key is locked: its Item is `isLocked`, with `multiple`. */
+  isLocked: (key: string) => boolean;
+  /** Called by an `isLocked` Item while it is mounted. */
+  registerLocked: (key: string) => () => void;
+  /** Selected items that can be removed: all of them but the locked ones. */
   removableItems: readonly unknown[];
   highlight: HighlightStore;
   setHighlight: (index: number, reason: ComboboxHighlightReason) => void;

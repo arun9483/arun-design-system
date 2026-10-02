@@ -679,14 +679,25 @@ substring. Filtering is memoised on `items` and the query, and the query is read
 `Clear` is present only while there is something to clear — a selection — and marks it with
 `data-visible`; the styled component hides it otherwise.
 
-**A selected disabled item cannot be removed, with `multiple`.** Not by its `ChipRemove`,
-Backspace or Delete, nor by `Clear`, which removes the rest. "Disabled" stays one concept: an
-`Item`'s `disabled` prop, as for picking. Since `Item` is where the Root learns it, and a search
-or a virtualizer unmounts Items, the Root keeps each key's last reported state rather than
-dropping it on unmount, so a chip stays locked while its option is hidden. A separate
-`isItemLocked`, and an `isItemDisabled` on the Root, were weighed and declined: two concepts, or
-two ways to disable an item. The known gap is a server search that has never returned a
-pre-selected item; it locks once a result includes it.
+**Disabled and locked are two concepts, both on `Item`.** `disabled` stops a pick, in either
+mode. `isLocked` stops a removal, with `multiple` only — not by its `ChipRemove`, Backspace,
+Delete or a press on it in the list, nor by `Clear`, which removes the rest. Folding the lock
+into `disabled` was tried first and dropped: "can't add" and "can't take off" are different
+needs, and an out-of-stock item someone already picked must stay removable. Single select has
+no lock — `disabled` on the Root fixes the one value — and ignores `isLocked`.
+
+No library checked locks a selection itself (October 2026). Base UI puts `disabled` on
+`ChipRemove`; MUI's "fixed tags" demo disables the chip and puts fixed options back in
+`onChange`; Ark/Zag's `remove` does not consult `isItemDisabled`. All three leave single select
+unlocked.
+
+**List keeps every selected item's Item mounted.** The Root learns `isLocked` from an Item's
+props (decision 10), and a search — or a server search that starts empty — leaves selected
+items out of the list. So List also calls its render function, with index `-1`, for each
+selected item the results leave out, inside a `hidden` element outside the listbox: no
+option is announced or reachable, and a chip is locked from the first render. A Root-level
+`isItemLocked(item)` would not need this, and was declined to keep the props on Item, beside
+`disabled`.
 
 **`required` is the platform's, on the input.** The hidden inputs cannot carry it — a hidden
 input is barred from constraint validation — so the visible input is `required` while the

@@ -4,14 +4,14 @@ import { useComboboxRootContext } from './ComboboxRootContext';
 export type ComboboxValueProps<T = unknown> = {
   /**
    * Renders the selection: `T | null`, or `T[]` with `multiple`. The Root's `itemToString` is
-   * passed along for labels — a chip's text, say — and `isItemDisabled`, for a chip that
+   * passed along for labels — a chip's text, say — and `isItemLocked`, for a chip that
    * cannot be removed.
    */
   children: (
     value: T,
     details: {
       itemToString: (item: unknown) => string;
-      isItemDisabled: (item: unknown) => boolean;
+      isItemLocked: (item: unknown) => boolean;
     },
   ) => ReactNode;
 };
@@ -24,9 +24,9 @@ export type ComboboxValueProps<T = unknown> = {
  * of it (decision 9): the value stays the Root's.
  */
 export function ComboboxValue<T = unknown>({ children }: ComboboxValueProps<T>) {
-  const { multiple, selectedItems, itemToString, itemToKey, disabledKeys } =
+  const { multiple, selectedItems, itemToString, itemToKey, isLocked } =
     useComboboxRootContext('Value');
   const value = (multiple ? selectedItems : (selectedItems[0] ?? null)) as T;
-  const isItemDisabled = (item: unknown) => disabledKeys.has(itemToKey(item));
-  return <>{children(value, { itemToString, isItemDisabled })}</>;
+  const isItemLocked = (item: unknown) => isLocked(itemToKey(item));
+  return <>{children(value, { itemToString, isItemLocked })}</>;
 }

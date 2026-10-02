@@ -22,7 +22,7 @@ export type ComboboxClearProps = ComboboxClearOwnProps &
 
 /**
  * Empties the input and the selection — with `multiple`, every selected item that is not
- * disabled. Give it an `aria-label`.
+ * locked. Give it an `aria-label`.
  *
  * `data-visible` is present while there is a selection it can clear; style it hidden otherwise.
  * Out of the tab order, and a press keeps focus in the input.

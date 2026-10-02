@@ -29,7 +29,7 @@ export type ComboboxInputProps = ComboboxInputOwnProps &
  * what the list lines up with.
  *
  * Chips are `Chip`s. Each has a remove button, and Backspace and the arrow keys reach them
- * from the text, as @arun-dev/headless describes. A chip whose Item is `disabled` cannot be
+ * from the text, as @arun-dev/headless describes. A chip whose Item is `isLocked` cannot be
  * removed, and has no remove button.
  */
 export function ComboboxInput({
@@ -44,12 +44,12 @@ export function ComboboxInput({
     <Headless.InputGroup className={cn('combobox', className)}>
       {startSlot != null && <span className="combobox-slot">{startSlot}</span>}
       <Headless.Value>
-        {(value, { itemToString, isItemDisabled }) =>
+        {(value, { itemToString, isItemLocked }) =>
           Array.isArray(value) &&
           value.map((item) => {
             const label = itemToString(item);
-            // Selected and disabled: it stays, so it has no remove button and no hint.
-            const locked = isItemDisabled(item);
+            // Locked: it stays, so it has no remove button and no hint.
+            const locked = isItemLocked(item);
             return (
               <Headless.Chip
                 key={label}

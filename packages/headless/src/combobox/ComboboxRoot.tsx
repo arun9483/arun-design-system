@@ -243,15 +243,41 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
     [setOpen, setInputValue, selectedLabel],
   );
 
+  // Keys of the Items rendered `isLocked`. With `multiple`, a selected one cannot be removed:
+  // not by its chip, Backspace, Clear or a press on it in the list. State, not a ref, since
+  // chips render from it. List keeps every selected item's Item mounted, so a lock is known
+  // while a search hides the item, or before a server search has ever returned it.
+  const [lockedKeys, setLockedKeys] = useState<ReadonlySet<string>>(() => new Set());
+  const registerLocked = useCallback((key: string) => {
+    const update = (add: boolean) =>
+      setLockedKeys((current) => {
+        if (current.has(key) === add) return current;
+        const next = new Set(current);
+        if (add) next.add(key);
+        else next.delete(key);
+        return next;
+      });
+    update(true);
+    return () => update(false);
+  }, []);
+  const isLocked = useCallback(
+    (key: string) => multiple && lockedKeys.has(key),
+    [multiple, lockedKeys],
+  );
+
   const select = useCallback(
     (item: unknown) => {
       const key = itemToKey(item);
       if (multiple) {
         const current = value as unknown[];
-        setValue(
-          selectedKeys.has(key) ? current.filter((i) => itemToKey(i) !== key) : [...current, item],
-          'item-press',
-        );
+        // A press on a locked item does not toggle it off.
+        if (!(selectedKeys.has(key) && isLocked(key)))
+          setValue(
+            selectedKeys.has(key)
+              ? current.filter((i) => itemToKey(i) !== key)
+              : [...current, item],
+            'item-press',
+          );
         setInputValue('', 'item-press');
       } else {
         // Picking the selected item again keeps it.
@@ -260,40 +286,35 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       }
       setOpen(false, 'item-press');
     },
-    [multiple, value, selectedKeys, itemToKey, itemToString, setValue, setInputValue, setOpen],
+    [
+      multiple,
+      value,
+      selectedKeys,
+      isLocked,
+      itemToKey,
+      itemToString,
+      setValue,
+      setInputValue,
+      setOpen,
+    ],
   );
 
-  // Keys of items whose Item was last rendered `disabled`. Kept after the Item unmounts — a
-  // search that hides it, a virtualizer — so its chip stays locked and the arrow keys know it.
-  const [disabledKeys, setDisabledKeys] = useState<ReadonlySet<string>>(() => new Set());
-  const setItemDisabled = useCallback((key: string, itemDisabled: boolean) => {
-    setDisabledKeys((current) => {
-      if (current.has(key) === itemDisabled) return current;
-      const next = new Set(current);
-      if (itemDisabled) next.add(key);
-      else next.delete(key);
-      return next;
-    });
-  }, []);
-
-  // A disabled item that is selected cannot be removed, with `multiple`: not by its chip, not
-  // by Backspace, not by Clear. It can only be selected from `value` or `defaultValue`.
   const removableItems = useMemo(
-    () => selectedItems.filter((item) => !multiple || !disabledKeys.has(itemToKey(item))),
-    [multiple, selectedItems, disabledKeys, itemToKey],
+    () => selectedItems.filter((item) => !isLocked(itemToKey(item))),
+    [selectedItems, isLocked, itemToKey],
   );
 
   const remove = useCallback(
     (item: unknown, reason: ComboboxChangeReason) => {
       if (!multiple) return;
       const key = itemToKey(item);
-      if (disabledKeys.has(key)) return;
+      if (isLocked(key)) return;
       setValue(
         (value as unknown[]).filter((i) => itemToKey(i) !== key),
         reason,
       );
     },
-    [multiple, value, disabledKeys, itemToKey, setValue],
+    [multiple, value, isLocked, itemToKey, setValue],
   );
 
   const clearSelection = useCallback(
@@ -332,6 +353,8 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
     // Only when the selection changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedKey]);
+
+  const [disabledKeys] = useState(() => new Set<string>());
 
   const [chips, setChips] = useState<ComboboxChipEntry[]>([]);
   const registerChip = useCallback((entry: ComboboxChipEntry) => {
@@ -405,7 +428,8 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       selectedKeys,
       selectedItems,
       disabledKeys,
-      setItemDisabled,
+      isLocked,
+      registerLocked,
       removableItems,
       highlight,
       setHighlight,
@@ -444,7 +468,8 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       selectedKeys,
       selectedItems,
       disabledKeys,
-      setItemDisabled,
+      isLocked,
+      registerLocked,
       removableItems,
       highlight,
       setHighlight,

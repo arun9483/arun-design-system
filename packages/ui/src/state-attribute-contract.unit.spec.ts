@@ -53,9 +53,18 @@ const USAGE = /\[\s*(data-[a-z0-9-]+)/g;
  *
  * `data-align` is Popover's. Alignment is placement, which headless sets inline as
  * `position-area`, so ui has nothing to add; `data-side` is styled, for the offset's axis.
+ *
+ * `data-locked` is Combobox's Chip. ui shows a locked chip by leaving its remove button out,
+ * so the chip itself looks like any other selection.
 
  */
-const UNSTYLED_HERE = ['data-align', 'data-closed', 'data-unchecked', 'data-unselected'];
+const UNSTYLED_HERE = [
+  'data-align',
+  'data-closed',
+  'data-locked',
+  'data-unchecked',
+  'data-unselected',
+];
 
 function filesIn(dir: string, extension: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

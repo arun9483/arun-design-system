@@ -38,8 +38,8 @@ export function useComboboxChipContext(): { value: unknown; disabled: boolean } 
  * One selected item, with `multiple`. Render one per item of the Root's `value`, before the
  * Input. Give it an `aria-description` that says how to remove it.
  *
- * `data-disabled` when the Root is disabled, or when its item's Item is: then it cannot be
- * removed.
+ * `data-disabled` when the Root is disabled; `data-locked` when its item's Item is
+ * `isLocked`. Either way it cannot be removed.
  *
  * Out of the tab order. Left from the start of the input reaches the last chip; Left and
  * Right move between chips, and Right from the last returns to the input; Backspace or
@@ -55,15 +55,16 @@ export function ComboboxChip<T = unknown>({
   const {
     disabled: rootDisabled,
     itemToKey,
-    disabledKeys,
+    isLocked,
     remove,
     registerChip,
     chips,
     inputRef,
   } = useComboboxRootContext('Chip');
   const key = itemToKey(value);
-  // A disabled item cannot be removed; its chip stays reachable with the arrow keys.
-  const disabled = rootDisabled || disabledKeys.has(key);
+  // A locked item cannot be removed; its chip stays reachable with the arrow keys.
+  const locked = isLocked(key);
+  const disabled = rootDisabled || locked;
   const elementRef = useRef<HTMLElement | null>(null);
 
   useLayoutEffect(() => registerChip({ key, ref: elementRef }), [registerChip, key]);
@@ -81,7 +82,8 @@ export function ComboboxChip<T = unknown>({
     defaultTagName: 'div',
     props: {
       tabIndex: -1,
-      'data-disabled': disabled ? '' : undefined,
+      'data-disabled': rootDisabled ? '' : undefined,
+      'data-locked': locked ? '' : undefined,
       className,
       children,
       ref: elementRef,
