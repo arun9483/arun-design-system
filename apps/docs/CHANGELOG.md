@@ -1,5 +1,13 @@
 # @arun-dev/docs
 
+## 0.0.33
+
+### Patch Changes
+
+- Updated dependencies [c852364]
+  - @arun-dev/ui@4.19.0
+  - @arun-dev/tokens@0.23.0
+
 ## 0.0.32
 
 ### Patch Changes
