@@ -1,5 +1,11 @@
 # @arun-dev/headless
 
+## 4.13.0
+
+### Minor Changes
+
+- 3fde054: Add `Toast` (decision 16). Headless (`@arun-dev/headless/toast`): `Provider`, `useToastManager()` (`add`, `update`, `close`), `Viewport` (a polite live region kept open in the top layer), `Root`, `Title`, `Description`, `Action`, `Close`; timers pause on hover, focus and a hidden page, and Esc closes. ui: a styled Viewport that renders toasts itself, styled parts, and `--toast-*` tokens. ui now needs `@arun-dev/headless` 4.13.0 or later.
+
 ## 4.12.0
 
 ### Minor Changes
