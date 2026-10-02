@@ -1,5 +1,16 @@
 # @arun-dev/ui
 
+## 4.19.0
+
+### Minor Changes
+
+- c852364: Add `Breadcrumb`, `Pagination` (with `paginationRange()`), `Table` and `Kbd`, with their tokens — decision 17. Each is native markup with styling.
+
+### Patch Changes
+
+- Updated dependencies [c852364]
+  - @arun-dev/tokens@0.23.0
+
 ## 4.18.0
 
 ### Minor Changes
