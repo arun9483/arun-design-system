@@ -1,0 +1,10 @@
+/* Kbd component tokens — a key on the keyboard. */
+:root {
+  --kbd-font-size: 0.8em;
+  --kbd-padding-inline: 0.4em;
+  --kbd-min-inline-size: 1.6em;
+  --kbd-radius: var(--radius-sm);
+  --kbd-bg: var(--color-bg-secondary);
+  --kbd-color: var(--color-text-primary);
+  --kbd-border-color: var(--color-border-default);
+}

@@ -963,3 +963,57 @@ shimmer stops under reduced motion. Size and shape are the consumer's `className
 
 **Rules out:** scripted Accordion triggers and their arrow keys; a live role on every Alert;
 swipe and a global shortcut on Toast.
+
+---
+
+## 17. Navigation and layout: markup first, state where it changes
+
+Phase three: `Breadcrumb`, `Pagination`, `Table`, `Kbd`, `Avatar`, `Toggle`, `ToggleGroup` and
+`Toolbar`. Decision 7's test splits them: the first four are native markup with styling, in
+`@arun-dev/ui` alone; the last four hold state or move focus with the arrow keys, so their
+behaviour is in `@arun-dev/headless`.
+
+| Component     | Element                              | Headless | Why                                                       |
+| ------------- | ------------------------------------ | -------- | --------------------------------------------------------- |
+| `Breadcrumb`  | `<nav>`, `<ol>`, `<a>`               | no       | links in order; the current page is `aria-current="page"` |
+| `Pagination`  | `<nav>`, `<ul>`, `<a>` or `<button>` | no       | the page is the consumer's — usually the URL's            |
+| `Table`       | `<table>` and its sections           | no       | rows, headers and `scope` are the platform's              |
+| `Kbd`         | `<kbd>`                              | no       | a key, styled                                             |
+| `Avatar`      | `<span>`, `<img>`                    | yes      | whether the image loaded is state                         |
+| `Toggle`      | `<button aria-pressed>`              | yes      | pressed is state                                          |
+| `ToggleGroup` | `role="group"` of Toggles            | yes      | a shared value, and arrow keys between them               |
+| `Toolbar`     | `role="toolbar"`                     | yes      | one Tab stop, arrow keys inside (`core/rovingFocus`)      |
+
+**`Breadcrumb` separators are CSS.** A `/` drawn by `::before` with empty alternative text
+(`content: "/" / ""`), so it is not read out between links, and no separator part exists.
+Parts: `Root` (`<nav aria-label="Breadcrumb">` around an `<ol>`), `Item` (`<li>`), `Link` (an
+`<a>`, a router's through `render`), `Current` (`aria-current="page"`, not a link).
+
+**`Pagination` holds no page.** The current page is the URL's, or the consumer's state, so
+`page` and `count` are required props and there is nothing to be uncontrolled. With
+`getHref(page)` each page is a link — the right element when pages are addresses; without it,
+buttons calling `onPageChange(page)`. Unavailable Previous or Next is a disabled button, or plain
+text for links, since a link cannot be disabled (decision 15). The range is the exported
+`paginationRange()`, a pure function a custom layout can reuse: every page when they fit in
+`2 × siblings + 5` slots, otherwise the same number of slots — first, last, the current page's
+neighbours — so the row does not change width as the page moves, with an ellipsis only where it
+stands for two pages or more.
+
+**`Table` is the native table, styled.** Parts map onto its elements: `Root` (`<table>`, inside a
+scrolling container), `Caption`, `Header`, `Body`, `Footer`, `Row`, `Head` (`<th>`, `scope="col"`
+by default) and `Cell`. Sorting is the consumer's: a `<button>` in the `Head`, and `aria-sort` on
+it, which the styling shows. A data grid — cell focus and arrow keys — is a different widget,
+ruled out here.
+
+**`Avatar`** is Base UI's three parts: `Root`, `Image` (rendered, and shown only once loaded) and
+`Fallback` (initials or an icon, shown until then, or for good if it fails; `delay` avoids a
+flash when the image is quick).
+
+**`Toggle`, `ToggleGroup` and `Toolbar`** follow Base UI and APG. A `Toggle` is a `<button>` with
+`aria-pressed`, through `useControlled`. A `ToggleGroup` holds a `value` array — one entry, or any
+number with `multiple` — and is one Tab stop with arrow keys between its Toggles. A `Toolbar` is
+`role="toolbar"`, one Tab stop, arrow keys across its `Button`s, `Link`s, `Input`s and groups, with
+`Separator`s between. Roving focus is `core/rovingFocus`, already Tabs' and Menu's.
+
+**Rules out:** a separator part in Breadcrumb; an uncontrolled Pagination; a data grid; a
+`checkbox` styled as a toggle, which says "checked", not "pressed".

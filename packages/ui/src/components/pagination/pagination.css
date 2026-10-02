@@ -1,0 +1,57 @@
+@layer pagination {
+  .pagination-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--pagination-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pagination-item,
+  .pagination-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: var(--pagination-item-size);
+    block-size: var(--pagination-item-size);
+    padding: 0 var(--space-2xs);
+    font-size: var(--pagination-font-size);
+  }
+
+  .pagination-item {
+    border: none;
+    border-radius: var(--pagination-item-radius);
+    background: none;
+    color: var(--pagination-color);
+    font-family: inherit;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .pagination-item:hover:not([aria-current='page'], :disabled, [data-disabled]) {
+    background-color: var(--pagination-bg-hover);
+  }
+
+  .pagination-item[aria-current='page'] {
+    background-color: var(--pagination-current-bg);
+    color: var(--pagination-current-color);
+    cursor: default;
+  }
+
+  .pagination-item:disabled,
+  .pagination-item[data-disabled] {
+    color: var(--pagination-disabled-color);
+    cursor: not-allowed;
+  }
+
+  .pagination-item:focus-visible {
+    outline: var(--space-2px) solid var(--pagination-focus-color);
+    outline-offset: var(--space-2px);
+  }
+
+  .pagination-ellipsis {
+    color: var(--pagination-disabled-color);
+  }
+}

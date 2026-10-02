@@ -1,0 +1,13 @@
+/* Table component tokens — a native table, ruled between rows. */
+:root {
+  --table-font-size: var(--text-sm);
+  --table-cell-padding-block: var(--space-2xs);
+  --table-cell-padding-inline: var(--space-sm);
+  --table-border-color: var(--color-border-default);
+  --table-head-color: var(--color-text-secondary);
+  --table-head-font-weight: var(--font-weight-semibold);
+  --table-head-bg: var(--color-bg-secondary);
+  --table-row-bg-hover: var(--color-bg-secondary);
+  --table-caption-color: var(--color-text-muted);
+  --table-radius: var(--radius-md);
+}

@@ -1,0 +1,40 @@
+---
+title: Breadcrumb
+description: Where the page sits, as a trail of links.
+---
+
+import Example from '@/components/Example.astro';
+import BreadcrumbBasics from '@/examples/breadcrumb-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="breadcrumb-basics">
+  <BreadcrumbBasics client:load />
+</Example>
+
+`Breadcrumb` is a `<nav aria-label="Breadcrumb">` around an ordered list of links. The page you
+are on comes last, as `Breadcrumb.Current`: not a link, and marked `aria-current="page"`. The
+`/` between steps is drawn by CSS and not read out.
+
+## Anatomy
+
+```tsx
+<Breadcrumb.Root>
+  <Breadcrumb.Item>
+    <Breadcrumb.Link href="/">Home</Breadcrumb.Link>
+  </Breadcrumb.Item>
+  <Breadcrumb.Item>
+    <Breadcrumb.Current>Settings</Breadcrumb.Current>
+  </Breadcrumb.Item>
+</Breadcrumb.Root>
+```
+
+Pass your router's link to `Breadcrumb.Link` through `render`, as with [Link](/components/link/).
+
+## Props
+
+<PropTable component="Breadcrumb.Root" />
+
+## Notes
+
+- With two breadcrumbs on a page, give each its own `aria-label`.
+- Restyle with the `--breadcrumb-*` tokens.

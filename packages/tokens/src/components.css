@@ -28,3 +28,7 @@
 @import './components/skeleton.css';
 @import './components/spinner.css';
 @import './components/toast.css';
+@import './components/breadcrumb.css';
+@import './components/kbd.css';
+@import './components/pagination.css';
+@import './components/table.css';

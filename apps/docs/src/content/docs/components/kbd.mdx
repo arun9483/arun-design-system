@@ -1,0 +1,19 @@
+---
+title: Kbd
+description: A key on the keyboard.
+---
+
+import Example from '@/components/Example.astro';
+import KbdBasics from '@/examples/kbd-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="kbd-basics">
+  <KbdBasics client:load />
+</Example>
+
+`Kbd` is a styled `<kbd>`, for a key in running text. Write a combination as keys side by side.
+It sizes with the surrounding text.
+
+## Props
+
+<PropTable component="Kbd" />

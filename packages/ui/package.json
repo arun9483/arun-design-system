@@ -65,7 +65,11 @@
     "./css/alert": "./dist/css/alert.css",
     "./css/spinner": "./dist/css/spinner.css",
     "./css/skeleton": "./dist/css/skeleton.css",
-    "./css/toast": "./dist/css/toast.css"
+    "./css/toast": "./dist/css/toast.css",
+    "./css/breadcrumb": "./dist/css/breadcrumb.css",
+    "./css/pagination": "./dist/css/pagination.css",
+    "./css/table": "./dist/css/table.css",
+    "./css/kbd": "./dist/css/kbd.css"
   },
   "publishConfig": {
     "access": "public"

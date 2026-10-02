@@ -1,0 +1,41 @@
+---
+title: Pagination
+description: Page links or buttons, with Previous and Next.
+---
+
+import Example from '@/components/Example.astro';
+import PaginationBasics from '@/examples/pagination-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="pagination-basics" layout="stack">
+  <PaginationBasics client:load />
+</Example>
+
+`Pagination` shows the first and last pages, the current one with its neighbours, and an ellipsis
+for the rest. It always uses the same number of slots, so the row doesn't change width as you
+move. The current page is marked `aria-current="page"`.
+
+## Links or buttons
+
+The page is yours, so `page` and `count` are always given:
+
+- **Pages are URLs** (`?page=3`): pass `getHref`, and each page is a link. Opening one in a new
+  tab works, and so does the back button.
+- **Pages are state**: pass `onPageChange`, and each page is a button.
+
+```tsx
+<Pagination page={page} count={20} getHref={(p) => `?page=${p}`} />
+<Pagination page={page} count={20} onPageChange={setPage} />
+```
+
+On the first or last page, Previous or Next is disabled. As a link it becomes plain text, since a
+link can't be disabled.
+
+## Your own layout
+
+`paginationRange(page, count, siblings)` returns the entries the component shows, numbers and
+`'ellipsis'`, so a layout of your own can use the same rules.
+
+## Props
+
+<PropTable component="Pagination" common={false} />

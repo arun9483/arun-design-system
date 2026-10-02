@@ -1,0 +1,78 @@
+@layer table {
+  .table-container {
+    max-inline-size: 100%;
+    overflow-x: auto;
+    border: var(--space-px) solid var(--table-border-color);
+    border-radius: var(--table-radius);
+  }
+
+  .table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: var(--table-font-size);
+  }
+
+  .table-caption {
+    padding: var(--table-cell-padding-block) var(--table-cell-padding-inline);
+    color: var(--table-caption-color);
+    text-align: start;
+    caption-side: bottom;
+  }
+
+  .table-head,
+  .table-cell {
+    padding: var(--table-cell-padding-block) var(--table-cell-padding-inline);
+    border-block-end: var(--space-px) solid var(--table-border-color);
+    text-align: start;
+  }
+
+  .table-head {
+    color: var(--table-head-color);
+    font-weight: var(--table-head-font-weight);
+    white-space: nowrap;
+  }
+
+  /* The header row is shaded; a row header in the body reads as a cell, only bolder. */
+  .table-header .table-head {
+    background-color: var(--table-head-bg);
+  }
+
+  .table-body .table-head {
+    color: inherit;
+  }
+
+  .table-body .table-row:last-child > .table-cell {
+    border-block-end: none;
+  }
+
+  .table-body .table-row:hover {
+    background-color: var(--table-row-bg-hover);
+  }
+
+  .table-footer .table-cell {
+    border-block-start: var(--space-px) solid var(--table-border-color);
+    border-block-end: none;
+    font-weight: var(--table-head-font-weight);
+  }
+
+  /* A sortable column: its button fills the cell, and aria-sort draws the arrow. */
+  .table-head > button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .table-head[aria-sort='ascending'] > button::after {
+    content: '↑' / '';
+  }
+
+  .table-head[aria-sort='descending'] > button::after {
+    content: '↓' / '';
+  }
+}
