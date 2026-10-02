@@ -124,6 +124,46 @@
         "default": "./dist/toast/index.cjs"
       }
     },
+    "./avatar": {
+      "import": {
+        "types": "./dist/avatar/index.d.ts",
+        "default": "./dist/avatar/index.js"
+      },
+      "require": {
+        "types": "./dist/avatar/index.d.cts",
+        "default": "./dist/avatar/index.cjs"
+      }
+    },
+    "./toggle": {
+      "import": {
+        "types": "./dist/toggle/index.d.ts",
+        "default": "./dist/toggle/index.js"
+      },
+      "require": {
+        "types": "./dist/toggle/index.d.cts",
+        "default": "./dist/toggle/index.cjs"
+      }
+    },
+    "./toggle-group": {
+      "import": {
+        "types": "./dist/toggle-group/index.d.ts",
+        "default": "./dist/toggle-group/index.js"
+      },
+      "require": {
+        "types": "./dist/toggle-group/index.d.cts",
+        "default": "./dist/toggle-group/index.cjs"
+      }
+    },
+    "./toolbar": {
+      "import": {
+        "types": "./dist/toolbar/index.d.ts",
+        "default": "./dist/toolbar/index.js"
+      },
+      "require": {
+        "types": "./dist/toolbar/index.d.cts",
+        "default": "./dist/toolbar/index.cjs"
+      }
+    },
     "./switch": {
       "import": {
         "types": "./dist/switch/index.d.ts",

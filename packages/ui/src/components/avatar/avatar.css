@@ -1,0 +1,33 @@
+@layer avatar {
+  .avatar {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--avatar-size);
+    block-size: var(--avatar-size);
+    overflow: hidden;
+    border-radius: var(--avatar-radius);
+    background-color: var(--avatar-bg);
+    color: var(--avatar-color);
+    font-weight: var(--avatar-font-weight);
+    font-size: calc(var(--avatar-size) * 0.4);
+    vertical-align: middle;
+    user-select: none;
+  }
+
+  /* Loaded, the picture fills it: no disc behind a transparent image. */
+  .avatar[data-image-status='loaded'] {
+    background: none;
+  }
+
+  .avatar-image {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .avatar-fallback {
+    line-height: 1;
+  }
+}

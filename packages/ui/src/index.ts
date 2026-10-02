@@ -76,3 +76,9 @@ export type {
 } from './components/table';
 export { Kbd } from './components/kbd';
 export type { KbdProps } from './components/kbd';
+export { Toggle } from './components/toggle';
+export type { ToggleProps } from './components/toggle';
+export { ToggleGroup } from './components/toggle-group';
+export type { ToggleGroupProps } from './components/toggle-group';
+export { Toolbar } from './components/toolbar';
+export { Avatar } from './components/avatar';

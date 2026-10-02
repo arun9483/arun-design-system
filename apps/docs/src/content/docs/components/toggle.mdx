@@ -1,0 +1,51 @@
+---
+title: Toggle
+description: A button that stays pressed, alone or in a group.
+---
+
+import Example from '@/components/Example.astro';
+import ToggleBasics from '@/examples/toggle-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="toggle-basics">
+  <ToggleBasics client:load />
+</Example>
+
+`Toggle` is a `<button aria-pressed>`: a button that stays pressed, such as Mute or Bold. Screen
+readers say "pressed" or "not pressed".
+
+## ToggleGroup
+
+`ToggleGroup` holds the values of its pressed Toggles:
+
+- **One at a time** by default: pressing one releases the others, and pressing the pressed one
+  releases it.
+- **Several** with `multiple`.
+- **One Tab stop**: Tab reaches the pressed Toggle (or the first), and the arrow keys move
+  along, skipping disabled ones.
+
+```tsx
+<ToggleGroup aria-label="Alignment" value={align} onValueChange={setAlign}>
+  <Toggle value="left">Left</Toggle>
+  <Toggle value="center">Center</Toggle>
+</ToggleGroup>
+```
+
+Inside a [Toolbar](/components/toolbar/), a ToggleGroup's Toggles join the toolbar's arrow keys.
+
+## Props
+
+### `Toggle`
+
+<PropTable component="Toggle" />
+
+### `ToggleGroup`
+
+<PropTable component="ToggleGroup" />
+
+## Notes
+
+- A choice that's on or off in a form, such as "Email me updates", is a
+  [Switch](/components/switch/) or a [Checkbox](/components/checkbox/). A Toggle is for actions
+  and view states.
+- Restyle with the `--toggle-*` tokens.

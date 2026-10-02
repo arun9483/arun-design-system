@@ -71,6 +71,10 @@ import type {
 } from '@arun-dev/ui';
 import type { FieldControlProps, FieldRootProps } from '@arun-dev/headless/field';
 import type { ToastProviderProps } from '@arun-dev/headless/toast';
+import type { ToggleProps } from '@arun-dev/headless/toggle';
+import type { ToggleGroupProps } from '@arun-dev/headless/toggle-group';
+import type { ToolbarRootProps } from '@arun-dev/headless/toolbar';
+import type { AvatarFallbackProps } from '@arun-dev/headless/avatar';
 import type { TabsListProps, TabsPanelProps, TabsTabProps } from '@arun-dev/headless/tabs';
 import type { COMMON, PROPS } from './props';
 
@@ -94,6 +98,10 @@ type Unknown =
   | OnlyRealProps<Documented<'Table.Root'>, TableRootProps>
   | OnlyRealProps<Documented<'Table.Head'>, TableHeadProps>
   | OnlyRealProps<Documented<'Kbd'>, KbdProps>
+  | OnlyRealProps<Documented<'Toggle'>, ToggleProps>
+  | OnlyRealProps<Documented<'ToggleGroup'>, ToggleGroupProps>
+  | OnlyRealProps<Documented<'Toolbar.Root'>, ToolbarRootProps>
+  | OnlyRealProps<Documented<'Avatar.Fallback'>, AvatarFallbackProps>
   | OnlyRealProps<Documented<'Accordion.Root'>, AccordionRootProps>
   | OnlyRealProps<Documented<'Accordion.Item'>, AccordionItemProps>
   | OnlyRealProps<Documented<'Alert.Root'>, AlertRootProps>

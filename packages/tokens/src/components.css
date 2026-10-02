@@ -32,3 +32,6 @@
 @import './components/kbd.css';
 @import './components/pagination.css';
 @import './components/table.css';
+@import './components/avatar.css';
+@import './components/toggle.css';
+@import './components/toolbar.css';

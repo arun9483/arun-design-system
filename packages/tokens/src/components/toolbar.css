@@ -1,0 +1,10 @@
+/* Toolbar component tokens — a row of controls with one Tab stop. */
+:root {
+  --toolbar-gap: var(--space-3xs);
+  --toolbar-padding: var(--space-3xs);
+  --toolbar-radius: var(--radius-md);
+  --toolbar-border-color: var(--color-border-default);
+  --toolbar-bg: var(--color-bg-primary);
+  --toolbar-separator-color: var(--color-border-default);
+  --toolbar-input-inline-size: 4rem;
+}

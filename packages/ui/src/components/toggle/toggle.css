@@ -1,0 +1,61 @@
+@layer toggle {
+  /* Also the look of a Toolbar's buttons, so a Toolbar's Toggles and Buttons match. */
+  .toggle,
+  .toolbar-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3xs);
+    min-inline-size: var(--toggle-height);
+    block-size: var(--toggle-height);
+    padding: 0 var(--toggle-padding-inline);
+    border: none;
+    border-radius: var(--toggle-radius);
+    background: none;
+    color: var(--toggle-color);
+    font: inherit;
+    font-size: var(--toggle-font-size);
+    cursor: pointer;
+  }
+
+  .toggle:hover:not(:disabled, [data-pressed]),
+  .toolbar-button:hover:not(:disabled) {
+    background-color: var(--toggle-bg-hover);
+    color: var(--color-text-primary);
+  }
+
+  .toggle[data-pressed] {
+    background-color: var(--toggle-pressed-bg);
+    color: var(--toggle-pressed-color);
+  }
+
+  .toggle:focus-visible,
+  .toolbar-button:focus-visible {
+    outline: var(--space-2px) solid var(--toggle-focus-color);
+    outline-offset: var(--space-px);
+  }
+
+  .toggle:disabled,
+  .toolbar-button:disabled {
+    opacity: var(--toggle-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  .toggle-group {
+    display: inline-flex;
+    gap: var(--toggle-group-gap);
+    padding: var(--toggle-group-padding);
+    border: var(--space-px) solid var(--toggle-group-border-color);
+    border-radius: var(--toggle-group-radius);
+  }
+
+  .toggle-group[data-orientation='vertical'] {
+    flex-direction: column;
+  }
+
+  /* In a Toolbar the group is only a grouping: the Toolbar draws the frame. */
+  .toolbar .toggle-group {
+    padding: 0;
+    border: none;
+  }
+}

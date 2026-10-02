@@ -1,0 +1,8 @@
+/* Avatar component tokens — a person's picture, or their initials. */
+:root {
+  --avatar-size: 2.5rem;
+  --avatar-radius: var(--radius-full);
+  --avatar-bg: var(--color-border-default);
+  --avatar-color: var(--color-text-secondary);
+  --avatar-font-weight: var(--font-weight-medium);
+}
