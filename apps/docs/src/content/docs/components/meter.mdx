@@ -1,0 +1,32 @@
+---
+title: Meter
+description: How much of a known range is used, as a native meter.
+---
+
+import Example from '@/components/Example.astro';
+import MeterBasics from '@/examples/meter-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="meter-basics" layout="stack">
+  <MeterBasics client:load />
+</Example>
+
+`Meter` is a native `<meter>`, for a measurement within a known range, such as disk usage or a
+password's strength. `low`, `high` and `optimum` colour it as the browser does:
+
+| Region                  | Colour | Token                      |
+| ----------------------- | ------ | -------------------------- |
+| the one `optimum` is in | good   | `--meter-optimum-color`    |
+| next to it              | fair   | `--meter-suboptimum-color` |
+| the far side            | poor   | `--meter-poor-color`       |
+
+In the example, low usage is best (`optimum` is low), so usage past `high` turns red.
+
+## Props
+
+<PropTable component="Meter" />
+
+## Notes
+
+- Progress through a task is a [Progress](/components/progress/).
+- Name it with a `<label>` or `aria-label`, and put the value in the text.

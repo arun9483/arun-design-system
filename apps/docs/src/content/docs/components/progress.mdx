@@ -1,0 +1,28 @@
+---
+title: Progress
+description: How far along a task is, as a native progress bar.
+---
+
+import Example from '@/components/Example.astro';
+import ProgressBasics from '@/examples/progress-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="progress-basics" layout="stack">
+  <ProgressBasics client:load />
+</Example>
+
+`Progress` is a native `<progress>`. Give it `value` and `max` to show how far along a task is.
+Leave out `value` and it is indeterminate: a short bar sweeps across while you wait. The sweep
+stops under reduced motion.
+
+Name it with a `<label>` or `aria-label`, and put the percentage in the text if it matters.
+
+## Props
+
+<PropTable component="Progress" />
+
+## Notes
+
+- To show how much of a range is used, such as disk space or password strength, use a
+  [Meter](/components/meter/).
+- Restyle with `--progress-height`, `--progress-track-color` and `--progress-bar-color`.

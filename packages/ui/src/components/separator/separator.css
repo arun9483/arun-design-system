@@ -1,0 +1,18 @@
+@layer separator {
+  /* The line only. Space around it is the layout's — a gap — so a reset's margin: 0, layered
+     after this one, cannot collapse it. */
+  .separator {
+    flex-shrink: 0;
+    align-self: stretch;
+    block-size: var(--separator-thickness);
+    margin: 0;
+    border: none;
+    background-color: var(--separator-color);
+  }
+
+  /* Upright, it takes the height of the row it sits in. */
+  .separator[data-orientation='vertical'] {
+    inline-size: var(--separator-thickness);
+    block-size: auto;
+  }
+}

@@ -28,6 +28,12 @@ const CSS_LAYERS = [
   { layer: 'checkbox', src: 'src/components/checkbox/checkbox.css' },
   { layer: 'radio-group', src: 'src/components/radio-group/radio-group.css' },
   { layer: 'switch', src: 'src/components/switch/switch.css' },
+  { layer: 'field', src: 'src/components/field/field.css' },
+  { layer: 'link', src: 'src/components/link/link.css' },
+  { layer: 'separator', src: 'src/components/separator/separator.css' },
+  { layer: 'progress', src: 'src/components/progress/progress.css' },
+  { layer: 'meter', src: 'src/components/meter/meter.css' },
+  { layer: 'slider', src: 'src/components/slider/slider.css' },
   { layer: 'metric', src: 'src/css/metric.css' },
   { layer: 'utilities', src: 'src/css/utilities.css' },
 ] as const;

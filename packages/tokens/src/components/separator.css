@@ -1,0 +1,6 @@
+/* Separator component tokens — an <hr>, across or upright. It draws the line only:
+   the space around it is the layout's gap, not a margin a reset could zero. */
+:root {
+  --separator-color: var(--color-border-default);
+  --separator-thickness: var(--space-px);
+}

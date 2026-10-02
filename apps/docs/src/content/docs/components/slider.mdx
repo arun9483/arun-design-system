@@ -1,0 +1,30 @@
+---
+title: Slider
+description: A value picked along a range, as a native range input.
+---
+
+import Example from '@/components/Example.astro';
+import SliderBasics from '@/examples/slider-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="slider-basics" layout="stack">
+  <SliderBasics client:load />
+</Example>
+
+`Slider` is a native `<input type="range">`. The arrow keys, Page Up and Down, Home and End,
+`step`, the form value and `form.reset()` are all the browser's, and react-hook-form's
+`register()` binds it.
+
+The browser draws it, in the brand's accent colour (`accent-color`), with the track filled up
+to the thumb. Show the value yourself if it matters, such as with an `<output>` beside the
+label.
+
+## Props
+
+<PropTable component="Slider" />
+
+## Notes
+
+- One thumb only. For a range from–to, use two sliders, or two number inputs.
+- The track and thumb shape are the browser's. Only the colour is themed, through
+  `--slider-accent-color`.

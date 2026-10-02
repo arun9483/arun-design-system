@@ -1,0 +1,19 @@
+@layer slider {
+  /* The platform draws the track, the fill and the thumb; accent-color colours them. */
+  .slider {
+    inline-size: 100%;
+    margin: 0;
+    accent-color: var(--slider-accent-color);
+    cursor: pointer;
+  }
+
+  .slider:focus-visible {
+    outline: var(--space-2px) solid var(--slider-focus-color);
+    outline-offset: var(--space-2px);
+  }
+
+  .slider:disabled {
+    opacity: var(--slider-disabled-opacity);
+    cursor: not-allowed;
+  }
+}

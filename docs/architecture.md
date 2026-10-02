@@ -592,17 +592,17 @@ Shipped since this list was written:
 | Roving tabindex                       | with Tabs: internal `core/rovingFocus`, for Menu and Toolbar to reuse     |
 | `focusableWhenDisabled`               | with Menu: an opt-in on Menu and Tabs, skipping by default — below        |
 | Combobox                              | decided: driven by data, Base UI's behaviour — decision 14                |
+| `Link`                                | with the form basics: always an `<a href>`, no `disabled` — decision 15   |
 
 Still deferred:
 
-| Deferred                                 | Revisit when                                                            |
-| ---------------------------------------- | ----------------------------------------------------------------------- |
-| Memoisation inside `useRender`           | profiling shows the per-render merge costs something                    |
-| `Link` — navigation, split out of Button | a consumer needs a styled link                                          |
-| Customizable select (`base-select`)      | it ships in every engine; it swaps the system picker for an in-page one |
-| Menu typeahead                           | a menu long enough to need it; items would need a `textValue` prop      |
-| Submenus                                 | a consumer needs nesting; it needs pointer intent and a second anchor   |
-| Checkbox and radio menu items, groups    | a consumer needs a menu that holds state rather than runs actions       |
+| Deferred                              | Revisit when                                                            |
+| ------------------------------------- | ----------------------------------------------------------------------- |
+| Memoisation inside `useRender`        | profiling shows the per-render merge costs something                    |
+| Customizable select (`base-select`)   | it ships in every engine; it swaps the system picker for an in-page one |
+| Menu typeahead                        | a menu long enough to need it; items would need a `textValue` prop      |
+| Submenus                              | a consumer needs nesting; it needs pointer intent and a second anchor   |
+| Checkbox and radio menu items, groups | a consumer needs a menu that holds state rather than runs actions       |
 
 Popover, Tooltip and Menu shipped on decision 12; Combobox follows it — decision 14.
 
@@ -823,3 +823,75 @@ features weighed in October 2026 and judged not needed:
   the many to serve the few.
 
 Nothing about Combobox is deferred.
+
+---
+
+## 15. Form basics: native elements, one headless part
+
+Phase one of completing the component set: `Field`, `Link`, `Separator`, `Progress`, `Meter` and
+`Slider`. Five of the six are a native element with styling — decision 7's test, "does it require
+JavaScript?", answers no — so they live in `@arun-dev/ui` alone, as `Input` and `Select` do.
+`Field` is the exception: tying a label, a description and an error to a control means generated
+ids and an `aria-describedby` that changes with what is shown, which is computed ARIA, so it has
+a headless half.
+
+| Component   | Element                   | Headless | Why                                                    |
+| ----------- | ------------------------- | -------- | ------------------------------------------------------ |
+| `Link`      | `<a href>`                | no       | focus, activation and navigation are the platform's    |
+| `Separator` | `<hr>`                    | no       | the platform exposes `role="separator"`                |
+| `Progress`  | `<progress>`              | no       | value, max and indeterminate are native, and styleable |
+| `Meter`     | `<meter>`                 | no       | low, high and optimum colour the bar natively          |
+| `Slider`    | `<input type="range">`    | no       | keys, steps and the form value are native              |
+| `Field`     | `<div>`, `<label>`, `<p>` | yes      | ids and a changing `aria-describedby` are computed     |
+
+**`Link` is always an `<a href>`, and cannot be disabled.** Decision 7 split navigation out of
+`Button`; this is that half. A disabled link has no platform meaning — the attribute is inert
+on `<a>` — and synthesising one was what `useButton` did wrong, so there is no `disabled`.
+`render` takes a router's link (`<NextLink />`) and keeps the styling. No automatic
+`target="_blank"` or external icon: those are the consumer's choice, per link.
+
+**`Separator` is an `<hr>`.** `orientation="vertical"` sets `aria-orientation` and
+`data-orientation`, for a divider in a toolbar or between inline items; the element stays an
+`<hr>`, so it is still a separator to assistive technology. A purely decorative line is the
+consumer's `aria-hidden`. It draws the line and no margin: the space around it is the layout's `gap`.
+Measured on the docs site, a reset's `* { margin: 0 }` in a cascade layer declared after ours
+zeroed a margin here, as any consumer's later or unlayered reset would.
+
+**`Progress` and `Meter` are styled native elements.** `appearance: none` and the engines'
+pseudo-elements (`::-webkit-progress-value`, `::-moz-progress-bar`, `::-webkit-meter-*`,
+`:-moz-meter-*`) style them in every supported browser, so the styling test passes. Omitting
+`value` on `<progress>` is native indeterminate, styled from `:indeterminate`. `Meter` keeps the
+platform's three regions — `optimum`, `suboptimum`, `even-less-good` from `low`, `high` and
+`optimum` — mapped onto the success, warning and error status tokens. Progress is "how far
+along"; Meter is "how much of a known range": a disk's usage, a password's strength.
+
+**`Slider` is a native range input, coloured with `accent-color`.** A filled track — the part
+before the thumb — is the one thing the native range cannot draw from CSS alone in Chromium and
+WebKit: there is no `::-webkit-slider-progress`, so a fill needs the value in a custom property,
+updated on every input by script. That is behaviour, which decision 7 keeps out of
+`@arun-dev/ui`, for a visual. `accent-color` draws the native, filled slider in all three
+engines, in the brand's accent, with the platform's thumb, keyboard, `step`, form value and
+`form.reset()`. Size is the platform's. A multi-thumb range slider fails the behaviour test and
+is ruled out: two native inputs side by side are the consumer's pattern.
+
+**`Field` ties a label, a description and an error to one control.** Parts, fewest first
+(decision 11): `Root`, `Label`, `Control`, `Description`, `Error`.
+
+- `Root` generates the ids and holds `invalid`, `disabled` and `required`.
+- `Label` is a `<label htmlFor>` the control's id.
+- `Control` renders its `render` — `<Input />`, `<Select />`, `<Checkbox.Root />`,
+  `<Combobox.Input />` — and merges `id`, `aria-describedby`, `aria-invalid`, `disabled` and
+  `required` onto it. Field does not reach into each control; `render` is the seam (decision 10).
+- `Description` and `Error` register when rendered, so `aria-describedby` names exactly what is
+  on screen — the description, then the error.
+- `Error` renders only while the Root is `invalid`.
+
+Validity is the consumer's: `invalid` comes from react-hook-form's `fieldState`, or from a
+`required` the browser reported. Field reads no `ValidityState` and writes no message — the
+browser's own bubble and `:user-invalid` stay the platform's. Base UI's Field also validates
+(`validate`, `validationMode`); that is a form library's job, and react-hook-form already does
+it for every consumer here. A group of controls under one label is a `<fieldset>` with a
+`<legend>`, native, so there is no `Fieldset` part.
+
+**Rules out:** `disabled` on `Link`; a filled track drawn by script on `Slider`; a multi-thumb
+slider; validation inside `Field`; a `Fieldset` part.

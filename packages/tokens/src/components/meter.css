@@ -1,0 +1,10 @@
+/* Meter component tokens — a native <meter>: how much of a known range. Its three regions,
+   from low, high and optimum, map onto the status tokens. */
+:root {
+  --meter-height: var(--space-2xs);
+  --meter-radius: var(--radius-full);
+  --meter-track-color: var(--color-bg-secondary);
+  --meter-optimum-color: var(--color-status-success);
+  --meter-suboptimum-color: var(--color-status-warning);
+  --meter-poor-color: var(--color-status-error);
+}

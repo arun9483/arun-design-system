@@ -1,0 +1,9 @@
+/* Link component tokens — an <a href> in running text or on its own. */
+:root {
+  --link-color: var(--color-text-accent);
+  --link-color-hover: var(--color-text-primary);
+  --link-underline-color: var(--color-border-accent);
+  --link-underline-thickness: var(--space-px);
+  --link-underline-offset: 0.2em;
+  --link-focus-color: var(--color-text-accent);
+}

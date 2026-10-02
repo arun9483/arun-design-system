@@ -1,0 +1,37 @@
+---
+title: Link
+description: Navigation, always a native link.
+---
+
+import Example from '@/components/Example.astro';
+import LinkBasics from '@/examples/link-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="link-basics">
+  <LinkBasics client:load />
+</Example>
+
+`Link` is always an `<a href>`, so focus, Enter, "open in new tab" and the back button are the
+browser's. Use it to go somewhere. To do something, such as save or delete, use a
+[Button](/components/button/).
+
+## With a router
+
+Pass your router's link through `render`. The styling stays, and the router handles the click:
+
+```tsx
+import NextLink from 'next/link';
+
+<Link render={<NextLink href="/docs" />}>Docs</Link>;
+```
+
+## Props
+
+<PropTable component="Link" />
+
+## Notes
+
+- There is no `disabled`: it has no meaning on a link. Render plain text instead.
+- Opening in a new tab is your choice, per link: add `target="_blank"` and
+  `rel="noreferrer"`, and say so in the text.
+- Restyle with `--link-color`, `--link-color-hover` and `--link-underline-*`.

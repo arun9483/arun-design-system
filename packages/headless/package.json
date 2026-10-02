@@ -104,6 +104,16 @@
         "default": "./dist/radio-group/index.cjs"
       }
     },
+    "./field": {
+      "import": {
+        "types": "./dist/field/index.d.ts",
+        "default": "./dist/field/index.js"
+      },
+      "require": {
+        "types": "./dist/field/index.d.cts",
+        "default": "./dist/field/index.cjs"
+      }
+    },
     "./switch": {
       "import": {
         "types": "./dist/switch/index.d.ts",

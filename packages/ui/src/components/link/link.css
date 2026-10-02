@@ -1,0 +1,22 @@
+@layer link {
+  /* An underline that is quieter than the text until hovered, so running text stays calm. */
+  .link {
+    color: var(--link-color);
+    text-decoration-line: underline;
+    text-decoration-color: var(--link-underline-color);
+    text-decoration-thickness: var(--link-underline-thickness);
+    text-underline-offset: var(--link-underline-offset);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  .link:hover {
+    color: var(--link-color-hover);
+    text-decoration-color: currentColor;
+  }
+
+  .link:focus-visible {
+    outline: var(--space-2px) solid var(--link-focus-color);
+    outline-offset: var(--space-2px);
+  }
+}
