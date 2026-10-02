@@ -1,5 +1,7 @@
 @layer chip {
   .chip {
+    /* A link in this shape is not running text: no underline. */
+    text-decoration: none;
     font-size: var(--chip-font-size);
     padding-inline: var(--chip-padding-inline);
     padding-block: var(--chip-padding-block);

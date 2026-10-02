@@ -54,9 +54,12 @@
     max-width: 100%;
   }
 
+  /* Links keep the colour around them, and their underline: in running text the underline is
+     what tells a link apart, so removing it would leave colour alone, which fails WCAG 1.4.1.
+     Components that are links in a different shape — Chip, Card, Menu items, Breadcrumb —
+     remove it themselves. */
   a {
     color: inherit;
-    text-decoration: none;
   }
 
   button,
