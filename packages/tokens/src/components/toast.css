@@ -1,0 +1,26 @@
+/* Toast component tokens — brief messages stacked in a corner, over the page. */
+:root {
+  --toast-viewport-inset: var(--space-md);
+  --toast-width: 22rem;
+  --toast-gap: var(--space-2xs);
+  --toast-padding: var(--space-sm);
+  --toast-radius: var(--radius-md);
+  --toast-bg: var(--color-bg-primary);
+  --toast-color: var(--color-text-primary);
+  --toast-description-color: var(--color-text-secondary);
+  --toast-border-color: var(--color-border-default);
+  --toast-shadow: var(--shadow-lg);
+  --toast-title-font-weight: var(--font-weight-semibold);
+  --toast-accent-width: var(--space-2px);
+  --toast-close-color: var(--color-text-secondary);
+  --toast-close-bg-hover: var(--color-bg-secondary);
+  --toast-focus-color: var(--color-text-accent);
+  --toast-duration: var(--duration-normal);
+
+  /* Types — the accent along the leading edge; no type keeps the border colour */
+  --toast-accent: var(--toast-border-color);
+  --toast-info-accent: var(--color-status-info);
+  --toast-success-accent: var(--color-status-success);
+  --toast-warning-accent: var(--color-status-warning);
+  --toast-error-accent: var(--color-status-error);
+}

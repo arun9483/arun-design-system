@@ -61,6 +61,7 @@ export default defineConfig({
             { label: 'Skeleton', slug: 'components/skeleton' },
             { label: 'Alert', slug: 'components/alert' },
             { label: 'Accordion', slug: 'components/accordion' },
+            { label: 'Toast', slug: 'components/toast' },
             { label: 'Dialog', slug: 'components/dialog' },
             { label: 'Popover', slug: 'components/popover' },
             { label: 'Menu', slug: 'components/menu' },

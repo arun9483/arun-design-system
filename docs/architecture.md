@@ -948,7 +948,11 @@ shimmer stops under reduced motion. Size and shape are the consumer's `className
 
 - The `Viewport` is a `<section aria-label="Notifications">` with `popover="manual"`, shown while
   any toast is, so it sits in the top layer above a modal Dialog — decision 12's mechanism — with
-  no portal.
+  no portal. It stays open while empty, so the live region exists before the first toast
+  arrives, and is shown again as each arrives, to move above anything opened since. Measured in
+  Chromium: over a modal Dialog it draws on top but is inert, as everything outside a modal
+  `<dialog>` is — readable, not clickable — until the Dialog closes, so a toast that may appear
+  then should keep a `timeout`.
 - It is `aria-live="polite"`; a toast added with `priority: 'high'` is `role="alert"` instead.
 - Timers pause while the pointer is over the Viewport or focus is in it, and while the page is
   hidden, and resume with the time that was left.

@@ -91,6 +91,36 @@ export const PROPS = {
     },
   ],
   Skeleton: [],
+  'Toast.Provider': [
+    {
+      name: 'limit',
+      type: 'number',
+      default: '3',
+      description:
+        'How many show at once. The rest wait, their timers stopped, and show as others close.',
+    },
+    {
+      name: 'timeout',
+      type: 'number',
+      default: '5000',
+      description:
+        'Milliseconds a toast stays, unless it sets its own. `0` keeps toasts until closed.',
+    },
+  ],
+  'Toast.Viewport': [
+    {
+      name: 'closeLabel',
+      type: 'string',
+      default: "'Dismiss'",
+      description: "Accessible name of each toast's close button, in the default rendering.",
+    },
+    {
+      name: 'children',
+      type: '(toasts) => ReactNode',
+      description:
+        'Lay the toasts out yourself with `Toast.Root` and its parts. Omit it for the default rendering.',
+    },
+  ],
   Link: [],
   Separator: [
     {

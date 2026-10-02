@@ -64,7 +64,8 @@
     "./css/accordion": "./dist/css/accordion.css",
     "./css/alert": "./dist/css/alert.css",
     "./css/spinner": "./dist/css/spinner.css",
-    "./css/skeleton": "./dist/css/skeleton.css"
+    "./css/skeleton": "./dist/css/skeleton.css",
+    "./css/toast": "./dist/css/toast.css"
   },
   "publishConfig": {
     "access": "public"
@@ -98,7 +99,7 @@
     "vitest": "4.1.11"
   },
   "peerDependencies": {
-    "@arun-dev/headless": ">=4.12.0",
+    "@arun-dev/headless": ">=4.13.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
   }
