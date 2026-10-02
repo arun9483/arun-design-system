@@ -11,6 +11,7 @@ import ComboboxAsync from '@/examples/combobox-async';
 import ComboboxLazy from '@/examples/combobox-lazy';
 import ComboboxDisabled from '@/examples/combobox-disabled';
 import ComboboxGrouped from '@/examples/combobox-grouped';
+import ComboboxCreatable from '@/examples/combobox-creatable';
 import PropTable from '@/components/PropTable.astro';
 
 `Combobox` is a text input that filters a list as you type. It follows the
@@ -161,6 +162,39 @@ one group at a time. Render a `Group` with its `GroupLabel` and an `Item` per it
 - **The value** is still an item, never a group. A group is any object with an `items` array,
   so an item type with its own `items` array can't be listed ungrouped.
 - Groups don't nest, as with `<optgroup>`, and there is no separator.
+
+## Creating an item
+
+<Example name="combobox-creatable" layout="stack">
+  <ComboboxCreatable client:load />
+</Example>
+
+Offer **Create "x"** when the text matches nothing, as GitHub's label picker does. It is a
+pattern, not a prop. The "Create" row is an ordinary item that you add to `items`:
+
+1. Track the text with `onInputValueChange`.
+2. While no item matches it exactly, ignoring case and accents, add a "Create" item. Give it the
+   text as its label, so a pick puts the new name in the input, and render it as "Create …" in
+   its `Item`.
+3. In `onValueChange`, swap the "Create" item for the real item you make, and add that to your
+   list.
+
+```tsx
+const exact = labels.some((l) => fold(l.name) === fold(text));
+const items = text && !exact ? [...labels, { id: `create:${text}`, name: text, create: true }] : labels;
+
+<Combobox.Root
+  items={items}
+  multiple
+  value={value}
+  onValueChange={(next) => setValue(next.map((l) => (l.create ? createLabel(l.name) : l)))}
+  onInputValueChange={setText}
+>
+```
+
+The arrow keys and Enter reach the "Create" row like any other. Making the item is up to you:
+saving it, asking your server for an id, or opening a [Dialog](/components/dialog/) for a
+colour first.
 
 ## Search
 
@@ -321,7 +355,7 @@ and `ref`.
   wrap them in `useCallback`. A new function each render filters the list again on every
   render.
 - Label the field with a `<label htmlFor>` pointing at the Input's `id`, or with `aria-label`.
-- Not yet: separators, groups in a virtualized list, creating an item that isn't in the list, and
+- Not yet: separators, groups in a virtualized list, action rows such as "Edit labels", and
   the input inside the popup.
 - Restyle every combobox with the `--combobox-*` tokens, e.g. `--combobox-popup-max-height`.
 - Types come from the package that owns them. `ComboboxInputProps` comes from

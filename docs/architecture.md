@@ -766,10 +766,27 @@ is not needed here: the consumer maps the group's already-filtered `items` direc
 recognised by its shape, as in Base UI, so an item type that itself has an `items` array cannot
 be listed ungrouped; none has asked for it.
 
+**Creating an item is a pattern, not an API.** A "Create "x"" row, as GitHub's label picker
+shows when nothing matches, is an item like any other: while the text matches no item exactly
+(case- and accent-insensitive), the consumer adds one to `items` — labelled with the text itself,
+drawn as "Create" by its `Item` — and in `onValueChange` swaps it for the real item it makes.
+Everything else is already there: the filter keeps it (its label is the text), the arrow keys and
+Enter reach it, with `multiple` the query clears, and without it the input shows the new label.
+The browser tests drive this pattern in both modes, with no change to the library.
+
+Measured against the platform and others (October 2026): `<select>` cannot create; `<input
+list>` accepts free text, which is why it was rejected above. Base UI has no API either — its
+"creatable" demo is this same pattern, confirming in a Dialog. React Aria
+(`allowsCustomValue`) and Ark (`allowCustomValue`) accept free text as the value instead, which
+`value` holding items rules out here. An `onCreate(text)` on the Root was weighed and declined
+for now: the pattern needs no new API, keeps creation (async, a Dialog for colour and
+description, a server-assigned id) wholly the consumer's, and adds nothing to every combobox that
+never creates. Revisit if the pattern proves error-prone in real screens.
+
 **Deferred:** separators (`<hr>` in `<select>` is recent, and grouping does not need one),
-nested groups (`<optgroup>` cannot nest), groups with a virtualized list, creating an item that
-is not in the list, the input inside the popup, an inline list, grid navigation, and a built-in
-virtualizer.
+nested groups (`<optgroup>` cannot nest), groups with a virtualized list, the input inside the
+popup, action rows that are not options (GitHub's "Edit labels"), an inline list, grid
+navigation, and a built-in virtualizer.
 
 **Rules out:** items registered as children; selection read from `items` or the DOM; a
 JavaScript positioning engine or a Portal (decision 12); and `cancel()` on change events.

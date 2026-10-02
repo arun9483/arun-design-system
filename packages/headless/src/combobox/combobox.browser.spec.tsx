@@ -168,6 +168,89 @@ const groupNames = () =>
     .queryAllByRole('group', { hidden: true })
     .map((g) => document.getElementById(g.getAttribute('aria-labelledby') ?? '')?.textContent);
 
+// Creating an item is a pattern, not an API (decision 14): a "Create" item joins `items` while
+// nothing matches exactly, and `onValueChange` swaps it for the real one.
+type Label = { id: string; label: string; create?: string };
+
+const fold = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim();
+
+function useCreatable() {
+  const [labels, setLabels] = useState<Label[]>([
+    { id: 'bug', label: 'bug' },
+    { id: 'docs', label: 'documentation' },
+  ]);
+  const [query, setQuery] = useState('');
+  const text = query.trim();
+  const exact = labels.some((l) => fold(l.label) === fold(text));
+  const items =
+    text !== '' && !exact
+      ? // Labelled with the text itself, so a pick puts that in the input; shown as "Create".
+        [...labels, { id: `create:${text}`, label: text, create: text }]
+      : labels;
+  function made(item: Label): Label {
+    if (item.create === undefined) return item;
+    const label = { id: item.create, label: item.create };
+    setLabels((current) => [...current, label]);
+    return label;
+  }
+  return { items, setQuery, made };
+}
+
+function LabelList() {
+  return (
+    <Combobox.Popup data-testid="popup">
+      <Combobox.List>
+        {(item: Label) => (
+          <Combobox.Item key={item.id} value={item}>
+            {item.create === undefined ? item.label : `Create "${item.create}"`}
+          </Combobox.Item>
+        )}
+      </Combobox.List>
+    </Combobox.Popup>
+  );
+}
+
+function CreatableMultiple() {
+  const { items, setQuery, made } = useCreatable();
+  const [value, setValue] = useState<Label[]>([]);
+  return (
+    <form data-testid="form">
+      <Combobox.Root
+        items={items}
+        itemToKey={(l: Label) => l.id}
+        multiple
+        name="product"
+        value={value}
+        onValueChange={(next) => setValue(next.map(made))}
+        onInputValueChange={setQuery}
+      >
+        <Combobox.Input aria-label="Product" />
+        <LabelList />
+      </Combobox.Root>
+    </form>
+  );
+}
+
+function CreatableSingle() {
+  const { items, setQuery, made } = useCreatable();
+  const [value, setValue] = useState<Label | null>(null);
+  return (
+    <form data-testid="form">
+      <Combobox.Root
+        items={items}
+        itemToKey={(l: Label) => l.id}
+        name="product"
+        value={value}
+        onValueChange={(next) => setValue(next && made(next))}
+        onInputValueChange={setQuery}
+      >
+        <Combobox.Input aria-label="Product" />
+        <LabelList />
+      </Combobox.Root>
+    </form>
+  );
+}
+
 describe('Combobox (browser)', () => {
   it('anchors the popup to the input as a native manual popover', () => {
     render(<Basic />);
@@ -402,6 +485,34 @@ describe('Combobox (browser)', () => {
       expect(input().value).toBe('Japan');
       expect(onPick).toHaveBeenCalledWith('jp');
       expect(submitted()).toEqual(['jp']);
+    });
+  });
+
+  describe('creating an item, as a pattern', () => {
+    it('offers "Create" while nothing matches exactly, and Enter adds the new item', async () => {
+      render(<CreatableMultiple />);
+      await userEvent.type(input(), 'urgent');
+      expect(options()).toEqual(['Create "urgent"']);
+      await userEvent.keyboard('{ArrowDown}{Enter}');
+      expect(submitted()).toEqual(['urgent']);
+      await userEvent.click(input());
+      expect(options()).toEqual(['bug', 'documentation', 'urgent']);
+    });
+
+    it('hides "Create" when an item matches exactly, ignoring case and accents', async () => {
+      render(<CreatableMultiple />);
+      await userEvent.type(input(), 'BUG');
+      expect(options()).toEqual(['bug']);
+    });
+
+    it('works without multiple: the input shows the created label', async () => {
+      render(<CreatableSingle />);
+      await userEvent.type(input(), 'feature');
+      await userEvent.click(option('Create "feature"'));
+      expect(input().value).toBe('feature');
+      expect(submitted()).toEqual(['feature']);
+      await userEvent.click(input());
+      expect(options()).toEqual(['bug', 'documentation', 'feature']);
     });
   });
 
