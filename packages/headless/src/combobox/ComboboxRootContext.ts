@@ -67,6 +67,7 @@ export type ComboboxChipEntry = {
 
 /** What the parts need from the Root beyond its state. Items are `unknown` here: `T` is the consumer's. */
 export type ComboboxRootContextValue = ComboboxState & {
+  required: boolean;
   inputValue: string;
   loading: boolean;
   /** The items the List renders, after filtering. */
@@ -77,8 +78,15 @@ export type ComboboxRootContextValue = ComboboxState & {
   indexByKey: ReadonlyMap<string, number>;
   /** Keys of the selected items. */
   selectedKeys: ReadonlySet<string>;
-  /** Keys of items disabled by their Item's props — read when the arrow keys move. */
-  disabledKeys: Set<string>;
+  /**
+   * Keys of items disabled by their Item's props, kept after it unmounts. The arrow keys skip
+   * them, and with `multiple` a selected one cannot be removed.
+   */
+  disabledKeys: ReadonlySet<string>;
+  /** Called by each Item as it renders: whether it is disabled. */
+  setItemDisabled: (key: string, disabled: boolean) => void;
+  /** Selected items that can be removed: all of them, but the disabled ones with `multiple`. */
+  removableItems: readonly unknown[];
   highlight: HighlightStore;
   setHighlight: (index: number, reason: ComboboxHighlightReason) => void;
   setOpen: (open: boolean, reason: ComboboxChangeReason) => void;

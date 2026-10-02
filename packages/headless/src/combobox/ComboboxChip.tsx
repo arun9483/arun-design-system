@@ -22,9 +22,11 @@ export type ComboboxChipProps<T = unknown> = ComboboxChipOwnProps<T> &
   Omit<ComponentPropsWithRef<'div'>, keyof ComboboxChipOwnProps<T>>;
 
 /** The item a Chip stands for, for its ChipRemove. */
-export const ComboboxChipContext = createContext<{ value: unknown } | null>(null);
+export const ComboboxChipContext = createContext<{ value: unknown; disabled: boolean } | null>(
+  null,
+);
 
-export function useComboboxChipContext(): { value: unknown } {
+export function useComboboxChipContext(): { value: unknown; disabled: boolean } {
   const context = useContext(ComboboxChipContext);
   if (context === null) {
     throw new Error('<Combobox.ChipRemove> must be rendered inside <Combobox.Chip>.');
@@ -35,6 +37,9 @@ export function useComboboxChipContext(): { value: unknown } {
 /**
  * One selected item, with `multiple`. Render one per item of the Root's `value`, before the
  * Input. Give it an `aria-description` that says how to remove it.
+ *
+ * `data-disabled` when the Root is disabled, or when its item's Item is: then it cannot be
+ * removed.
  *
  * Out of the tab order. Left from the start of the input reaches the last chip; Left and
  * Right move between chips, and Right from the last returns to the input; Backspace or
@@ -47,14 +52,23 @@ export function ComboboxChip<T = unknown>({
   render,
   ...rest
 }: ComboboxChipProps<T>) {
-  const { disabled, itemToKey, remove, registerChip, chips, inputRef } =
-    useComboboxRootContext('Chip');
+  const {
+    disabled: rootDisabled,
+    itemToKey,
+    disabledKeys,
+    remove,
+    registerChip,
+    chips,
+    inputRef,
+  } = useComboboxRootContext('Chip');
   const key = itemToKey(value);
+  // A disabled item cannot be removed; its chip stays reachable with the arrow keys.
+  const disabled = rootDisabled || disabledKeys.has(key);
   const elementRef = useRef<HTMLElement | null>(null);
 
   useLayoutEffect(() => registerChip({ key, ref: elementRef }), [registerChip, key]);
 
-  const chipContext = useMemo(() => ({ value: value as unknown }), [value]);
+  const chipContext = useMemo(() => ({ value: value as unknown, disabled }), [value, disabled]);
 
   function focusAt(index: number) {
     const chip = chips[index];

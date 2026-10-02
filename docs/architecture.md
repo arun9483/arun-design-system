@@ -677,7 +677,24 @@ substring. Filtering is memoised on `items` and the query, and the query is read
 | Backspace on empty input | —                                             | removes the last item              |
 
 `Clear` is present only while there is something to clear — a selection — and marks it with
-`data-visible`; the styled component hides it otherwise. Focus stays in the input throughout:
+`data-visible`; the styled component hides it otherwise.
+
+**A selected disabled item cannot be removed, with `multiple`.** Not by its `ChipRemove`,
+Backspace or Delete, nor by `Clear`, which removes the rest. "Disabled" stays one concept: an
+`Item`'s `disabled` prop, as for picking. Since `Item` is where the Root learns it, and a search
+or a virtualizer unmounts Items, the Root keeps each key's last reported state rather than
+dropping it on unmount, so a chip stays locked while its option is hidden. A separate
+`isItemLocked`, and an `isItemDisabled` on the Root, were weighed and declined: two concepts, or
+two ways to disable an item. The known gap is a server search that has never returned a
+pre-selected item; it locks once a result includes it.
+
+**`required` is the platform's, on the input.** The hidden inputs cannot carry it — a hidden
+input is barred from constraint validation — so the visible input is `required` while the
+selection is empty: the browser's message, `:invalid` and `checkValidity()` all come with it.
+With chips it would fail on an empty text, hence "while the selection is empty", with
+`aria-required` kept throughout. Typed text that picked nothing would pass `required`, so the
+input then sets `valueMissing`'s own message through `setCustomValidity`, and clears only a
+message it set. Focus stays in the input throughout:
 the highlighted option is `aria-activedescendant`, not focused, so `core/rovingFocus` does not
 apply to the list. Up and Down move the highlight, Home and End jump, Enter picks, Alt+Down
 opens. With `multiple`, Left Arrow at the start of the input moves into the chips; Left and

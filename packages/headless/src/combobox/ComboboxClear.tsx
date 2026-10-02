@@ -21,14 +21,14 @@ export type ComboboxClearProps = ComboboxClearOwnProps &
   Omit<ComponentPropsWithRef<'button'>, keyof ComboboxClearOwnProps>;
 
 /**
- * Empties the input and the selection — every selected item, with `multiple`. Give it an
- * `aria-label`.
+ * Empties the input and the selection — with `multiple`, every selected item that is not
+ * disabled. Give it an `aria-label`.
  *
- * `data-visible` is present while there is a selection to clear; style it hidden otherwise.
+ * `data-visible` is present while there is a selection it can clear; style it hidden otherwise.
  * Out of the tab order, and a press keeps focus in the input.
  */
 export function ComboboxClear({ className, children, render, ...rest }: ComboboxClearProps) {
-  const { disabled, selectedItems, clear, inputRef, registerInside } =
+  const { disabled, removableItems, clear, inputRef, registerInside } =
     useComboboxRootContext('Clear');
   const elementRef = useRef<HTMLElement | null>(null);
   // A press here clears; it is not a press outside, and the list stays as it is.
@@ -41,7 +41,7 @@ export function ComboboxClear({ className, children, render, ...rest }: Combobox
       type: 'button',
       tabIndex: -1,
       disabled: disabled || undefined,
-      ...comboboxClearDataAttributes(selectedItems.length > 0),
+      ...comboboxClearDataAttributes(removableItems.length > 0),
       className,
       children,
       ref: elementRef,

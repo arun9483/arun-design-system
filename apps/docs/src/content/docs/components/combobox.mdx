@@ -64,7 +64,7 @@ Focus stays in the input. The highlighted option is announced through `aria-acti
 | Enter                       | picks the highlighted item                                                               |
 | Esc                         | closes the list, putting the text back                                                   |
 | Tab                         | closes the list, and focus moves on                                                      |
-| Backspace in an empty input | with `multiple`, removes the last item                                                   |
+| Backspace in an empty input | with `multiple`, removes the last item, unless it is disabled                            |
 | ← at the start of the text  | with `multiple`, moves into the chips: ← → between them, Backspace or Delete removes one |
 
 ## Single and multiple
@@ -79,7 +79,7 @@ Focus stays in the input. The highlighted option is announced through `aria-acti
 | Pick a selected item    | stays selected                                    | removed                                           |
 | Empty the input         | the selection clears                              | the selection stays                               |
 | Esc, or a press outside | closes; the input goes back to the selected label | closes; the text clears                           |
-| Clear (×)               | clears the text and the selection                 | clears the text and every item                    |
+| Clear (×)               | clears the text and the selection                 | clears the text and every item but disabled ones  |
 
 **A selection survives a search that no longer returns it.** `value` holds the items
 themselves, not their keys. So search "book" and pick, then search "pen" and pick: the books stay
@@ -93,6 +93,14 @@ with one.
 
 Mark an option `disabled` on its `Item`. It can't be picked, and the arrow keys skip it. It is
 announced as unavailable through `aria-disabled`, and styled from `data-disabled`.
+
+With `multiple`, a disabled item that is already selected **can't be removed**. Its chip has no
+remove button, Backspace and Delete leave it, and Clear removes only the other items. It stays
+locked while a search hides it. Use this for a selection the user must keep, such as a
+mandatory recipient.
+
+The combobox learns that an item is disabled when its `Item` renders. With server search, a
+pre-selected item is locked once a result list has included it.
 
 ## Search
 
@@ -202,6 +210,18 @@ Give the Root a `name`. It renders one hidden input per selected item, holding t
 (`itemToKey`), so the form submits `name=key` once per item. `form.reset()` returns the
 selection and the text to what they were at mount.
 
+Add `required` and the form won't submit until something is selected. The browser reports it
+with its own message, the input matches `:invalid`, and `form.checkValidity()` returns
+`false`. Text that was typed but never picked counts as nothing selected. With `multiple`, one
+chip is enough.
+
+```tsx
+<Combobox.Root items={countries} name="country" required>
+```
+
+With react-hook-form, bind it through `Controller` and its `rules={{ required: true }}`, and pass
+`aria-invalid` to `Combobox.Input`. The field's border turns red from it.
+
 ## Props
 
 ### `Combobox.Root`
@@ -235,8 +255,7 @@ and `ref`.
   wrap them in `useCallback`. A new function each render filters the list again on every
   render.
 - Label the field with a `<label htmlFor>` pointing at the Input's `id`, or with `aria-label`.
-- Not yet: groups, creating an item that isn't in the list, the input inside the popup, and
-  `required`.
+- Not yet: groups, creating an item that isn't in the list, and the input inside the popup.
 - Restyle every combobox with the `--combobox-*` tokens, e.g. `--combobox-popup-max-height`.
 - Types come from the package that owns them. `ComboboxInputProps` comes from
   `@arun-dev/ui`; the other parts' props come from `@arun-dev/headless/combobox`, or use

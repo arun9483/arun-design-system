@@ -11,9 +11,18 @@ import { Popover } from '../popover';
  * real here. Delays are short so the suite stays fast.
  */
 
-// Closing a tooltip warms the next for 300ms (TooltipRoot). Let it cool between tests, so
-// each starts from a cold delay.
-beforeEach(() => new Promise((resolve) => setTimeout(resolve, 350)));
+// The real pointer stays where the last test left it — often on a trigger, which the next
+// test renders in the same place, so a mouse `pointerover` opens its tooltip. Park it in a
+// corner nothing is rendered in. Then, since closing a tooltip warms the next for 300ms
+// (TooltipRoot), let it cool, so each test starts from a cold delay.
+beforeEach(async () => {
+  const corner = document.createElement('div');
+  corner.style.cssText = 'position:fixed;right:0;bottom:0;width:4px;height:4px';
+  document.body.append(corner);
+  await userEvent.hover(corner);
+  corner.remove();
+  await new Promise((resolve) => setTimeout(resolve, 350));
+});
 
 function Basic(props: TooltipRootProps) {
   return (

@@ -35,6 +35,29 @@ describe('Combobox (ui)', () => {
     expect(screen.getByRole('button', { name: 'Drop Cherry' })).toHaveClass('combobox-chip-remove');
   });
 
+  it('drops the remove button and its hint from a chip whose Item is disabled', () => {
+    render(
+      <Combobox.Root items={fruits} multiple defaultValue={['Apple', 'Cherry']}>
+        <Combobox.Input aria-label="Fruit" />
+        <Combobox.Popup>
+          <Combobox.List>
+            {(item: string) => (
+              <Combobox.Item key={item} value={item} disabled={item === 'Apple'}>
+                {item}
+              </Combobox.Item>
+            )}
+          </Combobox.List>
+        </Combobox.Popup>
+      </Combobox.Root>,
+    );
+    const apple = document.querySelector('.combobox-chip');
+    expect(apple).toHaveTextContent('Apple');
+    expect(apple).toHaveAttribute('data-disabled');
+    expect(apple).not.toHaveAttribute('aria-description');
+    expect(screen.queryByRole('button', { name: 'Remove Apple' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Remove Cherry' })).toBeInTheDocument();
+  });
+
   it('renders no chips without multiple', () => {
     render(
       <Combobox.Root items={fruits} defaultValue="Apple">

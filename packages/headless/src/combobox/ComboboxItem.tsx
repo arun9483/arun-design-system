@@ -13,7 +13,10 @@ import { comboboxItemDataAttributes } from './comboboxDataAttributes';
 type ComboboxItemOwnProps<T> = {
   /** The item this option stands for — one of the Root's `items`. */
   value: T;
-  /** Cannot be picked, and the arrow keys skip it. */
+  /**
+   * Cannot be picked, and the arrow keys skip it. With `multiple`, a disabled item that is
+   * already selected cannot be removed either — its chip, Backspace and Clear leave it.
+   */
   disabled?: boolean;
   /** Element to render instead of the default `<div>`. Props and ref are merged onto it. */
   render?: ReactElement;
@@ -43,7 +46,7 @@ export function ComboboxItem<T = unknown>({
     itemToKey,
     indexByKey,
     selectedKeys,
-    disabledKeys,
+    setItemDisabled,
     highlight,
     setHighlight,
     select,
@@ -60,13 +63,8 @@ export function ComboboxItem<T = unknown>({
   const elementRef = useRef<HTMLElement | null>(null);
 
   // Registered from props, so the arrow keys skip it without reading the DOM (decision 10).
-  useLayoutEffect(() => {
-    if (!disabled) return;
-    disabledKeys.add(key);
-    return () => {
-      disabledKeys.delete(key);
-    };
-  }, [disabled, disabledKeys, key]);
+  // Not undone on unmount: a selected item stays locked after a search hides it.
+  useLayoutEffect(() => setItemDisabled(key, disabled), [setItemDisabled, key, disabled]);
 
   // The arrow keys move the highlight past the edge of a scrolled list: bring it into view.
   useEffect(() => {

@@ -433,6 +433,13 @@ export const PROPS = {
       description: 'Disables the input and every button.',
     },
     {
+      name: 'required',
+      type: 'boolean',
+      default: 'false',
+      description:
+        "Something must be selected before the form submits. Reported by the browser's own validation, on the input.",
+    },
+    {
       name: 'name',
       type: 'string',
       description: "Submits each selected item's key under this name, from hidden inputs.",
@@ -507,7 +514,8 @@ export const PROPS = {
       name: 'disabled',
       type: 'boolean',
       default: 'false',
-      description: 'Cannot be picked, and the arrow keys skip it.',
+      description:
+        'Cannot be picked, and the arrow keys skip it. With `multiple`, once selected it cannot be removed.',
     },
   ],
   'Menu.Root': [

@@ -50,8 +50,11 @@ function Basic({ items = products, ...props }: Props<false>) {
   );
 }
 
-function Multiple(props: Omit<Props<true>, 'multiple' | 'value' | 'onValueChange'>) {
-  const [value, setValue] = useState<Product[]>([]);
+function Multiple({
+  initial = [],
+  ...props
+}: Omit<Props<true>, 'multiple' | 'value' | 'onValueChange'> & { initial?: Product[] }) {
+  const [value, setValue] = useState<Product[]>(initial);
   return (
     <>
       <button type="button">Before</button>
@@ -98,6 +101,8 @@ const highlighted = () =>
   document.getElementById(input().getAttribute('aria-activedescendant') ?? '');
 const submitted = () =>
   new FormData(screen.getByTestId('form') as HTMLFormElement).getAll('product');
+const form = () => screen.getByTestId('form') as HTMLFormElement;
+const byId = (id: string) => products.find((p) => p.id === id) as Product;
 
 describe('Combobox (browser)', () => {
   it('anchors the popup to the input as a native manual popover', () => {
@@ -278,6 +283,52 @@ describe('Combobox (browser)', () => {
     expect(submitted()).toEqual(['b1']);
   });
 
+  describe('required', () => {
+    it('is required while nothing is selected, and valid once something is', async () => {
+      render(<Basic required />);
+      expect(input()).toBeRequired();
+      expect(input().validity.valueMissing).toBe(true);
+      expect(form().checkValidity()).toBe(false);
+      await userEvent.click(input());
+      await userEvent.click(option('Pen: Fountain'));
+      expect(input().required).toBe(false);
+      expect(input()).toHaveAttribute('aria-required', 'true');
+      expect(form().checkValidity()).toBe(true);
+    });
+
+    it("reports text that picked nothing with the browser's own message", async () => {
+      render(<Basic required />);
+      const message = input().validationMessage;
+      expect(message).not.toBe('');
+      await userEvent.type(input(), 'zzz');
+      expect(input().validity.customError).toBe(true);
+      expect(input().validationMessage).toBe(message);
+      expect(form().checkValidity()).toBe(false);
+      await userEvent.keyboard('{ArrowDown}');
+      await userEvent.clear(input());
+      await userEvent.type(input(), 'dune');
+      await userEvent.keyboard('{ArrowDown}{Enter}');
+      expect(input().validity.valid).toBe(true);
+    });
+
+    it('leaves a message the consumer set alone', async () => {
+      render(<Basic required defaultValue={products[0]} />);
+      input().setCustomValidity('Not this one');
+      await userEvent.click(input());
+      await userEvent.click(option('Pen: Fountain'));
+      expect(input().validationMessage).toBe('Not this one');
+    });
+
+    it('is satisfied by chips with multiple, while the text is empty', async () => {
+      render(<Multiple required />);
+      expect(form().checkValidity()).toBe(false);
+      await userEvent.click(input());
+      await userEvent.click(option('Book: Atlas'));
+      expect(input().value).toBe('');
+      expect(form().checkValidity()).toBe(true);
+    });
+  });
+
   describe('multiple', () => {
     it('keeps picks across searches: books, then pens', async () => {
       render(<Multiple />);
@@ -336,6 +387,38 @@ describe('Combobox (browser)', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Remove Book: Atlas' }));
       expect(submitted()).toEqual([]);
       expect(document.activeElement).toBe(input());
+    });
+
+    it('keeps a selected disabled item: its ChipRemove, Delete, Backspace and Clear leave it', async () => {
+      render(<Multiple initial={[byId('b1'), byId('b3')]} />);
+      expect(screen.getByTestId('chip-b3')).toHaveAttribute('data-disabled');
+      expect(screen.getByTestId('chip-b1')).not.toHaveAttribute('data-disabled');
+      expect(screen.getByRole('button', { name: 'Remove Book: Café stories' })).toBeDisabled();
+
+      // Backspace removes the last item only, and the last one is locked.
+      await userEvent.click(input());
+      await userEvent.keyboard('{Escape}{Backspace}');
+      expect(submitted()).toEqual(['b1', 'b3']);
+
+      await userEvent.keyboard('{ArrowLeft}');
+      expect(document.activeElement).toBe(screen.getByTestId('chip-b3'));
+      await userEvent.keyboard('{Delete}');
+      expect(submitted()).toEqual(['b1', 'b3']);
+
+      const clear = screen.getByRole('button', { name: 'Clear' });
+      expect(clear).toHaveAttribute('data-visible');
+      await userEvent.click(clear);
+      expect(submitted()).toEqual(['b3']);
+      expect(clear).not.toHaveAttribute('data-visible');
+    });
+
+    it('stays locked after a search hides its item', async () => {
+      render(<Multiple initial={[byId('b3')]} />);
+      await userEvent.type(input(), 'pen');
+      expect(options()).not.toContain('Book: Café stories');
+      // Still searching: the Item is unmounted, and the chip remembers it was disabled.
+      expect(screen.getByRole('button', { name: 'Remove Book: Café stories' })).toBeDisabled();
+      expect(screen.getByTestId('chip-b3')).toHaveAttribute('data-disabled');
     });
 
     it('Clear empties the whole selection', async () => {

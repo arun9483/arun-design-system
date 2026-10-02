@@ -29,7 +29,8 @@ export type ComboboxInputProps = ComboboxInputOwnProps &
  * what the list lines up with.
  *
  * Chips are `Chip`s. Each has a remove button, and Backspace and the arrow keys reach them
- * from the text, as @arun-dev/headless describes.
+ * from the text, as @arun-dev/headless describes. A chip whose Item is `disabled` cannot be
+ * removed, and has no remove button.
  */
 export function ComboboxInput({
   startSlot,
@@ -43,27 +44,31 @@ export function ComboboxInput({
     <Headless.InputGroup className={cn('combobox', className)}>
       {startSlot != null && <span className="combobox-slot">{startSlot}</span>}
       <Headless.Value>
-        {(value, { itemToString }) =>
+        {(value, { itemToString, isItemDisabled }) =>
           Array.isArray(value) &&
           value.map((item) => {
             const label = itemToString(item);
+            // Selected and disabled: it stays, so it has no remove button and no hint.
+            const locked = isItemDisabled(item);
             return (
               <Headless.Chip
                 key={label}
                 value={item}
                 className="combobox-chip"
-                aria-description="Press Backspace or Delete to remove"
+                aria-description={locked ? undefined : 'Press Backspace or Delete to remove'}
                 render={
                   <Chip>
                     {label}
-                    <Headless.ChipRemove
-                      className="combobox-chip-remove"
-                      aria-label={removeLabel(label)}
-                    >
-                      <svg viewBox="0 0 16 16" aria-hidden>
-                        <path d="m5 5 6 6m-6 0 6-6" />
-                      </svg>
-                    </Headless.ChipRemove>
+                    {!locked && (
+                      <Headless.ChipRemove
+                        className="combobox-chip-remove"
+                        aria-label={removeLabel(label)}
+                      >
+                        <svg viewBox="0 0 16 16" aria-hidden>
+                          <path d="m5 5 6 6m-6 0 6-6" />
+                        </svg>
+                      </Headless.ChipRemove>
+                    )}
                   </Chip>
                 }
               />

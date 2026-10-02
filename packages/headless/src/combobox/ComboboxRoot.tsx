@@ -79,6 +79,11 @@ export type ComboboxRootProps<T, Multiple extends boolean = false> = {
   loading?: boolean;
   /** Disables the input and every button. */
   disabled?: boolean;
+  /**
+   * Something must be selected before the form submits. The input is `required` while the
+   * selection is empty, so the browser's own validation reports it.
+   */
+  required?: boolean;
   /** Submits each selected item's key under this name, from hidden inputs. */
   name?: string;
   /** Associates the hidden inputs with a `<form>` by id, when rendered outside it. */
@@ -123,6 +128,7 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
   onLoadMore,
   loading = false,
   disabled = false,
+  required = false,
   name,
   form,
   children,
@@ -257,16 +263,37 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
     [multiple, value, selectedKeys, itemToKey, itemToString, setValue, setInputValue, setOpen],
   );
 
+  // Keys of items whose Item was last rendered `disabled`. Kept after the Item unmounts — a
+  // search that hides it, a virtualizer — so its chip stays locked and the arrow keys know it.
+  const [disabledKeys, setDisabledKeys] = useState<ReadonlySet<string>>(() => new Set());
+  const setItemDisabled = useCallback((key: string, itemDisabled: boolean) => {
+    setDisabledKeys((current) => {
+      if (current.has(key) === itemDisabled) return current;
+      const next = new Set(current);
+      if (itemDisabled) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+  }, []);
+
+  // A disabled item that is selected cannot be removed, with `multiple`: not by its chip, not
+  // by Backspace, not by Clear. It can only be selected from `value` or `defaultValue`.
+  const removableItems = useMemo(
+    () => selectedItems.filter((item) => !multiple || !disabledKeys.has(itemToKey(item))),
+    [multiple, selectedItems, disabledKeys, itemToKey],
+  );
+
   const remove = useCallback(
     (item: unknown, reason: ComboboxChangeReason) => {
       if (!multiple) return;
       const key = itemToKey(item);
+      if (disabledKeys.has(key)) return;
       setValue(
         (value as unknown[]).filter((i) => itemToKey(i) !== key),
         reason,
       );
     },
-    [multiple, value, itemToKey, setValue],
+    [multiple, value, disabledKeys, itemToKey, setValue],
   );
 
   const clearSelection = useCallback(
@@ -276,9 +303,23 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
 
   const clear = useCallback(() => {
     setInputValue('', 'clear');
-    clearSelection('clear');
+    if (!multiple) clearSelection('clear');
+    else if (removableItems.length > 0) {
+      setValue(
+        selectedItems.filter((item) => !removableItems.includes(item)),
+        'clear',
+      );
+    }
     setHighlight(-1, 'none');
-  }, [setInputValue, clearSelection, setHighlight]);
+  }, [
+    multiple,
+    selectedItems,
+    removableItems,
+    setInputValue,
+    clearSelection,
+    setValue,
+    setHighlight,
+  ]);
 
   // A controlled parent can change a single selection directly; the input follows, as it
   // does after a pick. Not reported — no one typed.
@@ -297,8 +338,6 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
     setChips((current) => [...current, entry].sort(byDocumentOrder));
     return () => setChips((current) => current.filter((c) => c !== entry));
   }, []);
-
-  const [disabledKeys] = useState(() => new Set<string>());
 
   const [insideRefs] = useState(() => new Set<RefObject<HTMLElement | null>>());
   const registerInside = useCallback(
@@ -356,6 +395,7 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       open,
       multiple,
       disabled,
+      required,
       inputValue,
       loading,
       filteredItems,
@@ -365,6 +405,8 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       selectedKeys,
       selectedItems,
       disabledKeys,
+      setItemDisabled,
+      removableItems,
       highlight,
       setHighlight,
       setOpen,
@@ -392,6 +434,7 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       open,
       multiple,
       disabled,
+      required,
       inputValue,
       loading,
       filteredItems,
@@ -401,6 +444,8 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       selectedKeys,
       selectedItems,
       disabledKeys,
+      setItemDisabled,
+      removableItems,
       highlight,
       setHighlight,
       setOpen,
