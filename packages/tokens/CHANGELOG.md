@@ -1,5 +1,11 @@
 # @arun-dev/tokens
 
+## 0.21.0
+
+### Minor Changes
+
+- 9cce84f: Add `Accordion` (native `<details>`/`<summary>`, `exclusive` through `name`), `Alert` (five tones, no live role by default), `Spinner` (an indeterminate `<progress>` drawn as a ring) and `Skeleton` (an `aria-hidden` placeholder), with their tokens — decision 16.
+
 ## 0.20.0
 
 ### Minor Changes
