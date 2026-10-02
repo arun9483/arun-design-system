@@ -805,9 +805,21 @@ rendered (decision 10 — from props).
 **Clear hides while the Root is `disabled`.** It can clear nothing then, so `data-visible` is
 absent though there is a selection, as a disabled `<select>` offers no reset.
 
-**Deferred:** nested groups (`<optgroup>` cannot nest), the input inside the popup, action rows
-that are not options (GitHub's "Edit labels"), an inline list, grid navigation, and a built-in
-virtualizer.
-
 **Rules out:** items registered as children; selection read from `items` or the DOM; a
-JavaScript positioning engine or a Portal (decision 12); and `cancel()` on change events.
+JavaScript positioning engine or a Portal (decision 12); `cancel()` on change events; and six
+features weighed in October 2026 and judged not needed:
+
+- **Nested groups** — `<optgroup>` cannot nest.
+- **The input inside the popup** — a button opening a panel that holds the search, GitHub's
+  label picker. The field is always the visible input.
+- **Action rows** that are not options, such as GitHub's "Edit labels" — a listbox holds only
+  options and groups. An action belongs beside the Combobox, in a Menu or a link.
+- **An inline list**, always shown rather than in a popup — the Combobox is built on the popup's
+  open and close; an always-visible list is `<select size>`'s job.
+- **Grid navigation**, two-dimensional arrow keys over `grid` cells — an emoji or swatch picker
+  is a different widget, with no native counterpart.
+- **A built-in virtualizer** — virtualization stays the consumer's, as above; below about a
+  thousand items rendering everything is fast enough, and a virtualizer in every combobox costs
+  the many to serve the few.
+
+Nothing about Combobox is deferred.

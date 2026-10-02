@@ -395,7 +395,9 @@ and `ref`.
   wrap them in `useCallback`. A new function each render filters the list again on every
   render.
 - Label the field with a `<label htmlFor>` pointing at the Input's `id`, or with `aria-label`.
-- Not yet: action rows such as "Edit labels", and the input inside the popup.
+- Not supported, by design: nested groups, an input inside the popup, action rows such as
+  "Edit labels", an always-visible inline list, grid navigation, and a built-in virtualizer. Put
+  an action beside the field, in a Menu or a link, and bring your own virtualizer.
 - Restyle every combobox with the `--combobox-*` tokens, e.g. `--combobox-popup-max-height`.
 - Types come from the package that owns them. `ComboboxInputProps` comes from
   `@arun-dev/ui`; the other parts' props come from `@arun-dev/headless/combobox`, or use
