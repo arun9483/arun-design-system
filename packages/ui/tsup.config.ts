@@ -38,6 +38,7 @@ const CSS_LAYERS = [
   { layer: 'alert', src: 'src/components/alert/alert.css' },
   { layer: 'spinner', src: 'src/components/spinner/spinner.css' },
   { layer: 'skeleton', src: 'src/components/skeleton/skeleton.css' },
+  { layer: 'toast', src: 'src/components/toast/toast.css' },
   { layer: 'metric', src: 'src/css/metric.css' },
   { layer: 'utilities', src: 'src/css/utilities.css' },
 ] as const;

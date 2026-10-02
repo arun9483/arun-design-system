@@ -57,6 +57,7 @@ import type {
   LinkProps,
   SkeletonProps,
   SpinnerProps,
+  ToastViewportProps,
   MeterProps,
   ProgressProps,
   SeparatorProps,
@@ -64,6 +65,7 @@ import type {
   Tabs,
 } from '@arun-dev/ui';
 import type { FieldControlProps, FieldRootProps } from '@arun-dev/headless/field';
+import type { ToastProviderProps } from '@arun-dev/headless/toast';
 import type { TabsListProps, TabsPanelProps, TabsTabProps } from '@arun-dev/headless/tabs';
 import type { COMMON, PROPS } from './props';
 
@@ -87,6 +89,8 @@ type Unknown =
   | OnlyRealProps<Documented<'Alert.Root'>, AlertRootProps>
   | OnlyRealProps<Documented<'Spinner'>, SpinnerProps>
   | OnlyRealProps<Documented<'Skeleton'>, SkeletonProps>
+  | OnlyRealProps<Documented<'Toast.Provider'>, ToastProviderProps>
+  | OnlyRealProps<Documented<'Toast.Viewport'>, ToastViewportProps>
   | OnlyRealProps<Documented<'Separator'>, SeparatorProps>
   | OnlyRealProps<Documented<'Progress'>, ProgressProps>
   | OnlyRealProps<Documented<'Meter'>, MeterProps>

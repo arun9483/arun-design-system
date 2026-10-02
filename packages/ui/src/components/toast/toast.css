@@ -1,0 +1,135 @@
+@layer toast {
+  /* The Viewport is a popover kept open: undo the UA's centred, bordered popover box and pin
+     it to the corner. Empty, it has no size. */
+  .toast-viewport {
+    position: fixed;
+    inset: auto var(--toast-viewport-inset) var(--toast-viewport-inset) auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--toast-gap);
+    inline-size: min(var(--toast-width), calc(100vw - 2 * var(--toast-viewport-inset)));
+    max-block-size: calc(100vh - 2 * var(--toast-viewport-inset));
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    border: none;
+    background: none;
+    color: inherit;
+  }
+
+  .toast-viewport:focus-visible {
+    outline: var(--space-2px) solid var(--toast-focus-color);
+    outline-offset: var(--space-2px);
+  }
+
+  .toast {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    column-gap: var(--space-2xs);
+    row-gap: var(--space-3xs);
+    padding: var(--toast-padding);
+    border: var(--space-px) solid var(--toast-border-color);
+    border-inline-start: var(--toast-accent-width) solid var(--toast-accent);
+    border-radius: var(--toast-radius);
+    background-color: var(--toast-bg);
+    color: var(--toast-color);
+    box-shadow: var(--toast-shadow);
+    transition:
+      opacity var(--toast-duration) var(--ease-smooth),
+      translate var(--toast-duration) var(--ease-smooth);
+  }
+
+  /* Slides up and fades in as it arrives. */
+  @starting-style {
+    .toast {
+      opacity: 0;
+      translate: 0 var(--space-2xs);
+    }
+  }
+
+  .toast[data-type='info'] {
+    --toast-accent: var(--toast-info-accent);
+  }
+
+  .toast[data-type='success'] {
+    --toast-accent: var(--toast-success-accent);
+  }
+
+  .toast[data-type='warning'] {
+    --toast-accent: var(--toast-warning-accent);
+  }
+
+  .toast[data-type='error'] {
+    --toast-accent: var(--toast-error-accent);
+  }
+
+  .toast > :not(.toast-close) {
+    grid-column: 1;
+  }
+
+  .toast-title {
+    margin: 0;
+    font-weight: var(--toast-title-font-weight);
+  }
+
+  .toast-description {
+    color: var(--toast-description-color);
+    font-size: var(--text-sm);
+  }
+
+  .toast-action {
+    justify-self: start;
+    margin-block-start: var(--space-3xs);
+    padding: var(--space-3xs) var(--space-xs);
+    border: var(--space-px) solid var(--toast-border-color);
+    border-radius: var(--radius-sm);
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  .toast-close {
+    grid-column: 2;
+    grid-row: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: none;
+    color: var(--toast-close-color);
+    cursor: pointer;
+  }
+
+  .toast-close svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+
+  .toast-action:hover,
+  .toast-close:hover {
+    background-color: var(--toast-close-bg-hover);
+  }
+
+  .toast-action:focus-visible,
+  .toast-close:focus-visible {
+    outline: var(--space-2px) solid var(--toast-focus-color);
+    outline-offset: var(--space-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .toast {
+      transition: none;
+    }
+  }
+}

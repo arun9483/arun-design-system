@@ -1,0 +1,95 @@
+---
+title: Toast
+description: Brief messages that stack in a corner and go away on their own.
+---
+
+import Example from '@/components/Example.astro';
+import ToastBasics from '@/examples/toast-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="toast-basics">
+  <ToastBasics client:load />
+</Example>
+
+A toast is a brief message that stacks in the bottom corner and closes itself after a few
+seconds: "Saved", "Archived — Undo".
+
+## Set up once
+
+Put the Provider and one Viewport near your app's root. Then call `useToastManager()` anywhere
+below to show a toast:
+
+```tsx
+import { Toast, useToastManager } from '@arun-dev/ui';
+
+<Toast.Provider>
+  <App />
+  <Toast.Viewport />
+</Toast.Provider>;
+
+function SaveButton() {
+  const toast = useToastManager();
+  return <Button onClick={() => toast.add({ title: 'Saved', type: 'success' })}>Save</Button>;
+}
+```
+
+## What `add` takes
+
+| Option        | Type                 | Does                                                               |
+| ------------- | -------------------- | ------------------------------------------------------------------ |
+| `title`       | `ReactNode`          | the headline                                                       |
+| `description` | `ReactNode`          | the detail, under it                                               |
+| `type`        | `string`             | `info`, `success`, `warning` or `error` colour the edge            |
+| `timeout`     | `number`             | milliseconds before it closes; `0` keeps it until closed           |
+| `priority`    | `'low' \| 'high'`    | `high` is read out at once (`role="alert"`); `low`, when idle      |
+| `action`      | `{ label, onClick }` | a button on the toast, such as "Undo". It does not close the toast |
+| `onClose`     | `() => void`         | called once, however it closed                                     |
+| `id`          | `string`             | reuse one to replace a toast                                       |
+
+`add` returns the id. Pass it to `update` to change the text when work finishes, or to `close`.
+
+## Behaviour
+
+- **Timers pause** while the pointer is over the toasts, while focus is in them, and while the
+  page is hidden. They resume with the time that was left.
+- **Esc** closes the toast that has focus. Focus moves to the toast area, not the page.
+- **Screen readers** hear new toasts politely, or at once with `priority: 'high'`.
+- **The newest three show** by default (`limit`). The rest wait their turn.
+- The toast area sits in the browser's top layer, so toasts draw above everything. While a
+  modal [Dialog](/components/dialog/) is open they can be read but not clicked. Everything
+  outside a modal dialog is inert. Give toasts that may appear then a `timeout`.
+
+## Your own layout
+
+Pass the Viewport a function of the toasts and lay each out with the parts:
+
+```tsx
+<Toast.Viewport>
+  {(toasts) =>
+    toasts.map((toast) => (
+      <Toast.Root key={toast.id} toast={toast}>
+        <Toast.Title />
+        <Toast.Description />
+        <Toast.Close aria-label="Dismiss" />
+      </Toast.Root>
+    ))
+  }
+</Toast.Viewport>
+```
+
+## Props
+
+### `Toast.Provider`
+
+<PropTable component="Toast.Provider" common={false} />
+
+### `Toast.Viewport`
+
+<PropTable component="Toast.Viewport" />
+
+## Notes
+
+- Keep toasts short, and never the only way to do something. A toast can vanish before
+  anyone reaches its Undo, so offer the same action elsewhere.
+- For a message that stays on the page, use an [Alert](/components/alert/).
+- Restyle with the `--toast-*` tokens.

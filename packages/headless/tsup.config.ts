@@ -13,6 +13,7 @@ export default defineConfig({
     'src/popover/index.ts',
     'src/radio-group/index.ts',
     'src/field/index.ts',
+    'src/toast/index.ts',
     'src/switch/index.ts',
     'src/tabs/index.ts',
     'src/tooltip/index.ts',
