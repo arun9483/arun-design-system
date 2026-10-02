@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-non-literal-fs-filename --
+   the paths are fixed source files of this package, joined to __dirname. */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
