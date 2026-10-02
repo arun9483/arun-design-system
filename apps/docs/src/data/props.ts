@@ -42,6 +42,76 @@ export const COMMON = [
 ] as const satisfies readonly PropDoc[];
 
 export const PROPS = {
+  Link: [],
+  Separator: [
+    {
+      name: 'orientation',
+      type: "'horizontal' | 'vertical'",
+      default: "'horizontal'",
+      description:
+        'Across, or upright between inline items. Sets `aria-orientation` and `data-orientation`.',
+    },
+  ],
+  Progress: [
+    {
+      name: 'value',
+      type: 'number',
+      description: 'How far along, up to `max`. Leave it out for an indeterminate bar.',
+    },
+    { name: 'max', type: 'number', default: '1', description: 'The value that means done.' },
+  ],
+  Meter: [
+    { name: 'value', type: 'number', description: 'The measurement, between `min` and `max`.' },
+    { name: 'min', type: 'number', default: '0', description: 'The bottom of the range.' },
+    { name: 'max', type: 'number', default: '1', description: 'The top of the range.' },
+    {
+      name: 'low',
+      type: 'number',
+      description: 'Below this is the low region. With `high` and `optimum`, it picks the colour.',
+    },
+    { name: 'high', type: 'number', description: 'Above this is the high region.' },
+    {
+      name: 'optimum',
+      type: 'number',
+      description:
+        'The best value. Its region is good (success); the next is fair (warning); the far one is poor (error).',
+    },
+  ],
+  Slider: [
+    { name: 'min', type: 'number', default: '0', description: 'The bottom of the range.' },
+    { name: 'max', type: 'number', default: '100', description: 'The top of the range.' },
+    {
+      name: 'step',
+      type: "number | 'any'",
+      default: '1',
+      description: 'The increment the keys and the thumb move by.',
+    },
+  ],
+  'Field.Root': [
+    {
+      name: 'invalid',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Shows the Error and marks the control `aria-invalid`. Yours to set: Field validates nothing.',
+    },
+    { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the control.' },
+    {
+      name: 'required',
+      type: 'boolean',
+      default: 'false',
+      description: "Marks the control `required`, so the browser's own validation reports it.",
+    },
+  ],
+  'Field.Control': [
+    {
+      name: 'render',
+      type: 'ReactElement',
+      default: '<Input />',
+      description:
+        'The control: `<Select />`, `<Textarea />`, `<Checkbox.Root />`, `<Combobox.Input />` or your own. Gets the id, `aria-describedby`, `aria-invalid`, `disabled` and `required`.',
+    },
+  ],
   Button: [
     {
       name: 'variant',

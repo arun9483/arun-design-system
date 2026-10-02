@@ -1,0 +1,28 @@
+---
+title: Separator
+description: A line between sections, across or upright.
+---
+
+import Example from '@/components/Example.astro';
+import SeparatorBasics from '@/examples/separator-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="separator-basics">
+  <SeparatorBasics client:load />
+</Example>
+
+`Separator` is an `<hr>`, so assistive technology announces it as a separator.
+`orientation="vertical"` stands it upright between inline items. It takes the height of the
+row it sits in.
+
+## Props
+
+<PropTable component="Separator" />
+
+## Notes
+
+- A purely decorative line takes `aria-hidden`.
+- In a Combobox list, use `Combobox.Separator`. A listbox may hold only options and groups.
+- It draws the line only. Put the space around it in the layout, with `gap`, so a CSS reset
+  can't collapse it.
+- Restyle with `--separator-color` and `--separator-thickness`.

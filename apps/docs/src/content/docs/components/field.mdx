@@ -1,0 +1,74 @@
+---
+title: Field
+description: A label, a description and an error, tied to one control.
+---
+
+import Example from '@/components/Example.astro';
+import FieldBasics from '@/examples/field-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="field-basics" layout="stack">
+  <FieldBasics client:load />
+</Example>
+
+`Field` ties a label, help text and an error message to one control, so a screen reader reads
+them together. It generates the ids, and `Field.Control` puts them on the control.
+
+## Anatomy
+
+```tsx
+import { Field } from '@arun-dev/ui';
+
+<Field.Root invalid={invalid} required>
+  <Field.Label>Email</Field.Label>
+  <Field.Control type="email" />
+  <Field.Description>We send the receipt here.</Field.Description>
+  <Field.Error>Enter a valid email.</Field.Error>
+</Field.Root>;
+```
+
+| Part          | Renders     | Does                                                                                              |
+| ------------- | ----------- | ------------------------------------------------------------------------------------------------- |
+| `Root`        | `<div>`     | generates the ids; holds `invalid`, `disabled` and `required`                                     |
+| `Label`       | `<label>`   | names the control; a press focuses it                                                             |
+| `Control`     | the control | an `Input` by default; gets the id, `aria-describedby`, `aria-invalid`, `disabled` and `required` |
+| `Description` | `<p>`       | help text, read out with the control                                                              |
+| `Error`       | `<p>`       | shown only while `invalid`, and read out with the control then                                    |
+
+## Any control
+
+`Field.Control` renders an `Input` unless `render` gives another. The Field's attributes are
+merged onto it, so it works with every control in the system and with your own:
+
+```tsx
+<Field.Control render={<Select>…</Select>} />
+<Field.Control render={<Textarea rows={4} />} />
+<Field.Control render={<Checkbox.Root />} />
+<Field.Control render={<Combobox.Input />} />
+```
+
+The id is the Field's. Don't give the control an `id` of your own, or the label loses it.
+
+## Validation is yours
+
+Field checks nothing. Set `invalid` from wherever you validate:
+
+- **react-hook-form:** `invalid={!!fieldState.error}`, and the message in `Field.Error`.
+- **The browser:** `required` on the Root makes the control `required`, so the browser stops
+  the form and shows its own message.
+
+A group of controls under one label, such as radios or checkboxes, is a native `<fieldset>`
+with a `<legend>`.
+
+## Props
+
+### `Field.Root`
+
+<PropTable component="Field.Root" />
+
+### `Field.Control`
+
+<PropTable component="Field.Control" common={false} />
+
+Every other prop goes to the control. `Field.Label`, `Field.Description` and `Field.Error` take
+the props of the element they render, plus `render` and `ref`.

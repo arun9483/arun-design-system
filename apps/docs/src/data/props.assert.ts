@@ -49,7 +49,16 @@ import type {
   TooltipTriggerProps,
 } from '@arun-dev/headless/tooltip';
 import type { ComponentProps } from 'react';
-import type { ComboboxInputProps, Tabs } from '@arun-dev/ui';
+import type {
+  ComboboxInputProps,
+  LinkProps,
+  MeterProps,
+  ProgressProps,
+  SeparatorProps,
+  SliderProps,
+  Tabs,
+} from '@arun-dev/ui';
+import type { FieldControlProps, FieldRootProps } from '@arun-dev/headless/field';
 import type { TabsListProps, TabsPanelProps, TabsTabProps } from '@arun-dev/headless/tabs';
 import type { COMMON, PROPS } from './props';
 
@@ -67,6 +76,13 @@ type OnlyRealProps<Names extends string, Props> = Exclude<
 type Unknown =
   | OnlyRealProps<Documented<'Button'> | (typeof COMMON)[number]['name'], ButtonProps>
   | OnlyRealProps<Documented<'Card'>, CardProps>
+  | OnlyRealProps<Documented<'Link'>, LinkProps>
+  | OnlyRealProps<Documented<'Separator'>, SeparatorProps>
+  | OnlyRealProps<Documented<'Progress'>, ProgressProps>
+  | OnlyRealProps<Documented<'Meter'>, MeterProps>
+  | OnlyRealProps<Documented<'Slider'>, SliderProps>
+  | OnlyRealProps<Documented<'Field.Root'>, FieldRootProps>
+  | OnlyRealProps<Documented<'Field.Control'>, FieldControlProps>
   | OnlyRealProps<Documented<'Chip'>, ChipProps>
   | OnlyRealProps<Documented<'Badge'>, BadgeProps>
   | OnlyRealProps<Documented<'Input'> | (typeof COMMON)[number]['name'], InputProps>

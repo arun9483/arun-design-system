@@ -1,0 +1,69 @@
+@layer progress {
+  /* appearance: none hands the bar to these rules: the element is the track, the
+     engine's pseudo-element the filled part. */
+  .progress {
+    appearance: none;
+    display: block;
+    inline-size: 100%;
+    block-size: var(--progress-height);
+    overflow: hidden;
+    border: none;
+    border-radius: var(--progress-radius);
+    background-color: var(--progress-track-color);
+    color: var(--progress-bar-color);
+  }
+
+  .progress::-webkit-progress-bar {
+    border-radius: inherit;
+    background-color: var(--progress-track-color);
+  }
+
+  .progress::-webkit-progress-value {
+    border-radius: inherit;
+    background-color: var(--progress-bar-color);
+    transition: inline-size var(--progress-duration) var(--ease-smooth);
+  }
+
+  .progress::-moz-progress-bar {
+    border-radius: inherit;
+    background-color: var(--progress-bar-color);
+  }
+
+  /* Indeterminate: no value, so a short bar sweeps across the track. */
+  .progress:indeterminate {
+    background-image: linear-gradient(
+      to right,
+      transparent,
+      var(--progress-bar-color),
+      transparent
+    );
+    background-repeat: no-repeat;
+    background-size: 40% 100%;
+    animation: progress-sweep 1.2s var(--ease-smooth) infinite;
+  }
+
+  .progress:indeterminate::-webkit-progress-bar {
+    background-color: transparent;
+  }
+
+  .progress:indeterminate::-moz-progress-bar {
+    background-color: transparent;
+  }
+
+  @keyframes progress-sweep {
+    from {
+      background-position: -40% 0;
+    }
+
+    to {
+      background-position: 140% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .progress:indeterminate {
+      animation: none;
+      background-position: center;
+    }
+  }
+}

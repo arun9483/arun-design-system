@@ -51,11 +51,22 @@ const USAGE = /\[\s*(data-[a-z0-9-]+)/g;
  * Popover's popup is styled from `:popover-open` for the same reason. `data-open` is styled
  * once, on Combobox's chevron, which turns while the list is open; `data-closed` is not.
  *
+ * `data-invalid` and `data-required` are Field's, on every part. ui styles an invalid control from
+ * `aria-invalid`, which Field.Control sets, so the field reads the same with or without Field;
+ * and a required marker is the label's text, the consumer's — an asterisk is not drawn here.
+ *
  * `data-align` is Popover's. Alignment is placement, which headless sets inline as
  * `position-area`, so ui has nothing to add; `data-side` is styled, for the offset's axis.
 
  */
-const UNSTYLED_HERE = ['data-align', 'data-closed', 'data-unchecked', 'data-unselected'];
+const UNSTYLED_HERE = [
+  'data-align',
+  'data-closed',
+  'data-invalid',
+  'data-required',
+  'data-unchecked',
+  'data-unselected',
+];
 
 function filesIn(dir: string, extension: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

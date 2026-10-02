@@ -1,0 +1,49 @@
+@layer meter {
+  /* appearance: none hands the bar to these rules: the element is the track, the
+     engine's pseudo-element the filled part, coloured by the region the value is in. */
+  .meter {
+    appearance: none;
+    display: block;
+    inline-size: 100%;
+    block-size: var(--meter-height);
+    overflow: hidden;
+    border: none;
+    border-radius: var(--meter-radius);
+    background: var(--meter-track-color);
+  }
+
+  .meter::-webkit-meter-bar {
+    block-size: 100%;
+    border: none;
+    border-radius: inherit;
+    background: var(--meter-track-color);
+  }
+
+  .meter::-webkit-meter-optimum-value {
+    border-radius: inherit;
+    background: var(--meter-optimum-color);
+  }
+
+  .meter::-webkit-meter-suboptimum-value {
+    border-radius: inherit;
+    background: var(--meter-suboptimum-color);
+  }
+
+  .meter::-webkit-meter-even-less-good-value {
+    border-radius: inherit;
+    background: var(--meter-poor-color);
+  }
+
+  .meter::-moz-meter-bar {
+    border-radius: inherit;
+    background: var(--meter-optimum-color);
+  }
+
+  .meter:-moz-meter-sub-optimum::-moz-meter-bar {
+    background: var(--meter-suboptimum-color);
+  }
+
+  .meter:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+    background: var(--meter-poor-color);
+  }
+}

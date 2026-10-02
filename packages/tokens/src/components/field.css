@@ -1,0 +1,11 @@
+/* Field component tokens — a label, a description and an error around one control. */
+:root {
+  --field-gap: var(--space-3xs);
+  --field-label-color: var(--color-text-primary);
+  --field-label-font-size: var(--text-sm);
+  --field-label-font-weight: var(--font-weight-medium);
+  --field-message-font-size: var(--text-xs);
+  --field-description-color: var(--color-text-muted);
+  --field-error-color: var(--color-status-error);
+  --field-disabled-opacity: 0.5;
+}

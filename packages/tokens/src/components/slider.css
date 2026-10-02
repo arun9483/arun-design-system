@@ -1,0 +1,6 @@
+/* Slider component tokens — a native <input type="range">, coloured with accent-color. */
+:root {
+  --slider-accent-color: var(--color-text-accent);
+  --slider-focus-color: var(--color-text-accent);
+  --slider-disabled-opacity: 0.5;
+}

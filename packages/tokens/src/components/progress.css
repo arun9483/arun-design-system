@@ -1,0 +1,8 @@
+/* Progress component tokens — a native <progress>: how far along. */
+:root {
+  --progress-height: var(--space-2xs);
+  --progress-radius: var(--radius-full);
+  --progress-track-color: var(--color-bg-secondary);
+  --progress-bar-color: var(--color-text-accent);
+  --progress-duration: var(--duration-normal);
+}
