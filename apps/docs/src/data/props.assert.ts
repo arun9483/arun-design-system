@@ -51,7 +51,12 @@ import type {
 import type { ComponentProps } from 'react';
 import type {
   ComboboxInputProps,
+  AccordionItemProps,
+  AccordionRootProps,
+  AlertRootProps,
   LinkProps,
+  SkeletonProps,
+  SpinnerProps,
   MeterProps,
   ProgressProps,
   SeparatorProps,
@@ -77,6 +82,11 @@ type Unknown =
   | OnlyRealProps<Documented<'Button'> | (typeof COMMON)[number]['name'], ButtonProps>
   | OnlyRealProps<Documented<'Card'>, CardProps>
   | OnlyRealProps<Documented<'Link'>, LinkProps>
+  | OnlyRealProps<Documented<'Accordion.Root'>, AccordionRootProps>
+  | OnlyRealProps<Documented<'Accordion.Item'>, AccordionItemProps>
+  | OnlyRealProps<Documented<'Alert.Root'>, AlertRootProps>
+  | OnlyRealProps<Documented<'Spinner'>, SpinnerProps>
+  | OnlyRealProps<Documented<'Skeleton'>, SkeletonProps>
   | OnlyRealProps<Documented<'Separator'>, SeparatorProps>
   | OnlyRealProps<Documented<'Progress'>, ProgressProps>
   | OnlyRealProps<Documented<'Meter'>, MeterProps>

@@ -1,0 +1,15 @@
+/* Accordion component tokens — native <details> items, one under another. */
+:root {
+  --accordion-border-color: var(--color-border-default);
+  --accordion-trigger-padding-block: var(--space-sm);
+  --accordion-trigger-padding-inline: var(--space-2xs);
+  --accordion-trigger-color: var(--color-text-primary);
+  --accordion-trigger-font-weight: var(--font-weight-medium);
+  --accordion-trigger-bg-hover: var(--color-bg-secondary);
+  --accordion-icon-color: var(--color-text-secondary);
+  --accordion-panel-padding-block-end: var(--space-sm);
+  --accordion-panel-color: var(--color-text-secondary);
+  --accordion-focus-color: var(--color-text-accent);
+  --accordion-radius: var(--radius-sm);
+  --accordion-duration: var(--duration-normal);
+}

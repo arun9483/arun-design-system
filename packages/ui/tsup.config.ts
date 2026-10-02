@@ -34,6 +34,10 @@ const CSS_LAYERS = [
   { layer: 'progress', src: 'src/components/progress/progress.css' },
   { layer: 'meter', src: 'src/components/meter/meter.css' },
   { layer: 'slider', src: 'src/components/slider/slider.css' },
+  { layer: 'accordion', src: 'src/components/accordion/accordion.css' },
+  { layer: 'alert', src: 'src/components/alert/alert.css' },
+  { layer: 'spinner', src: 'src/components/spinner/spinner.css' },
+  { layer: 'skeleton', src: 'src/components/skeleton/skeleton.css' },
   { layer: 'metric', src: 'src/css/metric.css' },
   { layer: 'utilities', src: 'src/css/utilities.css' },
 ] as const;

@@ -895,3 +895,67 @@ it for every consumer here. A group of controls under one label is a `<fieldset>
 
 **Rules out:** `disabled` on `Link`; a filled track drawn by script on `Slider`; a multi-thumb
 slider; validation inside `Field`; a `Fieldset` part.
+
+---
+
+## 16. Disclosure and feedback: native where the platform has it
+
+Phase two: `Accordion`, `Alert`, `Spinner`, `Skeleton` and `Toast`. The first four need no
+script, so they are `@arun-dev/ui` alone (decision 7). `Toast` holds a queue and timers, so its
+behaviour is in `@arun-dev/headless`.
+
+| Component   | Element                      | Headless | Why                                                             |
+| ----------- | ---------------------------- | -------- | --------------------------------------------------------------- |
+| `Accordion` | `<details>` / `<summary>`    | no       | toggling, keyboard, "only one open" and find-in-page are native |
+| `Alert`     | `<div>`                      | no       | a styled message; its live role is the consumer's choice        |
+| `Spinner`   | `<progress>`, no value       | no       | an indeterminate progress bar is "busy", natively               |
+| `Skeleton`  | `<div aria-hidden>`          | no       | a placeholder shape, hidden from assistive technology           |
+| `Toast`     | `<section popover="manual">` | yes      | a queue, timers that pause, and a live region                   |
+
+**`Accordion` is `<details>`, not buttons.** Base UI builds it from a heading and a `<button>`
+with `aria-expanded`, as APG does. The native element passes all three tests of decision 7:
+`<summary>` toggles on a press, Enter and Space; `name` on each `<details>` makes them
+exclusive — one open at a time — in every engine since 2024; and Chromium opens a closed one when
+find-in-page matches inside it, which a scripted panel cannot do. What is lost is the
+heading: `<summary>` is a button to assistive technology, so a heading inside it is not reached
+by heading navigation. That is accepted for the native behaviour. Arrow keys between triggers,
+optional in APG, are not added. Parts: `Root` (optional — its `exclusive` gives every Item one
+generated `name`), `Item` (`<details>`), `Trigger` (`<summary>`), `Panel`. `defaultOpen` sets
+`open` at mount; `open` with `onToggle` controls it. Opening animates where
+`::details-content` and `interpolate-size` are supported, and snaps elsewhere and under reduced
+motion.
+
+**`Alert` has no live role by default.** A callout on the page from the start is content, not
+an announcement, and `role="alert"` on it is read out at load. When it appears in response to
+something — a failed save — the consumer adds `role="alert"` (urgent) or `role="status"`
+(polite). Parts: `Root` with `tone` (`neutral`, `info`, `success`, `warning`, `error`, on the
+status tokens) and an optional `icon`, `Title`, `Description`.
+
+**`Spinner` is a `<progress>` without a value.** An indeterminate progress bar is exactly
+"working, no end known", exposed as `role="progressbar"` and named by `aria-label`, which
+defaults to "Loading". `appearance: none` turns the element into a rotating ring and hides the
+bar's pseudo-elements. A `role="status"` with hidden text was the alternative; a status region
+inserted with its content is announced unreliably, and the native element needs no hidden text.
+Under reduced motion the ring turns slowly rather than stopping, so it still reads as busy.
+
+**`Skeleton` is `aria-hidden`.** It is a shape, not content. The region it stands in for is
+what tells assistive technology it is loading: `aria-busy="true"` on it, the consumer's. The
+shimmer stops under reduced motion. Size and shape are the consumer's `className` or `style`.
+
+**`Toast`.** Parts: `Provider` (the queue: `limit`, default `timeout`), `useToastManager()`
+(`add`, `update`, `close`, and the toasts to render), `Viewport`, `Root`, `Title`, `Description`,
+`Action`, `Close`.
+
+- The `Viewport` is a `<section aria-label="Notifications">` with `popover="manual"`, shown while
+  any toast is, so it sits in the top layer above a modal Dialog — decision 12's mechanism — with
+  no portal.
+- It is `aria-live="polite"`; a toast added with `priority: 'high'` is `role="alert"` instead.
+- Timers pause while the pointer is over the Viewport or focus is in it, and while the page is
+  hidden, and resume with the time that was left.
+- Esc on a focused toast closes it; `Close` and `Action` are buttons.
+- Ruled out: swipe to dismiss (a pointer gesture with `Close` already there), and Base UI's
+  global F6 shortcut to reach the Viewport (a key the page may want). `Positioner` and `Arrow`,
+  for a toast anchored to an element, are not built.
+
+**Rules out:** scripted Accordion triggers and their arrow keys; a live role on every Alert;
+swipe and a global shortcut on Toast.

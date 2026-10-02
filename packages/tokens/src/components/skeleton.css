@@ -1,0 +1,7 @@
+/* Skeleton component tokens — a placeholder shape while content loads. */
+:root {
+  --skeleton-bg: var(--color-border-default);
+  --skeleton-shine: var(--color-bg-primary);
+  --skeleton-radius: var(--radius-sm);
+  --skeleton-duration: 1.6s;
+}

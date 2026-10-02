@@ -1,0 +1,9 @@
+/* Spinner component tokens — an indeterminate <progress>, drawn as a turning ring. */
+:root {
+  --spinner-size: 1.25rem;
+  --spinner-thickness: var(--space-2px);
+  --spinner-track-color: var(--color-border-default);
+  --spinner-color: var(--color-text-accent);
+  --spinner-duration: 0.8s;
+  --spinner-duration-reduced: 2.4s;
+}

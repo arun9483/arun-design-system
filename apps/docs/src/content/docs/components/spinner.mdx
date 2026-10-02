@@ -1,0 +1,31 @@
+---
+title: Spinner
+description: Working, with no end known.
+---
+
+import Example from '@/components/Example.astro';
+import SpinnerBasics from '@/examples/spinner-basics';
+import PropTable from '@/components/PropTable.astro';
+
+<Example name="spinner-basics">
+  <SpinnerBasics client:load />
+</Example>
+
+`Spinner` is a native `<progress>` with no value, drawn as a turning ring. Screen readers hear
+a progress bar named "Loading". Give it an `aria-label` that says more when you can, such as
+"Saving draft". Under reduced motion it turns slowly instead of stopping, so it still looks
+busy.
+
+When the text beside it already says what is happening, as in a "Saving…" button, hide it with
+`aria-hidden="true"`.
+
+When you know how far along the task is, use a [Progress](/components/progress/).
+
+## Props
+
+<PropTable component="Spinner" />
+
+## Notes
+
+- Size it with `--spinner-size`. Its colours come from `--spinner-color` and
+  `--spinner-track-color`.

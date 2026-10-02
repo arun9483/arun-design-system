@@ -1,0 +1,33 @@
+@layer skeleton {
+  .skeleton {
+    block-size: 1em;
+    border-radius: var(--skeleton-radius);
+    background-color: var(--skeleton-bg);
+    background-image: linear-gradient(
+      to right,
+      transparent,
+      color-mix(in srgb, var(--skeleton-shine) 60%, transparent),
+      transparent
+    );
+    background-repeat: no-repeat;
+    background-size: 50% 100%;
+    animation: skeleton-shine var(--skeleton-duration) var(--ease-smooth) infinite;
+  }
+
+  @keyframes skeleton-shine {
+    from {
+      background-position: -50% 0;
+    }
+
+    to {
+      background-position: 150% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton {
+      animation: none;
+      background-image: none;
+    }
+  }
+}

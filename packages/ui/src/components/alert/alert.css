@@ -1,0 +1,61 @@
+@layer alert {
+  .alert {
+    display: flex;
+    gap: var(--alert-gap);
+    padding: var(--alert-padding);
+    border: var(--alert-border-width) solid var(--alert-border-color);
+    border-radius: var(--alert-radius);
+    background-color: var(--alert-bg);
+    color: var(--alert-color);
+  }
+
+  /* Tones remap the base tokens: the accent colours the border and the icon. */
+  .alert-info {
+    --alert-bg: var(--alert-info-bg);
+    --alert-border-color: var(--alert-info-accent);
+    --alert-icon-color: var(--alert-info-accent);
+  }
+
+  .alert-success {
+    --alert-bg: var(--alert-success-bg);
+    --alert-border-color: var(--alert-success-accent);
+    --alert-icon-color: var(--alert-success-accent);
+  }
+
+  .alert-warning {
+    --alert-bg: var(--alert-warning-bg);
+    --alert-border-color: var(--alert-warning-accent);
+    --alert-icon-color: var(--alert-warning-accent);
+  }
+
+  .alert-error {
+    --alert-bg: var(--alert-error-bg);
+    --alert-border-color: var(--alert-error-accent);
+    --alert-icon-color: var(--alert-error-accent);
+  }
+
+  .alert-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--alert-icon-color);
+  }
+
+  .alert-body {
+    display: grid;
+    gap: var(--space-3xs);
+    min-inline-size: 0;
+  }
+
+  .alert-title {
+    margin: 0;
+    font-weight: var(--alert-title-font-weight);
+  }
+
+  .alert-description > :first-child {
+    margin-block-start: 0;
+  }
+
+  .alert-description > :last-child {
+    margin-block-end: 0;
+  }
+}
