@@ -243,41 +243,15 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
     [setOpen, setInputValue, selectedLabel],
   );
 
-  // Keys of the Items rendered `isLocked`. With `multiple`, a selected one cannot be removed:
-  // not by its chip, Backspace, Clear or a press on it in the list. State, not a ref, since
-  // chips render from it. List keeps every selected item's Item mounted, so a lock is known
-  // while a search hides the item, or before a server search has ever returned it.
-  const [lockedKeys, setLockedKeys] = useState<ReadonlySet<string>>(() => new Set());
-  const registerLocked = useCallback((key: string) => {
-    const update = (add: boolean) =>
-      setLockedKeys((current) => {
-        if (current.has(key) === add) return current;
-        const next = new Set(current);
-        if (add) next.add(key);
-        else next.delete(key);
-        return next;
-      });
-    update(true);
-    return () => update(false);
-  }, []);
-  const isLocked = useCallback(
-    (key: string) => multiple && lockedKeys.has(key),
-    [multiple, lockedKeys],
-  );
-
   const select = useCallback(
     (item: unknown) => {
       const key = itemToKey(item);
       if (multiple) {
         const current = value as unknown[];
-        // A press on a locked item does not toggle it off.
-        if (!(selectedKeys.has(key) && isLocked(key)))
-          setValue(
-            selectedKeys.has(key)
-              ? current.filter((i) => itemToKey(i) !== key)
-              : [...current, item],
-            'item-press',
-          );
+        setValue(
+          selectedKeys.has(key) ? current.filter((i) => itemToKey(i) !== key) : [...current, item],
+          'item-press',
+        );
         setInputValue('', 'item-press');
       } else {
         // Picking the selected item again keeps it.
@@ -286,35 +260,19 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       }
       setOpen(false, 'item-press');
     },
-    [
-      multiple,
-      value,
-      selectedKeys,
-      isLocked,
-      itemToKey,
-      itemToString,
-      setValue,
-      setInputValue,
-      setOpen,
-    ],
-  );
-
-  const removableItems = useMemo(
-    () => selectedItems.filter((item) => !isLocked(itemToKey(item))),
-    [selectedItems, isLocked, itemToKey],
+    [multiple, value, selectedKeys, itemToKey, itemToString, setValue, setInputValue, setOpen],
   );
 
   const remove = useCallback(
     (item: unknown, reason: ComboboxChangeReason) => {
       if (!multiple) return;
       const key = itemToKey(item);
-      if (isLocked(key)) return;
       setValue(
         (value as unknown[]).filter((i) => itemToKey(i) !== key),
         reason,
       );
     },
-    [multiple, value, isLocked, itemToKey, setValue],
+    [multiple, value, itemToKey, setValue],
   );
 
   const clearSelection = useCallback(
@@ -324,23 +282,9 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
 
   const clear = useCallback(() => {
     setInputValue('', 'clear');
-    if (!multiple) clearSelection('clear');
-    else if (removableItems.length > 0) {
-      setValue(
-        selectedItems.filter((item) => !removableItems.includes(item)),
-        'clear',
-      );
-    }
+    clearSelection('clear');
     setHighlight(-1, 'none');
-  }, [
-    multiple,
-    selectedItems,
-    removableItems,
-    setInputValue,
-    clearSelection,
-    setValue,
-    setHighlight,
-  ]);
+  }, [setInputValue, clearSelection, setHighlight]);
 
   // A controlled parent can change a single selection directly; the input follows, as it
   // does after a pick. Not reported — no one typed.
@@ -354,13 +298,13 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedKey]);
 
-  const [disabledKeys] = useState(() => new Set<string>());
-
   const [chips, setChips] = useState<ComboboxChipEntry[]>([]);
   const registerChip = useCallback((entry: ComboboxChipEntry) => {
     setChips((current) => [...current, entry].sort(byDocumentOrder));
     return () => setChips((current) => current.filter((c) => c !== entry));
   }, []);
+
+  const [disabledKeys] = useState(() => new Set<string>());
 
   const [insideRefs] = useState(() => new Set<RefObject<HTMLElement | null>>());
   const registerInside = useCallback(
@@ -428,9 +372,6 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       selectedKeys,
       selectedItems,
       disabledKeys,
-      isLocked,
-      registerLocked,
-      removableItems,
       highlight,
       setHighlight,
       setOpen,
@@ -468,9 +409,6 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       selectedKeys,
       selectedItems,
       disabledKeys,
-      isLocked,
-      registerLocked,
-      removableItems,
       highlight,
       setHighlight,
       setOpen,

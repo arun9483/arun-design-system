@@ -517,13 +517,6 @@ export const PROPS = {
       description:
         'Cannot be picked, and the arrow keys skip it. A selected one can still be removed.',
     },
-    {
-      name: 'isLocked',
-      type: 'boolean',
-      default: 'false',
-      description:
-        'With `multiple`, once selected it cannot be removed: its chip, Backspace, Clear and a press on it leave it. Ignored without `multiple`; disable the Root instead.',
-    },
   ],
   'Menu.Root': [
     {

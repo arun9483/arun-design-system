@@ -15,12 +15,6 @@ type ComboboxItemOwnProps<T> = {
   value: T;
   /** Cannot be picked, and the arrow keys skip it. */
   disabled?: boolean;
-  /**
-   * With `multiple`, once selected it cannot be removed: its chip, Backspace, Clear and a press
-   * on it here all leave it. Ignored without `multiple` — disable the Root to fix a single
-   * selection.
-   */
-  isLocked?: boolean;
   /** Element to render instead of the default `<div>`. Props and ref are merged onto it. */
   render?: ReactElement;
   /** Ref to the rendered element. Merged with any ref on the `render` element. */
@@ -40,7 +34,6 @@ export type ComboboxItemProps<T = unknown> = ComboboxItemOwnProps<T> &
 export function ComboboxItem<T = unknown>({
   value,
   disabled = false,
-  isLocked = false,
   className,
   children,
   render,
@@ -51,7 +44,6 @@ export function ComboboxItem<T = unknown>({
     indexByKey,
     selectedKeys,
     disabledKeys,
-    registerLocked,
     highlight,
     setHighlight,
     select,
@@ -75,11 +67,6 @@ export function ComboboxItem<T = unknown>({
       disabledKeys.delete(key);
     };
   }, [disabled, disabledKeys, key]);
-
-  useLayoutEffect(
-    () => (isLocked ? registerLocked(key) : undefined),
-    [isLocked, registerLocked, key],
-  );
 
   // The arrow keys move the highlight past the edge of a scrolled list: bring it into view.
   useEffect(() => {

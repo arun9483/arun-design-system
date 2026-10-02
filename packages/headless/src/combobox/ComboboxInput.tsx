@@ -30,8 +30,7 @@ export type ComboboxInputProps = ComboboxInputOwnProps &
  * Typing opens the list and filters it. Up and Down open it, or move the highlight, wrapping;
  * Home and End jump to the ends while it is open; Alt+Down opens it without highlighting.
  * Enter picks the highlighted item; Esc closes. With `multiple`, Backspace in an empty input
- * removes the last selected item, unless it is disabled, and Left at the start of the text
- * moves into the chips.
+ * removes the last selected item, and Left at the start of the text moves into the chips.
  *
  * With the Root's `required`, the input is `required` while nothing is selected, so the
  * browser's validation reports it, `:invalid` matches it, and `form.checkValidity()` fails.

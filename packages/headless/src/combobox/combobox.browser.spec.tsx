@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { describe, it, expect, vi } from 'vitest';
 import { useState } from 'react';
@@ -9,11 +9,11 @@ import type { ComboboxRootProps } from './ComboboxRoot';
 
 /** Runs in Chromium: jsdom has no popover API, light dismiss, anchoring or real focus. */
 
-type Product = { id: string; label: string; disabled?: boolean; locked?: boolean };
+type Product = { id: string; label: string; disabled?: boolean };
 
 const products: Product[] = [
   { id: 'b1', label: 'Book: Atlas' },
-  { id: 'b2', label: 'Book: Bestiary', locked: true },
+  { id: 'b2', label: 'Book: Bestiary' },
   { id: 'b3', label: 'Book: Café stories', disabled: true },
   { id: 'b4', label: 'Book: Dune' },
   { id: 'p1', label: 'Pen: Ballpoint' },
@@ -37,12 +37,7 @@ function Basic({ items = products, ...props }: Props<false>) {
             <Combobox.Empty>No products</Combobox.Empty>
             <Combobox.List>
               {(item: Product) => (
-                <Combobox.Item
-                  key={item.id}
-                  value={item}
-                  disabled={item.disabled}
-                  isLocked={item.locked}
-                >
+                <Combobox.Item key={item.id} value={item} disabled={item.disabled}>
                   {item.label}
                 </Combobox.Item>
               )}
@@ -55,11 +50,8 @@ function Basic({ items = products, ...props }: Props<false>) {
   );
 }
 
-function Multiple({
-  initial = [],
-  ...props
-}: Omit<Props<true>, 'multiple' | 'value' | 'onValueChange'> & { initial?: Product[] }) {
-  const [value, setValue] = useState<Product[]>(initial);
+function Multiple(props: Omit<Props<true>, 'multiple' | 'value' | 'onValueChange'>) {
+  const [value, setValue] = useState<Product[]>([]);
   return (
     <>
       <button type="button">Before</button>
@@ -84,12 +76,7 @@ function Multiple({
           <Combobox.Popup data-testid="popup">
             <Combobox.List>
               {(item: Product) => (
-                <Combobox.Item
-                  key={item.id}
-                  value={item}
-                  disabled={item.disabled}
-                  isLocked={item.locked}
-                >
+                <Combobox.Item key={item.id} value={item} disabled={item.disabled}>
                   {item.label}
                 </Combobox.Item>
               )}
@@ -106,17 +93,12 @@ const input = () => screen.getByRole('combobox', { name: 'Product' }) as HTMLInp
 const popup = () => screen.getByTestId('popup');
 const isOpen = () => popup().matches(':popover-open');
 const option = (name: string) => screen.getByRole('option', { name, hidden: true });
-// Options in the listbox: not the selected ones List keeps mounted, hidden, outside it.
-const options = () =>
-  within(screen.getByRole('listbox', { hidden: true }))
-    .queryAllByRole('option', { hidden: true })
-    .map((o) => o.textContent);
+const options = () => screen.queryAllByRole('option', { hidden: true }).map((o) => o.textContent);
 const highlighted = () =>
   document.getElementById(input().getAttribute('aria-activedescendant') ?? '');
 const submitted = () =>
   new FormData(screen.getByTestId('form') as HTMLFormElement).getAll('product');
 const form = () => screen.getByTestId('form') as HTMLFormElement;
-const byId = (id: string) => products.find((p) => p.id === id) as Product;
 
 describe('Combobox (browser)', () => {
   it('anchors the popup to the input as a native manual popover', () => {
@@ -297,12 +279,6 @@ describe('Combobox (browser)', () => {
     expect(submitted()).toEqual(['b1']);
   });
 
-  it('ignores isLocked without multiple: Clear still clears', async () => {
-    render(<Basic defaultValue={products[1]} />);
-    await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
-    expect(submitted()).toEqual(['']);
-  });
-
   describe('required', () => {
     it('is required while nothing is selected, and valid once something is', async () => {
       render(<Basic required />);
@@ -407,54 +383,6 @@ describe('Combobox (browser)', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Remove Book: Atlas' }));
       expect(submitted()).toEqual([]);
       expect(document.activeElement).toBe(input());
-    });
-
-    it('keeps a locked item: its ChipRemove, Delete, Backspace, Clear and the list leave it', async () => {
-      render(<Multiple initial={[byId('b1'), byId('b2')]} />);
-      expect(screen.getByTestId('chip-b2')).toHaveAttribute('data-locked');
-      expect(screen.getByTestId('chip-b1')).not.toHaveAttribute('data-locked');
-      expect(screen.getByRole('button', { name: 'Remove Book: Bestiary' })).toBeDisabled();
-
-      // Backspace removes the last item only, and the last one is locked.
-      await userEvent.click(input());
-      await userEvent.keyboard('{Escape}{Backspace}');
-      expect(submitted()).toEqual(['b1', 'b2']);
-
-      await userEvent.keyboard('{ArrowLeft}');
-      expect(document.activeElement).toBe(screen.getByTestId('chip-b2'));
-      await userEvent.keyboard('{Delete}');
-      expect(submitted()).toEqual(['b1', 'b2']);
-
-      // A press on it in the list does not toggle it off.
-      await userEvent.click(input());
-      await userEvent.click(option('Book: Bestiary'));
-      expect(submitted()).toEqual(['b1', 'b2']);
-
-      const clear = screen.getByRole('button', { name: 'Clear' });
-      expect(clear).toHaveAttribute('data-visible');
-      await userEvent.click(clear);
-      expect(submitted()).toEqual(['b2']);
-      expect(clear).not.toHaveAttribute('data-visible');
-    });
-
-    it('still lets a selected disabled item be removed: disabled only stops a pick', async () => {
-      render(<Multiple initial={[byId('b3')]} />);
-      await userEvent.click(screen.getByRole('button', { name: 'Remove Book: Café stories' }));
-      expect(submitted()).toEqual([]);
-    });
-
-    it('stays locked while a search hides its item', async () => {
-      render(<Multiple initial={[byId('b2')]} />);
-      await userEvent.type(input(), 'pen');
-      expect(options()).not.toContain('Book: Bestiary');
-      expect(screen.getByRole('button', { name: 'Remove Book: Bestiary' })).toBeDisabled();
-    });
-
-    it('is locked before a server search has returned it', () => {
-      render(<Multiple items={[]} filter={null} initial={[byId('b2')]} />);
-      expect(options()).toEqual([]);
-      expect(screen.getByTestId('chip-b2')).toHaveAttribute('data-locked');
-      expect(screen.getByRole('button', { name: 'Remove Book: Bestiary' })).toBeDisabled();
     });
 
     it('Clear empties the whole selection', async () => {

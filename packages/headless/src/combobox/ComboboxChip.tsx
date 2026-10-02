@@ -22,11 +22,9 @@ export type ComboboxChipProps<T = unknown> = ComboboxChipOwnProps<T> &
   Omit<ComponentPropsWithRef<'div'>, keyof ComboboxChipOwnProps<T>>;
 
 /** The item a Chip stands for, for its ChipRemove. */
-export const ComboboxChipContext = createContext<{ value: unknown; disabled: boolean } | null>(
-  null,
-);
+export const ComboboxChipContext = createContext<{ value: unknown } | null>(null);
 
-export function useComboboxChipContext(): { value: unknown; disabled: boolean } {
+export function useComboboxChipContext(): { value: unknown } {
   const context = useContext(ComboboxChipContext);
   if (context === null) {
     throw new Error('<Combobox.ChipRemove> must be rendered inside <Combobox.Chip>.');
@@ -37,9 +35,6 @@ export function useComboboxChipContext(): { value: unknown; disabled: boolean } 
 /**
  * One selected item, with `multiple`. Render one per item of the Root's `value`, before the
  * Input. Give it an `aria-description` that says how to remove it.
- *
- * `data-disabled` when the Root is disabled; `data-locked` when its item's Item is
- * `isLocked`. Either way it cannot be removed.
  *
  * Out of the tab order. Left from the start of the input reaches the last chip; Left and
  * Right move between chips, and Right from the last returns to the input; Backspace or
@@ -52,24 +47,14 @@ export function ComboboxChip<T = unknown>({
   render,
   ...rest
 }: ComboboxChipProps<T>) {
-  const {
-    disabled: rootDisabled,
-    itemToKey,
-    isLocked,
-    remove,
-    registerChip,
-    chips,
-    inputRef,
-  } = useComboboxRootContext('Chip');
+  const { disabled, itemToKey, remove, registerChip, chips, inputRef } =
+    useComboboxRootContext('Chip');
   const key = itemToKey(value);
-  // A locked item cannot be removed; its chip stays reachable with the arrow keys.
-  const locked = isLocked(key);
-  const disabled = rootDisabled || locked;
   const elementRef = useRef<HTMLElement | null>(null);
 
   useLayoutEffect(() => registerChip({ key, ref: elementRef }), [registerChip, key]);
 
-  const chipContext = useMemo(() => ({ value: value as unknown, disabled }), [value, disabled]);
+  const chipContext = useMemo(() => ({ value: value as unknown }), [value]);
 
   function focusAt(index: number) {
     const chip = chips[index];
@@ -82,8 +67,7 @@ export function ComboboxChip<T = unknown>({
     defaultTagName: 'div',
     props: {
       tabIndex: -1,
-      'data-disabled': rootDisabled ? '' : undefined,
-      'data-locked': locked ? '' : undefined,
+      'data-disabled': disabled ? '' : undefined,
       className,
       children,
       ref: elementRef,

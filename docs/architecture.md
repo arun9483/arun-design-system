@@ -679,25 +679,15 @@ substring. Filtering is memoised on `items` and the query, and the query is read
 `Clear` is present only while there is something to clear — a selection — and marks it with
 `data-visible`; the styled component hides it otherwise.
 
-**Disabled and locked are two concepts, both on `Item`.** `disabled` stops a pick, in either
-mode. `isLocked` stops a removal, with `multiple` only — not by its `ChipRemove`, Backspace,
-Delete or a press on it in the list, nor by `Clear`, which removes the rest. Folding the lock
-into `disabled` was tried first and dropped: "can't add" and "can't take off" are different
-needs, and an out-of-stock item someone already picked must stay removable. Single select has
-no lock — `disabled` on the Root fixes the one value — and ignores `isLocked`.
-
-No library checked locks a selection itself (October 2026). Base UI puts `disabled` on
-`ChipRemove`; MUI's "fixed tags" demo disables the chip and puts fixed options back in
-`onChange`; Ark/Zag's `remove` does not consult `isItemDisabled`. All three leave single select
-unlocked.
-
-**List keeps every selected item's Item mounted.** The Root learns `isLocked` from an Item's
-props (decision 10), and a search — or a server search that starts empty — leaves selected
-items out of the list. So List also calls its render function, with index `-1`, for each
-selected item the results leave out, inside a `hidden` element outside the listbox: no
-option is announced or reachable, and a chip is locked from the first render. A Root-level
-`isItemLocked(item)` would not need this, and was declined to keep the props on Item, beside
-`disabled`.
+**There is no locked selection: every selected item can be removed.** `disabled` on an `Item`
+stops a pick only, in either mode, as `disabled` on a native `<option>` does — in Chromium a
+plain click in a `<select multiple>` deselects a selected disabled option. An `isLocked` on
+`Item` was built and dropped: native `<select>` has no such state, none of Base UI, MUI or
+Ark/Zag locks a selection itself (October 2026), and knowing a lock before a server search
+returns the item meant List rendering every selected Item, hidden, outside the listbox. An app
+that needs a fixed item controls `value` and puts it back in `onValueChange`; a single
+selection is fixed with `disabled` on the Root. Revisit with a real case, and a Root-level
+`isItemLocked(item)` then, which needs no hidden render.
 
 **`required` is the platform's, on the input.** The hidden inputs cannot carry it — a hidden
 input is barred from constraint validation — so the visible input is `required` while the

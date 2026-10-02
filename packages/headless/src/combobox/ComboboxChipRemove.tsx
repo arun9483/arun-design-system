@@ -21,7 +21,6 @@ export type ComboboxChipRemoveProps = ComboboxChipRemoveOwnProps &
 
 /**
  * Removes its Chip's item from the selection. Give it an `aria-label` — "Remove Book".
- * Disabled with its Chip.
  * Out of the tab order; a press returns focus to the input.
  */
 export function ComboboxChipRemove({
@@ -30,8 +29,8 @@ export function ComboboxChipRemove({
   render,
   ...rest
 }: ComboboxChipRemoveProps) {
-  const { remove, inputRef } = useComboboxRootContext('ChipRemove');
-  const { value, disabled } = useComboboxChipContext();
+  const { disabled, remove, inputRef } = useComboboxRootContext('ChipRemove');
+  const { value } = useComboboxChipContext();
 
   return useRender({
     render,
