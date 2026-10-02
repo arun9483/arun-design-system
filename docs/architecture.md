@@ -805,9 +805,12 @@ rendered (decision 10 — from props).
 **Clear hides while the Root is `disabled`.** It can clear nothing then, so `data-visible` is
 absent though there is a selection, as a disabled `<select>` offers no reset.
 
-**Deferred:** nested groups (`<optgroup>` cannot nest), the input inside the popup, action rows
-that are not options (GitHub's "Edit labels"), an inline list, grid navigation, and a built-in
-virtualizer.
+**Deferred:** an inline list, grid navigation, and a built-in virtualizer.
 
 **Rules out:** items registered as children; selection read from `items` or the DOM; a
-JavaScript positioning engine or a Portal (decision 12); and `cancel()` on change events.
+JavaScript positioning engine or a Portal (decision 12); `cancel()` on change events; nested
+groups, as `<optgroup>` cannot nest; the input inside the popup — a button opening a panel that
+holds the search, GitHub's label picker — since the field is always the visible input; and
+action rows that are not options, such as GitHub's "Edit labels", since a listbox holds only
+options and groups. All three were weighed in October 2026 and judged not needed; a picker or an
+action belongs beside the Combobox, in a Popover or Menu, not inside it.
