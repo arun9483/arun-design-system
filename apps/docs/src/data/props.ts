@@ -390,7 +390,7 @@ export const PROPS = {
       name: 'onInputValueChange',
       type: '(text, { reason }) => void',
       description:
-        "Called on every change of the text, with why: `'input'` when typed, or `'item-press'`, `'clear'`, `'escape'`, `'outside-press'` or `'blur'` when the component reset it.",
+        "Called on every change of the text, with why: `'input'` when typed, or `'item-press'`, `'clear'`, `'escape'`, `'outside-press'` or `'blur'` when the component reset it, or `'value-change'` when it followed a new `value`.",
     },
     {
       name: 'open',

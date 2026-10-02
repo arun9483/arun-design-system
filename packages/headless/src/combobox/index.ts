@@ -22,6 +22,7 @@ export type { ComboboxListProps } from './ComboboxList';
 export type { ComboboxItemProps } from './ComboboxItem';
 export type { ComboboxGroupProps } from './ComboboxGroup';
 export type { ComboboxGroupLabelProps } from './ComboboxGroupLabel';
+export type { ComboboxSeparatorProps } from './ComboboxSeparator';
 export type { ComboboxEmptyProps } from './ComboboxEmpty';
 export type { ComboboxStatusProps } from './ComboboxStatus';
 export type { ComboboxChipProps } from './ComboboxChip';

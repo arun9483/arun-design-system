@@ -60,6 +60,20 @@ describe('Combobox (ui)', () => {
     expect(screen.getByText('Citrus')).toHaveClass('combobox-group-label');
   });
 
+  it('styles a Separator', () => {
+    render(
+      <Combobox.Root items={['Lemon']}>
+        <Combobox.Popup>
+          <Combobox.List>
+            <Combobox.Separator data-testid="separator" />
+          </Combobox.List>
+        </Combobox.Popup>
+      </Combobox.Root>,
+    );
+    expect(screen.getByTestId('separator')).toHaveClass('combobox-separator');
+    expect(screen.getByTestId('separator')).toHaveAttribute('aria-hidden', 'true');
+  });
+
   it('renders no chips without multiple', () => {
     render(
       <Combobox.Root items={fruits} defaultValue="Apple">

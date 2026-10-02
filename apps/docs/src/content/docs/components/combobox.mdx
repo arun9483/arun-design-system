@@ -11,6 +11,7 @@ import ComboboxAsync from '@/examples/combobox-async';
 import ComboboxLazy from '@/examples/combobox-lazy';
 import ComboboxDisabled from '@/examples/combobox-disabled';
 import ComboboxGrouped from '@/examples/combobox-grouped';
+import ComboboxCreatable from '@/examples/combobox-creatable';
 import PropTable from '@/components/PropTable.astro';
 
 `Combobox` is a text input that filters a list as you type. It follows the
@@ -48,6 +49,7 @@ import { Combobox } from '@arun-dev/ui';
 | `Item`       | `<div role="option">`       | one option, with a check while selected                                          |
 | `Group`      | `<div role="group">`        | items under a label, as an `<optgroup>`; optional                                |
 | `GroupLabel` | `<div>`                     | the group's name, shown but not an option                                        |
+| `Separator`  | `<div aria-hidden>`         | a line between items or groups, as an `<hr>` in a `<select>`; optional           |
 | `Empty`      | `<div>`                     | shown when nothing matches and nothing is loading                                |
 | `Status`     | `<div role="status">`       | a live region for "Searching…" or a result count                                 |
 
@@ -160,7 +162,43 @@ one group at a time. Render a `Group` with its `GroupLabel` and an `Item` per it
 - **`disabled` on a Group** disables every item in it, as `<optgroup disabled>` does.
 - **The value** is still an item, never a group. A group is any object with an `items` array,
   so an item type with its own `items` array can't be listed ungrouped.
-- Groups don't nest, as with `<optgroup>`, and there is no separator.
+- Groups don't nest, as with `<optgroup>`.
+- **`Combobox.Separator`** draws a line between items or groups, as an `<hr>` in a `<select>`.
+  It is visual only (`aria-hidden`), since a listbox may hold only options and groups. The
+  example above puts one between each region.
+
+## Creating an item
+
+<Example name="combobox-creatable" layout="stack">
+  <ComboboxCreatable client:load />
+</Example>
+
+Offer **Create "x"** when the text matches nothing, as GitHub's label picker does. It is a
+pattern, not a prop. The "Create" row is an ordinary item that you add to `items`:
+
+1. Track the text with `onInputValueChange`.
+2. While no item matches it exactly, ignoring case and accents, add a "Create" item. Give it the
+   text as its label, so a pick puts the new name in the input, and render it as "Create …" in
+   its `Item`.
+3. In `onValueChange`, swap the "Create" item for the real item you make, and add that to your
+   list.
+
+```tsx
+const exact = labels.some((l) => fold(l.name) === fold(text));
+const items = text && !exact ? [...labels, { id: `create:${text}`, name: text, create: true }] : labels;
+
+<Combobox.Root
+  items={items}
+  multiple
+  value={value}
+  onValueChange={(next) => setValue(next.map((l) => (l.create ? createLabel(l.name) : l)))}
+  onInputValueChange={setText}
+>
+```
+
+The arrow keys and Enter reach the "Create" row like any other. Making the item is up to you:
+saving it, asking your server for an id, or opening a [Dialog](/components/dialog/) for a
+colour first.
 
 ## Search
 
@@ -260,6 +298,42 @@ function BigCombobox({ all }: { all: string[] }) {
 }
 ```
 
+### With groups
+
+Flatten the groups into rows, labels and items, for the virtualizer, and wrap the rows in view
+in their `Group`. Keep a group's label when it scrolls out, `hidden`, so the group stays named.
+`onItemHighlighted` gives the index among items, so map it to its row.
+
+```tsx
+// Memoised: a new array each render is a new result list, which clears the highlight.
+const groups = useMemo(() => filterGroups(regions, query), [query]);
+const rows = useMemo(
+  () => groups.flatMap((group) => [{ group }, ...group.items.map((item) => ({ group, item }))]),
+  [groups],
+);
+const rowOfItem = rows.flatMap((row, i) => (row.item ? [i] : []));
+
+<Combobox.Root
+  items={groups}
+  filter={null}
+  onItemHighlighted={(_, { index, reason }) => {
+    if (reason === 'keyboard') virtualizer.scrollToIndex(rowOfItem[index]);
+  }}
+>
+  …
+  <Combobox.List>
+    {inViewByGroup(virtualizer.getVirtualItems(), rows).map(({ group, rows: inView }) => (
+      <Combobox.Group key={group.label}>
+        <Combobox.GroupLabel hidden={inView[0].item !== undefined}>{group.label}</Combobox.GroupLabel>
+        {inView.map(({ item }) => item && <Combobox.Item key={item} value={item}>{item}</Combobox.Item>)}
+      </Combobox.Group>
+    ))}
+  </Combobox.List>
+```
+
+A disabled item is skipped by the arrow keys only once it has rendered. That holds for every
+virtualized list, grouped or not.
+
 Below about a thousand items, you rarely need this. Filtering runs behind `useDeferredValue`, so
 typing stays responsive, and moving the highlight re-renders only the two items it moves
 between.
@@ -321,8 +395,7 @@ and `ref`.
   wrap them in `useCallback`. A new function each render filters the list again on every
   render.
 - Label the field with a `<label htmlFor>` pointing at the Input's `id`, or with `aria-label`.
-- Not yet: separators, groups in a virtualized list, creating an item that isn't in the list, and
-  the input inside the popup.
+- Not yet: action rows such as "Edit labels", and the input inside the popup.
 - Restyle every combobox with the `--combobox-*` tokens, e.g. `--combobox-popup-max-height`.
 - Types come from the package that owns them. `ComboboxInputProps` comes from
   `@arun-dev/ui`; the other parts' props come from `@arun-dev/headless/combobox`, or use

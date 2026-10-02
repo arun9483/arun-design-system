@@ -50,6 +50,10 @@
   --combobox-group-label-font-size: var(--text-xs);
   --combobox-group-label-font-weight: var(--font-weight-semibold);
 
+  /* Separator — a line between items or groups, as an <hr> in a <select> */
+  --combobox-separator-color: var(--color-border-subtle);
+  --combobox-separator-margin-block: var(--space-3xs);
+
   /* Empty and Status */
   --combobox-message-color: var(--color-text-muted);
 }

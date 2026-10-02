@@ -321,7 +321,8 @@ reach chips from the start of the input. `Empty` shows when nothing matches and 
 `loading`; `Status` is a polite live region. `required` on the Root makes the input `required`
 while nothing is selected. When `items` are groups (objects with an `items` array), List's
 function gets one group at a time, and renders a `Group` (`role="group"`, `disabled` like
-`<optgroup disabled>`) with a `GroupLabel` and its Items.
+`<optgroup disabled>`) with a `GroupLabel` and its Items. `Separator` draws a line between them, `aria-hidden`, since a
+listbox may hold only options and groups.
 
 Every change callback receives `{ reason }`. The Input, Trigger, Popup and InputGroup emit
 `data-open` / `data-closed`; an Item `data-selected`, `data-highlighted` and `data-disabled`;
