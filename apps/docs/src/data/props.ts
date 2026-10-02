@@ -518,6 +518,14 @@ export const PROPS = {
         'Cannot be picked, and the arrow keys skip it. A selected one can still be removed.',
     },
   ],
+  'Combobox.Group': [
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Disables every Item inside, as `disabled` on an `<optgroup>` does.',
+    },
+  ],
   'Menu.Root': [
     {
       name: 'open',

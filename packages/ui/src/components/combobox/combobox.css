@@ -208,6 +208,18 @@
     visibility: visible;
   }
 
+  .combobox-group + .combobox-group {
+    margin-block-start: var(--combobox-group-gap);
+  }
+
+  .combobox-group-label {
+    padding: var(--combobox-item-padding-block) var(--combobox-item-padding-inline);
+    color: var(--combobox-group-label-color);
+    font-size: var(--combobox-group-label-font-size);
+    font-weight: var(--combobox-group-label-font-weight);
+    cursor: default;
+  }
+
   .combobox-message {
     padding: var(--combobox-item-padding-block) var(--combobox-item-padding-inline);
     color: var(--combobox-message-color);

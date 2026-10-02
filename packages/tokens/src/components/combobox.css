@@ -44,6 +44,12 @@
   --combobox-item-bg-highlight: var(--color-bg-secondary);
   --combobox-item-check-color: var(--color-text-accent);
 
+  /* Group — a label over its items, as an <optgroup> */
+  --combobox-group-gap: var(--space-2xs);
+  --combobox-group-label-color: var(--color-text-secondary);
+  --combobox-group-label-font-size: var(--text-xs);
+  --combobox-group-label-font-weight: var(--font-weight-semibold);
+
   /* Empty and Status */
   --combobox-message-color: var(--color-text-muted);
 }

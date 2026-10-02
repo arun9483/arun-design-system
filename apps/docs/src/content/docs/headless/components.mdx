@@ -319,7 +319,9 @@ component closes it on a press outside its own elements, and on Esc and blur.
 renders the selection, for chips; `Chip` and `ChipRemove` remove an item, and the arrow keys
 reach chips from the start of the input. `Empty` shows when nothing matches and nothing is
 `loading`; `Status` is a polite live region. `required` on the Root makes the input `required`
-while nothing is selected.
+while nothing is selected. When `items` are groups (objects with an `items` array), List's
+function gets one group at a time, and renders a `Group` (`role="group"`, `disabled` like
+`<optgroup disabled>`) with a `GroupLabel` and its Items.
 
 Every change callback receives `{ reason }`. The Input, Trigger, Popup and InputGroup emit
 `data-open` / `data-closed`; an Item `data-selected`, `data-highlighted` and `data-disabled`;

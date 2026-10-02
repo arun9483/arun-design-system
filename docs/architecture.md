@@ -734,7 +734,7 @@ on the input. A press inside an open Popover's Combobox still does not light-dis
 Popover, since the list is that Popover's descendant in the DOM.
 
 **Parts, fewest first (decision 11):** `Root`, `Input`, `Trigger`, `Clear`, `Popup`, `List`,
-`Item`, `Empty`, `Status`, `Chip`, `ChipRemove`. `Chip` and `ChipRemove` are parts because
+`Item`, `Empty`, `Status`, `Chip`, `ChipRemove` — and `Group` and `GroupLabel`, below. `Chip` and `ChipRemove` are parts because
 removing an item needs the Root's setter and chip navigation needs the Root's focus handling.
 Two more landed with `@arun-dev/ui`'s Combobox, which earned them: `InputGroup`, the box around
 the input, chips and buttons, which takes over as the popup's anchor so the list lines up with
@@ -745,8 +745,31 @@ Base UI has both. The selected check is `data-selected` on `Item` and CSS, so th
 nor `Label`, since a `<label>` is the consumer's element linked by `id`. `@arun-dev/ui`'s
 Combobox renders the chips itself, styled as `Chip`.
 
-**Deferred:** groups and separators, creating an item that is not in the list, the input inside
-the popup, an inline list, grid navigation, and a built-in virtualizer.
+**Groups, as `<optgroup>`.** Items stay data (decision 10's "from props, never the DOM"
+holds), so a group is data too: `items` is either items or groups, where a group is any object
+with an `items` array — its label, id or anything else is the consumer's. The filter runs inside
+each group and a group it empties is left out; `List`'s function is then called once per group
+left, with the group narrowed to its matches, and renders a `Group` holding a `GroupLabel` and
+an `Item` per item. The arrow keys, the highlight index, `onItemHighlighted` and `Empty` see one
+flat list in group order, so keyboard handling does not change.
+
+Two parts are earned (decision 11). `Group` is `role="group"`, named by its label through
+`aria-labelledby` — the listbox → group → option structure APG allows. Its `disabled` disables
+every `Item` inside, as `<optgroup disabled>` does; an Item reads it from context, like its own
+prop, so the arrow keys skip them. `GroupLabel` is `<optgroup>`'s `label`: shown, never an
+option, never reached by the arrow keys.
+
+Measured against the platform and Base UI (October 2026): `<optgroup>` has `label` and
+`disabled` and does not nest — this matches all three. Base UI also has `Group`, `GroupLabel`,
+plus a `Collection` that renders a group's items from context and a `Separator`. `Collection`
+is not needed here: the consumer maps the group's already-filtered `items` directly. A group is
+recognised by its shape, as in Base UI, so an item type that itself has an `items` array cannot
+be listed ungrouped; none has asked for it.
+
+**Deferred:** separators (`<hr>` in `<select>` is recent, and grouping does not need one),
+nested groups (`<optgroup>` cannot nest), groups with a virtualized list, creating an item that
+is not in the list, the input inside the popup, an inline list, grid navigation, and a built-in
+virtualizer.
 
 **Rules out:** items registered as children; selection read from `items` or the DOM; a
 JavaScript positioning engine or a Portal (decision 12); and `cancel()` on change events.

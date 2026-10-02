@@ -31,6 +31,7 @@ import type {
   PopoverTriggerProps,
 } from '@arun-dev/headless/popover';
 import type {
+  ComboboxGroupProps,
   ComboboxItemProps,
   ComboboxListProps,
   ComboboxPopupProps,
@@ -94,6 +95,7 @@ type Unknown =
   | OnlyRealProps<Documented<'Combobox.Popup'>, ComboboxPopupProps>
   | OnlyRealProps<Documented<'Combobox.List'>, ComboboxListProps>
   | OnlyRealProps<Documented<'Combobox.Item'>, ComboboxItemProps>
+  | OnlyRealProps<Documented<'Combobox.Group'>, ComboboxGroupProps>
   | OnlyRealProps<Documented<'Menu.Root'>, MenuRootProps>
   | OnlyRealProps<Documented<'Menu.Popup'>, MenuPopupProps>
   | OnlyRealProps<Documented<'Menu.Trigger'>, MenuTriggerProps>

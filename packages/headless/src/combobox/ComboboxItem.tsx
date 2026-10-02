@@ -8,12 +8,13 @@ import type {
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
 import { useComboboxRootContext } from './ComboboxRootContext';
+import { useComboboxGroupContext } from './ComboboxGroup';
 import { comboboxItemDataAttributes } from './comboboxDataAttributes';
 
 type ComboboxItemOwnProps<T> = {
   /** The item this option stands for — one of the Root's `items`. */
   value: T;
-  /** Cannot be picked, and the arrow keys skip it. */
+  /** Cannot be picked, and the arrow keys skip it. A disabled Group disables it too. */
   disabled?: boolean;
   /** Element to render instead of the default `<div>`. Props and ref are merged onto it. */
   render?: ReactElement;
@@ -33,7 +34,7 @@ export type ComboboxItemProps<T = unknown> = ComboboxItemOwnProps<T> &
  */
 export function ComboboxItem<T = unknown>({
   value,
-  disabled = false,
+  disabled: disabledProp = false,
   className,
   children,
   render,
@@ -49,6 +50,8 @@ export function ComboboxItem<T = unknown>({
     select,
     optionId,
   } = useComboboxRootContext('Item');
+  const group = useComboboxGroupContext();
+  const disabled = disabledProp || (group?.disabled ?? false);
   const key = itemToKey(value);
   const index = indexByKey.get(key) ?? -1;
   const selected = selectedKeys.has(key);

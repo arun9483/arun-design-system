@@ -7,7 +7,8 @@ import { useComboboxRootContext } from './ComboboxRootContext';
 type ComboboxListOwnProps<T> = {
   /**
    * A function rendering one `Combobox.Item` per filtered item, or any nodes. With a
-   * virtualizer, render only the rows it asks for.
+   * virtualizer, render only the rows it asks for. With groups, it is called once per group
+   * the filter left an item in, with that group, and renders a `Combobox.Group`.
    */
   children?: ReactNode | ((item: T, index: number) => ReactNode);
   /** Element to render instead of the default `<div>`. Props and ref are merged onto it. */
@@ -20,7 +21,8 @@ export type ComboboxListProps<T = unknown> = ComboboxListOwnProps<T> &
   Omit<ComponentPropsWithRef<'div'>, keyof ComboboxListOwnProps<T>>;
 
 /**
- * The `role="listbox"`. Given a function, renders it once per item the filter left.
+ * The `role="listbox"`. Given a function, renders it once per item the filter left — or, when
+ * the Root's `items` are groups, once per group.
  *
  * With the Root's `onLoadMore`, an invisible sentinel follows the items; when it scrolls into
  * view and nothing is `loading`, `onLoadMore` is called. The list is `aria-busy` meanwhile.
@@ -31,11 +33,14 @@ export function ComboboxList<T = unknown>({
   render,
   ...rest
 }: ComboboxListProps<T>) {
-  const { multiple, loading, filteredItems, onLoadMore, listId } = useComboboxRootContext('List');
+  const { multiple, loading, filteredItems, filteredGroups, onLoadMore, listId } =
+    useComboboxRootContext('List');
 
   const content =
     typeof children === 'function'
-      ? (filteredItems as readonly T[]).map((item, index) => children(item, index))
+      ? ((filteredGroups ?? filteredItems) as readonly T[]).map((entry, index) =>
+          children(entry, index),
+        )
       : children;
 
   return useRender({

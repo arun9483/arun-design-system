@@ -25,9 +25,19 @@ export type ComboboxFilter<T> = (
   itemToString: (item: T) => string,
 ) => T[];
 
+/**
+ * Items under a label, as an `<optgroup>`: any object with an `items` array — the rest, a
+ * label or an id, is yours to render.
+ */
+export type ComboboxGroup<T> = { readonly items: readonly T[] };
+
 export type ComboboxRootProps<T, Multiple extends boolean = false> = {
-  /** Every item the list can show. With server search, the current results. */
-  items: readonly T[];
+  /**
+   * Every item the list can show. With server search, the current results. Or groups of
+   * them: each an object with an `items` array, which the filter searches and `List` renders
+   * one by one, leaving out the groups with no match.
+   */
+  items: readonly T[] | readonly ComboboxGroup<T>[];
   /**
    * An item's label: what the input shows once it is picked, and what the default filter
    * matches. Defaults to the item itself for strings, else its `label` property.
@@ -90,6 +100,19 @@ export type ComboboxRootProps<T, Multiple extends boolean = false> = {
   form?: string;
   children?: ReactNode;
 };
+
+/** Groups, when every entry has an `items` array — read as an `<optgroup>` each. */
+function isGroupList(items: readonly unknown[]): items is readonly ComboboxGroup<unknown>[] {
+  return (
+    items.length > 0 &&
+    items.every(
+      (entry) =>
+        entry !== null &&
+        typeof entry === 'object' &&
+        Array.isArray((entry as { items?: unknown }).items),
+    )
+  );
+}
 
 function defaultItemToString(item: unknown): string {
   if (typeof item === 'string') return item;
@@ -175,10 +198,25 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
   // Typing stays responsive over a long list: React renders the input first, the filter after.
   const deferredQuery = useDeferredValue(query);
 
-  const filteredItems: readonly unknown[] = useMemo(() => {
-    if (filter === null) return items;
-    const run = (filter ?? defaultFilter) as ComboboxFilter<unknown>;
-    return run(items, deferredQuery, itemToString);
+  // With groups, the filter runs inside each, and a group it empties is left out. The arrow
+  // keys, the highlight index and Empty all see one flat list, in group order.
+  const { filteredItems, filteredGroups } = useMemo(() => {
+    const run =
+      filter === null
+        ? (list: readonly unknown[]) => list
+        : (list: readonly unknown[]) =>
+            ((filter ?? defaultFilter) as ComboboxFilter<unknown>)(
+              list,
+              deferredQuery,
+              itemToString,
+            );
+    if (!isGroupList(items)) {
+      return { filteredItems: run(items), filteredGroups: null };
+    }
+    const groups = items
+      .map((group) => ({ ...group, items: run(group.items) }))
+      .filter((group) => group.items.length > 0);
+    return { filteredItems: groups.flatMap((group) => group.items), filteredGroups: groups };
   }, [items, filter, deferredQuery, itemToString]);
 
   const indexByKey = useMemo(
@@ -366,6 +404,7 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       inputValue,
       loading,
       filteredItems,
+      filteredGroups,
       itemToString,
       itemToKey,
       indexByKey,
@@ -403,6 +442,7 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
       inputValue,
       loading,
       filteredItems,
+      filteredGroups,
       itemToString,
       itemToKey,
       indexByKey,

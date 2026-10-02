@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { describe, it, expect, vi } from 'vitest';
 import { useState } from 'react';
@@ -99,6 +99,74 @@ const highlighted = () =>
 const submitted = () =>
   new FormData(screen.getByTestId('form') as HTMLFormElement).getAll('product');
 const form = () => screen.getByTestId('form') as HTMLFormElement;
+
+type Country = { code: string; label: string };
+type Continent = { label: string; disabled?: boolean; items: Country[] };
+
+const continents: Continent[] = [
+  {
+    label: 'Africa',
+    items: [
+      { code: 'eg', label: 'Egypt' },
+      { code: 'ke', label: 'Kenya' },
+    ],
+  },
+  {
+    label: 'Asia',
+    items: [
+      { code: 'in', label: 'India' },
+      { code: 'jp', label: 'Japan' },
+    ],
+  },
+  { label: 'Antarctica', disabled: true, items: [{ code: 'aq', label: 'Research station' }] },
+  {
+    label: 'Europe',
+    items: [
+      { code: 'fr', label: 'France' },
+      { code: 'de', label: 'Germany' },
+    ],
+  },
+];
+
+function Grouped({ onPick }: { onPick?: (code: string | undefined) => void }) {
+  return (
+    <form data-testid="form">
+      <Combobox.Root
+        items={continents}
+        itemToKey={(c: Country) => c.code}
+        name="product"
+        // Typed as the item, not the group: `code` exists only on Country.
+        onValueChange={(country) => onPick?.(country?.code)}
+      >
+        <Combobox.Input aria-label="Product" />
+        <Combobox.Popup data-testid="popup">
+          <Combobox.Empty>No countries</Combobox.Empty>
+          <Combobox.List>
+            {(group: Continent) => (
+              <Combobox.Group key={group.label} disabled={group.disabled}>
+                <Combobox.GroupLabel>{group.label}</Combobox.GroupLabel>
+                {group.items.map((country) => (
+                  <Combobox.Item key={country.code} value={country}>
+                    {country.label}
+                  </Combobox.Item>
+                ))}
+              </Combobox.Group>
+            )}
+          </Combobox.List>
+        </Combobox.Popup>
+      </Combobox.Root>
+    </form>
+  );
+}
+
+const groups = () =>
+  screen
+    .queryAllByRole('group', { hidden: true })
+    .map((g) => g.getAttribute('aria-label') ?? g.textContent);
+const groupNames = () =>
+  screen
+    .queryAllByRole('group', { hidden: true })
+    .map((g) => document.getElementById(g.getAttribute('aria-labelledby') ?? '')?.textContent);
 
 describe('Combobox (browser)', () => {
   it('anchors the popup to the input as a native manual popover', () => {
@@ -277,6 +345,64 @@ describe('Combobox (browser)', () => {
     (screen.getByTestId('form') as HTMLFormElement).reset();
     await vi.waitFor(() => expect(input().value).toBe('Book: Atlas'));
     expect(submitted()).toEqual(['b1']);
+  });
+
+  describe('groups', () => {
+    it('renders each group as a role="group" in the listbox, named by its label', async () => {
+      render(<Grouped />);
+      await userEvent.click(input());
+      expect(groupNames()).toEqual(['Africa', 'Asia', 'Antarctica', 'Europe']);
+      const asia = screen.getByRole('group', { name: 'Asia' });
+      expect(asia.parentElement).toHaveAttribute('role', 'listbox');
+      expect(
+        within(asia)
+          .getAllByRole('option')
+          .map((o) => o.textContent),
+      ).toEqual(['India', 'Japan']);
+    });
+
+    it('filters inside each group, and leaves out a group with no match', async () => {
+      render(<Grouped />);
+      await userEvent.type(input(), 'an');
+      expect(groupNames()).toEqual(['Asia', 'Europe']);
+      expect(options()).toEqual(['Japan', 'France', 'Germany']);
+      await userEvent.clear(input());
+      await userEvent.type(input(), 'zz');
+      expect(groups()).toEqual([]);
+      expect(screen.getByText('No countries')).toBeInTheDocument();
+    });
+
+    it('runs the arrow keys through every group as one list, past labels and a disabled group', async () => {
+      render(<Grouped />);
+      await userEvent.click(input());
+      const seen: (string | null | undefined)[] = [];
+      for (let i = 0; i < 5; i++) {
+        await userEvent.keyboard('{ArrowDown}');
+        seen.push(highlighted()?.textContent);
+      }
+      expect(seen).toEqual(['Egypt', 'Kenya', 'India', 'Japan', 'France']);
+    });
+
+    it('disables every item in a disabled group, as <optgroup disabled> does', async () => {
+      const onPick = vi.fn();
+      render(<Grouped onPick={onPick} />);
+      await userEvent.click(input());
+      expect(screen.getByRole('group', { name: 'Antarctica' })).toHaveAttribute('data-disabled');
+      const station = option('Research station');
+      expect(station).toHaveAttribute('aria-disabled', 'true');
+      await userEvent.click(station, { force: true });
+      expect(onPick).not.toHaveBeenCalled();
+    });
+
+    it('picks and submits an item from a group', async () => {
+      const onPick = vi.fn();
+      render(<Grouped onPick={onPick} />);
+      await userEvent.click(input());
+      await userEvent.click(option('Japan'));
+      expect(input().value).toBe('Japan');
+      expect(onPick).toHaveBeenCalledWith('jp');
+      expect(submitted()).toEqual(['jp']);
+    });
   });
 
   describe('required', () => {

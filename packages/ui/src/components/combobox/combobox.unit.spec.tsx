@@ -35,6 +35,31 @@ describe('Combobox (ui)', () => {
     expect(screen.getByRole('button', { name: 'Drop Cherry' })).toHaveClass('combobox-chip-remove');
   });
 
+  it('styles groups and their labels', () => {
+    render(
+      <Combobox.Root items={[{ label: 'Citrus', items: ['Lemon', 'Lime'] }]}>
+        <Combobox.Input aria-label="Fruit" />
+        <Combobox.Popup>
+          <Combobox.List>
+            {(group: { label: string; items: string[] }) => (
+              <Combobox.Group key={group.label} className="wide">
+                <Combobox.GroupLabel>{group.label}</Combobox.GroupLabel>
+                {group.items.map((item) => (
+                  <Combobox.Item key={item} value={item}>
+                    {item}
+                  </Combobox.Item>
+                ))}
+              </Combobox.Group>
+            )}
+          </Combobox.List>
+        </Combobox.Popup>
+      </Combobox.Root>,
+    );
+    const group = screen.getByRole('group', { name: 'Citrus', hidden: true });
+    expect(group).toHaveClass('combobox-group', 'wide');
+    expect(screen.getByText('Citrus')).toHaveClass('combobox-group-label');
+  });
+
   it('renders no chips without multiple', () => {
     render(
       <Combobox.Root items={fruits} defaultValue="Apple">
