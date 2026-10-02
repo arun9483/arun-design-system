@@ -1,5 +1,16 @@
 # @arun-dev/ui
 
+## 4.14.0
+
+### Minor Changes
+
+- 29e95e4: Combobox: add `Group` and `GroupLabel`, as `<optgroup>`. Pass groups (objects with an `items` array) as `items`; the filter runs inside each group and leaves out a group with no match. A disabled Group disables its items. New `--combobox-group-*` tokens.
+
+### Patch Changes
+
+- Updated dependencies [29e95e4]
+  - @arun-dev/tokens@0.18.0
+
 ## 4.13.0
 
 ### Minor Changes
