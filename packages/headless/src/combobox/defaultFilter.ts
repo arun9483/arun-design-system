@@ -1,10 +1,4 @@
-/**
- * Folds case and accents, so "e" matches "É" and "ü" matches "U": decompose to base letters
- * and combining marks, drop the marks, lower-case what is left.
- */
-function fold(text: string): string {
-  return text.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase();
-}
+import { fold } from '../core/fold';
 
 /**
  * Combobox's default filter: the items whose label contains the query, ignoring case and

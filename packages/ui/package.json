@@ -106,7 +106,7 @@
     "vitest": "4.1.11"
   },
   "peerDependencies": {
-    "@arun-dev/headless": ">=4.14.0",
+    "@arun-dev/headless": ">=4.15.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
   }

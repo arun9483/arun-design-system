@@ -593,16 +593,16 @@ Shipped since this list was written:
 | `focusableWhenDisabled`               | with Menu: an opt-in on Menu and Tabs, skipping by default — below        |
 | Combobox                              | decided: driven by data, Base UI's behaviour — decision 14                |
 | `Link`                                | with the form basics: always an `<a href>`, no `disabled` — decision 15   |
+| Menu typeahead                        | `textValue`, falling back to the children's text — decision 18            |
+| Checkbox and radio menu items, groups | `CheckboxItem`, `RadioGroup`, `RadioItem`, `Group` — decision 18          |
 
 Still deferred:
 
-| Deferred                              | Revisit when                                                            |
-| ------------------------------------- | ----------------------------------------------------------------------- |
-| Memoisation inside `useRender`        | profiling shows the per-render merge costs something                    |
-| Customizable select (`base-select`)   | it ships in every engine; it swaps the system picker for an in-page one |
-| Menu typeahead                        | a menu long enough to need it; items would need a `textValue` prop      |
-| Submenus                              | a consumer needs nesting; it needs pointer intent and a second anchor   |
-| Checkbox and radio menu items, groups | a consumer needs a menu that holds state rather than runs actions       |
+| Deferred                            | Revisit when                                                            |
+| ----------------------------------- | ----------------------------------------------------------------------- |
+| Memoisation inside `useRender`      | profiling shows the per-render merge costs something                    |
+| Customizable select (`base-select`) | it ships in every engine; it swaps the system picker for an in-page one |
+| Submenus                            | a consumer needs nesting; it needs pointer intent and a second anchor   |
 
 Popover, Tooltip and Menu shipped on decision 12; Combobox follows it — decision 14.
 
@@ -1017,3 +1017,59 @@ number with `multiple` — and is one Tab stop with arrow keys between its Toggl
 
 **Rules out:** a separator part in Breadcrumb; an uncontrolled Pagination; a data grid; a
 `checkbox` styled as a toggle, which says "checked", not "pressed".
+
+---
+
+## 18. Menu: typeahead, and items that hold state
+
+Phase four, part one: the rest of what decision 13 deferred for Menu, except submenus. Measured
+against APG's menu pattern and Base UI's Menu (October 2026).
+
+**Typeahead matches text from props.** Typing moves focus to the next item whose text starts
+with what was typed, ignoring case and accents (`core/fold`, shared with Combobox's filter).
+Keys typed within 500 ms build one search; one character, or the same one repeated, moves past
+the current item, so it cycles, as native menus and `<select>` do. A longer search may stay on
+the current item, so "de" does not leave "Delete" for "Deploy". Disabled items are skipped, as
+by the arrow keys. The logic is `core/typeahead`, internal, beside `core/rovingFocus`.
+
+An item's text is `textValue`, or else the strings in its `children`, collected through
+elements' own `children`. Radix and Base UI read the rendered `textContent` instead; reading it
+here would break decision 10's "nothing is read back from the DOM", and the props cover every
+item whose text the consumer writes inline. A component that renders its own text is opaque, so
+that item needs `textValue` — the prop decision 13 anticipated, named as Radix names it.
+
+**A Space inside a search is part of it.** On a button, Space activates. Once a search has
+started, a Space continues it — "New f" reaches "New folder" — and its default is prevented, so
+nothing is clicked, even when the search matches no item.
+
+**Checkable items, in Base UI's shape, with fewer parts.**
+
+| Part            | Element                            | Holds                                               |
+| --------------- | ---------------------------------- | --------------------------------------------------- |
+| `CheckboxItem`  | `<button role="menuitemcheckbox">` | its own `checked`, through `useControlled`          |
+| `RadioGroup`    | `<div role="group">`               | one `value`; `disabled` disables every item         |
+| `RadioItem`     | `<button role="menuitemradio">`    | nothing: checked while the group's value is its own |
+| `ItemIndicator` | `<span aria-hidden>`               | nothing: reads `checked` from either kind of item   |
+| `Group`         | `<div role="group">`               | nothing: named by its `GroupLabel`                  |
+| `GroupLabel`    | `<div>`                            | the id the group's `aria-labelledby` points at      |
+
+Base UI has a `CheckboxItemIndicator` and a `RadioItemIndicator`; one `ItemIndicator` reads the
+same `checked` from either item, so decision 11's "fewest parts" keeps one. It is always
+rendered, as `Checkbox.Indicator` is, so an unchecked item keeps the check's space and labels
+line up. `@arun-dev/ui` draws a checkmark in it; children replace it.
+
+Both checkable items stay open when activated — APG lets Space change a checkbox item "without
+closing the menu", and Base UI's `closeOnClick` defaults to `false` for both — so several
+settings can change in one visit. `closeOnClick` closes it. The consumer's `onClick` runs first,
+and `preventComponentHandler()` stops the change, as on `Item`. Checking the checked radio item
+again changes nothing, as with a native radio. There is no hidden input: a menu is not a form
+control.
+
+Groups follow Combobox's (decision 14): `role="group"`, named once a `GroupLabel` is there, and
+the arrow keys and typeahead run through every group's items as one list. `RadioGroup` is a
+group too, so a `GroupLabel` names it the same way. A separator stays the consumer's own
+`role="separator"` element, which `role="menu"` may own (decision 12).
+
+**Rules out:** reading item text from the DOM; a typeahead that activates the item it reaches;
+`aria-checked="mixed"` on a checkbox item, which no consumer has asked for; a form-submitting
+menu.

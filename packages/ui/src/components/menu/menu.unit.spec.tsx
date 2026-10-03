@@ -35,4 +35,42 @@ describe('Menu (ui)', () => {
     expect(screen.getByText('Actions')).toHaveClass('btn');
     expect(screen.getByText('Actions')).toHaveAttribute('aria-haspopup', 'menu');
   });
+
+  it('styles checkable items, groups and labels, with a checkmark that keeps its space', () => {
+    render(
+      <Menu.Root>
+        <Menu.Popup>
+          <Menu.Group data-testid="group">
+            <Menu.GroupLabel>View</Menu.GroupLabel>
+            <Menu.CheckboxItem>
+              <Menu.ItemIndicator data-testid="indicator" />
+              Show grid
+            </Menu.CheckboxItem>
+          </Menu.Group>
+          <Menu.RadioGroup data-testid="radios" defaultValue="name">
+            <Menu.RadioItem value="name">
+              <Menu.ItemIndicator>•</Menu.ItemIndicator>
+              Name
+            </Menu.RadioItem>
+          </Menu.RadioGroup>
+        </Menu.Popup>
+      </Menu.Root>,
+    );
+    expect(screen.getByTestId('group')).toHaveClass('menu-group');
+    expect(screen.getByTestId('radios')).toHaveClass('menu-group');
+    expect(screen.getByText('View')).toHaveClass('menu-group-label');
+
+    const box = screen.getByRole('menuitemcheckbox', { hidden: true });
+    expect(box).toHaveClass('menu-item');
+    const indicator = screen.getByTestId('indicator');
+    expect(indicator).toHaveClass('menu-item-indicator');
+    expect(indicator).toHaveAttribute('data-unchecked');
+    expect(indicator.querySelector('.menu-item-mark')).toBeInTheDocument();
+
+    const radio = screen.getByRole('menuitemradio', { hidden: true });
+    expect(radio).toHaveClass('menu-item');
+    expect(radio).toHaveAttribute('aria-checked', 'true');
+    // Children replace the default mark.
+    expect(radio.querySelector('.menu-item-mark')).toBeNull();
+  });
 });

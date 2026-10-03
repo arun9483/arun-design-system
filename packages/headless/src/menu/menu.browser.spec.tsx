@@ -131,4 +131,115 @@ describe('Menu (browser)', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
     expect(isOpen()).toBe(true);
   });
+
+  it('moves to the next item starting with a typed character, cycling on repeats', async () => {
+    render(<Basic />);
+    await userEvent.click(trigger());
+    await userEvent.keyboard('d');
+    expect(focused()).toBe(item('Duplicate'));
+    await userEvent.keyboard('d');
+    expect(focused()).toBe(item('Delete'));
+    await userEvent.keyboard('d');
+    expect(focused()).toBe(item('Duplicate'));
+    // Archive is disabled, so typeahead skips it as the arrows do.
+    await userEvent.keyboard('a');
+    expect(focused()).toBe(item('Duplicate'));
+  });
+
+  it('matches a typed word, and forgets it after a pause', async () => {
+    render(<Basic />);
+    await userEvent.click(trigger());
+    await userEvent.keyboard('del');
+    expect(focused()).toBe(item('Delete'));
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    await userEvent.keyboard('e');
+    expect(focused()).toBe(item('Edit'));
+  });
+});
+
+function Folders({ onNewFolder }: { onNewFolder: () => void }) {
+  return (
+    <Menu.Root>
+      <Menu.Trigger>File</Menu.Trigger>
+      <Menu.Popup data-testid="menu">
+        <Menu.Item>New file</Menu.Item>
+        <Menu.Item onClick={onNewFolder}>New folder</Menu.Item>
+        <Menu.Item textValue="Open">
+          <span aria-hidden>📂</span> <Label text="Open…" />
+        </Menu.Item>
+      </Menu.Popup>
+    </Menu.Root>
+  );
+}
+
+function Label({ text }: { text: string }) {
+  return <span>{text}</span>;
+}
+
+describe('Menu typeahead (browser)', () => {
+  it('lets a Space continue a search instead of activating the item', async () => {
+    const onNewFolder = vi.fn();
+    render(<Folders onNewFolder={onNewFolder} />);
+    await userEvent.click(screen.getByRole('button', { name: 'File' }));
+    // Opening focuses New file, so "n" moves on to New folder — where the Space is typed.
+    await userEvent.keyboard('new');
+    expect(focused()).toBe(item('New folder'));
+    await userEvent.keyboard('{ }fi');
+    expect(focused()).toBe(item('New file'));
+    // A search that matches nothing still owns its Space.
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    await userEvent.keyboard('{ArrowDown}z{ }');
+    expect(focused()).toBe(item('New folder'));
+    expect(onNewFolder).not.toHaveBeenCalled();
+    expect(isOpen()).toBe(true);
+  });
+
+  it('matches textValue when the text is rendered by a component', async () => {
+    render(<Folders onNewFolder={() => {}} />);
+    await userEvent.click(screen.getByRole('button', { name: 'File' }));
+    await userEvent.keyboard('o');
+    expect(focused()).toBe(item('Open…'));
+  });
+});
+
+describe('Menu checkable items (browser)', () => {
+  function View() {
+    return (
+      <Menu.Root>
+        <Menu.Trigger>View</Menu.Trigger>
+        <Menu.Popup data-testid="menu">
+          <Menu.CheckboxItem>Show grid</Menu.CheckboxItem>
+          <Menu.Group>
+            <Menu.GroupLabel>Sort by</Menu.GroupLabel>
+            <Menu.RadioGroup defaultValue="name">
+              <Menu.RadioItem value="name">Name</Menu.RadioItem>
+              <Menu.RadioItem value="size">Size</Menu.RadioItem>
+            </Menu.RadioGroup>
+          </Menu.Group>
+        </Menu.Popup>
+      </Menu.Root>
+    );
+  }
+  const box = () => screen.getByRole('menuitemcheckbox', { name: 'Show grid', hidden: true });
+  const radio = (name: string) => screen.getByRole('menuitemradio', { name, hidden: true });
+
+  it('toggles with Space and Enter, staying open, and arrows run across groups', async () => {
+    render(<View />);
+    await userEvent.click(screen.getByRole('button', { name: 'View' }));
+    expect(focused()).toBe(box());
+    await userEvent.keyboard('{ }');
+    expect(box()).toHaveAttribute('aria-checked', 'true');
+    await userEvent.keyboard('{Enter}');
+    expect(box()).toHaveAttribute('aria-checked', 'false');
+    expect(isOpen()).toBe(true);
+
+    await userEvent.keyboard('{ArrowDown}');
+    expect(focused()).toBe(radio('Name'));
+    await userEvent.keyboard('{ArrowDown}{ }');
+    expect(radio('Size')).toHaveAttribute('aria-checked', 'true');
+    expect(radio('Name')).toHaveAttribute('aria-checked', 'false');
+    expect(isOpen()).toBe(true);
+    await userEvent.keyboard('{ArrowDown}');
+    expect(focused()).toBe(box());
+  });
 });

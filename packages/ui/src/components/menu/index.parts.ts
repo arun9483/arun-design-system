@@ -6,3 +6,11 @@ export const Root = Headless.Root;
 export const Trigger = Headless.Trigger;
 export { MenuPopup as Popup } from './MenuPopup';
 export { MenuItem as Item } from './MenuItem';
+export { MenuCheckboxItem as CheckboxItem } from './MenuCheckboxItem';
+export { MenuRadioItem as RadioItem } from './MenuRadioItem';
+export { MenuItemIndicator as ItemIndicator } from './MenuItemIndicator';
+export {
+  MenuGroup as Group,
+  MenuRadioGroup as RadioGroup,
+  MenuGroupLabel as GroupLabel,
+} from './MenuGroup';
