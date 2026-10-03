@@ -148,7 +148,7 @@ describe('RadioGroup — controlled and uncontrolled', () => {
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
-  it('defers to the parent when controlled, but still reports the intent', () => {
+  it('follows the parent when controlled, but still reports the intent', () => {
     const onValueChange = vi.fn();
     render(<Fixture value="free" onValueChange={onValueChange} />);
     fireEvent.click(radio('Pro'));
