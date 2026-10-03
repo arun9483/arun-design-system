@@ -57,11 +57,15 @@ const USAGE = /\[\s*(data-[a-z0-9-]+)/g;
  *
  * `data-align` is Popover's. Alignment is placement, which headless sets inline as
  * `position-area`, so ui has nothing to add; `data-side` is styled, for the offset's axis.
+ *
+ * `data-complete` is OtpInput's Root, set once every slot holds a character. A full code looks
+ * like a filled one here; the attribute is for a consumer's success style.
 
  */
 const UNSTYLED_HERE = [
   'data-align',
   'data-closed',
+  'data-complete',
   'data-invalid',
   'data-required',
   'data-unchecked',

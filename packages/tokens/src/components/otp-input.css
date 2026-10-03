@@ -1,0 +1,23 @@
+/* OTP input component tokens — one box per character of a one-time code. Reuses the text
+   field's colours, so a code reads as part of the same form. */
+:root {
+  /* How many boxes: the component sets this on each row from its `length` prop. */
+  --otp-input-length: 6;
+  --otp-input-slot-size: 2.75rem;
+  --otp-input-slot-height: 3rem;
+  --otp-input-gap: var(--space-xs);
+  --otp-input-radius: var(--radius-md);
+  --otp-input-font-size: var(--text-xl);
+  --otp-input-font-weight: var(--font-weight-semibold);
+  --otp-input-font-family: var(--font-mono);
+  --otp-input-bg: var(--input-bg);
+  --otp-input-color: var(--input-color);
+  --otp-input-border-width: var(--input-border-width);
+  --otp-input-border-color: var(--input-border-color);
+  --otp-input-border-color-hover: var(--input-border-color-hover);
+  --otp-input-border-color-active: var(--input-border-color-focus);
+  --otp-input-border-color-invalid: var(--input-border-color-invalid);
+  --otp-input-caret-color: var(--color-text-primary);
+  --otp-input-disabled-opacity: var(--input-disabled-opacity);
+  --otp-input-duration: var(--duration-fast);
+}

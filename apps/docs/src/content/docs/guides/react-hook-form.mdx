@@ -6,8 +6,8 @@ description: Why these controls need Controller rather than register, and what w
 import { Aside } from '@astrojs/starlight/components';
 
 Every control that carries a value — [Checkbox](/components/checkbox/),
-[Radio group](/components/radio-group/) and [Switch](/components/switch/) — works with
-react-hook-form through `Controller`.
+[Radio group](/components/radio-group/), [Switch](/components/switch/) and
+[OTP input](/components/otp-input/#forms) — works with react-hook-form through `Controller`.
 
 `register()` does not work for them, and fails quietly. That is the whole of what you need to
 know; the rest of this page explains why, and what you get once the binding is right.

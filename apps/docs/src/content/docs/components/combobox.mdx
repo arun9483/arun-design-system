@@ -34,12 +34,13 @@ Not for a short list people can scan — use a Select or a RadioGroup.
 
 **Choosing between entering text:**
 
-| Component                         | Use it for                                                                  | For example                      |
-| --------------------------------- | --------------------------------------------------------------------------- | -------------------------------- |
-| [Input](/components/input/)       | One line of text: a name, an email, a search                                | Email address, search box        |
-| [Textarea](/components/textarea/) | Several lines of free text that may wrap                                    | Comment, description, message    |
-| **Combobox**                      | Typing to find and pick from a list of known options                        | Choose a city, add existing tags |
-| [Field](/components/field/)       | Not a control: wraps any of these to tie a label, a hint and an error to it | Any form control with validation |
+| Component                           | Use it for                                                                  | For example                      |
+| ----------------------------------- | --------------------------------------------------------------------------- | -------------------------------- |
+| [Input](/components/input/)         | One line of text: a name, an email, a search                                | Email address, search box        |
+| [OTP input](/components/otp-input/) | A code of fixed length, typed or pasted one character per box               | SMS code, two-factor code, PIN   |
+| [Textarea](/components/textarea/)   | Several lines of free text that may wrap                                    | Comment, description, message    |
+| **Combobox**                        | Typing to find and pick from a list of known options                        | Choose a city, add existing tags |
+| [Field](/components/field/)         | Not a control: wraps any of these to tie a label, a hint and an error to it | Any form control with validation |
 
 `Combobox` is a text input that filters a list as you type. It follows the
 [WAI-ARIA combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/), and behaves as

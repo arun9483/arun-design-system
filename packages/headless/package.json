@@ -84,6 +84,16 @@
         "default": "./dist/menu/index.cjs"
       }
     },
+    "./otp-input": {
+      "import": {
+        "types": "./dist/otp-input/index.d.ts",
+        "default": "./dist/otp-input/index.js"
+      },
+      "require": {
+        "types": "./dist/otp-input/index.d.cts",
+        "default": "./dist/otp-input/index.cjs"
+      }
+    },
     "./popover": {
       "import": {
         "types": "./dist/popover/index.d.ts",
