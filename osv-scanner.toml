@@ -2,7 +2,19 @@
 # security.yml). Each entry needs a justification, an owner, and an expiry
 # date <= 90 days out. No permanent exceptions.
 #
-# Currently empty: every known advisory is cleared by a real version bump.
 # Prefer bumping the pinned `pnpm.overrides` entry over adding a waiver here —
 # an override pinned to a version that later becomes vulnerable is the failure
-# mode this file exists to avoid, not to paper over.
+# mode this file exists to avoid, not to paper over. Waive only what no
+# published release fixes, and remove the entry as soon as one ships.
+
+# Owner: arun9483. Waived 2026-10-03 (#113).
+[[IgnoredVulns]]
+id = "GHSA-vfj7-8cjw-p6xm"
+ignoreUntil = 2027-01-01
+reason = "braces <= 3.0.3 stack-exhaustion DoS on deeply nested patterns; 3.0.3 is the latest release and no fix is published. Reached only through micromatch in @changesets/cli 2.x (a root devDependency), which expands the repo's own config globs, never untrusted input, and is not in any published package. changesets 3 drops micromatch, but it also requires moving release.yml to changesets/action v2 (v1 parses `New tag:` lines that changesets 3 no longer prints) — a publish-path migration to do deliberately. Remove once braces ships a fix or that migration lands."
+
+# Owner: arun9483. Waived 2026-10-03 (#113).
+[[IgnoredVulns]]
+id = "GHSA-ch52-4w7c-c8xp"
+ignoreUntil = 2027-01-01
+reason = "http-cache-semantics <= 4.2.0 max-stale handling can serve one user's cached response to another from a shared cache; 4.2.0 is the latest release and no fix is published. Reached only through astro (^4.2.0, latest astro included) in the private @arun-dev/docs app, which builds a static site served from GitHub Pages — no shared HTTP cache runs our code, and it is not in any published package. Remove once http-cache-semantics ships a fix."
