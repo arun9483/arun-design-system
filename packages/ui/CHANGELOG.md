@@ -1,5 +1,16 @@
 # @arun-dev/ui
 
+## 4.24.0
+
+### Minor Changes
+
+- 372b387: Add `OtpInput`: one box per character of a one-time code, over a single native input, so SMS autofill, paste and the numeric keypad work. `length` sets the number of boxes and `validationType` the allowed characters. ui's peer range moves to `@arun-dev/headless >=4.18.0`.
+
+### Patch Changes
+
+- Updated dependencies [372b387]
+  - @arun-dev/tokens@0.26.0
+
 ## 4.23.0
 
 ### Minor Changes
