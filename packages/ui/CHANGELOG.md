@@ -1,5 +1,17 @@
 # @arun-dev/ui
 
+## 4.23.0
+
+### Minor Changes
+
+- 2943e33: Toast position: `Toast.Viewport` takes a `position` — `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center` or `bottom-right`, the default — for every toast, and `add({ position })` sends one toast elsewhere, in a stack of its own inside the same toast area. Toasts at the top slide down as they arrive. Headless keeps the new `position` option for the ui's rendering; ui exports the `ToastPosition` type.
+
+  Card: only a `lift` card reacts to the pointer now, rising 2px with a deeper shadow. A default card no longer deepens its shadow on hover, so a card that isn't clickable no longer looks clickable.
+
+### Patch Changes
+
+- 2943e33: Fix two flickers. Menu and Combobox popups no longer drop their items into a row while fading out on close. Skeleton's shine now starts and ends fully off the bar, so each loop no longer jumps back into view.
+
 ## 4.22.0
 
 ### Minor Changes
