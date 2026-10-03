@@ -40,4 +40,37 @@ describe('Toast (ui)', () => {
     act(() => screen.getByRole('button', { name: 'Close', hidden: true }).click());
     expect(screen.queryByText('Archived')).toBeNull();
   });
+
+  it('places toasts at the Viewport position, and one with its own position in a stack there', () => {
+    render(
+      <Toast.Provider timeout={0}>
+        <Capture />
+        <Toast.Viewport position="top-right" />
+      </Toast.Provider>,
+    );
+    act(() => {
+      manager.add({ title: 'Saved' });
+      manager.add({ title: 'Copied', position: 'bottom-center' });
+      manager.add({ title: 'Synced', position: 'top-right' });
+    });
+    const viewport = screen.getByText('Saved').closest('.toast-viewport') as HTMLElement;
+    expect(viewport).toHaveClass('toast-position-top-right');
+    expect(screen.getByText('Saved').closest('.toast')?.parentElement).toBe(viewport);
+    // Its own position equal to the Viewport's is no stack of its own.
+    expect(screen.getByText('Synced').closest('.toast')?.parentElement).toBe(viewport);
+
+    const stack = screen.getByText('Copied').closest('.toast')?.parentElement as HTMLElement;
+    expect(stack).toHaveClass('toast-stack', 'toast-position-bottom-center');
+    // Still inside the Notifications region.
+    expect(stack.parentElement).toBe(viewport);
+  });
+
+  it('defaults to the bottom right', () => {
+    render(
+      <Toast.Provider>
+        <Toast.Viewport data-testid="viewport" />
+      </Toast.Provider>,
+    );
+    expect(screen.getByTestId('viewport')).toHaveClass('toast-position-bottom-right');
+  });
 });

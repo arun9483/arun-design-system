@@ -8,6 +8,23 @@ import MeterBasics from '@/examples/meter-basics';
 import MeterScores from '@/examples/meter-scores';
 import PropTable from '@/components/PropTable.astro';
 
+## When to use
+
+- Disk or quota usage
+- Password strength
+- A score or rating within a known range
+
+Not for progress through a task — use a Progress.
+
+**Choosing between showing progress, loading or a measurement:**
+
+| Component                         | Use it for                                                              | For example                                   |
+| --------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------- |
+| [Progress](/components/progress/) | A task whose completion is known, moving toward done                    | Upload at 40%, step 2 of 5                    |
+| **Meter**                         | A measurement within a known range, not a task                          | Disk usage, password strength, a score        |
+| [Spinner](/components/spinner/)   | Work of unknown length, in a small space                                | A button saying "Saving…", a panel refreshing |
+| [Skeleton](/components/skeleton/) | Content still loading whose shape is known, so the layout does not jump | Placeholder rows in a list, a profile card    |
+
 <Example name="meter-basics" layout="stack">
   <MeterBasics client:load />
 </Example>

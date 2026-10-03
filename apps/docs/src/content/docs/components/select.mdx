@@ -10,6 +10,24 @@ import PropTable from '@/components/PropTable.astro';
 import { SelectPlayground } from '@/components/playgrounds';
 import { Aside } from '@astrojs/starlight/components';
 
+## When to use
+
+- Picking one option from many in a form: country, language
+- A compact control where space is short
+- A choice that should use the system picker on mobile
+
+Not when people search the list by typing or pick several — use a Combobox — or for up to five options that are worth seeing — use a RadioGroup.
+
+**Choosing between choosing one option or a value:**
+
+| Component                              | Use it for                                                                          | For example                               |
+| -------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------- |
+| [RadioGroup](/components/radio-group/) | Up to about five options, all visible at once, as a form value                      | Shipping speed, plan size                 |
+| **Select**                             | One option from a longer list, in little space, with the system picker              | Country, time zone, sort order in a form  |
+| [Combobox](/components/combobox/)      | A long list people search by typing, several picks, or options loaded from a server | Assign reviewers, search a city, add tags |
+| [ToggleGroup](/components/toggle/)     | A few options shown as buttons that apply at once, not a form field                 | Text alignment, list or grid view         |
+| [Slider](/components/slider/)          | A number in a range, where dragging is easier than typing an exact value            | Volume, brightness, price range           |
+
 `Select` is a real `<select>`. The picker, keyboard, typeahead, validation and form submission are
 all the platform's, so there is no headless half. On phones it opens the system picker. It works
 with react-hook-form's `register()` as-is.

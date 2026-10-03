@@ -7,6 +7,21 @@ import Example from '@/components/Example.astro';
 import KbdBasics from '@/examples/kbd-basics';
 import PropTable from '@/components/PropTable.astro';
 
+## When to use
+
+- Keyboard shortcuts in help text: "Press ⌘ K"
+- Shortcuts inside a Tooltip or a Menu item
+
+Not for general code or values — use `<code>`.
+
+**Choosing between small labels:**
+
+| Component                   | Use it for                                         | For example                          |
+| --------------------------- | -------------------------------------------------- | ------------------------------------ |
+| [Badge](/components/badge/) | The status or category of something, at a glance   | "Paid", "Overdue", "Beta"            |
+| [Chip](/components/chip/)   | Tags, filters and metadata, often several in a row | "React", "Remote", an applied filter |
+| **Kbd**                     | A key on the keyboard, in text or a tooltip        | Press ⌘ K to search                  |
+
 <Example name="kbd-basics">
   <KbdBasics client:load />
 </Example>

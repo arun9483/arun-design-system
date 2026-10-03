@@ -11,6 +11,22 @@ import PropTable from '@/components/PropTable.astro';
 import { TextareaPlayground } from '@/components/playgrounds';
 import { Aside } from '@astrojs/starlight/components';
 
+## When to use
+
+- Comments, messages and descriptions
+- Any free text that may run over several lines
+
+Not for a single line — use an Input.
+
+**Choosing between entering text:**
+
+| Component                         | Use it for                                                                  | For example                      |
+| --------------------------------- | --------------------------------------------------------------------------- | -------------------------------- |
+| [Input](/components/input/)       | One line of text: a name, an email, a search                                | Email address, search box        |
+| **Textarea**                      | Several lines of free text that may wrap                                    | Comment, description, message    |
+| [Combobox](/components/combobox/) | Typing to find and pick from a list of known options                        | Choose a city, add existing tags |
+| [Field](/components/field/)       | Not a control: wraps any of these to tie a label, a hint and an error to it | Any form control with validation |
+
 `Textarea` is a real `<textarea>`. Typing, selection, spellcheck, validation and form submission
 are all the platform's, so there is no headless half and nothing to keep in sync. It works with
 react-hook-form's `register()` as-is.

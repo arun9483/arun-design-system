@@ -7,6 +7,22 @@ import Example from '@/components/Example.astro';
 import ProgressBasics from '@/examples/progress-basics';
 import PropTable from '@/components/PropTable.astro';
 
+## When to use
+
+- File uploads and downloads
+- Steps of an import or installation with a known total
+
+Not for a measurement that is not a task — use a Meter — or work of unknown length — use a Spinner.
+
+**Choosing between showing progress, loading or a measurement:**
+
+| Component                         | Use it for                                                              | For example                                   |
+| --------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------- |
+| **Progress**                      | A task whose completion is known, moving toward done                    | Upload at 40%, step 2 of 5                    |
+| [Meter](/components/meter/)       | A measurement within a known range, not a task                          | Disk usage, password strength, a score        |
+| [Spinner](/components/spinner/)   | Work of unknown length, in a small space                                | A button saying "Saving…", a panel refreshing |
+| [Skeleton](/components/skeleton/) | Content still loading whose shape is known, so the layout does not jump | Placeholder rows in a list, a profile card    |
+
 <Example name="progress-basics" layout="stack">
   <ProgressBasics client:load />
 </Example>

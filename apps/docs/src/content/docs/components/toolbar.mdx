@@ -7,6 +7,22 @@ import Example from '@/components/Example.astro';
 import ToolbarBasics from '@/examples/toolbar-basics';
 import PropTable from '@/components/PropTable.astro';
 
+## When to use
+
+- An editor’s formatting bar
+- Controls above a table or a canvas: zoom, filters, view
+- Any row of several controls that act on the same thing
+
+Not for two or three unrelated buttons, such as Cancel and Save.
+
+**Choosing between rows of controls:**
+
+| Component                               | Use it for                                                                         | For example                               |
+| --------------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------- |
+| **Toolbar**                             | Several controls acting on one thing, reached with one Tab stop and the arrow keys | An editor’s formatting bar                |
+| [ToggleGroup](/components/toggle/)      | A set of Toggles sharing one value                                                 | Text alignment, bold / italic / underline |
+| [Buttons in a row](/components/button/) | A few independent actions, each its own Tab stop                                   | Cancel / Save at the end of a form        |
+
 <Example name="toolbar-basics">
   <ToolbarBasics client:load />
 </Example>

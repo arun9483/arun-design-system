@@ -7,6 +7,31 @@ import Example from '@/components/Example.astro';
 import LinkBasics from '@/examples/link-basics';
 import PropTable from '@/components/PropTable.astro';
 
+## When to use
+
+- Going to another page or another site
+- Jumping to a section of the page
+- Downloading a file
+
+Not for actions that change something on the page — use a Button.
+
+**Choosing between actions and navigation:**
+
+| Component                     | Use it for                                                  | For example                     |
+| ----------------------------- | ----------------------------------------------------------- | ------------------------------- |
+| [Button](/components/button/) | Does something on this page: saves, deletes, opens a dialog | "Save", "Delete", "Add to cart" |
+| **Link**                      | Goes somewhere: another page, a section, a file             | "View invoice", "Read the docs" |
+| [Toggle](/components/toggle/) | Turns a state on or off and stays pressed                   | "Bold", "Mute"                  |
+
+**Choosing between moving around:**
+
+| Component                             | Use it for                                                   | For example                    |
+| ------------------------------------- | ------------------------------------------------------------ | ------------------------------ |
+| [Breadcrumb](/components/breadcrumb/) | Showing where the page sits in a hierarchy, with links up it | Home / Projects / Website      |
+| [Pagination](/components/pagination/) | Moving between pages of one long list                        | Search results, page 3 of 12   |
+| [Tabs](/components/tabs/)             | Switching between views within one page                      | Overview / Activity / Settings |
+| **Link**                              | One destination                                              | "Read the docs"                |
+
 <Example name="link-basics">
   <LinkBasics client:load />
 </Example>

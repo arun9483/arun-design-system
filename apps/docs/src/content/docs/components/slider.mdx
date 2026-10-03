@@ -7,6 +7,24 @@ import Example from '@/components/Example.astro';
 import SliderBasics from '@/examples/slider-basics';
 import PropTable from '@/components/PropTable.astro';
 
+## When to use
+
+- Volume, brightness, zoom
+- A range filter such as price
+- Values where the rough position matters more than the exact number
+
+Not when the exact value matters — use an Input with `type="number"`.
+
+**Choosing between choosing one option or a value:**
+
+| Component                              | Use it for                                                                          | For example                               |
+| -------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------- |
+| [RadioGroup](/components/radio-group/) | Up to about five options, all visible at once, as a form value                      | Shipping speed, plan size                 |
+| [Select](/components/select/)          | One option from a longer list, in little space, with the system picker              | Country, time zone, sort order in a form  |
+| [Combobox](/components/combobox/)      | A long list people search by typing, several picks, or options loaded from a server | Assign reviewers, search a city, add tags |
+| [ToggleGroup](/components/toggle/)     | A few options shown as buttons that apply at once, not a form field                 | Text alignment, list or grid view         |
+| **Slider**                             | A number in a range, where dragging is easier than typing an exact value            | Volume, brightness, price range           |
+
 <Example name="slider-basics" layout="stack">
   <SliderBasics client:load />
 </Example>

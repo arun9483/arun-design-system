@@ -11,8 +11,21 @@ import PropTable from '@/components/PropTable.astro';
 import { CheckboxPlayground } from '@/components/playgrounds';
 import { Aside } from '@astrojs/starlight/components';
 
-A checkbox is read on submit. Use a [switch](/components/switch/) instead when the change takes
-effect immediately.
+## When to use
+
+- Accepting terms before submitting a form
+- Choosing several independent options, such as which emails to receive
+- Selecting rows in a list, with the indeterminate state for "some"
+
+Not for a setting that should take effect at once — use a Switch.
+
+**Choosing between Checkbox, Switch or Toggle:**
+
+| Component                     | Use it for                                                                                      | For example                                |
+| ----------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| **Checkbox**                  | A yes/no choice, or one of several independent options, that applies when the form is submitted | "I agree to the terms", "Email me updates" |
+| [Switch](/components/switch/) | A setting that takes effect the moment it is flipped, with no Save button                       | "Dark mode", "Wi-Fi", "Notifications on"   |
+| [Toggle](/components/toggle/) | A button that stays pressed, usually in a toolbar, for a mode or formatting                     | "Bold", "Mute", "Pin"                      |
 
 <Example name="checkbox-basics" layout="stack">
   <CheckboxBasics client:load />

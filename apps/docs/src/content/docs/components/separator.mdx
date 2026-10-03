@@ -7,6 +7,23 @@ import Example from '@/components/Example.astro';
 import SeparatorBasics from '@/examples/separator-basics';
 import PropTable from '@/components/PropTable.astro';
 
+## When to use
+
+- Dividing groups in a Menu or a Toolbar
+- Splitting sections of a page or a card
+
+Not just to add space — use margins or gaps.
+
+**Choosing between organising content:**
+
+| Component                           | Use it for                                                                    | For example                           |
+| ----------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------- |
+| [Accordion](/components/accordion/) | Sections stacked on one page, of which people read one or a few               | FAQ, settings groups, order details   |
+| [Tabs](/components/tabs/)           | Views of the same thing at the same level, one at a time                      | Account / Billing / Security          |
+| [Card](/components/card/)           | A self-contained group of content, shown as one unit, often in a grid or list | A product tile, a project summary     |
+| [Table](/components/table/)         | Rows of records compared across the same columns                              | Invoices, users, order lines          |
+| **Separator**                       | A line that divides sections, with no content of its own                      | Between menu groups or toolbar groups |
+
 <Example name="separator-basics">
   <SeparatorBasics client:load />
 </Example>
