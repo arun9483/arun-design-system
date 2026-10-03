@@ -243,3 +243,146 @@ describe('Menu checkable items (browser)', () => {
     expect(focused()).toBe(box());
   });
 });
+
+describe('Menu submenus (browser)', () => {
+  function Nested({
+    onEmail,
+    onOpenChange,
+  }: {
+    onEmail?: () => void;
+    onOpenChange?: (open: boolean) => void;
+  }) {
+    return (
+      <Menu.Root>
+        {/* Unstyled, items would sit in a row and the submenu would cover the next one. */}
+        <style>{'[role="menu"]:popover-open { display: flex; flex-direction: column; }'}</style>
+        <Menu.Trigger>File</Menu.Trigger>
+        <Menu.Popup data-testid="menu">
+          <Menu.Item>Open</Menu.Item>
+          <Menu.SubmenuRoot onOpenChange={onOpenChange}>
+            <Menu.SubmenuTrigger>Share</Menu.SubmenuTrigger>
+            <Menu.Popup data-testid="submenu">
+              <Menu.Item onClick={onEmail}>Email</Menu.Item>
+              <Menu.Item>Copy link</Menu.Item>
+            </Menu.Popup>
+          </Menu.SubmenuRoot>
+          <Menu.Item>Print</Menu.Item>
+        </Menu.Popup>
+      </Menu.Root>
+    );
+  }
+  const file = () => screen.getByRole('button', { name: 'File' });
+  const share = () => item('Share');
+  const submenu = () => screen.getByTestId('submenu');
+  const subOpen = () => submenu().matches(':popover-open');
+  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  it('wires the trigger as a menuitem that opens a menu beside it', async () => {
+    render(<Nested />);
+    await userEvent.click(file());
+    expect(share()).toHaveAttribute('aria-haspopup', 'menu');
+    expect(share()).toHaveAttribute('aria-expanded', 'false');
+    expect(share()).toHaveAttribute('aria-controls', submenu().id);
+    expect(submenu()).toHaveAttribute('aria-labelledby', share().id);
+    expect(submenu()).toHaveAttribute('data-side', 'right');
+  });
+
+  it('opens with → at its first item, and ← returns to the trigger, the parent open', async () => {
+    render(<Nested />);
+    await userEvent.click(file());
+    await userEvent.keyboard('{ArrowDown}');
+    expect(focused()).toBe(share());
+    await userEvent.keyboard('{ArrowRight}');
+    expect(subOpen()).toBe(true);
+    expect(isOpen()).toBe(true);
+    expect(share()).toHaveAttribute('aria-expanded', 'true');
+    expect(focused()).toBe(item('Email'));
+    await userEvent.keyboard('{ArrowDown}');
+    expect(focused()).toBe(item('Copy link'));
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(subOpen()).toBe(false);
+    expect(isOpen()).toBe(true);
+    expect(focused()).toBe(share());
+  });
+
+  it('opens with Enter; Esc closes one level at a time', async () => {
+    render(<Nested />);
+    await userEvent.click(file());
+    await userEvent.keyboard('{ArrowDown}{Enter}');
+    expect(focused()).toBe(item('Email'));
+    await userEvent.keyboard('{Escape}');
+    expect(subOpen()).toBe(false);
+    expect(isOpen()).toBe(true);
+    expect(focused()).toBe(share());
+    await userEvent.keyboard('{Escape}');
+    expect(isOpen()).toBe(false);
+    expect(focused()).toBe(file());
+  });
+
+  it('closes every level when an item in the submenu is activated', async () => {
+    const onEmail = vi.fn();
+    render(<Nested onEmail={onEmail} />);
+    await userEvent.click(file());
+    await userEvent.keyboard('{ArrowDown}{ArrowRight}{Enter}');
+    expect(onEmail).toHaveBeenCalledOnce();
+    expect(subOpen()).toBe(false);
+    expect(isOpen()).toBe(false);
+    expect(focused()).toBe(file());
+  });
+
+  it('closes the submenu when the arrow keys move to another item of the parent', async () => {
+    render(<Nested />);
+    await userEvent.click(file());
+    await userEvent.keyboard('{ArrowDown}');
+    await userEvent.hover(share());
+    await wait(200);
+    expect(subOpen()).toBe(true);
+    await userEvent.keyboard('{ArrowDown}');
+    expect(focused()).toBe(item('Print'));
+    expect(subOpen()).toBe(false);
+  });
+
+  it('opens on hover without moving focus, and closes on another item after the grace period', async () => {
+    const onOpenChange = vi.fn();
+    render(<Nested onOpenChange={onOpenChange} />);
+    await userEvent.click(file());
+    expect(focused()).toBe(item('Open'));
+    await userEvent.hover(share());
+    expect(subOpen()).toBe(false);
+    await wait(200);
+    expect(subOpen()).toBe(true);
+    expect(focused()).toBe(item('Open'));
+
+    // Straight onto Print: still inside the grace area at first, so the submenu stays…
+    await userEvent.hover(item('Print'));
+    expect(subOpen()).toBe(true);
+    // …until the pointer moves on Print once the grace period is over.
+    await wait(400);
+    await userEvent.hover(item('Print'), { position: { x: 4, y: 4 } });
+    expect(subOpen()).toBe(false);
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it('stays open as the pointer crosses into the submenu', async () => {
+    render(<Nested />);
+    await userEvent.click(file());
+    await userEvent.hover(share());
+    await wait(200);
+    await userEvent.hover(item('Copy link'));
+    await wait(400);
+    await userEvent.hover(item('Email'));
+    expect(subOpen()).toBe(true);
+    await userEvent.click(item('Email'));
+    expect(isOpen()).toBe(false);
+  });
+
+  it('closes only the submenu on a click elsewhere in the parent', async () => {
+    render(<Nested />);
+    await userEvent.click(file());
+    await userEvent.keyboard('{ArrowDown}{ArrowRight}');
+    expect(subOpen()).toBe(true);
+    await userEvent.click(submenu().parentElement as HTMLElement, { position: { x: 2, y: 2 } });
+    expect(subOpen()).toBe(false);
+    expect(isOpen()).toBe(true);
+  });
+});

@@ -4,6 +4,8 @@ import { Menu as Headless } from '@arun-dev/headless/menu';
 // rendering a Button: <Menu.Trigger render={<Button />}>. They pass through.
 export const Root = Headless.Root;
 export const Trigger = Headless.Trigger;
+// SubmenuRoot renders no element either.
+export const SubmenuRoot = Headless.SubmenuRoot;
 export { MenuPopup as Popup } from './MenuPopup';
 export { MenuItem as Item } from './MenuItem';
 export { MenuCheckboxItem as CheckboxItem } from './MenuCheckboxItem';
@@ -14,3 +16,4 @@ export {
   MenuRadioGroup as RadioGroup,
   MenuGroupLabel as GroupLabel,
 } from './MenuGroup';
+export { MenuSubmenuTrigger as SubmenuTrigger } from './MenuSubmenuTrigger';

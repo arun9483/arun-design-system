@@ -45,7 +45,7 @@ export function MenuRadioItem({
 }: MenuRadioItemProps) {
   const group = useMenuRadioGroupContext();
   const disabled = disabledProp || group.disabled;
-  const { setOpen, itemProps } = useMenuItem('RadioItem', { disabled, textValue, children });
+  const { closeAll, itemProps } = useMenuItem('RadioItem', { disabled, textValue, children });
   const checked = group.value === value;
   const state = useMemo(() => ({ checked, disabled }), [checked, disabled]);
 
@@ -62,7 +62,7 @@ export function MenuRadioItem({
       onClick() {
         if (disabled) return;
         group.select(value);
-        if (closeOnClick) setOpen(false);
+        if (closeOnClick) closeAll();
       },
     },
     consumerProps: (disabled ? rest : { ...rest, onClick }) as UnknownProps,

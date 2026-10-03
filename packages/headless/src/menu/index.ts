@@ -10,3 +10,5 @@ export type { MenuRadioItemProps } from './MenuRadioItem';
 export type { MenuItemIndicatorProps } from './MenuItemIndicator';
 export type { MenuGroupProps } from './MenuGroup';
 export type { MenuGroupLabelProps } from './MenuGroupLabel';
+export type { MenuSubmenuRootProps } from './MenuSubmenuRoot';
+export type { MenuSubmenuTriggerProps } from './MenuSubmenuTrigger';

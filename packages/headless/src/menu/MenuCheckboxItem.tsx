@@ -54,7 +54,7 @@ export function MenuCheckboxItem({
   render,
   ...rest
 }: MenuCheckboxItemProps) {
-  const { setOpen, itemProps } = useMenuItem('CheckboxItem', { disabled, textValue, children });
+  const { closeAll, itemProps } = useMenuItem('CheckboxItem', { disabled, textValue, children });
   const [checked, setChecked] = useControlled({
     controlled: checkedProp,
     default: defaultChecked ?? false,
@@ -77,7 +77,7 @@ export function MenuCheckboxItem({
         if (disabled) return;
         setChecked(!checked);
         onCheckedChange?.(!checked);
-        if (closeOnClick) setOpen(false);
+        if (closeOnClick) closeAll();
       },
     },
     consumerProps: (disabled ? rest : { ...rest, onClick }) as UnknownProps,

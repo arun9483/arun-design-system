@@ -1,7 +1,8 @@
 import { createContext, useContext, useLayoutEffect, useRef } from 'react';
-import type { ReactNode } from 'react';
+import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react';
+import { isPointInPolygon, type Point } from '../core/pointerIntent';
 import { textOf } from '../core/typeahead';
-import { useMenuRootContext } from './MenuRootContext';
+import { useMenuRootContext, type MenuRootContextValue } from './MenuRootContext';
 
 /**
  * What every kind of item shares — Item, CheckboxItem, RadioItem: registering with the Root from
@@ -16,15 +17,18 @@ import { useMenuRootContext } from './MenuRootContext';
 export function useMenuItem(
   part: string,
   { disabled, textValue, children }: { disabled: boolean; textValue?: string; children: ReactNode },
+  // A SubmenuTrigger sits in the menu its SubmenuRoot is nested in, and registers there.
+  menu?: MenuRootContextValue,
 ) {
-  const { setOpen, focusableWhenDisabled, register } = useMenuRootContext(part);
+  const own = useMenuRootContext(part);
+  const { closeAll, focusableWhenDisabled, register, openSubmenuRef, graceRef } = menu ?? own;
   const ref = useRef<HTMLElement | null>(null);
   const text = textValue ?? textOf(children);
 
   useLayoutEffect(() => register({ disabled, textValue: text, ref }), [register, disabled, text]);
 
   return {
-    setOpen,
+    closeAll,
     itemProps: {
       type: 'button',
       tabIndex: -1,
@@ -32,8 +36,24 @@ export function useMenuItem(
       'aria-disabled': (disabled && focusableWhenDisabled) || undefined,
       'data-disabled': disabled ? '' : undefined,
       ref,
+      onPointerMove(event: ReactPointerEvent) {
+        // Moving onto another item closes the open submenu — unless the pointer is on its way
+        // there, across the grace area its trigger left.
+        if (event.pointerType !== 'mouse' || !openSubmenuRef.current) return;
+        if (isInGrace(graceRef.current, event)) return;
+        openSubmenuRef.current.close();
+      },
     },
   };
+}
+
+/** Whether a pointer event falls inside a grace area that has not yet run out. */
+export function isInGrace(
+  grace: { area: Point[]; until: number } | null,
+  event: { clientX: number; clientY: number },
+): boolean {
+  if (!grace || performance.now() > grace.until) return false;
+  return isPointInPolygon({ x: event.clientX, y: event.clientY }, grace.area);
 }
 
 /** A checkable item's state, for its ItemIndicator. */

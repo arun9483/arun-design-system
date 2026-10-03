@@ -107,19 +107,26 @@ describe('Menu', () => {
     expect(onOpenChange).not.toHaveBeenCalled();
   });
 
-  it.each(['Trigger', 'Popup', 'Item', 'CheckboxItem', 'Group', 'RadioGroup'] as const)(
-    'throws when Menu.%s is outside Menu.Root',
-    (part) => {
-      const Part = Menu[part] as () => React.ReactNode;
-      vi.spyOn(console, 'error').mockImplementation(() => {});
-      expect(() => render(<Part />)).toThrow(`<Menu.${part}> must be rendered inside <Menu.Root>.`);
-    },
-  );
+  it.each([
+    'Trigger',
+    'Popup',
+    'Item',
+    'CheckboxItem',
+    'Group',
+    'RadioGroup',
+    'SubmenuRoot',
+    'SubmenuTrigger',
+  ] as const)('throws when Menu.%s is outside Menu.Root', (part) => {
+    const Part = Menu[part] as () => React.ReactNode;
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() => render(<Part />)).toThrow(`<Menu.${part}> must be rendered inside <Menu.Root>.`);
+  });
 
   it.each([
     ['RadioItem', <Menu.RadioItem key="a" value="a" />, '<Menu.RadioGroup>'],
     ['ItemIndicator', <Menu.ItemIndicator key="b" />, '<Menu.CheckboxItem> or <Menu.RadioItem>'],
     ['GroupLabel', <Menu.GroupLabel key="c" />, '<Menu.Group> or <Menu.RadioGroup>'],
+    ['SubmenuTrigger', <Menu.SubmenuTrigger key="d" />, '<Menu.SubmenuRoot>'],
   ])('throws when Menu.%s is outside its parent', (part, element, parent) => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => render(<Menu.Root>{element}</Menu.Root>)).toThrow(

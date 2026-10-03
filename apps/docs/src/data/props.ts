@@ -828,7 +828,7 @@ export const PROPS = {
     {
       name: 'side',
       type: "'top' | 'bottom' | 'left' | 'right'",
-      default: "'bottom'",
+      default: "'bottom'; 'right' in a submenu",
       description:
         'Which side of the Trigger to open on. Flips to the opposite side when there is no room.',
     },
@@ -944,6 +944,51 @@ export const PROPS = {
       type: 'string',
       description:
         'The text typeahead matches. Defaults to the text in `children`; set it when a component of yours renders the text.',
+    },
+  ],
+  'Menu.SubmenuRoot': [
+    {
+      name: 'open',
+      type: 'boolean',
+      description:
+        'Controlled state. Provide `onOpenChange` alongside it. Never pass `undefined` — the mode is fixed at mount.',
+    },
+    {
+      name: 'defaultOpen',
+      type: 'boolean',
+      default: 'false',
+      description: 'Initial state when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onOpenChange',
+      type: '(open: boolean) => void',
+      description:
+        'Called on every request to open or close: its SubmenuTrigger, the arrow keys, an Item, Esc, a click elsewhere, or the pointer moving to another item.',
+    },
+    {
+      name: 'focusableWhenDisabled',
+      type: 'boolean',
+      description: "As on `Menu.Root`. Defaults to the parent menu's setting.",
+    },
+    {
+      name: 'children',
+      type: 'ReactNode',
+      description: 'A SubmenuTrigger and a Popup. Renders no element of its own.',
+    },
+  ],
+  'Menu.SubmenuTrigger': [
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Cannot open its submenu. Skipped by the arrow keys and typeahead, unless the Root sets `focusableWhenDisabled`.',
+    },
+    {
+      name: 'textValue',
+      type: 'string',
+      description:
+        'The text typeahead matches in the parent menu. Defaults to the text in `children`.',
     },
   ],
   'Tooltip.Root': [

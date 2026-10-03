@@ -6,6 +6,7 @@ description: A list of actions and settings opened from a button, with the ARIA 
 import Example from '@/components/Example.astro';
 import MenuBasics from '@/examples/menu-basics';
 import MenuViewOptions from '@/examples/menu-view-options';
+import MenuSubmenus from '@/examples/menu-submenus';
 import PropTable from '@/components/PropTable.astro';
 
 `Menu` opens a list of actions next to the button that opened it. It follows the
@@ -39,38 +40,46 @@ import { Menu } from '@arun-dev/ui';
         <Menu.ItemIndicator />
       </Menu.RadioItem>
     </Menu.RadioGroup>
+    <Menu.SubmenuRoot>
+      <Menu.SubmenuTrigger />
+      <Menu.Popup />
+    </Menu.SubmenuRoot>
   </Menu.Popup>
 </Menu.Root>;
 ```
 
-| Part            | Renders                            | Does                                                       |
-| --------------- | ---------------------------------- | ---------------------------------------------------------- |
-| `Root`          | nothing                            | holds `open`, and the setter every other part goes through |
-| `Trigger`       | `<button>`                         | opens it; the element it is anchored to, and its label     |
-| `Popup`         | `<div>`                            | the list: `popover="auto"`, `role="menu"`                  |
-| `Item`          | `<button role="menuitem">`         | one action; activating it closes the menu                  |
-| `CheckboxItem`  | `<button role="menuitemcheckbox">` | a setting that is on or off                                |
-| `RadioGroup`    | `<div role="group">`               | holds the value of its RadioItems                          |
-| `RadioItem`     | `<button role="menuitemradio">`    | one choice in a RadioGroup                                 |
-| `ItemIndicator` | `<span>`                           | the check in a CheckboxItem or RadioItem                   |
-| `Group`         | `<div role="group">`               | items under a label                                        |
-| `GroupLabel`    | `<div>`                            | names its Group or RadioGroup                              |
+| Part             | Renders                            | Does                                                       |
+| ---------------- | ---------------------------------- | ---------------------------------------------------------- |
+| `Root`           | nothing                            | holds `open`, and the setter every other part goes through |
+| `Trigger`        | `<button>`                         | opens it; the element it is anchored to, and its label     |
+| `Popup`          | `<div>`                            | the list: `popover="auto"`, `role="menu"`                  |
+| `Item`           | `<button role="menuitem">`         | one action; activating it closes the menu                  |
+| `CheckboxItem`   | `<button role="menuitemcheckbox">` | a setting that is on or off                                |
+| `RadioGroup`     | `<div role="group">`               | holds the value of its RadioItems                          |
+| `RadioItem`      | `<button role="menuitemradio">`    | one choice in a RadioGroup                                 |
+| `ItemIndicator`  | `<span>`                           | the check in a CheckboxItem or RadioItem                   |
+| `Group`          | `<div role="group">`               | items under a label                                        |
+| `GroupLabel`     | `<div>`                            | names its Group or RadioGroup                              |
+| `SubmenuRoot`    | nothing                            | holds a submenu's `open`, as Root does                     |
+| `SubmenuTrigger` | `<button role="menuitem">`         | an item of the parent menu that opens the submenu          |
 
 `Trigger` is an unstyled button, so render a [Button](/components/button/) to style it.
 
 ## Keyboard
 
-| Key                              | Does                                                 |
-| -------------------------------- | ---------------------------------------------------- |
-| Enter, Space, ↓ on Trigger       | opens the menu at the first item                     |
-| ↑ on Trigger                     | opens the menu at the last item                      |
-| ↓ ↑                              | the next or previous item, wrapping at the ends      |
-| Home, End                        | the first or last item                               |
-| A letter or word                 | the next item whose text starts with what you typed  |
-| Enter, Space on an item          | activates it and closes the menu                     |
-| Enter, Space on a checkable item | checks it; the menu stays open                       |
-| Esc                              | closes the menu, focus back on the Trigger           |
-| Tab                              | closes the menu, and focus moves on past the Trigger |
+| Key                                 | Does                                                                             |
+| ----------------------------------- | -------------------------------------------------------------------------------- |
+| Enter, Space, ↓ on Trigger          | opens the menu at the first item                                                 |
+| ↑ on Trigger                        | opens the menu at the last item                                                  |
+| ↓ ↑                                 | the next or previous item, wrapping at the ends                                  |
+| Home, End                           | the first or last item                                                           |
+| A letter or word                    | the next item whose text starts with what you typed                              |
+| Enter, Space on an item             | activates it and closes the menu                                                 |
+| Enter, Space on a checkable item    | checks it; the menu stays open                                                   |
+| Enter, Space, → on a SubmenuTrigger | opens the submenu at its first item                                              |
+| ← in a submenu                      | closes it, focus back on its SubmenuTrigger                                      |
+| Esc                                 | closes the menu, focus back on the Trigger; in a submenu, closes only that level |
+| Tab                                 | closes every level, and focus moves on past the Trigger                          |
 
 ## Items
 
@@ -108,6 +117,24 @@ for radio items.
 `Group` and `RadioGroup` are named by a `GroupLabel` inside them. The arrow keys and typeahead run
 through every group as one list, and skip the labels.
 
+## Submenus
+
+<Example name="menu-submenus">
+  <MenuSubmenus client:load />
+</Example>
+
+Wrap a `SubmenuTrigger` and a `Popup` in a `SubmenuRoot`. The trigger is an item of the parent
+menu, so the parent's arrow keys and typeahead reach it, and the submenu opens beside it, on the
+right by default. Submenus nest as deep as you need.
+
+- **Keyboard:** Enter, Space or → opens the submenu at its first item, and ← closes it. In a
+  right-to-left menu the arrows swap, and you pass `side="left"` to the submenu's `Popup`.
+- **Pointer:** resting on the trigger opens the submenu without moving focus. Moving to another
+  item of the parent closes it, but not while the pointer is crossing toward the submenu, even
+  over other items on the way.
+- **Closing:** Esc and a click elsewhere in the parent close one level. Activating an item, or
+  Tab, closes every level.
+
 ## Props
 
 ### `Menu.Root`
@@ -134,6 +161,14 @@ through every group as one list, and skip the labels.
 
 <PropTable component="Menu.RadioItem" />
 
+### `Menu.SubmenuRoot`
+
+<PropTable component="Menu.SubmenuRoot" common={false} />
+
+### `Menu.SubmenuTrigger`
+
+<PropTable component="Menu.SubmenuTrigger" />
+
 `Menu.Trigger` takes the props of the `<button>` it renders, plus `render` and `ref`.
 `Menu.Group`, `Menu.GroupLabel` and `Menu.ItemIndicator` take the props of the element they
 render, too.
@@ -142,7 +177,6 @@ render, too.
 
 - The popup is named by the Trigger through `aria-labelledby`. If you give the Trigger your own
   `id`, name the popup yourself with `aria-label`.
-- Not yet: submenus.
 - Restyle every menu with the `--menu-*` tokens, e.g. `--menu-min-width`.
 - Types come from the package that owns them:
   `import type { MenuItemProps } from '@arun-dev/headless/menu'`, or
