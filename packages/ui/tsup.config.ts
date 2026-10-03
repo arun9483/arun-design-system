@@ -17,6 +17,7 @@ const CSS_LAYERS = [
   { layer: 'btn', src: 'src/components/button/button.css' },
   { layer: 'badge', src: 'src/components/badge/badge.css' },
   { layer: 'input', src: 'src/components/input/input.css' },
+  { layer: 'otp-input', src: 'src/components/otp-input/otp-input.css' },
   { layer: 'textarea', src: 'src/components/textarea/textarea.css' },
   { layer: 'select', src: 'src/components/select/select.css' },
   { layer: 'dialog', src: 'src/components/dialog/dialog.css' },

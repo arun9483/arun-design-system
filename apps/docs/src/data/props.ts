@@ -370,6 +370,49 @@ export const PROPS = {
         'Goes on the box that frames the input and its slots, not on the `<input>`. Every other prop, `ref` and `render` included, goes on the `<input>`.',
     },
   ],
+  OtpInput: [
+    {
+      name: 'length',
+      type: 'number',
+      default: '6',
+      description: 'How many characters the code has, and so how many boxes.',
+    },
+    {
+      name: 'value',
+      type: 'string',
+      description: 'Controlled code. Provide `onValueChange` alongside it.',
+    },
+    {
+      name: 'defaultValue',
+      type: 'string',
+      default: "''",
+      description: 'Initial code when uncontrolled. Also what `form.reset()` returns to.',
+    },
+    {
+      name: 'onValueChange',
+      type: '(value: string) => void',
+      description: 'Called with the code after every change, partial or complete.',
+    },
+    {
+      name: 'validationType',
+      type: "'numeric' | 'alphanumeric'",
+      default: "'numeric'",
+      description:
+        'Which characters are kept. `numeric` also brings up the numeric keypad on phones.',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Disables the input and dims every box.',
+    },
+    {
+      name: 'className',
+      type: 'string',
+      description:
+        'Goes on the row of boxes, not on the `<input>`. Every other prop, `ref` included, goes on the `<input>`.',
+    },
+  ],
   Textarea: [
     {
       name: 'autoResize',

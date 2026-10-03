@@ -1,0 +1,108 @@
+---
+title: OTP input
+description: One box per character of a one-time code, over a single native input that autofill, paste and the numeric keypad all reach.
+---
+
+import Example from '@/components/Example.astro';
+import OtpInputBasics from '@/examples/otp-input-basics';
+import OtpInputVerify from '@/examples/otp-input-verify';
+import PropTable from '@/components/PropTable.astro';
+
+## When to use
+
+- A verification code sent by text message or email
+- A code from an authenticator app during two-factor sign-in
+- A short PIN or a backup code of fixed length
+
+Not for free text or a number of any length — use an Input.
+
+**Choosing between entering text:**
+
+| Component                         | Use it for                                                                  | For example                      |
+| --------------------------------- | --------------------------------------------------------------------------- | -------------------------------- |
+| [Input](/components/input/)       | One line of text: a name, an email, a search                                | Email address, search box        |
+| **OTP input**                     | A code of fixed length, typed or pasted one character per box               | SMS code, two-factor code, PIN   |
+| [Textarea](/components/textarea/) | Several lines of free text that may wrap                                    | Comment, description, message    |
+| [Combobox](/components/combobox/) | Typing to find and pick from a list of known options                        | Choose a city, add existing tags |
+| [Field](/components/field/)       | Not a control: wraps any of these to tie a label, a hint and an error to it | Any form control with validation |
+
+<Example name="otp-input-basics" layout="stack">
+  <OtpInputBasics client:load />
+</Example>
+
+`OtpInput` is one real `<input>` with the boxes drawn over it. The phone's code suggestion
+(`autocomplete="one-time-code"`), paste, the numeric keypad and password managers all reach that
+one input, so none of them needs special handling.
+
+## Verify a code
+
+<Example name="otp-input-verify" layout="stack">
+  <OtpInputVerify client:load />
+</Example>
+
+Checking the code is your server's job; the component only collects it. `onValueChange` fires
+on every change, so check `value.length === length` to verify as soon as the last character
+lands.
+
+## Typing and pasting
+
+| Action               | Result                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------- |
+| Type a character     | Fills the active box and moves to the next. A full code replaces the last box.        |
+| Type something else  | Ignored: letters in a numeric code, symbols in an alphanumeric one.                   |
+| Paste a whole code   | Replaces the code, with spaces and dashes dropped: "123 456" and "123-456" both work. |
+| Paste part of a code | Goes in at the caret.                                                                 |
+| Left / Right         | Move one box.                                                                         |
+| Backspace / Delete   | The platform's: remove the character before the caret, or the one in the active box.  |
+| Press a box          | Moves the caret there, or to the first empty box if the code has not reached it yet.  |
+
+Focus puts the caret on the first empty box, not over the whole code, so the next key never
+wipes what is there.
+
+## Where props go
+
+Like [Input](/components/input/), `className` goes on the row of boxes and every other prop goes
+on the `<input>`: `id`, `name`, `required`, `autoFocus`, `aria-*` and `ref`. So a
+`<label htmlFor>` names the code, and a [Field](/components/field/) works through
+`<Field.Control render={<OtpInput />} />`.
+
+## Forms
+
+- **Native forms:** give it a `name` and the code submits with the form. It carries
+  `maxLength` and a `pattern` of exactly `length` characters, so with `required` the browser
+  stops a short code, and `form.reset()` puts the first value back.
+- **react-hook-form:** use `Controller`, passing `field.value` to `value` and
+  `field.onChange` to `onValueChange`. The boxes draw the value, so it lives in React, which
+  `register()` cannot drive (as with [Radio group](/components/radio-group/)). Pass `field.ref`
+  to `ref`, so focus-on-error lands on the input.
+
+```tsx
+<Controller
+  control={control}
+  name="code"
+  rules={{ validate: (code) => code.length === 6 || 'Enter all 6 digits' }}
+  render={({ field, fieldState }) => (
+    <OtpInput
+      aria-label="Verification code"
+      aria-invalid={fieldState.error ? true : undefined}
+      ref={field.ref}
+      value={field.value}
+      onValueChange={field.onChange}
+      onBlur={field.onBlur}
+    />
+  )}
+/>
+```
+
+## Accessibility
+
+- Screen readers meet one text field with the whole code, not six. The boxes are hidden from
+  them.
+- Give it a name: a `<label htmlFor>`, a Field, or `aria-label`.
+- Set `aria-invalid` to colour every box as an error. A Field does it for you.
+
+## Props
+
+<PropTable component="OtpInput" common={false} />
+
+Every other prop goes to the `<input>`.

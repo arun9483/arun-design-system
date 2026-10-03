@@ -11,6 +11,7 @@ import type {
   CardProps,
   ChipProps,
   InputProps,
+  OtpInputProps,
   TextareaProps,
   SelectProps,
 } from '@arun-dev/ui';
@@ -123,6 +124,7 @@ type Unknown =
   | OnlyRealProps<Documented<'Chip'>, ChipProps>
   | OnlyRealProps<Documented<'Badge'>, BadgeProps>
   | OnlyRealProps<Documented<'Input'> | (typeof COMMON)[number]['name'], InputProps>
+  | OnlyRealProps<Documented<'OtpInput'>, OtpInputProps>
   | OnlyRealProps<Documented<'Textarea'>, TextareaProps>
   | OnlyRealProps<Documented<'Select'> | (typeof COMMON)[number]['name'], SelectProps>
   | OnlyRealProps<Documented<'Checkbox.Root'>, CheckboxRootProps>

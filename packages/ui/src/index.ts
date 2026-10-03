@@ -8,6 +8,8 @@ export { Badge } from './components/badge';
 export type { BadgeProps, BadgeTone } from './components/badge';
 export { Input } from './components/input';
 export type { InputProps } from './components/input';
+export { OtpInput } from './components/otp-input';
+export type { OtpInputProps } from './components/otp-input';
 export { Textarea } from './components/textarea';
 export type { TextareaProps } from './components/textarea';
 export { Select } from './components/select';

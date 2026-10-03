@@ -5,6 +5,7 @@ import type { ControllerRenderProps } from 'react-hook-form';
 import { Button } from './components/button';
 import { Checkbox } from './components/checkbox';
 import { Input } from './components/input';
+import { OtpInput } from './components/otp-input';
 import { RadioGroup } from './components/radio-group';
 import { Select } from './components/select';
 import { Switch } from './components/switch';
@@ -725,5 +726,74 @@ describe('Select with react-hook-form', () => {
     await act(async () => fireEvent.click(screen.getByText('Save')));
     expect(onSubmit).not.toHaveBeenCalled();
     expect(select).toHaveAttribute('aria-invalid', 'true');
+  });
+});
+
+describe('OtpInput with react-hook-form', () => {
+  // The <input> is native, but its value lives in React, because the boxes draw it — the
+  // RadioGroup case. Controller is the binding; the ref still reaches the <input>, so
+  // focus-on-error lands on the control.
+  type Values = { code: string };
+
+  function setup() {
+    const api: { form?: ReturnType<typeof useForm<Values>> } = {};
+    const onSubmit = vi.fn();
+
+    function Form() {
+      const form = useForm<Values>({ defaultValues: { code: '12' } });
+      api.form = form;
+      return (
+        <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+          <Controller
+            control={form.control}
+            name="code"
+            rules={{ validate: (code) => code.length === 4 || 'Enter all 4 digits' }}
+            render={({ field, fieldState }) => (
+              <OtpInput
+                length={4}
+                aria-label="Code"
+                aria-invalid={fieldState.error ? true : undefined}
+                ref={field.ref}
+                name={field.name}
+                value={field.value}
+                onValueChange={field.onChange}
+                onBlur={field.onBlur}
+              />
+            )}
+          />
+          <button type="submit">Verify</button>
+        </form>
+      );
+    }
+
+    render(<Form />);
+    return { api, onSubmit, input: () => screen.getByRole<HTMLInputElement>('textbox') };
+  }
+
+  it('shows defaultValues and reads what the user types, cleaned', () => {
+    const { api, input } = setup();
+    expect(input().value).toBe('12');
+    fireEvent.change(input(), { target: { value: '12a3' } });
+    expect(api.form?.getValues('code')).toBe('123');
+  });
+
+  it('is driven by setValue and reset, boxes included', () => {
+    const { api, input } = setup();
+    act(() => api.form?.setValue('code', '9876'));
+    expect(input().value).toBe('9876');
+    expect(document.querySelectorAll('.otp-input-slot[data-filled]')).toHaveLength(4);
+    act(() => api.form?.reset());
+    expect(input().value).toBe('12');
+  });
+
+  it('blocks submit until the code is complete, then submits it', async () => {
+    const { onSubmit, input } = setup();
+    await act(async () => fireEvent.click(screen.getByText('Verify')));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(input()).toHaveAttribute('aria-invalid', 'true');
+    expect(input()).toHaveFocus();
+    fireEvent.change(input(), { target: { value: '1234' } });
+    await act(async () => fireEvent.click(screen.getByText('Verify')));
+    expect(onSubmit).toHaveBeenCalledWith({ code: '1234' }, expect.anything());
   });
 });

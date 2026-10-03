@@ -17,12 +17,13 @@ Not for a group of controls under one caption — use a native `<fieldset>` and 
 
 **Choosing between entering text:**
 
-| Component                         | Use it for                                                                  | For example                      |
-| --------------------------------- | --------------------------------------------------------------------------- | -------------------------------- |
-| [Input](/components/input/)       | One line of text: a name, an email, a search                                | Email address, search box        |
-| [Textarea](/components/textarea/) | Several lines of free text that may wrap                                    | Comment, description, message    |
-| [Combobox](/components/combobox/) | Typing to find and pick from a list of known options                        | Choose a city, add existing tags |
-| **Field**                         | Not a control: wraps any of these to tie a label, a hint and an error to it | Any form control with validation |
+| Component                           | Use it for                                                                  | For example                      |
+| ----------------------------------- | --------------------------------------------------------------------------- | -------------------------------- |
+| [Input](/components/input/)         | One line of text: a name, an email, a search                                | Email address, search box        |
+| [OTP input](/components/otp-input/) | A code of fixed length, typed or pasted one character per box               | SMS code, two-factor code, PIN   |
+| [Textarea](/components/textarea/)   | Several lines of free text that may wrap                                    | Comment, description, message    |
+| [Combobox](/components/combobox/)   | Typing to find and pick from a list of known options                        | Choose a city, add existing tags |
+| **Field**                           | Not a control: wraps any of these to tie a label, a hint and an error to it | Any form control with validation |
 
 <Example name="field-basics" layout="stack">
   <FieldBasics client:load />

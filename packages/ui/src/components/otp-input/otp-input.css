@@ -1,0 +1,116 @@
+@layer otp-input {
+  /* The native <input> is drawn over the boxes, transparent: it takes every press, so a
+     mobile paste menu and autofill prompts work, and headless maps a press to the box under
+     it. The boxes read their state from data-* attributes emitted by @arun-dev/headless. */
+  /* As wide as `length` boxes, or the space there is: on a narrow screen the boxes share it
+     rather than overflow. --otp-input-length is set on the row from the `length` prop. */
+  .otp-input {
+    position: relative;
+    display: flex;
+    gap: var(--otp-input-gap);
+    inline-size: min(
+      100%,
+      calc(
+        var(--otp-input-length) * var(--otp-input-slot-size) + (var(--otp-input-length) - 1) *
+          var(--otp-input-gap)
+      )
+    );
+  }
+
+  .otp-input-control {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    inline-size: 100%;
+    block-size: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: transparent;
+    caret-color: transparent;
+    /* Under 16px, iOS zooms the page on focus. The text is invisible, so size costs nothing. */
+    font-size: max(1rem, 16px);
+    cursor: text;
+  }
+
+  .otp-input-control::selection {
+    background: transparent;
+  }
+
+  .otp-input-slot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 0;
+    min-inline-size: 0;
+    block-size: var(--otp-input-slot-height);
+    border: var(--otp-input-border-width) solid var(--otp-input-border-color);
+    border-radius: var(--otp-input-radius);
+    background-color: var(--otp-input-bg);
+    color: var(--otp-input-color);
+    font-family: var(--otp-input-font-family);
+    font-size: var(--otp-input-font-size);
+    font-weight: var(--otp-input-font-weight);
+    line-height: 1;
+    transition: border-color var(--otp-input-duration) var(--ease-smooth);
+  }
+
+  .otp-input:hover .otp-input-slot {
+    border-color: var(--otp-input-border-color-hover);
+  }
+
+  .otp-input:has(> .otp-input-control[aria-invalid='true']) .otp-input-slot {
+    border-color: var(--otp-input-border-color-invalid);
+  }
+
+  /* Only while the input has focus: headless clears data-active on blur. */
+  .otp-input-slot[data-active] {
+    border-color: var(--otp-input-border-color-active);
+    outline: var(--otp-input-border-width) solid var(--otp-input-border-color-active);
+  }
+
+  .otp-input:has(> .otp-input-control[aria-invalid='true']) .otp-input-slot[data-active] {
+    border-color: var(--otp-input-border-color-invalid);
+    outline-color: var(--otp-input-border-color-invalid);
+  }
+
+  /* The input's own caret is hidden, so the empty active box draws one. */
+  .otp-input-slot[data-active]:not([data-filled])::after {
+    content: '';
+    inline-size: var(--space-px);
+    block-size: 1em;
+    background-color: var(--otp-input-caret-color);
+    animation: otp-input-caret 1s step-end infinite;
+  }
+
+  .otp-input[data-disabled] {
+    opacity: var(--otp-input-disabled-opacity);
+  }
+
+  .otp-input[data-disabled] .otp-input-slot {
+    border-color: var(--otp-input-border-color);
+  }
+
+  .otp-input-control:disabled {
+    cursor: not-allowed;
+  }
+
+  @keyframes otp-input-caret {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .otp-input-slot {
+      transition-duration: 0ms;
+    }
+
+    .otp-input-slot[data-active]:not([data-filled])::after {
+      animation: none;
+    }
+  }
+}

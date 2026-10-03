@@ -1082,3 +1082,50 @@ not hover, so they open submenus by tapping the trigger.
 **Rules out:** a separate content part for submenus; logical `side` values, which would change
 decision 12 for every popup; moving focus on hover; and delay-only intent, which closes a
 submenu under a slow diagonal move or keeps the wrong one open under a fast one.
+
+---
+
+## 20. OTP input: one native input, boxes drawn over it
+
+`OtpInput` collects a one-time code: one box per character, `length` of them. The common build
+is one `<input>` per box, and it is ruled out by decision 7's table: a text field loses
+autofill, IME, mobile keyboards and password managers at any price. SMS autofill
+(`autocomplete="one-time-code"`) fills one input, paste lands in one input, and a password
+manager offers one input. So the code is a **single native `<input>`**, and the boxes are
+pictures of it.
+
+| Part    | Element   | Does                                                                                |
+| ------- | --------- | ----------------------------------------------------------------------------------- |
+| `Root`  | `<div>`   | holds `value`, `length`, `validationType` and `disabled`; `data-complete` when full |
+| `Input` | `<input>` | the control: typing, paste, autofill, the form and every native prop                |
+| `Slot`  | `<div>`   | draws character `index`; `data-active`, `data-filled`, `data-disabled`; aria-hidden |
+
+**Input is a part, though CSS places it.** It is the element a consumer addresses — `name`,
+`required`, `autoFocus`, a `ref`, a Field's attributes — so it needs to be reachable, as
+`Combobox.Input` is. Slots are parts by decision 11 (separate elements, needing the value, placed
+by the consumer, with a separator between groups being the consumer's own element). In
+`@arun-dev/ui` it is one component, `<OtpInput length={6} />`: `className` on the row and every
+other prop on the `<input>`, as for `Input`.
+
+**The value lives in React, so `register()` is lost — as for Radio group.** The boxes draw the
+value, and `setValue` writing `.value` on the DOM would be unheard (decision 10, rule 1).
+`Controller` is the binding. `form.reset()` is closed the same way as the other controls: React
+keeps the input's default equal to its value, so the Root returns to its mount-time value itself,
+through the one setter.
+
+**The caret is the platform's, read from the input's events.** The Input reads
+`selectionStart` and `selectionEnd` in its handlers, as `onChange` reads the value, and keeps
+the caret over one character so typing replaces the character in the active box. A press is
+mapped to the box under the pointer from the boxes' geometry at the press, as
+`core/pointerIntent` does — measured, never stored as state. The input is drawn over the boxes,
+transparent, so presses land on it: a long press still opens the phone's paste menu.
+
+**Native validation stays on.** The Input carries `maxLength` and a `pattern` of exactly
+`length` allowed characters, so with `required` the browser blocks a short code and
+`:invalid` matches it. Paste is handled by the component, because `maxLength` would cut
+"123 456" to "123 45" before the spaces could be dropped.
+
+**Rules out:** one input per box; a hidden input beside the boxes for the form (the Input is the
+form field); validation of the code itself, which is the server's; an `onComplete` callback —
+`onValueChange` with `value.length === length` is the same thing, and adding one later is not a
+breaking change.

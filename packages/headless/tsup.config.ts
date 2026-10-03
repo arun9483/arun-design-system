@@ -10,6 +10,7 @@ export default defineConfig({
     'src/combobox/index.ts',
     'src/dialog/index.ts',
     'src/menu/index.ts',
+    'src/otp-input/index.ts',
     'src/popover/index.ts',
     'src/radio-group/index.ts',
     'src/field/index.ts',
