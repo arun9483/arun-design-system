@@ -40,10 +40,11 @@ one input, so none of them needs special handling.
   <OtpInputVerify client:load />
 </Example>
 
-Checking the code is your server's job; the component only collects it. `onValueChange` fires
-on every change, so test it against a pattern such as `/^\d{6}$/` to verify as soon as the last
-box is filled. Not `value.length === 6`: a box emptied in the middle is a space in the value, so
-`"123 56"` has six characters too.
+Checking the code is your server's job; the component only collects it. `onComplete` fires
+with the code whenever a change leaves every box filled — the last digit typed, a whole code
+pasted, or an emptied box filled again — so pass your check to it to verify with nothing more to
+press. To test a value yourself, use a pattern such as `/^\d{6}$/`, not `value.length === 6`: a
+box emptied in the middle is a space in the value, so `"123 56"` has six characters too.
 
 ## Typing and pasting
 

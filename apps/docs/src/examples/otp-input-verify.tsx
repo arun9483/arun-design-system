@@ -3,7 +3,8 @@ import { Button, Field, OtpInput } from '@arun-dev/ui';
 
 const LENGTH = 6;
 // Complete means every box holds a digit. A box emptied in place is a space, so the length
-// alone is not enough: "123 56" has six characters.
+// alone is not enough: "123 56" has six characters. Only the Verify button needs this;
+// onComplete already knows.
 const COMPLETE = /^\d{6}$/;
 
 export default function OtpInputVerify() {
@@ -42,9 +43,9 @@ export default function OtpInputVerify() {
                 setCode(next);
                 setError('');
                 setVerified(false);
-                // Checks as soon as the last digit lands, so there is nothing more to press.
-                if (COMPLETE.test(next)) verify(next);
               }}
+              // Checks as soon as every box is filled, so there is nothing more to press.
+              onComplete={verify}
             />
           }
         />

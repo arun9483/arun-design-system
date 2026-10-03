@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { OtpInput } from './index';
 import { Field } from '../field';
 
@@ -37,5 +37,12 @@ describe('OtpInput (ui)', () => {
     expect(input).toHaveAccessibleDescription('Sent to your phone. That code has expired.');
     expect(input).toBeDisabled();
     expect(input.parentElement).toHaveAttribute('data-disabled');
+  });
+
+  it('passes onComplete through to the headless Root', () => {
+    const onComplete = vi.fn();
+    render(<OtpInput aria-label="Code" length={4} onComplete={onComplete} />);
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: '1234' } });
+    expect(onComplete).toHaveBeenCalledWith('1234');
   });
 });

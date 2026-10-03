@@ -5,6 +5,7 @@ import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
 import {
   OtpInputRootContext,
+  isComplete,
   normalize,
   otpInputDataAttributes,
   type OtpInputSelection,
@@ -27,6 +28,12 @@ type OtpInputRootOwnProps = {
    * the length alone.
    */
   onValueChange?: (value: string) => void;
+  /**
+   * Called with the code after a change that leaves it complete: every slot filled, no gap.
+   * Typing the last digit, pasting a whole code and filling an emptied slot all count; a change
+   * that leaves a slot empty does not. Use it to verify as soon as the code is in.
+   */
+  onComplete?: (value: string) => void;
   /** How many characters the code has, and so how many slots it shows. Defaults to 6. */
   length?: number;
   /**
@@ -60,6 +67,7 @@ export function OtpInputRoot({
   value: valueProp,
   defaultValue,
   onValueChange,
+  onComplete,
   length = 6,
   validationType = 'numeric',
   disabled = false,
@@ -83,8 +91,9 @@ export function OtpInputRoot({
       if (clean === value) return;
       setValue(clean);
       onValueChange?.(clean);
+      if (isComplete(clean, length)) onComplete?.(clean);
     },
-    [validationType, length, value, setValue, onValueChange],
+    [validationType, length, value, setValue, onValueChange, onComplete],
   );
 
   const [selection, setSelection] = useState<OtpInputSelection | null>(null);

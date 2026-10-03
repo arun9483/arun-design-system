@@ -1127,8 +1127,9 @@ stored in the value, so the input stays the one source of truth and the `pattern
 itself — no custom validation. A gap at the end is dropped, so the last box emptied is just a
 shorter code. Backspace on an empty box moves back and empties the one before. Deletion is read
 from the platform's `beforeinput`, not `keydown`, because a phone keyboard often sends no
-Backspace key. The cost lands on consumers: a complete code is a pattern, `/^\d{6}$/`, not
-`value.length === length`.
+Backspace key. The cost would land on consumers — a complete code is a pattern, `/^\d{6}$/`,
+not `value.length === length` — so the Root reports it: `onComplete` fires after any change
+that leaves every slot filled, the same test as `data-complete`.
 
 **Native validation stays on.** The Input carries `maxLength` and a `pattern` of exactly
 `length` allowed characters, so with `required` the browser blocks a short code and
@@ -1137,6 +1138,4 @@ Backspace key. The cost lands on consumers: a complete code is a pattern, `/^\d{
 only a deletion makes a gap.
 
 **Rules out:** one input per box; a hidden input beside the boxes for the form (the Input is the
-form field); validation of the code itself, which is the server's; an `onComplete` callback —
-`onValueChange` with `value.length === length` is the same thing, and adding one later is not a
-breaking change.
+form field); validation of the code itself, which is the server's.

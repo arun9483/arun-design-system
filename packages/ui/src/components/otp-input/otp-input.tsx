@@ -5,7 +5,13 @@ import { cn } from '../../lib/cn';
 
 type OtpInputOwnProps = Pick<
   OtpInputRootProps,
-  'value' | 'defaultValue' | 'onValueChange' | 'length' | 'validationType' | 'disabled'
+  | 'value'
+  | 'defaultValue'
+  | 'onValueChange'
+  | 'onComplete'
+  | 'length'
+  | 'validationType'
+  | 'disabled'
 > & {
   /** Classes for the row of boxes — size it, place it. Every other prop goes to the `<input>`. */
   className?: string;
@@ -27,6 +33,7 @@ export function OtpInput({
   value,
   defaultValue,
   onValueChange,
+  onComplete,
   length = 6,
   validationType,
   disabled,
@@ -38,6 +45,7 @@ export function OtpInput({
       value={value}
       defaultValue={defaultValue}
       onValueChange={onValueChange}
+      onComplete={onComplete}
       length={length}
       validationType={validationType}
       disabled={disabled}

@@ -381,3 +381,61 @@ describe('OtpInput deletion: boxes are emptied in place (browser)', () => {
     expect(input()).toHaveValue('1234 6');
   });
 });
+
+describe('OtpInput onComplete (browser)', () => {
+  it('fires once the last box is filled, not before', async () => {
+    const onComplete = vi.fn();
+    render(<Code onComplete={onComplete} />);
+    input().focus();
+    await userEvent.keyboard('12345');
+    expect(onComplete).not.toHaveBeenCalled();
+    await userEvent.keyboard('6');
+    expect(onComplete).toHaveBeenCalledOnce();
+    expect(onComplete).toHaveBeenCalledWith('123456');
+  });
+
+  it('fires for a whole pasted code', async () => {
+    const onComplete = vi.fn();
+    render(<Code onComplete={onComplete} />);
+    input().focus();
+    await paste('123 456');
+    expect(onComplete).toHaveBeenCalledWith('123456');
+  });
+
+  it('does not fire while a box is emptied in place, and fires when it is filled', async () => {
+    const onComplete = vi.fn();
+    render(<Code defaultValue="123456" onComplete={onComplete} />);
+    await pressSlot(3);
+    await userEvent.keyboard('{Delete}');
+    expect(onComplete).not.toHaveBeenCalled();
+    await userEvent.keyboard('8');
+    expect(onComplete).toHaveBeenCalledOnce();
+    expect(onComplete).toHaveBeenCalledWith('123856');
+  });
+
+  it('fires again when a digit of a complete code is typed over', async () => {
+    const onComplete = vi.fn();
+    render(<Code defaultValue="123456" onComplete={onComplete} />);
+    await pressSlot(0);
+    await userEvent.keyboard('9');
+    expect(onComplete).toHaveBeenCalledWith('923456');
+  });
+
+  it('does not fire on re-render or on a change that leaves the code short', async () => {
+    const onComplete = vi.fn();
+    const { rerender } = render(<Code defaultValue="123456" onComplete={onComplete} />);
+    rerender(<Code defaultValue="123456" onComplete={onComplete} />);
+    input().focus();
+    await userEvent.keyboard('{Backspace}');
+    expect(input()).toHaveValue('12345');
+    expect(onComplete).not.toHaveBeenCalled();
+  });
+
+  it('respects a shorter length', async () => {
+    const onComplete = vi.fn();
+    render(<Code length={4} onComplete={onComplete} />);
+    input().focus();
+    await userEvent.keyboard('1234');
+    expect(onComplete).toHaveBeenCalledWith('1234');
+  });
+});
