@@ -6,9 +6,11 @@ export type MenuState = {
   open: boolean;
 };
 
-/** An Item as the Root knows it: its props, and its element only to move focus to. */
+/** An item as the Root knows it: its props, and its element only to move focus to. */
 export type MenuItemEntry = {
   disabled: boolean;
+  /** What typeahead matches: `textValue`, or the text in its children. */
+  textValue: string;
   ref: RefObject<HTMLElement | null>;
 };
 

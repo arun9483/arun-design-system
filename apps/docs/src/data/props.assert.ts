@@ -38,8 +38,11 @@ import type {
   ComboboxRootProps,
 } from '@arun-dev/headless/combobox';
 import type {
+  MenuCheckboxItemProps,
   MenuItemProps,
   MenuPopupProps,
+  MenuRadioGroupProps,
+  MenuRadioItemProps,
   MenuRootProps,
   MenuTriggerProps,
 } from '@arun-dev/headless/menu';
@@ -148,6 +151,9 @@ type Unknown =
   | OnlyRealProps<Documented<'Menu.Popup'>, MenuPopupProps>
   | OnlyRealProps<Documented<'Menu.Trigger'>, MenuTriggerProps>
   | OnlyRealProps<Documented<'Menu.Item'>, MenuItemProps>
+  | OnlyRealProps<Documented<'Menu.CheckboxItem'>, MenuCheckboxItemProps>
+  | OnlyRealProps<Documented<'Menu.RadioGroup'>, MenuRadioGroupProps>
+  | OnlyRealProps<Documented<'Menu.RadioItem'>, MenuRadioItemProps>
   | OnlyRealProps<Documented<'Tooltip.Root'>, TooltipRootProps>
   | OnlyRealProps<Documented<'Tooltip.Popup'>, TooltipPopupProps>
   | OnlyRealProps<Documented<'Tooltip.Trigger'>, TooltipTriggerProps>

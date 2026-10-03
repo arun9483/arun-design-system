@@ -67,6 +67,39 @@
     background: none;
   }
 
+  /* A Group or RadioGroup: rows, as in the popup itself. */
+  .menu-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu-group-label {
+    padding: var(--menu-item-padding-block) var(--menu-item-padding-inline);
+    color: var(--menu-group-label-color);
+    font-size: var(--menu-group-label-font-size);
+    font-weight: var(--menu-group-label-font-weight);
+  }
+
+  /* The check keeps its space when hidden, so checked and unchecked labels line up. */
+  .menu-item-indicator {
+    display: inline-flex;
+    flex: none;
+    inline-size: var(--menu-indicator-size);
+    block-size: var(--menu-indicator-size);
+  }
+
+  /* Hidden as the base rule and shown by [data-checked], as Switch and Checkbox are styled. */
+  .menu-item-mark {
+    inline-size: 100%;
+    block-size: 100%;
+    stroke-width: var(--menu-indicator-stroke-width);
+    visibility: hidden;
+  }
+
+  .menu-item-indicator[data-checked] .menu-item-mark {
+    visibility: visible;
+  }
+
   /* Fade in and out, as Popover does, and for the same reason: opacity only. */
   .menu {
     opacity: 0;

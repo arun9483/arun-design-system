@@ -1,10 +1,11 @@
 ---
 title: Menu
-description: A list of actions opened from a button, with the ARIA menu button keyboard pattern.
+description: A list of actions and settings opened from a button, with the ARIA menu button keyboard pattern.
 ---
 
 import Example from '@/components/Example.astro';
 import MenuBasics from '@/examples/menu-basics';
+import MenuViewOptions from '@/examples/menu-view-options';
 import PropTable from '@/components/PropTable.astro';
 
 `Menu` opens a list of actions next to the button that opened it. It follows the
@@ -25,30 +26,51 @@ import { Menu } from '@arun-dev/ui';
   <Menu.Trigger />
   <Menu.Popup>
     <Menu.Item />
+    <Menu.CheckboxItem>
+      <Menu.ItemIndicator />
+    </Menu.CheckboxItem>
+    <Menu.Group>
+      <Menu.GroupLabel />
+      <Menu.Item />
+    </Menu.Group>
+    <Menu.RadioGroup>
+      <Menu.GroupLabel />
+      <Menu.RadioItem>
+        <Menu.ItemIndicator />
+      </Menu.RadioItem>
+    </Menu.RadioGroup>
   </Menu.Popup>
 </Menu.Root>;
 ```
 
-| Part      | Renders                    | Does                                                       |
-| --------- | -------------------------- | ---------------------------------------------------------- |
-| `Root`    | nothing                    | holds `open`, and the setter every other part goes through |
-| `Trigger` | `<button>`                 | opens it; the element it is anchored to, and its label     |
-| `Popup`   | `<div>`                    | the list: `popover="auto"`, `role="menu"`                  |
-| `Item`    | `<button role="menuitem">` | one action; activating it closes the menu                  |
+| Part            | Renders                            | Does                                                       |
+| --------------- | ---------------------------------- | ---------------------------------------------------------- |
+| `Root`          | nothing                            | holds `open`, and the setter every other part goes through |
+| `Trigger`       | `<button>`                         | opens it; the element it is anchored to, and its label     |
+| `Popup`         | `<div>`                            | the list: `popover="auto"`, `role="menu"`                  |
+| `Item`          | `<button role="menuitem">`         | one action; activating it closes the menu                  |
+| `CheckboxItem`  | `<button role="menuitemcheckbox">` | a setting that is on or off                                |
+| `RadioGroup`    | `<div role="group">`               | holds the value of its RadioItems                          |
+| `RadioItem`     | `<button role="menuitemradio">`    | one choice in a RadioGroup                                 |
+| `ItemIndicator` | `<span>`                           | the check in a CheckboxItem or RadioItem                   |
+| `Group`         | `<div role="group">`               | items under a label                                        |
+| `GroupLabel`    | `<div>`                            | names its Group or RadioGroup                              |
 
 `Trigger` is an unstyled button, so render a [Button](/components/button/) to style it.
 
 ## Keyboard
 
-| Key                        | Does                                                 |
-| -------------------------- | ---------------------------------------------------- |
-| Enter, Space, ↓ on Trigger | opens the menu at the first item                     |
-| ↑ on Trigger               | opens the menu at the last item                      |
-| ↓ ↑                        | the next or previous item, wrapping at the ends      |
-| Home, End                  | the first or last item                               |
-| Enter, Space on an item    | activates it and closes the menu                     |
-| Esc                        | closes the menu, focus back on the Trigger           |
-| Tab                        | closes the menu, and focus moves on past the Trigger |
+| Key                              | Does                                                 |
+| -------------------------------- | ---------------------------------------------------- |
+| Enter, Space, ↓ on Trigger       | opens the menu at the first item                     |
+| ↑ on Trigger                     | opens the menu at the last item                      |
+| ↓ ↑                              | the next or previous item, wrapping at the ends      |
+| Home, End                        | the first or last item                               |
+| A letter or word                 | the next item whose text starts with what you typed  |
+| Enter, Space on an item          | activates it and closes the menu                     |
+| Enter, Space on a checkable item | checks it; the menu stays open                       |
+| Esc                              | closes the menu, focus back on the Trigger           |
+| Tab                              | closes the menu, and focus moves on past the Trigger |
 
 ## Items
 
@@ -58,6 +80,33 @@ a toggle, say — call `event.preventComponentHandler()` in your `onClick`.
 Disabled items are skipped by the arrow keys. Set `focusableWhenDisabled` on the Root to keep them
 in the sequence, so a screen reader announces them as unavailable. They still can't be activated:
 the item is `aria-disabled` instead of `disabled`, and your `onClick` isn't called.
+
+## Typeahead
+
+Typing moves focus to the next item whose text starts with what you typed, ignoring case and
+accents. Type a letter again to cycle through the items that start with it. Keys typed close
+together build one search, so `new f` reaches "New folder": a Space in the middle of a search is
+part of it, not a click.
+
+An item's text comes from its `children`. If a component of yours renders the text, typeahead
+can't see it, so give the item a `textValue`.
+
+## Checkbox and radio items
+
+<Example name="menu-view-options">
+  <MenuViewOptions client:load />
+</Example>
+
+A `CheckboxItem` holds its own `checked`, controlled or not. A `RadioGroup` holds one `value`, and
+each `RadioItem` inside is checked while that value is its own. Both leave the menu open when
+activated, so several settings can be changed in one go; set `closeOnClick` to close it.
+
+Put a `Menu.ItemIndicator` where the check should go. It stays in the layout when unchecked, so
+labels line up. The styled one draws a checkmark; pass children to draw your own, such as a dot
+for radio items.
+
+`Group` and `RadioGroup` are named by a `GroupLabel` inside them. The arrow keys and typeahead run
+through every group as one list, and skip the labels.
 
 ## Props
 
@@ -73,13 +122,27 @@ the item is `aria-disabled` instead of `disabled`, and your `onClick` isn't call
 
 <PropTable component="Menu.Item" />
 
+### `Menu.CheckboxItem`
+
+<PropTable component="Menu.CheckboxItem" />
+
+### `Menu.RadioGroup`
+
+<PropTable component="Menu.RadioGroup" />
+
+### `Menu.RadioItem`
+
+<PropTable component="Menu.RadioItem" />
+
 `Menu.Trigger` takes the props of the `<button>` it renders, plus `render` and `ref`.
+`Menu.Group`, `Menu.GroupLabel` and `Menu.ItemIndicator` take the props of the element they
+render, too.
 
 ## Notes
 
 - The popup is named by the Trigger through `aria-labelledby`. If you give the Trigger your own
   `id`, name the popup yourself with `aria-label`.
-- Not yet: typeahead, submenus, checkbox and radio items, and groups.
+- Not yet: submenus.
 - Restyle every menu with the `--menu-*` tokens, e.g. `--menu-min-width`.
 - Types come from the package that owns them:
   `import type { MenuItemProps } from '@arun-dev/headless/menu'`, or

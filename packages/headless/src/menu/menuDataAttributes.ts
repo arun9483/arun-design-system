@@ -7,8 +7,3 @@ export function menuDataAttributes({ open }: MenuState) {
     'data-closed': open ? undefined : '',
   };
 }
-
-/** On an Item. */
-export function menuItemDataAttributes(disabled: boolean) {
-  return { 'data-disabled': disabled ? '' : undefined };
-}

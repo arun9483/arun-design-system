@@ -14,6 +14,7 @@ import {
   type PopoverElement,
 } from '../core/anchoring';
 import { rovingIndex } from '../core/rovingFocus';
+import { typeaheadIndex, useTypeahead } from '../core/typeahead';
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
 import { useMenuRootContext } from './MenuRootContext';
@@ -41,8 +42,9 @@ export type MenuPopupProps = MenuPopupOwnProps &
  * Popover's popup is (decision 12), and labelled by it.
  *
  * Opening moves focus to the first item — the last, when Up on the Trigger opened it. Up
- * and Down then move between items, wrapping, with Home and End; disabled items are skipped
- * unless the Root sets `focusableWhenDisabled`. Tab closes the menu and lets focus move on.
+ * and Down then move between items, wrapping, with Home and End; typing moves to the next item
+ * whose text starts with what was typed. Disabled items are skipped by both, unless the Root
+ * sets `focusableWhenDisabled`. Tab closes the menu and lets focus move on.
  *
  * Light dismiss and Esc close the element before anyone is asked; the `toggle` event
  * reports it through the Root, and the element reopens if the state stays open. Focus
@@ -72,6 +74,7 @@ export function MenuPopup({
   const focusPendingRef = useRef(false);
   // Re-runs the sync after the element closed itself, in case the state did not follow.
   const [, resync] = useReducer((n: number) => n + 1, 0);
+  const typeahead = useTypeahead();
 
   // Runs after every render: cheap, and it keeps element and state in step whichever of
   // them moved.
@@ -124,12 +127,22 @@ export function MenuPopup({
         const current = navigableItems.findIndex((i) => i.ref.current === event.target);
         // Only from an item of this menu, or the menu itself: a nested widget's keys are its own.
         if (current < 0 && event.target !== event.currentTarget) return;
-        const next = rovingIndex(event.key, {
-          count: navigableItems.length,
-          current,
-          orientation: 'vertical',
-          rtl: false,
-        });
+        const search = typeahead(event);
+        const next =
+          search === null
+            ? rovingIndex(event.key, {
+                count: navigableItems.length,
+                current,
+                orientation: 'vertical',
+                rtl: false,
+              })
+            : typeaheadIndex(
+                navigableItems.map((i) => i.textValue),
+                current,
+                search,
+              );
+        // A typed key is the search's, matched or not: a Space in one must not activate.
+        if (search !== null) event.preventDefault();
         if (next === null) return;
         event.preventDefault();
         navigableItems[next]?.ref.current?.focus();

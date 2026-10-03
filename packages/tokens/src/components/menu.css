@@ -21,4 +21,13 @@
   --menu-item-radius: var(--radius-sm);
   --menu-item-bg-highlight: var(--color-bg-secondary);
   --menu-disabled-opacity: 0.5;
+
+  /* Checkbox and radio items */
+  --menu-indicator-size: var(--space-sm);
+  --menu-indicator-stroke-width: 2;
+
+  /* Group label */
+  --menu-group-label-color: var(--color-text-secondary);
+  --menu-group-label-font-size: var(--text-xs);
+  --menu-group-label-font-weight: var(--font-weight-semibold);
 }

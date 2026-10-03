@@ -846,7 +846,104 @@ export const PROPS = {
       type: 'boolean',
       default: 'false',
       description:
-        'Cannot be activated. Skipped by the arrow keys, unless the Root sets `focusableWhenDisabled`.',
+        'Cannot be activated. Skipped by the arrow keys and typeahead, unless the Root sets `focusableWhenDisabled`.',
+    },
+    {
+      name: 'textValue',
+      type: 'string',
+      description:
+        'The text typeahead matches. Defaults to the text in `children`; set it when a component of yours renders the text.',
+    },
+  ],
+  'Menu.CheckboxItem': [
+    {
+      name: 'checked',
+      type: 'boolean',
+      description:
+        'Controlled state. Provide `onCheckedChange` alongside it. Never pass `undefined` — the mode is fixed at mount.',
+    },
+    {
+      name: 'defaultChecked',
+      type: 'boolean',
+      default: 'false',
+      description: 'Initial state when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onCheckedChange',
+      type: '(checked: boolean) => void',
+      description: 'Called with the new state, in both controlled and uncontrolled modes.',
+    },
+    {
+      name: 'closeOnClick',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Closes the menu when activated. Off by default, so several settings can be changed at once.',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Cannot be activated. Skipped by the arrow keys and typeahead, unless the Root sets `focusableWhenDisabled`.',
+    },
+    {
+      name: 'textValue',
+      type: 'string',
+      description:
+        'The text typeahead matches. Defaults to the text in `children`; set it when a component of yours renders the text.',
+    },
+  ],
+  'Menu.RadioGroup': [
+    {
+      name: 'value',
+      type: 'string | null',
+      description:
+        'Controlled value: the `value` of the checked RadioItem, or `null` for none. Provide `onValueChange` alongside it.',
+    },
+    {
+      name: 'defaultValue',
+      type: 'string | null',
+      default: 'null',
+      description: 'Initial value when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onValueChange',
+      type: '(value: string) => void',
+      description: 'Called with the value of the RadioItem being checked.',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Disables every RadioItem inside.',
+    },
+  ],
+  'Menu.RadioItem': [
+    {
+      name: 'value',
+      type: 'string',
+      description: "Required. Checked while the RadioGroup's `value` equals it.",
+    },
+    {
+      name: 'closeOnClick',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Closes the menu when activated. Off by default, so several settings can be changed at once.',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Cannot be activated. Skipped by the arrow keys and typeahead, unless the Root sets `focusableWhenDisabled`.',
+    },
+    {
+      name: 'textValue',
+      type: 'string',
+      description:
+        'The text typeahead matches. Defaults to the text in `children`; set it when a component of yours renders the text.',
     },
   ],
   'Tooltip.Root': [
