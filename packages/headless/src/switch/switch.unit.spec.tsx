@@ -114,7 +114,7 @@ describe('Switch — controlled and uncontrolled', () => {
     expect(el).toHaveAttribute('aria-checked', 'false');
   });
 
-  it('defers to the parent when controlled, but still reports the intent', () => {
+  it('follows the parent when controlled, but still reports the intent', () => {
     const onCheckedChange = vi.fn();
     render(<Fixture checked={false} onCheckedChange={onCheckedChange} />);
     fireEvent.click(screen.getByRole('switch'));

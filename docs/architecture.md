@@ -390,9 +390,8 @@ a component that must not carry a prop does not put it there in the first place.
 A prop written directly on a `render` element outranks the component and no layer can
 retract it. That is the consumer's choice and is not reported (decision 10).
 
-**Rules out:** a sentinel value meaning "delete this key" in `useRender`. It was
-deferred here waiting for a third component to need it; instead the two that needed it
-stopped needing it.
+**Rules out:** a sentinel value meaning "delete this key" in `useRender`. The two components
+that once needed one no longer do.
 
 ---
 
@@ -495,7 +494,7 @@ exposing an element the component can place itself.
 
 ## 12. Anchored popups: native `popover`, positioned by CSS
 
-Decided before Popover's code exists, as the deferred list asked. It covers every popup that
+Decided before Popover's code existed. It covers every popup that
 opens next to the element that opened it — Popover first, then Tooltip, Menu and Combobox.
 
 **The element is a native `popover`, shown with `showPopover({ source })`.** `popover="auto"`
@@ -535,8 +534,8 @@ element before anyone is asked — only opening is cancellable in `beforetoggle`
 reports the close through `onOpenChange(false)`, and reopens if a controlled parent keeps it
 open. This is Dialog's `<form method="dialog">` path, not a new mechanism.
 
-**No runtime layout variables.** The deferred `--hl-*` layout vars were for a JavaScript
-engine to publish measurements to CSS. Anchor positioning makes them unnecessary: the trigger's
+**No runtime layout variables.** `--hl-*` layout vars would be for a JavaScript engine to
+publish measurements to CSS. Anchor positioning makes them unnecessary: the trigger's
 width is `anchor-size(width)`, and inside a `position-area` the available height is
 `max-block-size: 100%`. The `--hl-` prefix survives for one thing: generated anchor names are
 `--hl-anchor-<id>`, so they cannot collide with a consumer's own.
@@ -574,37 +573,7 @@ leave pixel positions to a check in each engine before release.
 
 ---
 
-## 13. Deferred, with reasons
-
-Shipped since this list was written:
-
-| Was deferred                          | Landed in                                                                 |
-| ------------------------------------- | ------------------------------------------------------------------------- |
-| `@arun-dev/headless` package          | `0.1.0` — the render engine and state plumbing                            |
-| `data-*` state attributes             | `0.2.0`, with Switch — the first component with state                     |
-| `useRender` moved out of `ui`         | `0.1.0` — now `@arun-dev/headless` `core/`, exported                      |
-| Shared `data-disabled` spelling       | emitted directly by each component; React drops the `undefined` case      |
-| `mergeProps` handler order            | consumer first, cancellable with `preventComponentHandler()` — decision 8 |
-| Button's non-native behaviour         | removed — `Button` always renders a native `<button>` — decision 7        |
-| Vitest browser mode                   | with Dialog: `*.browser.spec.tsx` in Chromium, for what jsdom lacks       |
-| Positioning engine, Floating UI       | decided: CSS anchor positioning, no JavaScript engine — decision 12       |
-| Runtime layout vars + `--hl-*` prefix | not needed; `--hl-` kept for generated anchor names — decision 12         |
-| Roving tabindex                       | with Tabs: internal `core/rovingFocus`, for Menu and Toolbar to reuse     |
-| `focusableWhenDisabled`               | with Menu: an opt-in on Menu and Tabs, skipping by default — below        |
-| Combobox                              | decided: driven by data, Base UI's behaviour — decision 14                |
-| `Link`                                | with the form basics: always an `<a href>`, no `disabled` — decision 15   |
-| Menu typeahead                        | `textValue`, falling back to the children's text — decision 18            |
-| Checkbox and radio menu items, groups | `CheckboxItem`, `RadioGroup`, `RadioItem`, `Group` — decision 18          |
-| Submenus                              | nested native popovers, with pointer intent — decision 19                 |
-
-Still deferred:
-
-| Deferred                            | Revisit when                                                            |
-| ----------------------------------- | ----------------------------------------------------------------------- |
-| Memoisation inside `useRender`      | profiling shows the per-render merge costs something                    |
-| Customizable select (`base-select`) | it ships in every engine; it swaps the system picker for an in-page one |
-
-Popover, Tooltip and Menu shipped on decision 12; Combobox follows it — decision 14.
+## 13. Disabled items in roving groups
 
 **Disabled items in a roving group are skipped by default, in every component.** APG allows
 disabled tabs, menu items, options and tree items to stay focusable — so a screen reader can
@@ -634,7 +603,7 @@ effect.
 
 ## 14. Combobox: driven by data, Base UI's behaviour
 
-Decided before Combobox's code exists, as the deferred list asked. A text input that filters a
+Decided before Combobox's code existed. A text input that filters a
 list of options, with single or multiple selection. Behaviour follows Base UI's Combobox;
 structure follows this library's decisions.
 
@@ -686,8 +655,7 @@ plain click in a `<select multiple>` deselects a selected disabled option. An `i
 Ark/Zag locks a selection itself (October 2026), and knowing a lock before a server search
 returns the item meant List rendering every selected Item, hidden, outside the listbox. An app
 that needs a fixed item controls `value` and puts it back in `onValueChange`; a single
-selection is fixed with `disabled` on the Root. Revisit with a real case, and a Root-level
-`isItemLocked(item)` then, which needs no hidden render.
+selection is fixed with `disabled` on the Root.
 
 **`required` is the platform's, on the input.** The hidden inputs cannot carry it — a hidden
 input is barred from constraint validation — so the visible input is `required` while the
@@ -781,10 +749,10 @@ Measured against the platform and others (October 2026): `<select>` cannot creat
 list>` accepts free text, which is why it was rejected above. Base UI has no API either — its
 "creatable" demo is this same pattern, confirming in a Dialog. React Aria
 (`allowsCustomValue`) and Ark (`allowCustomValue`) accept free text as the value instead, which
-`value` holding items rules out here. An `onCreate(text)` on the Root was weighed and declined
-for now: the pattern needs no new API, keeps creation (async, a Dialog for colour and
-description, a server-assigned id) wholly the consumer's, and adds nothing to every combobox that
-never creates. Revisit if the pattern proves error-prone in real screens.
+`value` holding items rules out here. An `onCreate(text)` on the Root was weighed and declined:
+the pattern needs no new API, keeps creation (async, a Dialog for colour and description, a
+server-assigned id) wholly the consumer's, and adds nothing to every combobox that never
+creates.
 
 **`Separator` is visual only.** A line between items or groups, as an `<hr>` in a `<select>`,
 which Chromium exposes as a separator inside the listbox. Measured with axe (October 2026): a
@@ -821,8 +789,6 @@ features weighed in October 2026 and judged not needed:
 - **A built-in virtualizer** — virtualization stays the consumer's, as above; below about a
   thousand items rendering everything is fast enough, and a virtualizer in every combobox costs
   the many to serve the few.
-
-Nothing about Combobox is deferred.
 
 ---
 
@@ -1022,8 +988,8 @@ number with `multiple` — and is one Tab stop with arrow keys between its Toggl
 
 ## 18. Menu: typeahead, and items that hold state
 
-Phase four, part one: the rest of what decision 13 deferred for Menu, except submenus. Measured
-against APG's menu pattern and Base UI's Menu (October 2026).
+Phase four, part one: typeahead and checkable items for Menu; submenus are decision 19.
+Measured against APG's menu pattern and Base UI's Menu (October 2026).
 
 **Typeahead matches text from props.** Typing moves focus to the next item whose text starts
 with what was typed, ignoring case and accents (`core/fold`, shared with Combobox's filter).
@@ -1036,7 +1002,7 @@ An item's text is `textValue`, or else the strings in its `children`, collected 
 elements' own `children`. Radix and Base UI read the rendered `textContent` instead; reading it
 here would break decision 10's "nothing is read back from the DOM", and the props cover every
 item whose text the consumer writes inline. A component that renders its own text is opaque, so
-that item needs `textValue` — the prop decision 13 anticipated, named as Radix names it.
+that item needs `textValue`, named as Radix names it.
 
 **A Space inside a search is part of it.** On a button, Space activates. Once a search has
 started, a Space continues it — "New f" reaches "New folder" — and its default is prevented, so
@@ -1071,14 +1037,13 @@ group too, so a `GroupLabel` names it the same way. A separator stays the consum
 `role="separator"` element, which `role="menu"` may own (decision 12).
 
 **Rules out:** reading item text from the DOM; a typeahead that activates the item it reaches;
-`aria-checked="mixed"` on a checkbox item, which no consumer has asked for; a form-submitting
-menu.
+a form-submitting menu.
 
 ---
 
 ## 19. Menu: submenus, nested native popovers
 
-Phase four, part two: the last of Menu's deferrals. Measured against APG's menu pattern, the
+Phase four, part two: submenus for Menu. Measured against APG's menu pattern, the
 HTML popover algorithms and Base UI's Menu (October 2026).
 
 **Two parts, and the Popup again.** `SubmenuRoot` holds a submenu's state, as `Root` does, and
@@ -1089,8 +1054,8 @@ does not need. Submenus nest to any depth.
 
 **The trigger belongs to two menus.** It is a `menuitem` of the parent — registered there, so the
 parent's arrow keys and typeahead reach it — with `aria-haspopup="menu"`, `aria-expanded` and
-`aria-controls` for the submenu, which it anchors and names. That is the "second anchor"
-decision 13 asked for: each SubmenuRoot has its own anchor name, carried by its trigger.
+`aria-controls` for the submenu, which it anchors and names: each SubmenuRoot has its own anchor
+name, carried by its trigger.
 
 **Nesting is the platform's.** The submenu is `popover="auto"` shown with its trigger as
 `source`; the trigger sits inside the parent's popover, so the submenu nests in it. The parent
