@@ -178,7 +178,11 @@ export function CheckboxPlayground() {
         // ignored. Keying on it remounts the checkbox so the control demonstrates what
         // the prop does, rather than appearing inert. The key is a playground device
         // and is not part of the printed snippet.
-        <Checkbox.Root key={String(props.defaultChecked)} {...props}>
+        <Checkbox.Root
+          key={String(props.defaultChecked)}
+          aria-label="Playground checkbox"
+          {...props}
+        >
           <Checkbox.Indicator />
         </Checkbox.Root>
       )}
@@ -202,7 +206,7 @@ export function SwitchPlayground() {
         // ignored. Keying on it remounts the switch so the control demonstrates what the
         // prop does, rather than appearing inert. The key is a playground device and is
         // not part of the printed snippet.
-        <Switch.Root key={String(props.defaultChecked)} {...props}>
+        <Switch.Root key={String(props.defaultChecked)} aria-label="Playground switch" {...props}>
           <Switch.Thumb />
         </Switch.Root>
       )}

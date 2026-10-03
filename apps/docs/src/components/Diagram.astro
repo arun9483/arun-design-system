@@ -31,7 +31,13 @@ if (source === undefined) {
 ---
 
 <figure class="ds-diagram not-content">
-  <pre class="mermaid" data-diagram={name}>{source.trimEnd()}</pre>
+  {/* A wide diagram scrolls inside the box, so the box takes a Tab stop and a name. */}
+  <pre
+    class="mermaid"
+    data-diagram={name}
+    tabindex="0"
+    role="region"
+    aria-label={caption ? `Diagram: ${caption}` : 'Diagram'}>{source.trimEnd()}</pre>
   {caption && <figcaption>{caption}</figcaption>}
 </figure>
 

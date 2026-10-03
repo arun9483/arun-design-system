@@ -35,7 +35,9 @@ const rows: readonly PropDoc[] = [
 ];
 ---
 
-<div class="ds-props">
+<!-- The wrapper is the scroll box, so it is the Tab stop and the named region: a wide table
+     can then be scrolled from the keyboard. -->
+<div class="ds-props" tabindex="0" role="region" aria-label={`${component} props`}>
   <table>
     <thead>
       <tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr>
