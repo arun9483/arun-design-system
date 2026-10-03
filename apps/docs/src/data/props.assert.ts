@@ -44,6 +44,8 @@ import type {
   MenuRadioGroupProps,
   MenuRadioItemProps,
   MenuRootProps,
+  MenuSubmenuRootProps,
+  MenuSubmenuTriggerProps,
   MenuTriggerProps,
 } from '@arun-dev/headless/menu';
 import type {
@@ -154,6 +156,8 @@ type Unknown =
   | OnlyRealProps<Documented<'Menu.CheckboxItem'>, MenuCheckboxItemProps>
   | OnlyRealProps<Documented<'Menu.RadioGroup'>, MenuRadioGroupProps>
   | OnlyRealProps<Documented<'Menu.RadioItem'>, MenuRadioItemProps>
+  | OnlyRealProps<Documented<'Menu.SubmenuRoot'>, MenuSubmenuRootProps>
+  | OnlyRealProps<Documented<'Menu.SubmenuTrigger'>, MenuSubmenuTriggerProps>
   | OnlyRealProps<Documented<'Tooltip.Root'>, TooltipRootProps>
   | OnlyRealProps<Documented<'Tooltip.Popup'>, TooltipPopupProps>
   | OnlyRealProps<Documented<'Tooltip.Trigger'>, TooltipTriggerProps>

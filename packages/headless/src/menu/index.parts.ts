@@ -8,3 +8,5 @@ export { MenuRadioItem as RadioItem } from './MenuRadioItem';
 export { MenuItemIndicator as ItemIndicator } from './MenuItemIndicator';
 export { MenuGroup as Group } from './MenuGroup';
 export { MenuGroupLabel as GroupLabel } from './MenuGroupLabel';
+export { MenuSubmenuRoot as SubmenuRoot } from './MenuSubmenuRoot';
+export { MenuSubmenuTrigger as SubmenuTrigger } from './MenuSubmenuTrigger';

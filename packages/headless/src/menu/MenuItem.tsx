@@ -25,8 +25,8 @@ export type MenuItemProps = MenuItemOwnProps &
 
 /**
  * One action. A native `<button>`, so Enter, Space and a click activate it with no key
- * handling here: put the action in `onClick`. Activating it closes the menu — call
- * `event.preventComponentHandler()` in your `onClick` to keep it open.
+ * handling here: put the action in `onClick`. Activating it closes the menu, and every menu
+ * it is nested in — call `event.preventComponentHandler()` in your `onClick` to keep it open.
  *
  * Disabled, your `onClick` is not attached, so an `aria-disabled` item under the Root's
  * `focusableWhenDisabled` cannot run it either.
@@ -40,7 +40,7 @@ export function MenuItem({
   render,
   ...rest
 }: MenuItemProps) {
-  const { setOpen, itemProps } = useMenuItem('Item', { disabled, textValue, children });
+  const { closeAll, itemProps } = useMenuItem('Item', { disabled, textValue, children });
 
   return useRender({
     render,
@@ -52,7 +52,7 @@ export function MenuItem({
       children,
       onClick() {
         // Guarded on state, not the attribute a `render` element might drop (decision 10).
-        if (!disabled) setOpen(false);
+        if (!disabled) closeAll();
       },
     },
     consumerProps: (disabled ? rest : { ...rest, onClick }) as UnknownProps,

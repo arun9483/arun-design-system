@@ -67,6 +67,30 @@
     background: none;
   }
 
+  /* A SubmenuTrigger keeps the highlight while its submenu is open, so the path stays visible
+     as the pointer moves into the submenu. */
+  .menu-item[data-open] {
+    background-color: var(--menu-item-bg-highlight);
+  }
+
+  .menu-submenu-label {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--menu-item-padding-inline);
+  }
+
+  .menu-submenu-chevron {
+    flex: none;
+    inline-size: var(--menu-indicator-size);
+    block-size: var(--menu-indicator-size);
+    stroke-width: var(--menu-indicator-stroke-width);
+  }
+
+  .menu-submenu-chevron:dir(rtl) {
+    transform: scaleX(-1);
+  }
+
   /* A Group or RadioGroup: rows, as in the popup itself. */
   .menu-group {
     display: flex;

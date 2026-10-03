@@ -73,4 +73,27 @@ describe('Menu (ui)', () => {
     // Children replace the default mark.
     expect(radio.querySelector('.menu-item-mark')).toBeNull();
   });
+
+  it('styles a SubmenuTrigger as an item, its label pushing a chevron to the end', () => {
+    render(
+      <Menu.Root>
+        <Menu.Popup>
+          <Menu.SubmenuRoot>
+            <Menu.SubmenuTrigger className="share">Share</Menu.SubmenuTrigger>
+            <Menu.Popup data-testid="submenu">
+              <Menu.Item>Email</Menu.Item>
+            </Menu.Popup>
+          </Menu.SubmenuRoot>
+        </Menu.Popup>
+      </Menu.Root>,
+    );
+    const trigger = screen.getByRole('menuitem', { name: 'Share', hidden: true });
+    expect(trigger).toHaveClass('menu-item', 'share');
+    expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+    expect(trigger.firstElementChild).toHaveClass('menu-submenu-label');
+    expect(trigger.firstElementChild).toHaveTextContent('Share');
+    expect(trigger.lastElementChild).toHaveClass('menu-submenu-chevron');
+    expect(screen.getByTestId('submenu')).toHaveClass('menu');
+    expect(screen.getByTestId('submenu')).toHaveAttribute('data-side', 'right');
+  });
 });

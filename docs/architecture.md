@@ -595,6 +595,7 @@ Shipped since this list was written:
 | `Link`                                | with the form basics: always an `<a href>`, no `disabled` — decision 15   |
 | Menu typeahead                        | `textValue`, falling back to the children's text — decision 18            |
 | Checkbox and radio menu items, groups | `CheckboxItem`, `RadioGroup`, `RadioItem`, `Group` — decision 18          |
+| Submenus                              | nested native popovers, with pointer intent — decision 19                 |
 
 Still deferred:
 
@@ -602,7 +603,6 @@ Still deferred:
 | ----------------------------------- | ----------------------------------------------------------------------- |
 | Memoisation inside `useRender`      | profiling shows the per-render merge costs something                    |
 | Customizable select (`base-select`) | it ships in every engine; it swaps the system picker for an in-page one |
-| Submenus                            | a consumer needs nesting; it needs pointer intent and a second anchor   |
 
 Popover, Tooltip and Menu shipped on decision 12; Combobox follows it — decision 14.
 
@@ -1073,3 +1073,47 @@ group too, so a `GroupLabel` names it the same way. A separator stays the consum
 **Rules out:** reading item text from the DOM; a typeahead that activates the item it reaches;
 `aria-checked="mixed"` on a checkbox item, which no consumer has asked for; a form-submitting
 menu.
+
+---
+
+## 19. Menu: submenus, nested native popovers
+
+Phase four, part two: the last of Menu's deferrals. Measured against APG's menu pattern, the
+HTML popover algorithms and Base UI's Menu (October 2026).
+
+**Two parts, and the Popup again.** `SubmenuRoot` holds a submenu's state, as `Root` does, and
+renders nothing; `SubmenuTrigger` is the item that opens it; the submenu itself is a `Popup`,
+which knows it is one from context. Base UI has the same pair (`SubmenuRoot`,
+`SubmenuTrigger`); Radix's `Sub`, `SubTrigger`, `SubContent` adds a content part this design
+does not need. Submenus nest to any depth.
+
+**The trigger belongs to two menus.** It is a `menuitem` of the parent — registered there, so the
+parent's arrow keys and typeahead reach it — with `aria-haspopup="menu"`, `aria-expanded` and
+`aria-controls` for the submenu, which it anchors and names. That is the "second anchor"
+decision 13 asked for: each SubmenuRoot has its own anchor name, carried by its trigger.
+
+**Nesting is the platform's.** The submenu is `popover="auto"` shown with its trigger as
+`source`; the trigger sits inside the parent's popover, so the submenu nests in it. The parent
+stays open while it is, Esc closes one level at a time, and a click elsewhere in the parent
+closes only the submenu. One thing the platform does not do: it returns focus only when the
+outermost auto popover closes. So a submenu closing with focus inside moves focus to its trigger
+itself, in `beforetoggle`, before the element hides.
+
+**Keyboard, by APG.** Enter, Space and → open the submenu at its first item; ← closes it. The
+arrows follow the writing direction, swapping in a right-to-left menu. Placement does not: `side`
+stays physical (decision 12), so a right-to-left menu passes `side="left"` to the submenu's
+Popup. The default is `'right'`, a Root's `'bottom'`. Activating an item closes every level, as
+Tab does; moving to another parent item with the arrow keys closes the open submenu.
+
+**Pointer intent.** Resting on a trigger for 100 ms opens its submenu, without moving focus: the
+keyboard user's focus is not taken by a passing pointer. Moving onto another item of the parent
+closes it — but a pointer on its way to the submenu crosses other items. When it leaves the
+trigger, the trigger measures the submenu and records the triangle from the exit point to the
+submenu's near edge; for 300 ms, movement inside that triangle closes nothing. This is Radix's
+approach. The measurement is geometry the pointer moves through, never state (decision 10), and
+positions nothing (decision 12). The logic is `core/pointerIntent`, internal. Touch and pen do
+not hover, so they open submenus by tapping the trigger.
+
+**Rules out:** a separate content part for submenus; logical `side` values, which would change
+decision 12 for every popup; moving focus on hover; and delay-only intent, which closes a
+submenu under a slow diagonal move or keeps the wrong one open under a fast one.

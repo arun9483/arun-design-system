@@ -24,7 +24,10 @@ export type MenuSide = AnchorSide;
 export type MenuAlign = AnchorAlign;
 
 type MenuPopupOwnProps = {
-  /** Which side of the trigger to open on. Flips to the opposite side when there is no room. */
+  /**
+   * Which side of the trigger to open on. Flips to the opposite side when there is no room.
+   * Defaults to `'bottom'`, and to `'right'` in a submenu.
+   */
   side?: MenuSide;
   /** Where along that side: flush with the trigger's start or end edge, or centred on it. */
   align?: MenuAlign;
@@ -46,12 +49,16 @@ export type MenuPopupProps = MenuPopupOwnProps &
  * whose text starts with what was typed. Disabled items are skipped by both, unless the Root
  * sets `focusableWhenDisabled`. Tab closes the menu and lets focus move on.
  *
+ * Inside a SubmenuRoot it is that submenu's popup: it opens beside its SubmenuTrigger, ← (→ in
+ * a right-to-left menu) closes it, and Tab closes every level. Closing with focus inside returns
+ * it to the SubmenuTrigger.
+ *
  * Light dismiss and Esc close the element before anyone is asked; the `toggle` event
  * reports it through the Root, and the element reopens if the state stays open. Focus
  * returns to the Trigger, the invoker, whenever the menu hides with focus inside it.
  */
 export function MenuPopup({
-  side = 'bottom',
+  side: sideProp,
   align = 'start',
   className,
   children,
@@ -67,8 +74,11 @@ export function MenuPopup({
     popupId,
     anchorName,
     triggerRef,
+    parent,
+    popupRef: elementRef,
+    openSubmenuRef,
   } = useMenuRootContext('Popup');
-  const elementRef = useRef<HTMLElement | null>(null);
+  const side = sideProp ?? (parent ? 'right' : 'bottom');
   // Set when the menu is shown; cleared once an item has taken focus. Items register in
   // effects, so on the first open they may arrive a render after the popup is shown.
   const focusPendingRef = useRef(false);
@@ -98,7 +108,9 @@ export function MenuPopup({
 
     if (focusPendingRef.current && navigableItems.length > 0) {
       focusPendingRef.current = false;
-      const target = focusOnOpenRef.current === 'last' ? navigableItems.at(-1) : navigableItems[0];
+      const focus = focusOnOpenRef.current;
+      const target =
+        focus === 'last' ? navigableItems.at(-1) : focus === 'first' ? navigableItems[0] : null;
       target?.ref.current?.focus();
     }
   });
@@ -125,8 +137,16 @@ export function MenuPopup({
           return;
         }
         const current = navigableItems.findIndex((i) => i.ref.current === event.target);
-        // Only from an item of this menu, or the menu itself: a nested widget's keys are its own.
+        // Only from an item of this menu, or the menu itself: a nested widget's keys are its own,
+        // and so are a submenu's, whose items are inside this element too.
         if (current < 0 && event.target !== event.currentTarget) return;
+        const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
+        if (parent && event.key === (rtl ? 'ArrowRight' : 'ArrowLeft')) {
+          // Back to the parent: the platform returns focus to the SubmenuTrigger, the invoker.
+          event.preventDefault();
+          setOpen(false);
+          return;
+        }
         const search = typeahead(event);
         const next =
           search === null
@@ -145,7 +165,18 @@ export function MenuPopup({
         if (search !== null) event.preventDefault();
         if (next === null) return;
         event.preventDefault();
-        navigableItems[next]?.ref.current?.focus();
+        const target = navigableItems[next]?.ref.current;
+        // Leaving a SubmenuTrigger for another item closes the submenu it opened.
+        const submenu = openSubmenuRef.current;
+        if (submenu && submenu.triggerRef.current !== target) submenu.close();
+        target?.focus();
+      },
+      onBeforeToggle(event: SyntheticEvent) {
+        if (event.target !== event.currentTarget || !parent) return;
+        if ((event.nativeEvent as ToggleEvent).newState !== 'closed') return;
+        // The platform returns focus only for the outermost auto popover, never a nested one, so
+        // a submenu closing with focus inside hands it back to its SubmenuTrigger itself.
+        if (event.currentTarget.contains(document.activeElement)) triggerRef.current?.focus();
       },
       onToggle(event: SyntheticEvent) {
         // React carries a nested popover's toggle up the component tree; it isn't ours.

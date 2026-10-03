@@ -1,6 +1,7 @@
 import { useCallback, useId, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { anchorNameFor } from '../core/anchoring';
+import type { Point } from '../core/pointerIntent';
 import { byDocumentOrder } from '../core/rovingFocus';
 import { useControlled } from '../core/useControlled';
 import {
@@ -8,6 +9,7 @@ import {
   type MenuFocusOnOpen,
   type MenuItemEntry,
   type MenuRootContextValue,
+  type OpenSubmenu,
 } from './MenuRootContext';
 
 export type MenuRootProps = {
@@ -43,17 +45,29 @@ export type MenuRootProps = {
  * Each Item registers its own `disabled` from its props; the Root never reads it back from
  * the DOM (decision 10). Elements are kept only to move focus to.
  */
-export function MenuRoot({
-  open: openProp,
-  defaultOpen,
-  onOpenChange,
-  focusableWhenDisabled = false,
-  children,
-}: MenuRootProps) {
+export function MenuRoot({ children, ...props }: MenuRootProps) {
+  const context = useMenuRootValue('Menu.Root', props, null);
+  return <MenuRootContext.Provider value={context}>{children}</MenuRootContext.Provider>;
+}
+
+/**
+ * The state and context of a menu — Root's, and a SubmenuRoot's, which passes the menu it is
+ * nested in as `parent`.
+ */
+export function useMenuRootValue(
+  name: string,
+  {
+    open: openProp,
+    defaultOpen,
+    onOpenChange,
+    focusableWhenDisabled = false,
+  }: Omit<MenuRootProps, 'children'>,
+  parent: MenuRootContextValue | null,
+): MenuRootContextValue {
   const [open, setOpenState] = useControlled({
     controlled: openProp,
     default: defaultOpen ?? false,
-    name: 'Menu.Root',
+    name,
     state: 'open',
   });
 
@@ -66,6 +80,11 @@ export function MenuRoot({
     },
     [open, setOpenState, onOpenChange],
   );
+
+  const closeAll = useCallback(() => {
+    setOpen(false);
+    parent?.closeAll();
+  }, [setOpen, parent]);
 
   const [items, setItems] = useState<MenuItemEntry[]>([]);
   const register = useCallback((entry: MenuItemEntry) => {
@@ -81,11 +100,15 @@ export function MenuRoot({
   const id = useId();
   const triggerRef = useRef<HTMLElement | null>(null);
   const focusOnOpenRef = useRef<MenuFocusOnOpen>('first');
+  const popupRef = useRef<HTMLElement | null>(null);
+  const openSubmenuRef = useRef<OpenSubmenu | null>(null);
+  const graceRef = useRef<{ area: Point[]; until: number } | null>(null);
 
-  const context: MenuRootContextValue = useMemo(
+  return useMemo(
     () => ({
       open,
       setOpen,
+      closeAll,
       navigableItems,
       focusableWhenDisabled,
       register,
@@ -94,9 +117,11 @@ export function MenuRoot({
       popupId: `${id}-popup`,
       anchorName: anchorNameFor(id),
       triggerRef,
+      parent,
+      popupRef,
+      openSubmenuRef,
+      graceRef,
     }),
-    [open, setOpen, navigableItems, focusableWhenDisabled, register, id],
+    [open, setOpen, closeAll, navigableItems, focusableWhenDisabled, register, id, parent],
   );
-
-  return <MenuRootContext.Provider value={context}>{children}</MenuRootContext.Provider>;
 }
