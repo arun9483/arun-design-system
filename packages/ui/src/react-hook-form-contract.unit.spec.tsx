@@ -747,7 +747,7 @@ describe('OtpInput with react-hook-form', () => {
           <Controller
             control={form.control}
             name="code"
-            rules={{ validate: (code) => code.length === 4 || 'Enter all 4 digits' }}
+            rules={{ pattern: { value: /^\d{4}$/, message: 'Enter all 4 digits' } }}
             render={({ field, fieldState }) => (
               <OtpInput
                 length={4}
@@ -795,5 +795,13 @@ describe('OtpInput with react-hook-form', () => {
     fireEvent.change(input(), { target: { value: '1234' } });
     await act(async () => fireEvent.click(screen.getByText('Verify')));
     expect(onSubmit).toHaveBeenCalledWith({ code: '1234' }, expect.anything());
+  });
+
+  it('blocks submit while a box is emptied in place, though the length is full', async () => {
+    const { api, onSubmit } = setup();
+    act(() => api.form?.setValue('code', '12 4'));
+    await act(async () => fireEvent.click(screen.getByText('Verify')));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(document.querySelectorAll('.otp-input-slot[data-filled]')).toHaveLength(3);
   });
 });

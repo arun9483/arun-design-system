@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Button, Field, OtpInput } from '@arun-dev/ui';
 
 const LENGTH = 6;
+// Complete means every box holds a digit. A box emptied in place is a space, so the length
+// alone is not enough: "123 56" has six characters.
+const COMPLETE = /^\d{6}$/;
 
 export default function OtpInputVerify() {
   const [code, setCode] = useState('');
@@ -14,7 +17,7 @@ export default function OtpInputVerify() {
       setVerified(true);
       setError('');
     } else {
-      setError(value.length < LENGTH ? `Enter all ${LENGTH} digits.` : 'That code is not right.');
+      setError(COMPLETE.test(value) ? 'That code is not right.' : `Enter all ${LENGTH} digits.`);
     }
   }
 
@@ -40,7 +43,7 @@ export default function OtpInputVerify() {
                 setError('');
                 setVerified(false);
                 // Checks as soon as the last digit lands, so there is nothing more to press.
-                if (next.length === LENGTH) verify(next);
+                if (COMPLETE.test(next)) verify(next);
               }}
             />
           }

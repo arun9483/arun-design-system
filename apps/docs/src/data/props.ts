@@ -391,7 +391,8 @@ export const PROPS = {
     {
       name: 'onValueChange',
       type: '(value: string) => void',
-      description: 'Called with the code after every change, partial or complete.',
+      description:
+        'Called with the code after every change, partial or complete. A box emptied in the middle is a space, `"123 56"`, so check completeness with a pattern, not the length.',
     },
     {
       name: 'validationType',
