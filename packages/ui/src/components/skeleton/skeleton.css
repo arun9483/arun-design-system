@@ -14,13 +14,16 @@
     animation: skeleton-shine var(--skeleton-duration) var(--ease-smooth) infinite;
   }
 
+  /* The shine is half the element's width, and a percentage position moves it by the
+     difference between the two: -100% starts it wholly off the start edge and 200% ends it
+     wholly off the end, so each loop restarts unseen instead of jumping back into view. */
   @keyframes skeleton-shine {
     from {
-      background-position: -50% 0;
+      background-position: -100% 0;
     }
 
     to {
-      background-position: 150% 0;
+      background-position: 200% 0;
     }
   }
 

@@ -23,7 +23,17 @@ the page.
 ## Sorting
 
 Sorting is yours. Put a `<button>` in the column's `Head`, sort your rows when it's pressed, and
-set `aria-sort` on the `Head`. The arrow follows `aria-sort`.
+set `aria-sort` on the `Head`. The arrow follows `aria-sort`:
+
+| State                              | `aria-sort`    | Arrow |
+| ---------------------------------- | -------------- | ----- |
+| As received, e.g. from your server | leave it off   | none  |
+| Ascending                          | `"ascending"`  | ↑     |
+| Descending                         | `"descending"` | ↓     |
+
+The example cycles through all three: each press of **Amount** moves from the order the rows
+arrived in, to ascending, to descending, and back. Keep the original array and sort a copy, so
+you can return to it. Only the sorted column carries `aria-sort`; leave it off the others.
 
 ## Props
 

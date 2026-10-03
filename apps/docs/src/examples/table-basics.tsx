@@ -8,14 +8,19 @@ const invoices = [
   { id: 'INV-1045', customer: 'Katherine Johnson', amount: 780, status: 'Overdue' },
 ];
 
-type Direction = 'ascending' | 'descending';
+type Sort = 'none' | 'ascending' | 'descending';
+// Each press moves on: as received, then ascending, then descending, then back.
+const next: Record<Sort, Sort> = { none: 'ascending', ascending: 'descending', descending: 'none' };
 
 // Sorting is yours: a button in the header, and aria-sort on the header cell.
 export default function TableBasics() {
-  const [direction, setDirection] = useState<Direction>('descending');
-  const rows = [...invoices].sort((a, b) =>
-    direction === 'ascending' ? a.amount - b.amount : b.amount - a.amount,
-  );
+  const [sort, setSort] = useState<Sort>('none');
+  const rows =
+    sort === 'none'
+      ? invoices
+      : [...invoices].sort((a, b) =>
+          sort === 'ascending' ? a.amount - b.amount : b.amount - a.amount,
+        );
   const total = invoices.reduce((sum, i) => sum + i.amount, 0);
 
   return (
@@ -26,11 +31,9 @@ export default function TableBasics() {
           <Table.Head>Invoice</Table.Head>
           <Table.Head>Customer</Table.Head>
           <Table.Head>Status</Table.Head>
-          <Table.Head aria-sort={direction}>
-            <button
-              type="button"
-              onClick={() => setDirection(direction === 'ascending' ? 'descending' : 'ascending')}
-            >
+          {/* No aria-sort while unsorted, so no arrow. */}
+          <Table.Head aria-sort={sort === 'none' ? undefined : sort}>
+            <button type="button" onClick={() => setSort(next[sort])}>
               Amount
             </button>
           </Table.Head>
