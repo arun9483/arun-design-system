@@ -574,9 +574,9 @@ leave pixel positions to a check in each engine before release.
 
 ---
 
-## 13. Deferred, with reasons
+## 13. Once deferred, all landed
 
-Shipped since this list was written:
+Everything this list once deferred has landed:
 
 | Was deferred                          | Landed in                                                                 |
 | ------------------------------------- | ------------------------------------------------------------------------- |
@@ -596,13 +596,6 @@ Shipped since this list was written:
 | Menu typeahead                        | `textValue`, falling back to the children's text — decision 18            |
 | Checkbox and radio menu items, groups | `CheckboxItem`, `RadioGroup`, `RadioItem`, `Group` — decision 18          |
 | Submenus                              | nested native popovers, with pointer intent — decision 19                 |
-
-Still deferred:
-
-| Deferred                            | Revisit when                                                            |
-| ----------------------------------- | ----------------------------------------------------------------------- |
-| Memoisation inside `useRender`      | profiling shows the per-render merge costs something                    |
-| Customizable select (`base-select`) | it ships in every engine; it swaps the system picker for an in-page one |
 
 Popover, Tooltip and Menu shipped on decision 12; Combobox follows it — decision 14.
 
@@ -686,8 +679,7 @@ plain click in a `<select multiple>` deselects a selected disabled option. An `i
 Ark/Zag locks a selection itself (October 2026), and knowing a lock before a server search
 returns the item meant List rendering every selected Item, hidden, outside the listbox. An app
 that needs a fixed item controls `value` and puts it back in `onValueChange`; a single
-selection is fixed with `disabled` on the Root. Revisit with a real case, and a Root-level
-`isItemLocked(item)` then, which needs no hidden render.
+selection is fixed with `disabled` on the Root.
 
 **`required` is the platform's, on the input.** The hidden inputs cannot carry it — a hidden
 input is barred from constraint validation — so the visible input is `required` while the
@@ -781,10 +773,10 @@ Measured against the platform and others (October 2026): `<select>` cannot creat
 list>` accepts free text, which is why it was rejected above. Base UI has no API either — its
 "creatable" demo is this same pattern, confirming in a Dialog. React Aria
 (`allowsCustomValue`) and Ark (`allowCustomValue`) accept free text as the value instead, which
-`value` holding items rules out here. An `onCreate(text)` on the Root was weighed and declined
-for now: the pattern needs no new API, keeps creation (async, a Dialog for colour and
-description, a server-assigned id) wholly the consumer's, and adds nothing to every combobox that
-never creates. Revisit if the pattern proves error-prone in real screens.
+`value` holding items rules out here. An `onCreate(text)` on the Root was weighed and declined:
+the pattern needs no new API, keeps creation (async, a Dialog for colour and description, a
+server-assigned id) wholly the consumer's, and adds nothing to every combobox that never
+creates.
 
 **`Separator` is visual only.** A line between items or groups, as an `<hr>` in a `<select>`,
 which Chromium exposes as a separator inside the listbox. Measured with axe (October 2026): a
@@ -1071,8 +1063,7 @@ group too, so a `GroupLabel` names it the same way. A separator stays the consum
 `role="separator"` element, which `role="menu"` may own (decision 12).
 
 **Rules out:** reading item text from the DOM; a typeahead that activates the item it reaches;
-`aria-checked="mixed"` on a checkbox item, which no consumer has asked for; a form-submitting
-menu.
+a form-submitting menu.
 
 ---
 

@@ -10,9 +10,7 @@ import { mergeProps, type UnknownProps } from './mergeProps';
  * default element and the props it wants; the consumer can replace the element
  * entirely via `render` without losing any of it.
  *
- * Currently uses no hooks. The `use` prefix matches the API it will grow into
- * (memoised merging, so parts stop re-rendering their children needlessly) and keeps
- * call sites stable when that lands.
+ * Uses no hooks; the `use` prefix keeps its call sites those of a hook.
  */
 export interface UseRenderParams {
   /**
