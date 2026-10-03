@@ -9,6 +9,22 @@ import ChipElements from '@/examples/chip-elements';
 import PropTable from '@/components/PropTable.astro';
 import { ChipPlayground } from '@/components/playgrounds';
 
+## When to use
+
+- Tags on an item: "React", "TypeScript"
+- Applied filters above a list
+- Metadata in a compact row
+
+Not for a status at a glance — use a Badge.
+
+**Choosing between small labels:**
+
+| Component                   | Use it for                                         | For example                          |
+| --------------------------- | -------------------------------------------------- | ------------------------------------ |
+| [Badge](/components/badge/) | The status or category of something, at a glance   | "Paid", "Overdue", "Beta"            |
+| **Chip**                    | Tags, filters and metadata, often several in a row | "React", "Remote", an applied filter |
+| [Kbd](/components/kbd/)     | A key on the keyboard, in text or a tooltip        | Press ⌘ K to search                  |
+
 <Example name="chip-variants">
   <ChipVariants client:load />
 </Example>

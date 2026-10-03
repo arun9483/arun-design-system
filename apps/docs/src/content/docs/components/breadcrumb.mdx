@@ -7,6 +7,22 @@ import Example from '@/components/Example.astro';
 import BreadcrumbBasics from '@/examples/breadcrumb-basics';
 import PropTable from '@/components/PropTable.astro';
 
+## When to use
+
+- Pages deep in a hierarchy, such as Docs / Components / Breadcrumb
+- Letting people go up a level without the back button
+
+Not on a flat site, or as the only navigation.
+
+**Choosing between moving around:**
+
+| Component                             | Use it for                                                   | For example                    |
+| ------------------------------------- | ------------------------------------------------------------ | ------------------------------ |
+| **Breadcrumb**                        | Showing where the page sits in a hierarchy, with links up it | Home / Projects / Website      |
+| [Pagination](/components/pagination/) | Moving between pages of one long list                        | Search results, page 3 of 12   |
+| [Tabs](/components/tabs/)             | Switching between views within one page                      | Overview / Activity / Settings |
+| [Link](/components/link/)             | One destination                                              | "Read the docs"                |
+
 <Example name="breadcrumb-basics">
   <BreadcrumbBasics client:load />
 </Example>

@@ -1,9 +1,13 @@
 @layer toast {
   /* The Viewport is a popover kept open: undo the UA's centred, bordered popover box and pin
-     it to the corner. Empty, it has no size. */
-  .toast-viewport {
+     it to its position. Empty, it has no size. A stack is the column for toasts added with a
+     position of their own: fixed too, so it sits at its own place though it is inside the
+     Viewport's element. Nothing here may transform the Viewport — a transform would make it
+     the containing block of those stacks — so the centred positions are offset, not
+     translated. */
+  .toast-viewport,
+  .toast-stack {
     position: fixed;
-    inset: auto var(--toast-viewport-inset) var(--toast-viewport-inset) auto;
     display: flex;
     flex-direction: column;
     gap: var(--toast-gap);
@@ -15,6 +19,32 @@
     border: none;
     background: none;
     color: inherit;
+  }
+
+  .toast-position-top-left {
+    inset: var(--toast-viewport-inset) auto auto var(--toast-viewport-inset);
+  }
+
+  .toast-position-top-center {
+    inset: var(--toast-viewport-inset) auto auto
+      calc(50% - min(var(--toast-width), calc(100vw - 2 * var(--toast-viewport-inset))) / 2);
+  }
+
+  .toast-position-top-right {
+    inset: var(--toast-viewport-inset) var(--toast-viewport-inset) auto auto;
+  }
+
+  .toast-position-bottom-left {
+    inset: auto auto var(--toast-viewport-inset) var(--toast-viewport-inset);
+  }
+
+  .toast-position-bottom-center {
+    inset: auto auto var(--toast-viewport-inset)
+      calc(50% - min(var(--toast-width), calc(100vw - 2 * var(--toast-viewport-inset))) / 2);
+  }
+
+  .toast-position-bottom-right {
+    inset: auto var(--toast-viewport-inset) var(--toast-viewport-inset) auto;
   }
 
   .toast-viewport:focus-visible {
@@ -40,11 +70,16 @@
       translate var(--toast-duration) var(--ease-smooth);
   }
 
-  /* Slides up and fades in as it arrives. */
+  /* Slides in from the window's edge and fades in as it arrives: up at the bottom, down at
+     the top. */
   @starting-style {
     .toast {
       opacity: 0;
       translate: 0 var(--space-2xs);
+    }
+
+    :is(.toast-position-top-left, .toast-position-top-center, .toast-position-top-right) > .toast {
+      translate: 0 calc(-1 * var(--space-2xs));
     }
   }
 

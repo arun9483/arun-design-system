@@ -10,6 +10,23 @@ import PropTable from '@/components/PropTable.astro';
 import { InputPlayground } from '@/components/playgrounds';
 import { Aside } from '@astrojs/starlight/components';
 
+## When to use
+
+- Names, email addresses, passwords, numbers
+- A search box, with an icon in the slot before the text
+- Any single line of free text in a form
+
+Not for text that runs over several lines — use a Textarea — or a choice from known options — use a Select or a Combobox.
+
+**Choosing between entering text:**
+
+| Component                         | Use it for                                                                  | For example                      |
+| --------------------------------- | --------------------------------------------------------------------------- | -------------------------------- |
+| **Input**                         | One line of text: a name, an email, a search                                | Email address, search box        |
+| [Textarea](/components/textarea/) | Several lines of free text that may wrap                                    | Comment, description, message    |
+| [Combobox](/components/combobox/) | Typing to find and pick from a list of known options                        | Choose a city, add existing tags |
+| [Field](/components/field/)       | Not a control: wraps any of these to tie a label, a hint and an error to it | Any form control with validation |
+
 `Input` is a real `<input>`. Typing, selection, autofill, validation and form submission are all
 the platform's, so there is no headless half and nothing to keep in sync. It works with
 react-hook-form's `register()` as-is.

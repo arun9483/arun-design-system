@@ -5,7 +5,25 @@ description: How much of a known range is used, as a native meter.
 
 import Example from '@/components/Example.astro';
 import MeterBasics from '@/examples/meter-basics';
+import MeterScores from '@/examples/meter-scores';
 import PropTable from '@/components/PropTable.astro';
+
+## When to use
+
+- Disk or quota usage
+- Password strength
+- A score or rating within a known range
+
+Not for progress through a task — use a Progress.
+
+**Choosing between showing progress, loading or a measurement:**
+
+| Component                         | Use it for                                                              | For example                                   |
+| --------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------- |
+| [Progress](/components/progress/) | A task whose completion is known, moving toward done                    | Upload at 40%, step 2 of 5                    |
+| **Meter**                         | A measurement within a known range, not a task                          | Disk usage, password strength, a score        |
+| [Spinner](/components/spinner/)   | Work of unknown length, in a small space                                | A button saying "Saving…", a panel refreshing |
+| [Skeleton](/components/skeleton/) | Content still loading whose shape is known, so the layout does not jump | Placeholder rows in a list, a profile card    |
 
 <Example name="meter-basics" layout="stack">
   <MeterBasics client:load />
@@ -21,6 +39,24 @@ password's strength. `low`, `high` and `optimum` colour it as the browser does:
 | the far side            | poor   | `--meter-poor-color`       |
 
 In the example, low usage is best (`optimum` is low), so usage past `high` turns red.
+
+## Which end is good
+
+The colours aren't tied to high or low values. `optimum` says which end is good, and the colours
+follow it:
+
+| Measurement   | Good when | Set `optimum`           | 90% shows |
+| ------------- | --------- | ----------------------- | --------- |
+| Disk usage    | low       | below `low`, e.g. `0.1` | red       |
+| Average score | high      | above `high`, e.g. `1`  | green     |
+
+<Example name="meter-scores" layout="stack">
+  <MeterScores client:load />
+</Example>
+
+Here a high score is best (`optimum` is `1`), so 90% is green, and an average under `low` turns
+red. With `optimum` between `low` and `high`, the middle is good and both ends are fair; neither
+end turns red.
 
 ## Props
 

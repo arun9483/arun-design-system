@@ -7,6 +7,24 @@ import Example from '@/components/Example.astro';
 import TableBasics from '@/examples/table-basics';
 import PropTable from '@/components/PropTable.astro';
 
+## When to use
+
+- Records compared across the same columns: invoices, users
+- Data people sort or scan by column
+- Totals in a footer
+
+Not for layout, or items that read better as tiles — use a Card grid.
+
+**Choosing between organising content:**
+
+| Component                           | Use it for                                                                    | For example                           |
+| ----------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------- |
+| [Accordion](/components/accordion/) | Sections stacked on one page, of which people read one or a few               | FAQ, settings groups, order details   |
+| [Tabs](/components/tabs/)           | Views of the same thing at the same level, one at a time                      | Account / Billing / Security          |
+| [Card](/components/card/)           | A self-contained group of content, shown as one unit, often in a grid or list | A product tile, a project summary     |
+| **Table**                           | Rows of records compared across the same columns                              | Invoices, users, order lines          |
+| [Separator](/components/separator/) | A line that divides sections, with no content of its own                      | Between menu groups or toolbar groups |
+
 <Example name="table-basics">
   <TableBasics client:load />
 </Example>
@@ -23,7 +41,17 @@ the page.
 ## Sorting
 
 Sorting is yours. Put a `<button>` in the column's `Head`, sort your rows when it's pressed, and
-set `aria-sort` on the `Head`. The arrow follows `aria-sort`.
+set `aria-sort` on the `Head`. The arrow follows `aria-sort`:
+
+| State                              | `aria-sort`    | Arrow |
+| ---------------------------------- | -------------- | ----- |
+| As received, e.g. from your server | leave it off   | none  |
+| Ascending                          | `"ascending"`  | ↑     |
+| Descending                         | `"descending"` | ↓     |
+
+The example cycles through all three: each press of **Amount** moves from the order the rows
+arrived in, to ascending, to descending, and back. Keep the original array and sort a copy, so
+you can return to it. Only the sorted column carries `aria-sort`; leave it off the others.
 
 ## Props
 

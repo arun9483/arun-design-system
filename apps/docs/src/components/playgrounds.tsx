@@ -4,6 +4,7 @@
  */
 import type { ComponentProps } from 'react';
 import {
+  Accordion,
   Badge,
   Button,
   Card,
@@ -15,6 +16,7 @@ import {
   Switch,
   Tabs,
   Textarea,
+  Tooltip,
 } from '@arun-dev/ui';
 import { Playground, type Control } from './Playground';
 
@@ -176,7 +178,11 @@ export function CheckboxPlayground() {
         // ignored. Keying on it remounts the checkbox so the control demonstrates what
         // the prop does, rather than appearing inert. The key is a playground device
         // and is not part of the printed snippet.
-        <Checkbox.Root key={String(props.defaultChecked)} {...props}>
+        <Checkbox.Root
+          key={String(props.defaultChecked)}
+          aria-label="Playground checkbox"
+          {...props}
+        >
           <Checkbox.Indicator />
         </Checkbox.Root>
       )}
@@ -200,7 +206,7 @@ export function SwitchPlayground() {
         // ignored. Keying on it remounts the switch so the control demonstrates what the
         // prop does, rather than appearing inert. The key is a playground device and is
         // not part of the printed snippet.
-        <Switch.Root key={String(props.defaultChecked)} {...props}>
+        <Switch.Root key={String(props.defaultChecked)} aria-label="Playground switch" {...props}>
           <Switch.Thumb />
         </Switch.Root>
       )}
@@ -255,6 +261,12 @@ const TABS_CONTROLS: Control[] = [
     initial: 'horizontal',
   },
   { name: 'position', type: 'select', options: ['start', 'end'], initial: 'start' },
+  {
+    name: 'activationMode',
+    type: 'select',
+    options: ['automatic', 'manual'],
+    initial: 'automatic',
+  },
 ];
 
 export function TabsPlayground() {
@@ -294,8 +306,65 @@ export function TabsPlayground() {
             </Tabs.Root>
           </div>
           <p style={{ margin: 'var(--space-xs) 0 0', fontSize: 'var(--text-sm)' }}>
-            Drag the frame's bottom-right corner to narrow it.
+            Click a tab, then use the arrow keys: with <code>automatic</code> each arrow selects the
+            tab it reaches; with <code>manual</code> it only moves focus, and Enter or Space
+            selects. Drag the frame's bottom-right corner to narrow it.
           </p>
+        </div>
+      )}
+    />
+  );
+}
+
+const ACCORDION_CONTROLS: Control[] = [{ name: 'exclusive', type: 'boolean', initial: true }];
+
+export function AccordionPlayground() {
+  return (
+    <Playground
+      component="Accordion.Root"
+      controls={ACCORDION_CONTROLS}
+      children="<Accordion.Item /> …"
+      render={({ children: _snippet, ...props }: ComponentProps<typeof Accordion.Root>) => (
+        <div style={{ inlineSize: '28rem', maxInlineSize: '100%' }}>
+          <Accordion.Root {...props}>
+            {['Shipping', 'Returns', 'Warranty'].map((topic) => (
+              <Accordion.Item key={topic}>
+                <Accordion.Trigger>{topic}</Accordion.Trigger>
+                <Accordion.Panel>Everything about {topic.toLowerCase()}.</Accordion.Panel>
+              </Accordion.Item>
+            ))}
+          </Accordion.Root>
+          <p style={{ margin: 'var(--space-xs) 0 0', fontSize: 'var(--text-sm)' }}>
+            Open two items: with <code>exclusive</code> the first closes as the second opens;
+            without it, both stay open.
+          </p>
+        </div>
+      )}
+    />
+  );
+}
+
+const TOOLTIP_CONTROLS: Control[] = [
+  { name: 'side', type: 'select', options: ['top', 'right', 'bottom', 'left'], initial: 'top' },
+  { name: 'align', type: 'select', options: ['start', 'center', 'end'], initial: 'center' },
+];
+
+export function TooltipPlayground() {
+  return (
+    <Playground
+      component="Tooltip.Popup"
+      controls={TOOLTIP_CONTROLS}
+      children="Saves the draft"
+      render={({ children, ...props }: ComponentProps<typeof Tooltip.Popup>) => (
+        // Kept open, so the placement can be seen while the controls change. The padding
+        // leaves room on every side for it to sit without flipping. Remounted on each change:
+        // Chromium can keep an open popup's last fallback when its position-area changes, and a
+        // tooltip that opens with its placement — as one always does in an app — has none.
+        <div style={{ padding: 'var(--space-2xl) var(--space-3xl)' }}>
+          <Tooltip.Root open key={`${props.side}-${props.align}`}>
+            <Tooltip.Trigger render={<Button />}>Save</Tooltip.Trigger>
+            <Tooltip.Popup {...props}>{children}</Tooltip.Popup>
+          </Tooltip.Root>
         </div>
       )}
     />

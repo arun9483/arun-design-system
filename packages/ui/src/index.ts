@@ -55,7 +55,7 @@ export type { SpinnerProps } from './components/spinner';
 export { Skeleton } from './components/skeleton';
 export type { SkeletonProps } from './components/skeleton';
 export { Toast, useToastManager } from './components/toast';
-export type { ToastViewportProps } from './components/toast';
+export type { ToastViewportProps, ToastPosition } from './components/toast';
 export { Breadcrumb } from './components/breadcrumb';
 export type {
   BreadcrumbRootProps,

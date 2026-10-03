@@ -10,6 +10,25 @@ import PopoverEvents from '@/examples/popover-events';
 import PropTable from '@/components/PropTable.astro';
 import { Aside } from '@astrojs/starlight/components';
 
+## When to use
+
+- A filter panel or settings next to the button that opens them
+- Details about an item, with links or buttons inside
+- A small form that should not block the page
+
+Not for a plain text label — use a Tooltip — or a task that must be finished first — use a Dialog.
+
+**Choosing between messages and popups:**
+
+| Component                       | Use it for                                                                                         | For example                                       |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| [Dialog](/components/dialog/)   | Something that needs a decision or input before the user carries on; the page is blocked meanwhile | Confirm a delete, edit a record in a form         |
+| **Popover**                     | Extra content or controls next to a button, while the rest of the page stays usable                | Filter panel, share options, details card         |
+| [Menu](/components/menu/)       | A list of actions or settings opened from a button                                                 | "More actions ⋯", a View menu                     |
+| [Tooltip](/components/tooltip/) | A short text label on hover or focus; nothing in it can be clicked                                 | Name of an icon button, a keyboard shortcut       |
+| [Toast](/components/toast/)     | A brief confirmation after an action, which goes away by itself                                    | "Saved", "Archived — Undo"                        |
+| [Alert](/components/alert/)     | A message that stays in the page until the situation changes                                       | "Your trial ends in 3 days", a form error summary |
+
 `Popover` opens a panel next to the button that opened it. It is a native `popover`, so the
 platform supplies the top layer, closing on Esc or a click outside, the Tab order from the trigger
 into the panel, and focus returning to the trigger. CSS anchor positioning keeps it attached

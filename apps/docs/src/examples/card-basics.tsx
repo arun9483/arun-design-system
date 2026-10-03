@@ -1,26 +1,31 @@
 import { Card } from '@arun-dev/ui';
 
+const box = { padding: 'var(--space-sm)', borderRadius: 'var(--radius-lg)' };
+
 export default function CardBasics() {
   return (
     <>
-      <Card style={{ padding: 'var(--space-sm)', borderRadius: 'var(--radius-lg)' }}>
+      <Card style={box}>
         <p className="font-weight-semibold">Default</p>
-        <p className="text-size-sm text-color-secondary">Renders a div.</p>
+        <p className="text-size-sm text-color-secondary">
+          Stays still under the pointer: it isn&apos;t clickable.
+        </p>
       </Card>
 
-      <Card lift style={{ padding: 'var(--space-sm)', borderRadius: 'var(--radius-lg)' }}>
-        <p className="font-weight-semibold">lift</p>
-        <p className="text-size-sm text-color-secondary">Raises on hover.</p>
+      {/* A card that opens something: hover it to see it rise. */}
+      <Card lift render={<a href="#card" />} style={box}>
+        <p className="font-weight-semibold">lift — hover me</p>
+        <p className="text-size-sm text-color-secondary">
+          Rises with a deeper shadow, so it reads as clickable.
+        </p>
       </Card>
 
-      {/* Unrecognised props reach the DOM, so this is a labelled landmark. */}
-      <Card
-        as="nav"
-        aria-label="Example navigation"
-        style={{ padding: 'var(--space-sm)', borderRadius: 'var(--radius-lg)' }}
-      >
+      {/* `as` changes the element, not the look: this one is a labelled landmark. */}
+      <Card as="nav" aria-label="Example navigation" style={box}>
         <p className="font-weight-semibold">as=&quot;nav&quot;</p>
-        <p className="text-size-sm text-color-secondary">Keeps its aria-label.</p>
+        <p className="text-size-sm text-color-secondary">
+          Looks like Default. It is a &lt;nav&gt; landmark, which screen readers list.
+        </p>
       </Card>
     </>
   );

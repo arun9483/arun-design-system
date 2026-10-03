@@ -10,12 +10,11 @@
       transform var(--duration-fast) var(--ease-smooth);
   }
 
-  .card:hover {
-    box-shadow: var(--shadow-md);
-  }
-
-  /* Lifts the card upward on hover — use for interactive list cards */
+  /* Only a lift card answers the pointer: a card that is not clickable stays still, so it
+     doesn't look clickable. Lift raises it — a deeper shadow and a 2px rise — for cards that
+     open something. */
   .card-lift:hover {
-    transform: translateY(calc(-1 * var(--space-px)));
+    box-shadow: var(--shadow-md);
+    transform: translateY(calc(-1 * var(--space-2px)));
   }
 }

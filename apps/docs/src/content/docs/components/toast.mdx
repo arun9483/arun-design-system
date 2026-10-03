@@ -5,14 +5,34 @@ description: Brief messages that stack in a corner and go away on their own.
 
 import Example from '@/components/Example.astro';
 import ToastBasics from '@/examples/toast-basics';
+import ToastPositionExample from '@/examples/toast-position';
 import PropTable from '@/components/PropTable.astro';
+
+## When to use
+
+- Confirming an action: "Saved", "Message sent"
+- Offering a quick Undo after an action
+- Background events that need no decision: "Connection restored"
+
+Not for errors that need attention or information that must stay — use an Alert or a Dialog.
+
+**Choosing between messages and popups:**
+
+| Component                       | Use it for                                                                                         | For example                                       |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| [Dialog](/components/dialog/)   | Something that needs a decision or input before the user carries on; the page is blocked meanwhile | Confirm a delete, edit a record in a form         |
+| [Popover](/components/popover/) | Extra content or controls next to a button, while the rest of the page stays usable                | Filter panel, share options, details card         |
+| [Menu](/components/menu/)       | A list of actions or settings opened from a button                                                 | "More actions ⋯", a View menu                     |
+| [Tooltip](/components/tooltip/) | A short text label on hover or focus; nothing in it can be clicked                                 | Name of an icon button, a keyboard shortcut       |
+| **Toast**                       | A brief confirmation after an action, which goes away by itself                                    | "Saved", "Archived — Undo"                        |
+| [Alert](/components/alert/)     | A message that stays in the page until the situation changes                                       | "Your trial ends in 3 days", a form error summary |
 
 <Example name="toast-basics">
   <ToastBasics client:load />
 </Example>
 
-A toast is a brief message that stacks in the bottom corner and closes itself after a few
-seconds: "Saved", "Archived — Undo".
+A toast is a brief message that stacks at the edge of the window, the bottom right by default,
+and closes itself after a few seconds: "Saved", "Archived — Undo".
 
 ## Set up once
 
@@ -44,9 +64,33 @@ function SaveButton() {
 | `priority`    | `'low' \| 'high'`    | `high` is read out at once (`role="alert"`); `low`, when idle      |
 | `action`      | `{ label, onClick }` | a button on the toast, such as "Undo". It does not close the toast |
 | `onClose`     | `() => void`         | called once, however it closed                                     |
+| `position`    | `ToastPosition`      | where this toast shows, instead of the Viewport's `position`       |
 | `id`          | `string`             | reuse one to replace a toast                                       |
 
 `add` returns the id. Pass it to `update` to change the text when work finishes, or to `close`.
+
+## Position
+
+Toasts show at the bottom right by default. Set `position` on the Viewport to change it for every
+toast, and pass `position` to `add` to send one toast somewhere else:
+
+```tsx
+<Toast.Viewport position="top-center" />;
+
+toast.add({ title: 'Link copied', position: 'bottom-left' });
+```
+
+The six positions are `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center` and
+`bottom-right`. Toasts at the top slide down as they arrive, and toasts at the bottom slide up.
+A toast with its own position joins a stack at that position, which is still part of the same
+toast area, so pausing, Esc and screen-reader announcements work the same.
+
+<Example name="toast-position">
+  <ToastPositionExample client:load />
+</Example>
+
+Choose a default for all toasts in the menu, then show one at the default and one at
+`bottom-left`, which overrides it.
 
 ## Behaviour
 

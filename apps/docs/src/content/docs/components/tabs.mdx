@@ -9,6 +9,33 @@ import TabsVertical from '@/examples/tabs-vertical';
 import PropTable from '@/components/PropTable.astro';
 import { TabsPlayground } from '@/components/playgrounds';
 
+## When to use
+
+- Settings split into Account, Billing and Security
+- Views of one item: Overview, Activity, Files
+- Content where people look at one part at a time
+
+Not when people need to compare panels — show them together — or for steps that must be done in order.
+
+**Choosing between organising content:**
+
+| Component                           | Use it for                                                                    | For example                           |
+| ----------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------- |
+| [Accordion](/components/accordion/) | Sections stacked on one page, of which people read one or a few               | FAQ, settings groups, order details   |
+| **Tabs**                            | Views of the same thing at the same level, one at a time                      | Account / Billing / Security          |
+| [Card](/components/card/)           | A self-contained group of content, shown as one unit, often in a grid or list | A product tile, a project summary     |
+| [Table](/components/table/)         | Rows of records compared across the same columns                              | Invoices, users, order lines          |
+| [Separator](/components/separator/) | A line that divides sections, with no content of its own                      | Between menu groups or toolbar groups |
+
+**Choosing between moving around:**
+
+| Component                             | Use it for                                                   | For example                    |
+| ------------------------------------- | ------------------------------------------------------------ | ------------------------------ |
+| [Breadcrumb](/components/breadcrumb/) | Showing where the page sits in a hierarchy, with links up it | Home / Projects / Website      |
+| [Pagination](/components/pagination/) | Moving between pages of one long list                        | Search results, page 3 of 12   |
+| **Tabs**                              | Switching between views within one page                      | Overview / Activity / Settings |
+| [Link](/components/link/)             | One destination                                              | "Read the docs"                |
+
 `Tabs` shows one panel of content at a time, chosen from a list of tabs. It follows the
 [WAI-ARIA tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/): the whole list is a
 single Tab stop, and the arrow keys move between tabs.

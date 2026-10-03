@@ -19,9 +19,16 @@
     overscroll-behavior: contain;
   }
 
+  /* Only `display` waits for :popover-open — the UA hides a closed popover with it. The
+     direction stays on the base rule: while the close fades out, display is held at flex
+     but :popover-open no longer matches, and a direction set there would drop items into a
+     row for the length of the fade. */
+  .menu {
+    flex-direction: column;
+  }
+
   .menu:popover-open {
     display: flex;
-    flex-direction: column;
   }
 
   .menu:is([data-side='top'], [data-side='bottom']) {

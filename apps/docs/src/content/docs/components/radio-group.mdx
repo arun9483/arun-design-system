@@ -11,9 +11,23 @@ import PropTable from '@/components/PropTable.astro';
 import { RadioGroupPlayground } from '@/components/playgrounds';
 import { Aside } from '@astrojs/starlight/components';
 
-A radio group picks exactly one option from a small set, read on submit. Use a
-[checkbox](/components/checkbox/) when several can be chosen at once, and a
-[switch](/components/switch/) for a single setting that takes effect immediately.
+## When to use
+
+- Two to about five options people should see all at once
+- Choices that are easier to compare side by side: delivery speed, plan
+- A required choice in a form, with nothing chosen at first
+
+Not for a long list — use a Select — or an on/off choice — use a Checkbox or a Switch.
+
+**Choosing between choosing one option or a value:**
+
+| Component                          | Use it for                                                                          | For example                               |
+| ---------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------- |
+| **RadioGroup**                     | Up to about five options, all visible at once, as a form value                      | Shipping speed, plan size                 |
+| [Select](/components/select/)      | One option from a longer list, in little space, with the system picker              | Country, time zone, sort order in a form  |
+| [Combobox](/components/combobox/)  | A long list people search by typing, several picks, or options loaded from a server | Assign reviewers, search a city, add tags |
+| [ToggleGroup](/components/toggle/) | A few options shown as buttons that apply at once, not a form field                 | Text alignment, list or grid view         |
+| [Slider](/components/slider/)      | A number in a range, where dragging is easier than typing an exact value            | Volume, brightness, price range           |
 
 <Example name="radio-group-basics" layout="stack">
   <RadioGroupBasics client:load />

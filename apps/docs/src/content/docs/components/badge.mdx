@@ -9,6 +9,22 @@ import BadgeDomainMapping from '@/examples/badge-domain-mapping';
 import PropTable from '@/components/PropTable.astro';
 import { BadgePlayground } from '@/components/playgrounds';
 
+## When to use
+
+- The status of an item in a list or table: "Paid", "Overdue"
+- A category or stage: "Beta", "New"
+- A count next to a label
+
+Not for something people click or remove — use a Chip or a Button.
+
+**Choosing between small labels:**
+
+| Component                 | Use it for                                         | For example                          |
+| ------------------------- | -------------------------------------------------- | ------------------------------------ |
+| **Badge**                 | The status or category of something, at a glance   | "Paid", "Overdue", "Beta"            |
+| [Chip](/components/chip/) | Tags, filters and metadata, often several in a row | "React", "Remote", an applied filter |
+| [Kbd](/components/kbd/)   | A key on the keyboard, in text or a tooltip        | Press ⌘ K to search                  |
+
 <Example name="badge-tones">
   <BadgeTones client:load />
 </Example>

@@ -7,6 +7,26 @@ import Example from '@/components/Example.astro';
 import TooltipToolbar from '@/examples/tooltip-toolbar';
 import PropTable from '@/components/PropTable.astro';
 import { Aside } from '@astrojs/starlight/components';
+import { TooltipPlayground } from '@/components/playgrounds';
+
+## When to use
+
+- The name of an icon-only button
+- A keyboard shortcut for a button
+- A short hint about a control
+
+Not for anything clickable or long — use a Popover — or essential information that touch users must see.
+
+**Choosing between messages and popups:**
+
+| Component                       | Use it for                                                                                         | For example                                       |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| [Dialog](/components/dialog/)   | Something that needs a decision or input before the user carries on; the page is blocked meanwhile | Confirm a delete, edit a record in a form         |
+| [Popover](/components/popover/) | Extra content or controls next to a button, while the rest of the page stays usable                | Filter panel, share options, details card         |
+| [Menu](/components/menu/)       | A list of actions or settings opened from a button                                                 | "More actions ⋯", a View menu                     |
+| **Tooltip**                     | A short text label on hover or focus; nothing in it can be clicked                                 | Name of an icon button, a keyboard shortcut       |
+| [Toast](/components/toast/)     | A brief confirmation after an action, which goes away by itself                                    | "Saved", "Archived — Undo"                        |
+| [Alert](/components/alert/)     | A message that stays in the page until the situation changes                                       | "Your trial ends in 3 days", a form error summary |
 
 `Tooltip` shows a short label next to an element while it is hovered or has keyboard focus — a
 button's shortcut, or the name of an icon. It is anchored like [Popover](/components/popover/),
@@ -82,6 +102,13 @@ renders nothing, so it has only `onOpenChange`.
 `Tooltip.Popup` also takes the popover events, `onBeforeToggle` and `onToggle`, which fire on each
 open and close with `event.newState` set to `'open'` or `'closed'`. Stopping an open in
 `onBeforeToggle` keeps the tooltip hidden, and `onOpenChange(false)` reports it.
+
+## Placement
+
+`side` picks the side of the trigger, and `align` where along it: flush with its start or
+end edge, or centred. With no room on the chosen side, it flips to the opposite one.
+
+<TooltipPlayground client:load />
 
 ## Props
 

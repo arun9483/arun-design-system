@@ -12,7 +12,20 @@ import PropTable from '@/components/PropTable.astro';
 import { SwitchPlayground } from '@/components/playgrounds';
 import { Aside } from '@astrojs/starlight/components';
 
-A switch takes effect immediately. Use a checkbox instead when the change applies on submit.
+## When to use
+
+- Settings that apply immediately: dark mode, notifications
+- Turning a feature on or off in a settings list
+
+Not in a form that is submitted — use a Checkbox, since a switch suggests the change already happened.
+
+**Choosing between Checkbox, Switch or Toggle:**
+
+| Component                         | Use it for                                                                                      | For example                                |
+| --------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| [Checkbox](/components/checkbox/) | A yes/no choice, or one of several independent options, that applies when the form is submitted | "I agree to the terms", "Email me updates" |
+| **Switch**                        | A setting that takes effect the moment it is flipped, with no Save button                       | "Dark mode", "Wi-Fi", "Notifications on"   |
+| [Toggle](/components/toggle/)     | A button that stays pressed, usually in a toolbar, for a mode or formatting                     | "Bold", "Mute", "Pin"                      |
 
 <Example name="switch-basics" layout="stack">
   <SwitchBasics client:load />

@@ -7,6 +7,23 @@ import Example from '@/components/Example.astro';
 import SpinnerBasics from '@/examples/spinner-basics';
 import PropTable from '@/components/PropTable.astro';
 
+## When to use
+
+- A button busy saving: "Saving…"
+- A small area refreshing
+- Short waits with no known end
+
+Not for a task with a known total — use a Progress — or loading a whole layout — use a Skeleton.
+
+**Choosing between showing progress, loading or a measurement:**
+
+| Component                         | Use it for                                                              | For example                                   |
+| --------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------- |
+| [Progress](/components/progress/) | A task whose completion is known, moving toward done                    | Upload at 40%, step 2 of 5                    |
+| [Meter](/components/meter/)       | A measurement within a known range, not a task                          | Disk usage, password strength, a score        |
+| **Spinner**                       | Work of unknown length, in a small space                                | A button saying "Saving…", a panel refreshing |
+| [Skeleton](/components/skeleton/) | Content still loading whose shape is known, so the layout does not jump | Placeholder rows in a list, a profile card    |
+
 <Example name="spinner-basics">
   <SpinnerBasics client:load />
 </Example>

@@ -2,13 +2,17 @@ import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 import { rehypeBaseUrl } from './plugins/rehype-base-url.mjs';
+import { rehypeFocusableTables } from './plugins/rehype-focusable-tables.mjs';
 
 export default defineConfig({
   site: 'https://arun9483.github.io',
   base: process.env.DOCS_BASE ?? '/',
   // Links written by hand in content are not base-aware on their own. The MDX
   // integration extends this markdown config, so one plugin covers .md and .mdx alike.
-  markdown: { rehypePlugins: [[rehypeBaseUrl, { base: process.env.DOCS_BASE ?? '/' }]] },
+  // Tables get a Tab stop: Starlight makes each one a scroll box, which the keyboard must reach.
+  markdown: {
+    rehypePlugins: [[rehypeBaseUrl, { base: process.env.DOCS_BASE ?? '/' }], rehypeFocusableTables],
+  },
   integrations: [
     starlight({
       title: 'arun-design-system',

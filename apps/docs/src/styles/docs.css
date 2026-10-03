@@ -83,8 +83,14 @@
   gap: 0.4rem;
 }
 
-/* Prop tables */
+/* Prop tables. The wrapper scrolls, not the table: Starlight makes every content table its own
+   scroll box, which nothing could focus. The wrapper carries the Tab stop and the name. */
+.ds-props {
+  overflow-x: auto;
+}
+
 .ds-props table {
+  display: table;
   width: 100%;
   table-layout: auto;
 }
@@ -173,4 +179,14 @@
 .ds-icon-thumb {
   color: var(--switch-track-bg-checked);
   padding: 0;
+}
+
+/* The Tab stops on scroll boxes — prop tables, code blocks, content tables, diagrams — need a
+   visible ring when reached by keyboard. */
+.ds-props:focus-visible,
+.expressive-code pre:focus-visible,
+.sl-markdown-content table:focus-visible,
+.ds-diagram pre:focus-visible {
+  outline: 2px solid var(--sl-color-text-accent);
+  outline-offset: 2px;
 }

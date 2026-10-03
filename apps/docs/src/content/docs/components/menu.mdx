@@ -9,6 +9,25 @@ import MenuViewOptions from '@/examples/menu-view-options';
 import MenuSubmenus from '@/examples/menu-submenus';
 import PropTable from '@/components/PropTable.astro';
 
+## When to use
+
+- A "More actions ⋯" button on a row or a card
+- An app-style menu: File, Edit, View — with submenus
+- Settings that toggle or pick one of several, such as a View menu
+
+Not to pick a value for a form — use a Select or a Combobox, which submit with the form.
+
+**Choosing between messages and popups:**
+
+| Component                       | Use it for                                                                                         | For example                                       |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| [Dialog](/components/dialog/)   | Something that needs a decision or input before the user carries on; the page is blocked meanwhile | Confirm a delete, edit a record in a form         |
+| [Popover](/components/popover/) | Extra content or controls next to a button, while the rest of the page stays usable                | Filter panel, share options, details card         |
+| **Menu**                        | A list of actions or settings opened from a button                                                 | "More actions ⋯", a View menu                     |
+| [Tooltip](/components/tooltip/) | A short text label on hover or focus; nothing in it can be clicked                                 | Name of an icon button, a keyboard shortcut       |
+| [Toast](/components/toast/)     | A brief confirmation after an action, which goes away by itself                                    | "Saved", "Archived — Undo"                        |
+| [Alert](/components/alert/)     | A message that stays in the page until the situation changes                                       | "Your trial ends in 3 days", a form error summary |
+
 `Menu` opens a list of actions next to the button that opened it. It follows the
 [WAI-ARIA menu button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/), and is a
 native `popover` anchored like [Popover](/components/popover/): Esc, a click outside and focus

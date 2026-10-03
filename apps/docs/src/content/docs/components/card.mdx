@@ -8,9 +8,40 @@ import CardBasics from '@/examples/card-basics';
 import PropTable from '@/components/PropTable.astro';
 import { CardPlayground } from '@/components/playgrounds';
 
+## When to use
+
+- A grid or list of items, each a unit: products, projects, articles
+- A clickable tile that opens something — with `lift`
+- A panel that groups related content on a page
+
+Not for rows of data compared across columns — use a Table.
+
+**Choosing between organising content:**
+
+| Component                           | Use it for                                                                    | For example                           |
+| ----------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------- |
+| [Accordion](/components/accordion/) | Sections stacked on one page, of which people read one or a few               | FAQ, settings groups, order details   |
+| [Tabs](/components/tabs/)           | Views of the same thing at the same level, one at a time                      | Account / Billing / Security          |
+| **Card**                            | A self-contained group of content, shown as one unit, often in a grid or list | A product tile, a project summary     |
+| [Table](/components/table/)         | Rows of records compared across the same columns                              | Invoices, users, order lines          |
+| [Separator](/components/separator/) | A line that divides sections, with no content of its own                      | Between menu groups or toolbar groups |
+
 <Example name="card-basics" layout="stack">
   <CardBasics client:load />
 </Example>
+
+Two props change a card, in different ways:
+
+| Prop   | Changes             | What you see                            | Use it for                                    |
+| ------ | ------------------- | --------------------------------------- | --------------------------------------------- |
+| none   | —                   | a still surface; hovering does nothing  | content that isn't clickable                  |
+| `lift` | how it looks        | rises 2px with a deeper shadow on hover | a card that opens something: a link, a button |
+| `as`   | which element it is | nothing — it looks like the default     | meaning: `nav`, `article`, `section`, `aside` |
+
+`as` is for screen readers and the page's outline, not for looks: `as="nav"` makes the card a
+navigation landmark that assistive technology lists, and `as="article"` marks it as a
+self-contained item. A card that is a link renders one with `render={<a href="…" />}`, as the
+example's `lift` card does.
 
 ## Playground
 

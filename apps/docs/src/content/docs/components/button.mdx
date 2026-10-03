@@ -8,6 +8,30 @@ import ButtonVariants from '@/examples/button-variants';
 import PropTable from '@/components/PropTable.astro';
 import { ButtonPlayground } from '@/components/playgrounds';
 
+## When to use
+
+- Submitting a form, saving or deleting
+- Opening a Dialog, a Menu or a Popover
+- Any action that changes something on this page
+
+Not to go to another page — use a Link, so it can be opened in a new tab and is announced as a link.
+
+**Choosing between actions and navigation:**
+
+| Component                     | Use it for                                                  | For example                     |
+| ----------------------------- | ----------------------------------------------------------- | ------------------------------- |
+| **Button**                    | Does something on this page: saves, deletes, opens a dialog | "Save", "Delete", "Add to cart" |
+| [Link](/components/link/)     | Goes somewhere: another page, a section, a file             | "View invoice", "Read the docs" |
+| [Toggle](/components/toggle/) | Turns a state on or off and stays pressed                   | "Bold", "Mute"                  |
+
+**Choosing between rows of controls:**
+
+| Component                          | Use it for                                                                         | For example                               |
+| ---------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------- |
+| [Toolbar](/components/toolbar/)    | Several controls acting on one thing, reached with one Tab stop and the arrow keys | An editor’s formatting bar                |
+| [ToggleGroup](/components/toggle/) | A set of Toggles sharing one value                                                 | Text alignment, bold / italic / underline |
+| **Buttons in a row**               | A few independent actions, each its own Tab stop                                   | Cancel / Save at the end of a form        |
+
 <Example name="button-variants">
   <ButtonVariants client:load />
 </Example>

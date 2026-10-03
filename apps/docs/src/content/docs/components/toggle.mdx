@@ -7,12 +7,41 @@ import Example from '@/components/Example.astro';
 import ToggleBasics from '@/examples/toggle-basics';
 import PropTable from '@/components/PropTable.astro';
 
+## When to use
+
+- A formatting button in an editor: Bold, Italic
+- A mode that stays on: Mute, Pin
+- A group of options that apply at once: alignment, list or grid view — with ToggleGroup
+
+Not for a setting in a form or a settings list — use a Checkbox or a Switch.
+
+**Choosing between rows of controls:**
+
+| Component                               | Use it for                                                                         | For example                               |
+| --------------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------- |
+| [Toolbar](/components/toolbar/)         | Several controls acting on one thing, reached with one Tab stop and the arrow keys | An editor’s formatting bar                |
+| **ToggleGroup**                         | A set of Toggles sharing one value                                                 | Text alignment, bold / italic / underline |
+| [Buttons in a row](/components/button/) | A few independent actions, each its own Tab stop                                   | Cancel / Save at the end of a form        |
+
+**Choosing between Checkbox, Switch or Toggle:**
+
+| Component                         | Use it for                                                                                      | For example                                |
+| --------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| [Checkbox](/components/checkbox/) | A yes/no choice, or one of several independent options, that applies when the form is submitted | "I agree to the terms", "Email me updates" |
+| [Switch](/components/switch/)     | A setting that takes effect the moment it is flipped, with no Save button                       | "Dark mode", "Wi-Fi", "Notifications on"   |
+| **Toggle**                        | A button that stays pressed, usually in a toolbar, for a mode or formatting                     | "Bold", "Mute", "Pin"                      |
+
 <Example name="toggle-basics">
   <ToggleBasics client:load />
 </Example>
 
 `Toggle` is a `<button aria-pressed>`: a button that stays pressed, such as Mute or Bold. Screen
 readers say "pressed" or "not pressed".
+
+To show the state in the content too, as the bell does, control the Toggle with `pressed` and
+`onPressedChange` and pick the icon from the same state. Keep the name the same in both states
+("Mute notifications"): `aria-pressed` already says whether it's on, and a name that changed to
+"Unmute" would describe the opposite action.
 
 ## ToggleGroup
 

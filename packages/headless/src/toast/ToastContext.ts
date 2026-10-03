@@ -15,6 +15,11 @@ export type ToastOptions<Data = unknown> = {
   /** Milliseconds before it closes on its own. `0` keeps it until closed. Defaults to the Provider's. */
   timeout?: number;
   priority?: ToastPriority;
+  /**
+   * Where this toast shows, for the ui's default rendering, overriding its Viewport's
+   * `position`. Headless keeps it and does nothing with it: your own layout places toasts.
+   */
+  position?: string;
   /** A button on the toast, for the ui's default rendering. The headless `Action` part is yours to place. */
   action?: { label: ReactNode; onClick: () => void };
   /** Called once it closes, however it closed. */
