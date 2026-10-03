@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import type { UnknownProps } from '../core/mergeProps';
 import { useRender } from '../core/useRender';
-import { useOtpInputRootContext } from './OtpInputRootContext';
+import { GAP, useOtpInputRootContext } from './OtpInputRootContext';
 
 type OtpInputSlotOwnProps = {
   /** Which character of the code this slot shows, from 0. */
@@ -26,7 +26,8 @@ export type OtpInputSlotProps = OtpInputSlotOwnProps &
  */
 export function OtpInputSlot({ index, className, children, render, ...rest }: OtpInputSlotProps) {
   const { value, length, disabled, selection, registerSlot } = useOtpInputRootContext('Slot');
-  const char = value.charAt(index);
+  // A gap is a box emptied in place: shown empty, like a box past the end of the code.
+  const char = value.charAt(index) === GAP ? '' : value.charAt(index);
 
   let active = false;
   if (selection) {

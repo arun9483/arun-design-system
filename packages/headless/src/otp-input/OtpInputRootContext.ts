@@ -37,14 +37,35 @@ export function useOtpInputRootContext(part: string): OtpInputRootContextValue {
   return context;
 }
 
+/**
+ * A box emptied in place: Delete or Backspace on a character before the end leaves a space,
+ * so the characters after it keep their boxes. The `pattern` rejects it, so a code with a gap
+ * is invalid until the box is filled again.
+ */
+export const GAP = ' ';
+
 /** Keeps only the characters `validationType` allows, so pasted "123 456" becomes "123456". */
 export function sanitize(text: string, validationType: OtpInputValidationType): string {
   return validationType === 'numeric' ? text.replace(/\D/g, '') : text.replace(/[^A-Za-z0-9]/g, '');
 }
 
+/**
+ * What the Root stores: allowed characters and gaps, at most `length`, with no gap at the end —
+ * an empty last box is simply a shorter code.
+ */
+export function normalize(text: string, validationType: OtpInputValidationType, length: number) {
+  const allowed = validationType === 'numeric' ? /[^\d ]/g : /[^A-Za-z0-9 ]/g;
+  return text.replace(allowed, '').slice(0, length).trimEnd();
+}
+
+/** Every box holds a character: `length` of them, and no gap. */
+export function isComplete(value: string, length: number): boolean {
+  return value.length === length && !value.includes(GAP);
+}
+
 export function otpInputDataAttributes({ value, length, disabled }: OtpInputState) {
   return {
-    'data-complete': value.length === length ? '' : undefined,
+    'data-complete': isComplete(value, length) ? '' : undefined,
     'data-disabled': disabled ? '' : undefined,
   };
 }

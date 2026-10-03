@@ -1120,12 +1120,22 @@ mapped to the box under the pointer from the boxes' geometry at the press, as
 `core/pointerIntent` does — measured, never stored as state. The input is drawn over the boxes,
 transparent, so presses land on it: a long press still opens the phone's paste menu.
 
+**Deleting empties a box in place.** Boxes read as separate fields, so Delete or Backspace on
+a character before the end leaves a gap rather than shifting the rest left: delete the 4 in
+`123456` and the value is `"123 56"`, with the caret still on the empty box. The gap is a space,
+stored in the value, so the input stays the one source of truth and the `pattern` rejects it by
+itself — no custom validation. A gap at the end is dropped, so the last box emptied is just a
+shorter code. Backspace on an empty box moves back and empties the one before. Deletion is read
+from the platform's `beforeinput`, not `keydown`, because a phone keyboard often sends no
+Backspace key. The cost would land on consumers — a complete code is a pattern, `/^\d{6}$/`,
+not `value.length === length` — so the Root reports it: `onComplete` fires after any change
+that leaves every slot filled, the same test as `data-complete`.
+
 **Native validation stays on.** The Input carries `maxLength` and a `pattern` of exactly
 `length` allowed characters, so with `required` the browser blocks a short code and
 `:invalid` matches it. Paste is handled by the component, because `maxLength` would cut
-"123 456" to "123 45" before the spaces could be dropped.
+"123 456" to "123 45" before the spaces could be dropped. Pasted and typed spaces are dropped;
+only a deletion makes a gap.
 
 **Rules out:** one input per box; a hidden input beside the boxes for the form (the Input is the
-form field); validation of the code itself, which is the server's; an `onComplete` callback —
-`onValueChange` with `value.length === length` is the same thing, and adding one later is not a
-breaking change.
+form field); validation of the code itself, which is the server's.

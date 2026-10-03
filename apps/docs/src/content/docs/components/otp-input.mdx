@@ -40,9 +40,11 @@ one input, so none of them needs special handling.
   <OtpInputVerify client:load />
 </Example>
 
-Checking the code is your server's job; the component only collects it. `onValueChange` fires
-on every change, so check `value.length === length` to verify as soon as the last character
-lands.
+Checking the code is your server's job; the component only collects it. `onComplete` fires
+with the code whenever a change leaves every box filled — the last digit typed, a whole code
+pasted, or an emptied box filled again — so pass your check to it to verify with nothing more to
+press. To test a value yourself, use a pattern such as `/^\d{6}$/`, not `value.length === 6`: a
+box emptied in the middle is a space in the value, so `"123 56"` has six characters too.
 
 ## Typing and pasting
 
@@ -51,10 +53,17 @@ lands.
 | Type a character     | Fills the active box and moves to the next. A full code replaces the last box.        |
 | Type something else  | Ignored: letters in a numeric code, symbols in an alphanumeric one.                   |
 | Paste a whole code   | Replaces the code, with spaces and dashes dropped: "123 456" and "123-456" both work. |
-| Paste part of a code | Goes in at the caret.                                                                 |
+| Paste part of a code | Fills boxes from the caret on, over what they held.                                   |
 | Left / Right         | Move one box.                                                                         |
-| Backspace / Delete   | The platform's: remove the character before the caret, or the one in the active box.  |
+| Delete               | Empties the active box. The boxes after it keep their digits, and the caret stays.    |
+| Backspace            | Empties the active box too. On an empty box, moves back and empties the one before.   |
 | Press a box          | Moves the caret there, or to the first empty box if the code has not reached it yet.  |
+
+Deleting never shifts the other digits: delete the 4 in `123456` and the boxes read
+`1 2 3 _ 5 6`, with the caret still on the empty box, so typing 8 gives `123856`. Until it is
+filled the code is incomplete: the value reports the empty box as a space, `"123 56"`, which the
+input's `pattern` rejects. An empty box at the end is simply a shorter code, so deleting the
+last digit of `123456` gives `"12345"`.
 
 Focus puts the caret on the first empty box, not over the whole code, so the next key never
 wipes what is there.
@@ -80,7 +89,7 @@ on the `<input>`: `id`, `name`, `required`, `autoFocus`, `aria-*` and `ref`. So 
 <Controller
   control={control}
   name="code"
-  rules={{ validate: (code) => code.length === 6 || 'Enter all 6 digits' }}
+  rules={{ pattern: { value: /^\d{6}$/, message: 'Enter all 6 digits' } }}
   render={({ field, fieldState }) => (
     <OtpInput
       aria-label="Verification code"

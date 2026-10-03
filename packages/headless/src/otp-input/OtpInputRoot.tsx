@@ -5,8 +5,9 @@ import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
 import {
   OtpInputRootContext,
+  isComplete,
+  normalize,
   otpInputDataAttributes,
-  sanitize,
   type OtpInputSelection,
   type OtpInputValidationType,
 } from './OtpInputRootContext';
@@ -21,8 +22,18 @@ type OtpInputRootOwnProps = {
   value?: string;
   /** Initial value when uncontrolled. Read once, at mount. */
   defaultValue?: string;
-  /** Called with the code after every change, partial or complete. */
+  /**
+   * Called with the code after every change, partial or complete. A box emptied before the end
+   * is a space — `"123 56"` — so check completeness with a pattern such as `/^\d{6}$/`, not
+   * the length alone.
+   */
   onValueChange?: (value: string) => void;
+  /**
+   * Called with the code after a change that leaves it complete: every slot filled, no gap.
+   * Typing the last digit, pasting a whole code and filling an emptied slot all count; a change
+   * that leaves a slot empty does not. Use it to verify as soon as the code is in.
+   */
+  onComplete?: (value: string) => void;
   /** How many characters the code has, and so how many slots it shows. Defaults to 6. */
   length?: number;
   /**
@@ -56,6 +67,7 @@ export function OtpInputRoot({
   value: valueProp,
   defaultValue,
   onValueChange,
+  onComplete,
   length = 6,
   validationType = 'numeric',
   disabled = false,
@@ -72,15 +84,16 @@ export function OtpInputRoot({
   });
 
   // Every change goes through here, so the value is always clean and never longer than
-  // `length`, whatever the input or a parent hands it.
+  // `length`, whatever the input or a parent hands it. Gaps — boxes emptied in place — stay.
   const commit = useCallback(
     (next: string) => {
-      const clean = sanitize(next, validationType).slice(0, length);
+      const clean = normalize(next, validationType, length);
       if (clean === value) return;
       setValue(clean);
       onValueChange?.(clean);
+      if (isComplete(clean, length)) onComplete?.(clean);
     },
-    [validationType, length, value, setValue, onValueChange],
+    [validationType, length, value, setValue, onValueChange, onComplete],
   );
 
   const [selection, setSelection] = useState<OtpInputSelection | null>(null);
