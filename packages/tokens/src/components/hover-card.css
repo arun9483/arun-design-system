@@ -1,0 +1,15 @@
+/* HoverCard component tokens — the card that previews a link on hover or focus.
+   Override any of these to restyle hover cards without moving other components. */
+:root {
+  --hover-card-offset: var(--space-2xs);
+  --hover-card-width: 20rem;
+  --hover-card-padding: var(--space-sm);
+  --hover-card-radius: var(--radius-md);
+  --hover-card-bg: var(--color-bg-primary);
+  --hover-card-color: var(--color-text-primary);
+  --hover-card-border-width: var(--space-px);
+  --hover-card-border-color: var(--color-border-default);
+  --hover-card-shadow: var(--shadow-lg);
+  --hover-card-font-size: var(--text-sm);
+  --hover-card-duration: var(--duration-fast);
+}

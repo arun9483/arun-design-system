@@ -11,6 +11,8 @@ import {
   Checkbox,
   Chip,
   Drawer,
+  HoverCard,
+  Link,
   Input,
   RadioGroup,
   Select,
@@ -443,6 +445,29 @@ export function DrawerPlayground() {
           <Drawer.Trigger render={<Button />}>Open from the {String(props.side)}</Drawer.Trigger>
           <Drawer.Popup {...props} aria-label="Playground drawer" />
         </Drawer.Root>
+      )}
+    />
+  );
+}
+
+const HOVER_CARD_CONTROLS: Control[] = [
+  { name: 'side', type: 'select', options: ['bottom', 'top', 'left', 'right'], initial: 'bottom' },
+  { name: 'align', type: 'select', options: ['center', 'start', 'end'], initial: 'center' },
+];
+
+export function HoverCardPlayground() {
+  return (
+    <Playground
+      component="HoverCard.Popup"
+      controls={HOVER_CARD_CONTROLS}
+      children="Card content"
+      render={(props: ComponentProps<typeof HoverCard.Popup>) => (
+        <HoverCard.Root>
+          <HoverCard.Trigger render={<Link href="#playground" />}>
+            Hover or focus me
+          </HoverCard.Trigger>
+          <HoverCard.Popup {...props} />
+        </HoverCard.Root>
       )}
     />
   );

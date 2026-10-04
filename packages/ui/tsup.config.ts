@@ -31,6 +31,7 @@ const CSS_LAYERS = [
   { layer: 'menu', src: 'src/components/menu/menu.css' },
   { layer: 'combobox', src: 'src/components/combobox/combobox.css' },
   { layer: 'tooltip', src: 'src/components/tooltip/tooltip.css' },
+  { layer: 'hover-card', src: 'src/components/hover-card/hover-card.css' },
   { layer: 'tabs', src: 'src/components/tabs/tabs.css' },
   { layer: 'checkbox', src: 'src/components/checkbox/checkbox.css' },
   { layer: 'radio-group', src: 'src/components/radio-group/radio-group.css' },

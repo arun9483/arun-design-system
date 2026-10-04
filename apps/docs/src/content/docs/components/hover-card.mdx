@@ -1,0 +1,102 @@
+---
+title: HoverCard
+description: A preview of where a link goes, shown on hover or keyboard focus — never the only way to reach what's in it.
+---
+
+import Example from '@/components/Example.astro';
+import HoverCardBasics from '@/examples/hover-card-basics';
+import PropTable from '@/components/PropTable.astro';
+import { HoverCardPlayground } from '@/components/playgrounds';
+
+## When to use
+
+- A profile behind an @mention or an author's name
+- A summary of a linked repository, issue or document, before following the link
+
+Not for anything people need: a hover card never opens on touch, so on a phone it doesn't
+exist. Put essential content on the page, or in a [Popover](/components/popover/) opened by a
+press.
+
+**Choosing between messages and popups:**
+
+| Component                       | Use it for                                                                                         | For example                                          |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [Dialog](/components/dialog/)   | Something that needs a decision or input before the user carries on; the page is blocked meanwhile | Confirm a delete, edit a record in a form            |
+| [Drawer](/components/drawer/)   | A panel that slides in from an edge and blocks the page; the first choice on a phone               | Share options, a mobile nav, a filter panel          |
+| [Popover](/components/popover/) | Extra content or controls next to a button, while the rest of the page stays usable                | Filter panel, share options, details card            |
+| [Menu](/components/menu/)       | A list of actions or settings opened from a button                                                 | "More actions ⋯", a View menu                        |
+| [Tooltip](/components/tooltip/) | A short text label on hover or focus; nothing in it can be clicked                                 | Name of an icon button, a keyboard shortcut          |
+| **HoverCard**                   | A preview of where a link goes, on hover or focus; nothing essential in it                         | A profile behind an @mention, a repository's summary |
+| [Toast](/components/toast/)     | A brief confirmation after an action, which goes away by itself                                    | "Saved", "Archived — Undo"                           |
+| [Alert](/components/alert/)     | A message that stays in the page until the situation changes                                       | "Your trial ends in 3 days", a form error summary    |
+
+<Example name="hover-card-basics">
+  <HoverCardBasics client:load />
+</Example>
+
+## Anatomy
+
+```tsx
+import { HoverCard, Link } from '@arun-dev/ui';
+
+<HoverCard.Root>
+  <HoverCard.Trigger render={<Link href="/ada" />}>@ada</HoverCard.Trigger>
+  <HoverCard.Popup />
+</HoverCard.Root>;
+```
+
+| Part      | Renders                  | Does                                             |
+| --------- | ------------------------ | ------------------------------------------------ |
+| `Root`    | nothing                  | holds `open`, and the hover timers               |
+| `Trigger` | `<a>`                    | the link it previews; the card is anchored to it |
+| `Popup`   | `<div popover="manual">` | the card                                         |
+
+`Trigger` is an unstyled link: render a [Link](/components/link/) to style it, or your
+router's link.
+
+## Opening and closing
+
+| Input    | Opens                                         | Closes                                                        |
+| -------- | --------------------------------------------- | ------------------------------------------------------------- |
+| Mouse    | after resting on the link for `delay` (600ms) | `closeDelay` (300ms) after leaving both the link and the card |
+| Keyboard | at once, on focus                             | when focus leaves both the link and the card, or on Esc       |
+| Touch    | never: a tap follows the link                 | —                                                             |
+
+- The pointer can move from the link onto the card: it stays open while either is hovered.
+- After the link, **Tab moves into the card**, wherever the card is in the page, and on through
+  its links. Esc closes it and puts focus back on the link.
+- Pressing the link closes the card, since following the link is what you came to do.
+- It doesn't close an open Popover or Dialog, and Esc closes only the card.
+
+## Playground
+
+<HoverCardPlayground client:load />
+
+## Accessibility
+
+- The link must make sense without the card. The card adds detail; it doesn't replace the
+  link's text.
+- Nothing in it may be the only way to do something: a touch user never sees it.
+- It has no role, so it isn't announced as a dialog. Screen reader users reach its content by
+  tabbing on from the link.
+
+## Props
+
+### `HoverCard.Root`
+
+<PropTable component="HoverCard.Root" common={false} />
+
+### `HoverCard.Popup`
+
+<PropTable component="HoverCard.Popup" />
+
+`HoverCard.Trigger` takes the props of an `<a>`, plus `render` and `ref`.
+
+## Notes
+
+- Restyle with the `--hover-card-*` tokens, such as `--hover-card-width` or
+  `--hover-card-padding`.
+- Placement is CSS anchor positioning, as for Popover: it flips to the other side when there's
+  no room.
+- Types: `import type { HoverCardRootProps } from '@arun-dev/headless/hover-card'`, or
+  `ComponentProps<typeof HoverCard.Root>`.
