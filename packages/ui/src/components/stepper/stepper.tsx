@@ -63,7 +63,10 @@ export function StepperRoot({
 }
 
 type StepperItemOwnProps = {
-  /** Done, in progress, or ahead. Defaults to `upcoming`. Exactly one step is `current`. */
+  /**
+   * Done, in progress, or ahead. Defaults to `upcoming`. At most one step is `current`, and
+   * none once the flow is finished: then every step is `complete`.
+   */
   status?: StepperStatus;
   className?: string;
   /** Element to render instead of the default `<li>`. Props and ref are merged onto it. */

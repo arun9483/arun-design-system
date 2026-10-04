@@ -474,28 +474,84 @@ export function HoverCardPlayground() {
   );
 }
 
-const STEPPER_CONTROLS: Control[] = [
-  {
-    name: 'orientation',
-    type: 'select',
-    options: ['horizontal', 'vertical'],
-    initial: 'horizontal',
-  },
+const STEPPER_STEPS = [
+  { title: 'Details', content: 'Your name and email.' },
+  { title: 'Plan', content: 'Free, Pro or Team.' },
+  { title: 'Payment', content: 'A card, or pay by invoice.' },
 ];
 
+/**
+ * The Stepper with the current step as a control, so every status can be seen — including the
+ * finished flow, where every step is complete. Custom rather than the generic Playground, which
+ * prints one element's props: here the status is on each Item.
+ */
 export function StepperPlayground() {
+  const [orientation, setOrientation] = useState<'horizontal' | 'vertical'>('horizontal');
+  const [current, setCurrent] = useState(1);
+  const status = (index: number) =>
+    index < current ? 'complete' : index === current ? 'current' : 'upcoming';
+  const open =
+    orientation === 'vertical'
+      ? '<Stepper.Root aria-label="Sign-up progress" orientation="vertical">'
+      : '<Stepper.Root aria-label="Sign-up progress">';
+  const jsx = [
+    open,
+    ...STEPPER_STEPS.map(({ title }, index) =>
+      status(index) === 'upcoming'
+        ? `  <Stepper.Item>${title}</Stepper.Item>`
+        : `  <Stepper.Item status="${status(index)}">${title}</Stepper.Item>`,
+    ),
+    '</Stepper.Root>',
+  ].join('\n');
+
   return (
-    <Playground
-      component="Stepper.Root"
-      controls={STEPPER_CONTROLS}
-      children="…"
-      render={(props: ComponentProps<typeof Stepper.Root>) => (
-        <Stepper.Root {...props} aria-label="Playground steps" style={{ inlineSize: '100%' }}>
-          <Stepper.Item status="complete">Details</Stepper.Item>
-          <Stepper.Item status="current">Plan</Stepper.Item>
-          <Stepper.Item>Payment</Stepper.Item>
+    <div className="ds-example not-content">
+      <div className="ds-example-preview" data-layout="stack">
+        <Stepper.Root aria-label="Sign-up progress" orientation={orientation}>
+          {STEPPER_STEPS.map(({ title }, index) => (
+            <Stepper.Item key={title} status={status(index)}>
+              {title}
+            </Stepper.Item>
+          ))}
         </Stepper.Root>
-      )}
-    />
+        <p style={{ margin: 0 }}>
+          <strong>{STEPPER_STEPS[current]?.title ?? 'Finished'}:</strong>{' '}
+          {STEPPER_STEPS[current]?.content ?? 'every step is complete, and none is current.'}
+        </p>
+      </div>
+
+      <div className="ds-playground-controls">
+        <label className="ds-control" htmlFor="pg-stepper-orientation">
+          <span>orientation</span>
+          <select
+            id="pg-stepper-orientation"
+            value={orientation}
+            onChange={(e) => setOrientation(e.target.value as 'horizontal' | 'vertical')}
+          >
+            <option value="horizontal">horizontal</option>
+            <option value="vertical">vertical</option>
+          </select>
+        </label>
+        <label className="ds-control" htmlFor="pg-stepper-current">
+          <span>current step</span>
+          <select
+            id="pg-stepper-current"
+            value={current}
+            onChange={(e) => setCurrent(Number(e.target.value))}
+          >
+            {STEPPER_STEPS.map(({ title }, index) => (
+              <option key={title} value={index}>
+                {title}
+              </option>
+            ))}
+            <option value={STEPPER_STEPS.length}>Finished</option>
+          </select>
+        </label>
+      </div>
+
+      <pre className="ds-playground-output" tabIndex={0}>
+        <code>{jsx}</code>
+      </pre>
+    </div>
   );
 }
