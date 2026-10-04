@@ -1244,3 +1244,42 @@ stays visible, to press and to read it as a layer.
 
 **Rules out:** snap points, a non-modal drawer, a drawer that stays mounted in the page flow, and
 a Handle part — all deferred until a use needs them; swiping as the only way to close.
+
+---
+
+## 24. HoverCard: a link's preview, on hover and keyboard focus
+
+A hover card shows more about where a link goes. It follows Tooltip's timing and Popover's
+anchoring (decision 12), and differs from a Tooltip in one way that shapes everything else:
+**it may hold links and buttons**, so it must be reachable by keyboard.
+
+**The Trigger is an `<a>`.** The card previews a destination, and the link must work without
+it — a tap follows it, a screen reader reads its text. A Link or a router's link is passed
+through `render`.
+
+**The card is `popover="manual"`, opened with the Trigger as its `source`.** `manual`, as for
+Tooltip: it does not close an open Popover, and it must not light-dismiss on a click elsewhere
+while the pointer is still on it. `source` makes the Trigger its invoker, so Tab moves from the
+Trigger into the card wherever it sits in the DOM — the reason Tooltip leaves `source` out (a
+tooltip is never focused) is the reason HoverCard puts it in.
+
+**Opening and closing.** A mouse or pen opens it after `delay` (600ms) and closes it
+`closeDelay` (300ms, three times Tooltip's) after leaving both the Trigger and the card — long
+enough to cross the `--hover-card-offset` gap. Keyboard focus (`:focus-visible` only) opens it
+at once; focus leaving both closes it; Esc closes it and returns focus from the card to the
+Trigger. Pressing the Trigger closes it. **Touch never opens it**: there is no hover to end
+it, and a tap is for the link.
+
+**No grace polygon.** `core/pointerIntent`'s triangle exists for submenus, where the pointer
+crosses other items on its way. The card sits next to its Trigger with nothing between them,
+so the close delay alone covers the crossing.
+
+**No role, no ARIA on the Trigger.** It is not a dialog, and `aria-describedby` would read the
+whole card as the link's description. Its content is supplementary by contract: never the only
+way to reach anything, because touch users never see it.
+
+**Parts, fewest first (decision 11):** `Root`, `Trigger`, `Popup`. No warm window between
+cards, as Tooltip has: cards are not read one after another along a toolbar.
+
+**Rules out:** opening on touch (long press included); a HoverCard whose content is the only
+path to an action; `popover="hint"`, for Tooltip's reason — Safari lacks it.

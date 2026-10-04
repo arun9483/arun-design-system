@@ -1207,6 +1207,59 @@ export const PROPS = {
     },
   ],
   'Tooltip.Trigger': [],
+  'HoverCard.Root': [
+    {
+      name: 'delay',
+      type: 'number',
+      default: '600',
+      description:
+        'Milliseconds a pointer rests on the Trigger before the card opens. Keyboard focus opens it at once.',
+    },
+    {
+      name: 'closeDelay',
+      type: 'number',
+      default: '300',
+      description:
+        'Milliseconds between the pointer leaving the Trigger or the card and the card closing — time to cross the gap onto the card.',
+    },
+    {
+      name: 'open',
+      type: 'boolean',
+      description:
+        'Controlled state. Provide `onOpenChange` alongside it. Never pass `undefined` — the mode is fixed at mount.',
+    },
+    {
+      name: 'defaultOpen',
+      type: 'boolean',
+      default: 'false',
+      description: 'Initial state when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onOpenChange',
+      type: '(open: boolean) => void',
+      description: 'Called on every open and close, after any delay has run.',
+    },
+    {
+      name: 'children',
+      type: 'ReactNode',
+      description: 'The other parts. Root renders no element of its own.',
+    },
+  ],
+  'HoverCard.Popup': [
+    {
+      name: 'side',
+      type: "'top' | 'bottom' | 'left' | 'right'",
+      default: "'bottom'",
+      description:
+        'Which side of the Trigger to show on. Flips to the opposite side when there is no room.',
+    },
+    {
+      name: 'align',
+      type: "'start' | 'center' | 'end'",
+      default: "'center'",
+      description: "Flush with the Trigger's start or end edge, or centred on it.",
+    },
+  ],
   'Tabs.Root': [
     {
       name: 'value',

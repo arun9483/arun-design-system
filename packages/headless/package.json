@@ -84,6 +84,16 @@
         "default": "./dist/drawer/index.cjs"
       }
     },
+    "./hover-card": {
+      "import": {
+        "types": "./dist/hover-card/index.d.ts",
+        "default": "./dist/hover-card/index.js"
+      },
+      "require": {
+        "types": "./dist/hover-card/index.d.cts",
+        "default": "./dist/hover-card/index.cjs"
+      }
+    },
     "./menu": {
       "import": {
         "types": "./dist/menu/index.d.ts",

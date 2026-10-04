@@ -20,15 +20,16 @@ Not for a short decision in the middle of the screen — use a [Dialog](/compone
 
 **Choosing between messages and popups:**
 
-| Component                       | Use it for                                                                                         | For example                                       |
-| ------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| [Dialog](/components/dialog/)   | Something that needs a decision or input before the user carries on; the page is blocked meanwhile | Confirm a delete, edit a record in a form         |
-| **Drawer**                      | A panel that slides in from an edge and blocks the page; the first choice on a phone               | Share options, a mobile nav, a filter panel       |
-| [Popover](/components/popover/) | Extra content or controls next to a button, while the rest of the page stays usable                | Filter panel, share options, details card         |
-| [Menu](/components/menu/)       | A list of actions or settings opened from a button                                                 | "More actions ⋯", a View menu                     |
-| [Tooltip](/components/tooltip/) | A short text label on hover or focus; nothing in it can be clicked                                 | Name of an icon button, a keyboard shortcut       |
-| [Toast](/components/toast/)     | A brief confirmation after an action, which goes away by itself                                    | "Saved", "Archived — Undo"                        |
-| [Alert](/components/alert/)     | A message that stays in the page until the situation changes                                       | "Your trial ends in 3 days", a form error summary |
+| Component                            | Use it for                                                                                         | For example                                          |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [Dialog](/components/dialog/)        | Something that needs a decision or input before the user carries on; the page is blocked meanwhile | Confirm a delete, edit a record in a form            |
+| **Drawer**                           | A panel that slides in from an edge and blocks the page; the first choice on a phone               | Share options, a mobile nav, a filter panel          |
+| [Popover](/components/popover/)      | Extra content or controls next to a button, while the rest of the page stays usable                | Filter panel, share options, details card            |
+| [Menu](/components/menu/)            | A list of actions or settings opened from a button                                                 | "More actions ⋯", a View menu                        |
+| [Tooltip](/components/tooltip/)      | A short text label on hover or focus; nothing in it can be clicked                                 | Name of an icon button, a keyboard shortcut          |
+| [HoverCard](/components/hover-card/) | A preview of where a link goes, on hover or focus; nothing essential in it                         | A profile behind an @mention, a repository's summary |
+| [Toast](/components/toast/)          | A brief confirmation after an action, which goes away by itself                                    | "Saved", "Archived — Undo"                           |
+| [Alert](/components/alert/)          | A message that stays in the page until the situation changes                                       | "Your trial ends in 3 days", a form error summary    |
 
 `Drawer` is a [Dialog](/components/dialog/) attached to one edge: the same native `<dialog>`
 opened with `showModal()`, with the same top layer, inert page, focus trap, Esc and backdrop

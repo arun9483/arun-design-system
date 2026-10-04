@@ -82,6 +82,7 @@ import type {
 } from '@arun-dev/ui';
 import type { FieldControlProps, FieldRootProps } from '@arun-dev/headless/field';
 import type { DrawerPopupProps } from '@arun-dev/headless/drawer';
+import type { HoverCardPopupProps, HoverCardRootProps } from '@arun-dev/headless/hover-card';
 import type { ToastProviderProps } from '@arun-dev/headless/toast';
 import type { ToggleProps } from '@arun-dev/headless/toggle';
 import type { ToggleGroupProps } from '@arun-dev/headless/toggle-group';
@@ -174,6 +175,8 @@ type Unknown =
   | OnlyRealProps<Documented<'Menu.SubmenuTrigger'>, MenuSubmenuTriggerProps>
   | OnlyRealProps<Documented<'Tooltip.Root'>, TooltipRootProps>
   | OnlyRealProps<Documented<'Tooltip.Popup'>, TooltipPopupProps>
+  | OnlyRealProps<Documented<'HoverCard.Root'>, HoverCardRootProps>
+  | OnlyRealProps<Documented<'HoverCard.Popup'>, HoverCardPopupProps>
   | OnlyRealProps<Documented<'Tooltip.Trigger'>, TooltipTriggerProps>
   | OnlyRealProps<Documented<'Tabs.Root'>, ComponentProps<typeof Tabs.Root>>
   | OnlyRealProps<Documented<'Tabs.List'>, TabsListProps>
