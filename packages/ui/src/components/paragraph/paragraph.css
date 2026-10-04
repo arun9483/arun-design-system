@@ -1,0 +1,8 @@
+@layer paragraph {
+  .paragraph {
+    /* A readable line length. A maximum, so a narrower container still wins. */
+    max-inline-size: var(--paragraph-max-inline-size);
+    /* No single word stranded on the last line. */
+    text-wrap: pretty;
+  }
+}

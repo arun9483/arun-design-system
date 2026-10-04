@@ -1,0 +1,44 @@
+---
+title: Paragraph
+description: A block of running text, kept to a readable line length.
+---
+
+import Example from '@/components/Example.astro';
+import ParagraphBasics from '@/examples/paragraph-basics';
+import PropTable from '@/components/PropTable.astro';
+
+## When to use
+
+- Body copy, descriptions and other running text
+- Supporting text under a heading, smaller or quieter
+
+**Choosing between showing text:**
+
+| Component                       | Use it for                                                 | Renders       | For example                    |
+| ------------------------------- | ---------------------------------------------------------- | ------------- | ------------------------------ |
+| [Heading](/components/heading/) | The title of a page or a section, at a rank in the outline | `<h1>`–`<h6>` | A page title, a card title     |
+| **Paragraph**                   | A block of running text                                    | `<p>`         | Body copy, a description       |
+| [Text](/components/text/)       | A run of text inside other text, styled from the tokens    | `<span>`      | A date, a count, a name        |
+| [Kbd](/components/kbd/)         | A key or a shortcut                                        | `<kbd>`       | <kbd>Ctrl</kbd> + <kbd>K</kbd> |
+| [Link](/components/link/)       | Text that goes somewhere                                   | `<a>`         | Read more                      |
+
+<Example name="paragraph-basics">
+  <ParagraphBasics client:load />
+</Example>
+
+`Paragraph` is a `<p>`. It stops at a readable line length — `--paragraph-max-inline-size`,
+`65ch` by default — as a maximum, so a narrower container still wins. The last line never ends
+on a single stranded word, in browsers that support `text-wrap: pretty`.
+
+Size and colour are inherited unless you set them, so a paragraph inside an Alert or a Card
+takes the text style there.
+
+## Props
+
+<PropTable component="Paragraph" />
+
+## Notes
+
+- The space between paragraphs belongs to the layout: put them in a [Stack](/components/stack/).
+- To centre a short paragraph, centre the block too: `margin-inline: auto` along with
+  `text-align: center`, since it may be narrower than its container.

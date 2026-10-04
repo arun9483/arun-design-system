@@ -1,0 +1,4 @@
+/* Paragraph component tokens. Colour and size are inherited unless set per paragraph. */
+:root {
+  --paragraph-max-inline-size: 65ch;
+}

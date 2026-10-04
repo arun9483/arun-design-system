@@ -301,6 +301,56 @@ export const PROPS = {
       description: 'Space between rows and columns: the `--space-*` token of the same name.',
     },
   ],
+  Heading: [
+    {
+      name: 'level',
+      type: '1 | 2 | 3 | 4 | 5 | 6',
+      default: '2',
+      description:
+        'Its rank in the outline, and so the element: `<h1>` to `<h6>`. Choose it by structure.',
+    },
+    {
+      name: 'size',
+      type: "'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl'",
+      default: "'4xl' to 'base', by level",
+      description:
+        'How big it looks, a step on the type scale: the `--text-*` token of the same name.',
+    },
+  ],
+  Paragraph: [
+    {
+      name: 'size',
+      type: "'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl'",
+      description:
+        'A step on the type scale: the `--text-*` token of the same name. Inherited from the text around it.',
+    },
+    {
+      name: 'color',
+      type: "'primary' | 'secondary' | 'muted' | 'accent'",
+      description:
+        'A text colour role: the `--color-text-*` token of the same name. Inherited from the text around it.',
+    },
+  ],
+  Text: [
+    {
+      name: 'size',
+      type: "'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl'",
+      description:
+        'A step on the type scale: the `--text-*` token of the same name. Inherited from the text around it.',
+    },
+    {
+      name: 'color',
+      type: "'primary' | 'secondary' | 'muted' | 'accent'",
+      description:
+        'A text colour role: the `--color-text-*` token of the same name. Inherited from the text around it.',
+    },
+    {
+      name: 'weight',
+      type: "'normal' | 'medium' | 'semibold' | 'bold'",
+      description:
+        'A font weight: the `--font-weight-*` token of the same name. Inherited from the text around it.',
+    },
+  ],
   Progress: [
     {
       name: 'value',

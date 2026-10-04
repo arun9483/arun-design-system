@@ -75,7 +75,9 @@
     "./css/avatar": "./dist/css/avatar.css",
     "./css/otp-input": "./dist/css/otp-input.css",
     "./css/stack": "./dist/css/stack.css",
-    "./css/grid": "./dist/css/grid.css"
+    "./css/grid": "./dist/css/grid.css",
+    "./css/heading": "./dist/css/heading.css",
+    "./css/paragraph": "./dist/css/paragraph.css"
   },
   "publishConfig": {
     "access": "public"

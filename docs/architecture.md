@@ -1176,3 +1176,32 @@ row keeps the column width instead of stretching.
 **Rules out:** responsive props (`{ sm: 'column', md: 'row' }`), which need breakpoints a custom
 property cannot carry into a media query; arbitrary gap lengths; a `Box` or `Flex` primitive
 carrying every CSS property as a prop.
+
+---
+
+## 22. Typography: native elements, the utility classes as props
+
+`Heading`, `Paragraph` and `Text` render `<h1>`–`<h6>`, `<p>` and `<span>`. None needs
+JavaScript, so all three are `@arun-dev/ui` alone (decision 7), and each takes `render` for a
+more precise element — `<strong>`, `<time>`, `<legend>`.
+
+**A heading's level and its size are separate props.** `level` is structure — the element, and
+so the outline screen reader users move through — and `size` is appearance, a step on the type
+scale. Each level has a default size, `4xl` down to `base`, so the common case is one prop. Tying
+them would push authors to skip a level to get a smaller look.
+
+**Props map onto the existing utility classes.** `.text-size-*` (size with its paired leading),
+`.text-color-*` and `.font-weight-*` were already public in the `utilities` layer, so the
+components add those classes rather than restating the same declarations in a layer of their
+own; `.font-weight-normal` joined them. Only what a utility does not cover has a layer:
+`heading` (font family, weight, letter spacing and colour from `--heading-*` tokens, and
+`text-wrap: balance`) and `paragraph` (a `max-inline-size` of `--paragraph-max-inline-size`,
+`65ch`, and `text-wrap: pretty`). `Text` has no stylesheet.
+
+**What is left out is inherited.** A Paragraph or Text without `size` or `color` takes the text
+around it, so it reads right inside an Alert, a Card or a Field. A Heading always sets a size: a
+heading is not part of the text around it.
+
+**Rules out:** an element chosen from `size` or `variant` (`<Text variant="h2">`); a Text that
+renders a `<p>`, which is Paragraph's job; colours beyond the `--color-text-*` roles — status
+colours belong to Alert, Badge and Field.Error.

@@ -73,6 +73,9 @@ import type {
   ProgressProps,
   SeparatorProps,
   StackProps,
+  HeadingProps,
+  ParagraphProps,
+  TextProps,
   GridProps,
   SliderProps,
   Tabs,
@@ -119,6 +122,9 @@ type Unknown =
   | OnlyRealProps<Documented<'Toast.Viewport'>, ToastViewportProps>
   | OnlyRealProps<Documented<'Separator'>, SeparatorProps>
   | OnlyRealProps<Documented<'Stack'>, StackProps>
+  | OnlyRealProps<Documented<'Heading'>, HeadingProps>
+  | OnlyRealProps<Documented<'Paragraph'>, ParagraphProps>
+  | OnlyRealProps<Documented<'Text'>, TextProps>
   | OnlyRealProps<Documented<'Grid'>, GridProps>
   | OnlyRealProps<Documented<'Progress'>, ProgressProps>
   | OnlyRealProps<Documented<'Meter'>, MeterProps>
