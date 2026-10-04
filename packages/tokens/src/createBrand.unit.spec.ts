@@ -109,3 +109,55 @@ describe('generatePaletteFromSeed', () => {
     }
   });
 });
+
+/** WCAG relative luminance of a #rrggbb colour. */
+function relativeLuminance(hex: string): number {
+  const [r = 0, g = 0, b = 0] = [1, 3, 5]
+    .map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+    .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function contrast(a: string, b: string): number {
+  const light = Math.max(relativeLuminance(a), relativeLuminance(b));
+  const dark = Math.min(relativeLuminance(a), relativeLuminance(b));
+  return (light + 0.05) / (dark + 0.05);
+}
+
+/** The colour a theme block gives `name`, following its var() into the palette. */
+function resolve(css: string, selector: string, name: string): string {
+  const palette = extractBlock(css, ':root');
+  const value = extractBlock(css, selector)[name] ?? '';
+  const reference = /^var\((--[\w-]+)\)$/.exec(value)?.[1];
+  return reference ? (palette[reference] ?? '') : value;
+}
+
+/* Accent fills — primary Button, a checked Checkbox, Radio, Switch, the current page — are
+   --color-text-accent, with --color-text-on-accent drawn on them. In dark mode the accent is
+   light, so the text on it must be dark. */
+describe('text on an accent fill', () => {
+  const themes = [
+    ['light', "[data-theme='light']"],
+    ['dark', "[data-theme='dark']"],
+    ['dark system preference', ":root:not([data-theme='light'])"],
+  ] as const;
+
+  it.each(themes)('meets AAA (7:1) in the default brand, %s', (_label, selector) => {
+    const fill = resolve(generated, selector, '--color-text-accent');
+    const text = resolve(generated, selector, '--color-text-on-accent');
+    expect(contrast(fill, text)).toBeGreaterThanOrEqual(7);
+  });
+
+  // Blue, red, green, teal, purple and pink seeds, saturated and muted. Yellows are left out:
+  // their generated brand-700 is too light for white text in light mode, a palette issue.
+  it.each(['#0000b3', '#2563eb', '#dc2626', '#16a34a', '#0d9488', '#7c3aed', '#db2777', '#64748b'])(
+    'meets AA (4.5:1) in dark mode for a brand seeded with %s',
+    (seed) => {
+      const css = createBrand({ name: 'seeded', seed });
+      const selector = "[data-theme='dark']";
+      const fill = resolve(css, selector, '--color-text-accent');
+      const text = resolve(css, selector, '--color-text-on-accent');
+      expect(contrast(fill, text)).toBeGreaterThanOrEqual(4.5);
+    },
+  );
+});

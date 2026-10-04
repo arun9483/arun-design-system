@@ -223,7 +223,8 @@ function deriveDark(): Record<string, string> {
     '--color-text-muted': 'var(--color-neutral-400)',
     '--color-text-accent': 'var(--color-brand-300)',
     '--color-text-inverse': 'var(--color-neutral-900)',
-    '--color-text-on-accent': 'var(--color-neutral-0)',
+    // The accent is light in dark mode, so the text on it is dark.
+    '--color-text-on-accent': 'var(--color-neutral-950)',
     '--color-border-default': 'var(--color-neutral-700)',
     '--color-border-subtle': 'var(--color-neutral-800)',
     '--color-border-strong': 'var(--color-neutral-600)',
