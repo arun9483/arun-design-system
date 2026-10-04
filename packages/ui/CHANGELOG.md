@@ -1,5 +1,16 @@
 # @arun-dev/ui
 
+## 5.4.0
+
+### Minor Changes
+
+- 6ba6a84: Add `Stepper`: the steps of a multi-step flow and which one you're on. `Stepper.Root` is an `<ol role="list">` (`orientation`: horizontal or vertical; `labels` for translation) and `Stepper.Item` an `<li>` with a `status` — `complete`, `current` (`aria-current="step"`) or `upcoming`. The number or tick is drawn and hidden; a complete step adds a hidden "(completed)". The current step is the consumer's state, as for Pagination. Tokens: `--stepper-*`.
+
+### Patch Changes
+
+- Updated dependencies [6ba6a84]
+  - @arun-dev/tokens@0.32.0
+
 ## 5.3.0
 
 ### Minor Changes
