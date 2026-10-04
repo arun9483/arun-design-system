@@ -72,6 +72,8 @@ import type {
   MeterProps,
   ProgressProps,
   SeparatorProps,
+  StackProps,
+  GridProps,
   SliderProps,
   Tabs,
 } from '@arun-dev/ui';
@@ -116,6 +118,8 @@ type Unknown =
   | OnlyRealProps<Documented<'Toast.Provider'>, ToastProviderProps>
   | OnlyRealProps<Documented<'Toast.Viewport'>, ToastViewportProps>
   | OnlyRealProps<Documented<'Separator'>, SeparatorProps>
+  | OnlyRealProps<Documented<'Stack'>, StackProps>
+  | OnlyRealProps<Documented<'Grid'>, GridProps>
   | OnlyRealProps<Documented<'Progress'>, ProgressProps>
   | OnlyRealProps<Documented<'Meter'>, MeterProps>
   | OnlyRealProps<Documented<'Slider'>, SliderProps>

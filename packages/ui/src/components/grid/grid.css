@@ -1,0 +1,64 @@
+@layer grid {
+  /* Equal columns. --grid-columns and --grid-min-item-size are set on the element from the
+     props; --grid-gap by the gap class, because the fitting formula below needs it as a value. */
+  .layout-grid {
+    display: grid;
+    gap: var(--grid-gap);
+    grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  }
+
+  /* As many columns as fit at the minimum size. min(100%, …) keeps one column inside a grid
+     narrower than the minimum, so a phone never scrolls sideways. auto-fill, not auto-fit:
+     two items in a wide grid keep the size of a full row's, rather than stretching across. */
+  .layout-grid-fit {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--grid-min-item-size)), 1fr));
+  }
+
+  /* The same, at most --grid-columns: a column is also never narrower than a full row's share
+     of the width, so no more than that many fit. */
+  .layout-grid-fit-capped {
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(
+        max(
+          min(100%, var(--grid-min-item-size)),
+          (100% - (var(--grid-columns) - 1) * var(--grid-gap)) / var(--grid-columns)
+        ),
+        1fr
+      )
+    );
+  }
+
+  /* Gap — one class per step of the spacing scale. A length, never a bare 0: calc() above
+     subtracts it from a percentage. */
+  .layout-grid-gap-0 {
+    --grid-gap: 0px;
+  }
+  .layout-grid-gap-3xs {
+    --grid-gap: var(--space-3xs);
+  }
+  .layout-grid-gap-2xs {
+    --grid-gap: var(--space-2xs);
+  }
+  .layout-grid-gap-xs {
+    --grid-gap: var(--space-xs);
+  }
+  .layout-grid-gap-sm {
+    --grid-gap: var(--space-sm);
+  }
+  .layout-grid-gap-md {
+    --grid-gap: var(--space-md);
+  }
+  .layout-grid-gap-lg {
+    --grid-gap: var(--space-lg);
+  }
+  .layout-grid-gap-xl {
+    --grid-gap: var(--space-xl);
+  }
+  .layout-grid-gap-2xl {
+    --grid-gap: var(--space-2xl);
+  }
+  .layout-grid-gap-3xl {
+    --grid-gap: var(--space-3xl);
+  }
+}

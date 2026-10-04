@@ -73,7 +73,9 @@
     "./css/toggle": "./dist/css/toggle.css",
     "./css/toolbar": "./dist/css/toolbar.css",
     "./css/avatar": "./dist/css/avatar.css",
-    "./css/otp-input": "./dist/css/otp-input.css"
+    "./css/otp-input": "./dist/css/otp-input.css",
+    "./css/stack": "./dist/css/stack.css",
+    "./css/grid": "./dist/css/grid.css"
   },
   "publishConfig": {
     "access": "public"

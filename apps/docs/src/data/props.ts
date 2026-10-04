@@ -248,6 +248,59 @@ export const PROPS = {
         'Across, or upright between inline items. Sets `aria-orientation` and `data-orientation`.',
     },
   ],
+  Stack: [
+    {
+      name: 'direction',
+      type: "'column' | 'row'",
+      default: "'column'",
+      description: 'Down the page, or across it.',
+    },
+    {
+      name: 'gap',
+      type: "'0' | '3xs' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'",
+      default: "'sm'",
+      description: 'Space between the children: the `--space-*` token of the same name.',
+    },
+    {
+      name: 'align',
+      type: "'start' | 'center' | 'end' | 'baseline' | 'stretch'",
+      default: "'stretch'",
+      description: 'How children line up across the stack: across a column, or down a row.',
+    },
+    {
+      name: 'justify',
+      type: "'start' | 'center' | 'end' | 'between'",
+      default: "'start'",
+      description: 'How children are spread along the stack. `between` pushes the ends apart.',
+    },
+    {
+      name: 'wrap',
+      type: 'boolean',
+      default: 'false',
+      description: 'Lets children move onto a new line when they run out of room.',
+    },
+  ],
+  Grid: [
+    {
+      name: 'columns',
+      type: 'number',
+      default: '1',
+      description:
+        'How many equal columns. With `minItemSize`, the most there can be: fewer as the space narrows.',
+    },
+    {
+      name: 'minItemSize',
+      type: 'string',
+      description:
+        "The narrowest a column may be, as a CSS length (`'12rem'`). The grid fits as many as there is room for.",
+    },
+    {
+      name: 'gap',
+      type: "'0' | '3xs' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'",
+      default: "'sm'",
+      description: 'Space between rows and columns: the `--space-*` token of the same name.',
+    },
+  ],
   Progress: [
     {
       name: 'value',

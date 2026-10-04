@@ -12,6 +12,9 @@ import { defineConfig } from 'tsup';
  */
 const CSS_LAYERS = [
   { layer: 'reset', src: 'src/css/reset.css' },
+  // Layout before components: a component's own styles win on an element that is both.
+  { layer: 'stack', src: 'src/components/stack/stack.css' },
+  { layer: 'grid', src: 'src/components/grid/grid.css' },
   { layer: 'chip', src: 'src/components/chip/chip.css' },
   { layer: 'card', src: 'src/components/card/card.css' },
   { layer: 'btn', src: 'src/components/button/button.css' },

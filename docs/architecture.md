@@ -1143,3 +1143,36 @@ only a deletion makes a gap.
 
 **Rules out:** one input per box; a hidden input beside the boxes for the form (the Input is the
 form field); validation of the code itself, which is the server's.
+
+---
+
+## 21. Layout: Stack and Grid, class names over a gap scale
+
+`Stack` is a flex container: children in one line, down or across. `Grid` is a CSS grid of
+equal columns. Neither needs JavaScript, so both are `@arun-dev/ui` alone (decision 7), render a
+`<div>` by default, and take `render` for the element the content needs — a `<ul>`, a `<form>`.
+
+**Space is the layout's.** `gap` takes a step on the spacing scale — `0`, `3xs` up to `3xl`, the
+`Space` type exported for it — never a margin on the children. A reset cannot collapse a gap,
+two margins cannot add up, and a child placed elsewhere carries no stray spacing with it. Free
+lengths are ruled out so spacing stays on the scale; `className` is the escape hatch.
+
+**Props become class names, not inline styles.** Each step is a class — `layout-stack-gap-md` —
+so the `var(--space-*)` reads sit in CSS, where the token contract checks them (decision 4).
+Classes, not `data-*`, because the state-attribute contract reserves `data-*` for what headless
+emits. The prefix is `layout-`: `.stack` is already a utility class, in the last layer, and would
+override every modifier; `.grid` is Tailwind's. The `stack` and `grid` layers come right after
+`reset`, so a component's own styles win on an element that is both.
+
+**Grid's counts are custom properties on the element.** A column count or a minimum width is
+data, not a step on a scale, so `--grid-columns` and `--grid-min-item-size` are set inline, as
+OtpInput sets `--otp-input-length`. Every Grid sets the ones its mode reads: a nested grid would
+otherwise inherit the outer grid's count. `minItemSize` fits as many columns as there is room
+for — `repeat(auto-fill, minmax(min(100%, size), 1fr))` — so a grid is responsive with no
+breakpoints, which CSS cannot read from a token. With `columns` as well, a column is also never
+narrower than a full row's share, which caps the count. `auto-fill`, not `auto-fit`, so a short
+row keeps the column width instead of stretching.
+
+**Rules out:** responsive props (`{ sm: 'column', md: 'row' }`), which need breakpoints a custom
+property cannot carry into a media query; arbitrary gap lengths; a `Box` or `Flex` primitive
+carrying every CSS property as a prop.
