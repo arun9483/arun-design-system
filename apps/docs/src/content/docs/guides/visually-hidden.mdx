@@ -1,0 +1,61 @@
+---
+title: Visually hidden
+description: Text for screen readers that isn't drawn on screen — the sr-only and sr-only-focusable classes.
+---
+
+import Example from '@/components/Example.astro';
+import VisuallyHiddenBasics from '@/examples/visually-hidden-basics';
+import VisuallyHiddenSkipLink from '@/examples/visually-hidden-skip-link';
+
+Sometimes a screen reader needs words that sighted users get from the layout or an icon. Two
+classes in `@arun-dev/ui/components.css` keep text in the page for assistive technology without
+drawing it. They're classes, not a component, because they need nothing but CSS.
+
+| Class               | Hidden                                      | Use it for                                    |
+| ------------------- | ------------------------------------------- | --------------------------------------------- |
+| `sr-only`           | Always                                      | A label, or extra context, for screen readers |
+| `sr-only-focusable` | Until it, or something inside it, has focus | A skip link                                   |
+
+## `sr-only`
+
+<Example name="visually-hidden-basics">
+  <VisuallyHiddenBasics client:load />
+</Example>
+
+The text stays in the page, so it's read out, found by in-page search, and translated by the
+browser's translate tool. It's drawn as a 1px box clipped to nothing, rather than with
+`display: none` or `visibility: hidden`, which would hide it from screen readers too.
+
+## `sr-only-focusable`
+
+Hidden until it's focused: a **skip link** at the top of the page lets keyboard users jump past
+the navigation. It appears when tabbed to, and hides again when focus moves on.
+
+<Example name="visually-hidden-skip-link">
+  <VisuallyHiddenSkipLink client:load />
+</Example>
+
+It hides itself only while not focused, so style it for how it looks when it appears. Give the
+target `tabIndex={-1}` so focus moves there too, not only the scroll position.
+
+## Choosing how to hide
+
+| Goal                                          | Use                                        |
+| --------------------------------------------- | ------------------------------------------ |
+| Hidden from sight, read by screen readers     | `sr-only`                                  |
+| Hidden until focused                          | `sr-only-focusable`                        |
+| Hidden from everyone                          | the `hidden` attribute, or `display: none` |
+| Shown, but not read out (a decorative icon)   | `aria-hidden="true"`                       |
+| A name for an element with no text of its own | `aria-label`, or `sr-only` text inside it  |
+
+## Notes
+
+- Prefer visible text when there's room for it. Hidden text helps screen reader users, but not
+  people who'd benefit from seeing the words.
+- Never put `sr-only` on something focusable, like a link or a button: keyboard users would tab
+  to something they can't see. Use `sr-only-focusable`.
+- Inside an element with an accessible name, such as a Button, `sr-only` text becomes part of
+  that name. `aria-label` replaces the whole name; `sr-only` text adds to the visible text, so
+  voice control users can still say what they see.
+- The classes are in the `utilities` layer, the last one, so they win over a component's own
+  styles on the same element.

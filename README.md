@@ -146,7 +146,7 @@ element the components don't render.
 | Type style     | `type-display` `type-overline` `font-weight-medium` `font-weight-semibold` `font-weight-bold` `letter-spacing-wider` `line-height-tight` `line-height-snug` `line-height-relaxed` `uppercase` `capitalize` `underline` |
 | Colour         | `text-color-primary` `text-color-secondary` `text-color-muted` `text-color-accent` `bar-accent`                                                                                                                        |
 | Text overflow  | `truncate` `line-clamp-2` `line-clamp-3`                                                                                                                                                                               |
-| Accessibility  | `sr-only`                                                                                                                                                                                                              |
+| Accessibility  | `sr-only` `sr-only-focusable`                                                                                                                                                                                          |
 | Component-only | `metric` — an accent-tinted stat container; supply your own markup (e.g. a `<dl>`)                                                                                                                                     |
 
 The reset keeps list markers: a `<ul>` or `<ol>` in running text shows its bullets or numbers. A list
