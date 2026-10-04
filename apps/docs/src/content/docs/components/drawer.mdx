@@ -1,0 +1,137 @@
+---
+title: Drawer
+description: A modal panel that slides in from an edge of the screen and closes with a swipe — a Dialog at an edge.
+---
+
+import Example from '@/components/Example.astro';
+import DrawerBasics from '@/examples/drawer-basics';
+import DrawerNavigation from '@/examples/drawer-navigation';
+import DrawerUnsaved from '@/examples/drawer-unsaved';
+import PropTable from '@/components/PropTable.astro';
+import { DrawerPlayground } from '@/components/playgrounds';
+
+## When to use
+
+- On a phone, actions or options for what's on screen: share, sort, filter
+- Navigation that doesn't fit in the header, opened from a Menu button
+- A form or details that need more room than a Popover, alongside the page's context
+
+Not for a short decision in the middle of the screen — use a [Dialog](/components/dialog/).
+
+**Choosing between messages and popups:**
+
+| Component                       | Use it for                                                                                         | For example                                       |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| [Dialog](/components/dialog/)   | Something that needs a decision or input before the user carries on; the page is blocked meanwhile | Confirm a delete, edit a record in a form         |
+| **Drawer**                      | A panel that slides in from an edge and blocks the page; the first choice on a phone               | Share options, a mobile nav, a filter panel       |
+| [Popover](/components/popover/) | Extra content or controls next to a button, while the rest of the page stays usable                | Filter panel, share options, details card         |
+| [Menu](/components/menu/)       | A list of actions or settings opened from a button                                                 | "More actions ⋯", a View menu                     |
+| [Tooltip](/components/tooltip/) | A short text label on hover or focus; nothing in it can be clicked                                 | Name of an icon button, a keyboard shortcut       |
+| [Toast](/components/toast/)     | A brief confirmation after an action, which goes away by itself                                    | "Saved", "Archived — Undo"                        |
+| [Alert](/components/alert/)     | A message that stays in the page until the situation changes                                       | "Your trial ends in 3 days", a form error summary |
+
+`Drawer` is a [Dialog](/components/dialog/) attached to one edge: the same native `<dialog>`
+opened with `showModal()`, with the same top layer, inert page, focus trap, Esc and backdrop
+click. It adds a side, a slide in and out, and **swipe to close**.
+
+<Example name="drawer-basics">
+  <DrawerBasics client:load />
+</Example>
+
+## Anatomy
+
+```tsx
+import { Drawer } from '@arun-dev/ui';
+
+<Drawer.Root>
+  <Drawer.Trigger />
+  <Drawer.Popup side="bottom">
+    <Drawer.Title />
+    <Drawer.Close />
+  </Drawer.Popup>
+</Drawer.Root>;
+```
+
+`Root`, `Trigger`, `Title` and `Close` are Dialog's own parts and work the same way.
+`Popup` is a Dialog popup with a `side`. As with Dialog, render a
+[Button](/components/button/) to style `Trigger` and `Close`.
+
+## Sides
+
+| `side`             | Comes in from | Size                                                  | For example        |
+| ------------------ | ------------- | ----------------------------------------------------- | ------------------ |
+| `bottom` (default) | the bottom    | full width, as tall as its content; a grab bar on top | actions, a picker  |
+| `top`              | the top       | full width, as tall as its content                    | a search or notice |
+| `left`             | the left      | full height, `--drawer-size` wide (22rem)             | navigation         |
+| `right`            | the right     | full height, `--drawer-size` wide                     | filters, a form    |
+
+It never covers the whole screen: a strip of backdrop stays visible beside or above it,
+`--drawer-viewport-gap`, so it reads as a panel over the page and the backdrop can be pressed.
+The sides are physical, so in a right-to-left layout choose `right` for navigation yourself.
+
+<Example name="drawer-navigation">
+  <DrawerNavigation client:load />
+</Example>
+
+## Playground
+
+<DrawerPlayground client:load />
+
+## Swipe to close
+
+Drag the drawer back toward its edge, with a finger, a pen or a mouse:
+
+| Release                             | Result           |
+| ----------------------------------- | ---------------- |
+| past a quarter of the drawer's size | closes           |
+| a fast flick, however short         | closes           |
+| anything else                       | slides back open |
+
+- The drawer follows the finger while it moves. Toward opening, it stops at the open position.
+- A press that starts in a text field, or moves across the drawer's axis, isn't a swipe.
+- Scrolling content inside scrolls first. A bottom drawer's list scrolled halfway down scrolls
+  back up, and only a swipe that starts with the list at its top closes the drawer.
+- The click a swipe ends with is dropped, so letting go over a button doesn't press it.
+
+## Closing
+
+Every close is a request through `onOpenChange(false)`, as for Dialog: `Drawer.Close`, Esc, a
+backdrop click, a `<form method="dialog">`, and now a swipe. A controlled drawer that refuses
+it slides back open.
+
+<Example name="drawer-unsaved">
+  <DrawerUnsaved client:load />
+</Example>
+
+## Accessibility
+
+- Name it with `Drawer.Title`. Without one, pass `aria-label` to `Drawer.Popup`.
+- Swiping is never the only way to close: Esc, the backdrop and a `Drawer.Close` button all
+  work, so a keyboard or switch user isn't stuck. Include a Close button for screen reader users
+  on touch devices.
+- Focus moves inside when it opens and returns to the Trigger when it closes. The page behind is
+  inert and does not scroll.
+- `prefers-reduced-motion` turns the slide off.
+
+## Props
+
+### `Drawer.Root`
+
+Takes Dialog.Root's props.
+
+<PropTable component="Dialog.Root" common={false} />
+
+### `Drawer.Popup`
+
+<PropTable component="Drawer.Popup" />
+
+## Notes
+
+- A bottom or top drawer keeps clear of the phone's home indicator and notch with
+  `env(safe-area-inset-*)` padding, when the page uses `viewport-fit=cover`.
+- While it's dragged, the distance is `--drawer-swipe` on the element and it has
+  `data-swiping`. Use them to style the pull in your own stylesheet.
+- Restyle with the `--drawer-*` tokens, such as `--drawer-size`, `--drawer-radius` or
+  `--drawer-backdrop`.
+- Types: `import type { DrawerPopupProps, DrawerSide } from '@arun-dev/headless/drawer'`, or
+  `ComponentProps<typeof Drawer.Root>`.

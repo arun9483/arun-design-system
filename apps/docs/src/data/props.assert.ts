@@ -81,6 +81,7 @@ import type {
   Tabs,
 } from '@arun-dev/ui';
 import type { FieldControlProps, FieldRootProps } from '@arun-dev/headless/field';
+import type { DrawerPopupProps } from '@arun-dev/headless/drawer';
 import type { ToastProviderProps } from '@arun-dev/headless/toast';
 import type { ToggleProps } from '@arun-dev/headless/toggle';
 import type { ToggleGroupProps } from '@arun-dev/headless/toggle-group';
@@ -148,6 +149,7 @@ type Unknown =
   | OnlyRealProps<Documented<'Dialog.Trigger'>, DialogTriggerProps>
   | OnlyRealProps<Documented<'Dialog.Title'>, DialogTitleProps>
   | OnlyRealProps<Documented<'Dialog.Close'>, DialogCloseProps>
+  | OnlyRealProps<Documented<'Drawer.Popup'>, DrawerPopupProps>
   | OnlyRealProps<Documented<'Popover.Root'>, PopoverRootProps>
   | OnlyRealProps<Documented<'Popover.Popup'>, PopoverPopupProps>
   | OnlyRealProps<Documented<'Popover.Trigger'>, PopoverTriggerProps>

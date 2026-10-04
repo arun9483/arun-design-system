@@ -10,6 +10,7 @@ import {
   Card,
   Checkbox,
   Chip,
+  Drawer,
   Input,
   RadioGroup,
   Select,
@@ -420,9 +421,29 @@ export function ListPlayground() {
         </label>
       </div>
 
-      <pre className="ds-playground-output">
+      <pre className="ds-playground-output" tabIndex={0}>
         <code>{jsx}</code>
       </pre>
     </div>
+  );
+}
+
+const DRAWER_CONTROLS: Control[] = [
+  { name: 'side', type: 'select', options: ['bottom', 'top', 'left', 'right'], initial: 'bottom' },
+];
+
+export function DrawerPlayground() {
+  return (
+    <Playground
+      component="Drawer.Popup"
+      controls={DRAWER_CONTROLS}
+      children="Drawer content"
+      render={(props: ComponentProps<typeof Drawer.Popup>) => (
+        <Drawer.Root>
+          <Drawer.Trigger render={<Button />}>Open from the {String(props.side)}</Drawer.Trigger>
+          <Drawer.Popup {...props} aria-label="Playground drawer" />
+        </Drawer.Root>
+      )}
+    />
   );
 }

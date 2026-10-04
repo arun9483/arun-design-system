@@ -1205,3 +1205,42 @@ heading is not part of the text around it.
 **Rules out:** an element chosen from `size` or `variant` (`<Text variant="h2">`); a Text that
 renders a `<p>`, which is Paragraph's job; colours beyond the `--color-text-*` roles — status
 colours belong to Alert, Badge and Field.Error.
+
+---
+
+## 23. Drawer: a Dialog at an edge, closed by a swipe
+
+A drawer is a modal dialog that slides in from one edge. Everything Dialog leans on the platform
+for (decision 7's `showModal()`: top layer, backdrop, inert page, focus trap and return, Esc) is
+the same, so `@arun-dev/headless/drawer` re-exports Dialog's `Root`, `Trigger`, `Title` and
+`Close`, and its `Popup` is Dialog's popup with props merged on, not a second implementation. A
+fix to Dialog is a fix to Drawer.
+
+**`side` is physical** — `bottom` (the default, where a phone's thumb is), `top`, `left`,
+`right` — and is emitted as `data-side`, the attribute anchored popups already use. Physical
+rather than logical because the swipe direction is physical too.
+
+**Swipe to close is behaviour, so it is headless** (decision 7). It is read from pointer events,
+so finger, pen and mouse all work. Past a small slop the press becomes a swipe only if it set off
+along the drawer's axis toward closing; the distance is written as `--drawer-swipe` on the
+element, with `data-swiping`, imperatively — transient geometry, like `core/pointerIntent`'s, not
+React state. On release, a quarter of the drawer's size or a flick faster than 0.5 px/ms asks the
+Root to close through the one setter, so a controlled parent can refuse and the drawer slides
+back. The click a swipe ends with is swallowed.
+
+**Content scrolls first.** Pointer events stop with `pointercancel` once the browser starts
+scrolling, and `touch-action` cannot change mid-gesture. So the drawer keeps the default
+`touch-action`, and a native non-passive `touchmove` listener cancels the page's scroll only once
+a press has become a swipe — and a press becomes one only when no content between it and the
+drawer can scroll the other way. A list scrolled halfway scrolls; at its top, the drawer moves.
+Presses in text fields are never swipes.
+
+**`@arun-dev/ui` draws it with CSS.** Closed, it sits just past its edge (`translate: 0 100%`);
+open, at its edge less `--drawer-swipe`; `@starting-style` and discrete `display`/`overlay`
+transitions slide it both ways, and `[data-swiping]` turns the transition off so it follows the
+finger. The bottom drawer's grab bar is a `::before`, not a part: it needs nothing from the
+Root (decision 11). It never covers the whole viewport — `--drawer-viewport-gap` of backdrop
+stays visible, to press and to read it as a layer.
+
+**Rules out:** snap points, a non-modal drawer, a drawer that stays mounted in the page flow, and
+a Handle part — all deferred until a use needs them; swiping as the only way to close.

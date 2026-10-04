@@ -701,6 +701,15 @@ export const PROPS = {
     },
   ],
   'Dialog.Popup': [],
+  'Drawer.Popup': [
+    {
+      name: 'side',
+      type: "'bottom' | 'top' | 'left' | 'right'",
+      default: "'bottom'",
+      description:
+        'The edge it comes in from, and the direction a swipe closes it. Sets `data-side`.',
+    },
+  ],
   'Dialog.Trigger': [],
   'Dialog.Title': [],
   'Dialog.Close': [],

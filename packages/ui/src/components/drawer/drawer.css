@@ -1,0 +1,171 @@
+@layer drawer {
+  /* A <dialog> in the top layer, attached to one edge: data-side from @arun-dev/headless.
+     Placed by inset, not the UA's margin: auto, which a `* { margin: 0 }` reset would undo —
+     as for Dialog. */
+  .drawer {
+    position: fixed;
+    margin: 0;
+    max-inline-size: none;
+    max-block-size: none;
+    padding: var(--drawer-padding);
+    border: var(--drawer-border-width) solid var(--drawer-border-color);
+    background-color: var(--drawer-bg);
+    color: var(--drawer-color);
+    box-shadow: var(--drawer-shadow);
+    overflow: auto;
+    overscroll-behavior: contain;
+    /* --drawer-swipe is how far a finger has pulled it toward closing; 0 when it isn't.
+       Reset here so a drawer nested in another never takes the outer one's pull. */
+    --drawer-swipe: 0px;
+  }
+
+  /* Across the bottom: full width, as tall as its content up to a gap below the top. The
+     home indicator's safe area is padding, so the last control is never under it. */
+  .drawer[data-side='bottom'] {
+    inset: auto 0 0;
+    inline-size: 100%;
+    max-block-size: calc(100% - var(--drawer-viewport-gap));
+    padding-block-end: max(var(--drawer-padding), env(safe-area-inset-bottom));
+    border-block-end: none;
+    border-inline: none;
+    border-start-start-radius: var(--drawer-radius);
+    border-start-end-radius: var(--drawer-radius);
+  }
+
+  .drawer[data-side='top'] {
+    inset: 0 0 auto;
+    inline-size: 100%;
+    max-block-size: calc(100% - var(--drawer-viewport-gap));
+    padding-block-start: max(var(--drawer-padding), env(safe-area-inset-top));
+    border-block-start: none;
+    border-inline: none;
+    border-end-start-radius: var(--drawer-radius);
+    border-end-end-radius: var(--drawer-radius);
+  }
+
+  /* Down a side: full height, --drawer-size wide, never wider than the viewport less a gap
+     the backdrop shows through, so it reads as a panel over the page. */
+  .drawer[data-side='left'],
+  .drawer[data-side='right'] {
+    block-size: 100%;
+    inline-size: min(var(--drawer-size), 100% - var(--drawer-viewport-gap));
+    border-block: none;
+  }
+
+  .drawer[data-side='left'] {
+    inset: 0 auto 0 0;
+    border-inline-start: none;
+  }
+
+  .drawer[data-side='right'] {
+    inset: 0 0 0 auto;
+    border-inline-end: none;
+  }
+
+  /* A grab bar on a bottom drawer: it shows the drawer can be pulled down. Drawn, not a part —
+     it holds nothing and needs nothing from the drawer. */
+  .drawer[data-side='bottom']::before {
+    content: '';
+    display: block;
+    inline-size: var(--drawer-handle-width);
+    block-size: var(--drawer-handle-height);
+    margin: calc(var(--drawer-padding) * -0.5) auto var(--drawer-padding);
+    border-radius: var(--radius-full);
+    background-color: var(--drawer-handle-color);
+  }
+
+  .drawer::backdrop {
+    background-color: var(--drawer-backdrop);
+  }
+
+  .drawer-title {
+    margin: 0;
+    padding-block-end: var(--drawer-title-gap);
+    font-size: var(--drawer-title-font-size);
+    font-weight: var(--drawer-title-font-weight);
+    line-height: var(--line-height-snug);
+  }
+
+  /* The page behind is inert but would still scroll; stop it, as Dialog does. */
+  :root:has(.drawer:modal) {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
+
+  /* Slide in from the side, out to it. Closed, it sits just past its edge; open, at its edge
+     less the swipe. display and overlay are animated discretely so the slide out plays
+     before the element leaves the top layer. */
+  .drawer,
+  .drawer::backdrop {
+    transition:
+      opacity var(--drawer-duration) var(--ease-smooth),
+      translate var(--drawer-duration) var(--ease-smooth),
+      display var(--drawer-duration) allow-discrete,
+      overlay var(--drawer-duration) allow-discrete;
+  }
+
+  .drawer::backdrop {
+    opacity: 0;
+  }
+
+  .drawer[open]::backdrop {
+    opacity: 1;
+  }
+
+  .drawer[data-side='bottom'] {
+    translate: 0 100%;
+  }
+  .drawer[data-side='top'] {
+    translate: 0 -100%;
+  }
+  .drawer[data-side='left'] {
+    translate: -100% 0;
+  }
+  .drawer[data-side='right'] {
+    translate: 100% 0;
+  }
+
+  .drawer[data-side='bottom'][open] {
+    translate: 0 var(--drawer-swipe);
+  }
+  .drawer[data-side='top'][open] {
+    translate: 0 calc(-1 * var(--drawer-swipe));
+  }
+  .drawer[data-side='left'][open] {
+    translate: calc(-1 * var(--drawer-swipe)) 0;
+  }
+  .drawer[data-side='right'][open] {
+    translate: var(--drawer-swipe) 0;
+  }
+
+  @starting-style {
+    .drawer[open]::backdrop {
+      opacity: 0;
+    }
+    .drawer[data-side='bottom'][open] {
+      translate: 0 100%;
+    }
+    .drawer[data-side='top'][open] {
+      translate: 0 -100%;
+    }
+    .drawer[data-side='left'][open] {
+      translate: -100% 0;
+    }
+    .drawer[data-side='right'][open] {
+      translate: 100% 0;
+    }
+  }
+
+  /* While a finger pulls it, it follows the finger exactly: no easing behind it. */
+  .drawer[data-swiping] {
+    transition: none;
+    user-select: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .drawer,
+    .drawer::backdrop {
+      transition-duration: 0ms;
+    }
+  }
+}

@@ -160,7 +160,9 @@ export function Playground<P>({ render, controls, component, children = 'Label' 
         })}
       </div>
 
-      <pre className="ds-playground-output">
+      {/* Focusable, as every code block here is: when a line is too long it scrolls, and a
+          keyboard user has to be able to reach it to scroll it. */}
+      <pre className="ds-playground-output" tabIndex={0}>
         <code>{jsx}</code>
       </pre>
     </div>
