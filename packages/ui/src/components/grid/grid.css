@@ -7,6 +7,12 @@
     grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
   }
 
+  /* A Grid rendered as a list is layout, never bulleted. */
+  :where(ul, ol).layout-grid {
+    padding-inline-start: 0;
+    list-style: none;
+  }
+
   /* As many columns as fit at the minimum size. min(100%, …) keeps one column inside a grid
      narrower than the minimum, so a phone never scrolls sideways. auto-fill, not auto-fit:
      two items in a wide grid keep the size of a full row's, rather than stretching across. */

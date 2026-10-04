@@ -149,6 +149,9 @@ element the components don't render.
 | Accessibility  | `sr-only`                                                                                                                                                                                                              |
 | Component-only | `metric` — an accent-tinted stat container; supply your own markup (e.g. a `<dl>`)                                                                                                                                     |
 
+The reset keeps list markers: a `<ul>` or `<ol>` in running text shows its bullets or numbers. A list
+used for layout opts out with `role="list"`, which also keeps it announced as a list in Safari.
+
 Individual stylesheets are also exported for granular loading: `@arun-dev/ui/css/reset`,
 `/css/btn`, `/css/card`, `/css/chip`, `/css/badge`, `/css/switch`, `/css/metric`, `/css/utilities`.
 

@@ -43,7 +43,9 @@ rather than stretching across.
 
 ## Notes
 
-- It renders a `<div>`. Use `render={<ul />}` for a list of cards, with each card as an `<li>`.
+- It renders a `<div>`. Use `render={<ul role="list" />}` for a list of cards, with each card as an
+  `<li>`. A Grid drops a list's markers itself; `role="list"` keeps it announced as a list in
+  Safari.
 - `gap` takes a step on the spacing scale, as in [Stack](/components/stack/), for rows and
   columns alike.
 - The columns reach the CSS as `--grid-columns` and `--grid-min-item-size` on the element. A

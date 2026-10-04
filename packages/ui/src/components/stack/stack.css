@@ -5,6 +5,11 @@
     display: flex;
     flex-direction: column;
   }
+  /* A Stack rendered as a list is layout, never bulleted. */
+  :where(ul, ol).layout-stack {
+    padding-inline-start: 0;
+    list-style: none;
+  }
   .layout-stack-row {
     flex-direction: row;
   }

@@ -31,10 +31,19 @@
     margin: 0;
   }
 
+  /* Lists keep their markers: in running text the bullet or the number is part of the
+     content. A list used as layout — a nav, a row of cards — opts out with role="list",
+     which also keeps it announced as a list by VoiceOver in Safari, where list-style: none
+     alone can drop the list semantics. */
   ul,
   ol {
     margin: 0;
-    padding: 0;
+    padding-inline-start: var(--space-lg);
+  }
+
+  ul[role='list'],
+  ol[role='list'] {
+    padding-inline-start: 0;
     list-style: none;
   }
 

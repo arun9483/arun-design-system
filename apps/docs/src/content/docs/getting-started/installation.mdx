@@ -51,6 +51,26 @@ import '@arun-dev/ui/components.css';
   backgrounds and inherited text colour.
 </Aside>
 
+### What the reset changes
+
+`components.css` starts with a small reset. It removes the browser's default margins, so spacing
+comes from gaps and tokens alone. Lists keep their bullets and numbers, because in running text
+they're part of the content.
+
+A list used for layout, such as a nav or a row of cards, opts out of its markers with
+`role="list"`:
+
+```html
+<ul role="list" class="tags">
+  <li>React</li>
+  <li>CSS</li>
+</ul>
+```
+
+`role="list"` also keeps the list announced as a list by VoiceOver in Safari, which can stop
+announcing a list styled with `list-style: none`. A [Stack](/components/stack/) or a
+[Grid](/components/grid/) rendered as a list drops the markers itself.
+
 ## Use a component
 
 ```tsx

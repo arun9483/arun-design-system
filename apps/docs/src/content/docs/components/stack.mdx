@@ -37,8 +37,9 @@ can't collapse it, and two margins never add up.
 
 ## Notes
 
-- It renders a `<div>`. Use `render` for the element the content needs: `render={<ul />}` for
-  a list, `render={<form />}` for a form.
+- It renders a `<div>`. Use `render` for the element the content needs: `render={<ul role="list" />}` for
+  a list, `render={<form />}` for a form. A Stack drops a list's markers itself; `role="list"`
+  keeps it announced as a list in Safari.
 - For a layout that changes at a width, such as a column on phones and a row on wide screens,
   add your own class with a media query. Or use a [Grid](/components/grid/) with `minItemSize`,
   which needs no breakpoints.
