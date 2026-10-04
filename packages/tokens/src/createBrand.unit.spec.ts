@@ -113,9 +113,12 @@ describe('generatePaletteFromSeed', () => {
 });
 
 /** The colour a theme block gives `name`, following its var() into the palette. */
-function resolve(css: string, selector: string, name: string): string {
-  const palette = extractBlock(css, ':root');
-  const value = extractBlock(css, selector)[name] ?? '';
+function resolve(
+  palette: Record<string, string>,
+  block: Record<string, string>,
+  name: string,
+): string {
+  const value = block[name] ?? '';
   const reference = /^var\((--[\w-]+)\)$/.exec(value)?.[1];
   return reference ? (palette[reference] ?? '') : value;
 }
@@ -128,17 +131,21 @@ const THEMES = [
 
 /** Every requirement a brand's CSS misses, as readable lines; empty when it meets them all. */
 function contrastFailures(css: string): string[] {
-  return THEMES.flatMap(([theme, selector]) =>
-    CONTRAST_REQUIREMENTS.flatMap(({ foreground, background, min }) => {
+  // Each block is parsed once per brand, not once per lookup: the sweep below checks hundreds
+  // of brands, and re-parsing for every token made it slow enough to time out in CI.
+  const palette = extractBlock(css, ':root');
+  return THEMES.flatMap(([theme, selector]) => {
+    const block = extractBlock(css, selector);
+    return CONTRAST_REQUIREMENTS.flatMap(({ foreground, background, min }) => {
       const ratio = contrastRatio(
-        resolve(css, selector, foreground),
-        resolve(css, selector, background),
+        resolve(palette, block, foreground),
+        resolve(palette, block, background),
       );
       return ratio >= min
         ? []
         : [`${theme}: ${foreground} on ${background} ${ratio.toFixed(2)} < ${min}`];
-    }),
-  );
+    });
+  });
 }
 
 /** Hue, saturation and lightness of a seed grid: every hue, muted to vivid, dark to light. */
