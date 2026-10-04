@@ -57,10 +57,27 @@ await writeFile('src/brand.css', createBrand({ name: 'acme', seed: '#0ea5e9' }))
 Then import `src/brand.css` in place of `@arun-dev/tokens/brands/default`. It emits the light,
 dark and system variants together, so theming keeps working.
 
+### Contrast is guaranteed for a seed
+
+Any seed colour gives a brand that meets WCAG contrast, in light and in dark. Text is at least
+4.5:1 on its background, and 7:1 where the default brand is audited AAA (body text, and the
+accent on the page and under on-accent text). Icons and outlines are at least 3:1.
+
+`createBrand()` checks every pair of tokens the components draw one on the other, listed in
+`CONTRAST_REQUIREMENTS`. A shade that falls short is made darker or lighter until it passes,
+keeping its hue. A bright seed such as yellow gets a deeper 700, for example, so white text on a
+primary Button stays readable. The other shades then move to keep the scale in order.
+
 You can also pass a full palette instead of a seed if you already have one:
 
 ```ts
 createBrand({ name: 'acme', palette: { 50: '#…', 100: '#…', /* … */ 950: '#…' } });
+```
+
+A palette you pass is used exactly as given, so check it yourself with the same list:
+
+```ts
+import { contrastRatio, CONTRAST_REQUIREMENTS } from '@arun-dev/tokens/createBrand';
 ```
 
 :::note[This site is that consumer]

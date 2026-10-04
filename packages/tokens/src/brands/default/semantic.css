@@ -34,7 +34,7 @@
   --color-status-error-bg: #fef2f2;
   --color-status-warning: #b45309;
   --color-status-warning-bg: #fffbeb;
-  --color-status-info: var(--color-brand-500);
+  --color-status-info: var(--color-brand-600); /* 5.62:1 on brand-50 */
   --color-status-info-bg: var(--color-brand-50);
 }
 
@@ -126,7 +126,7 @@
   --color-status-error-bg: #fef2f2;
   --color-status-warning: #b45309;
   --color-status-warning-bg: #fffbeb;
-  --color-status-info: var(--color-brand-500);
+  --color-status-info: var(--color-brand-600); /* 5.62:1 on brand-50 */
   --color-status-info-bg: var(--color-brand-50);
 }
 

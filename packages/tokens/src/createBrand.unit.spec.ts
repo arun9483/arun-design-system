@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  contrastRatio,
+  CONTRAST_REQUIREMENTS,
   createBrand,
   generatePaletteFromSeed,
   DEFAULT_NEUTRAL,
@@ -110,20 +112,6 @@ describe('generatePaletteFromSeed', () => {
   });
 });
 
-/** WCAG relative luminance of a #rrggbb colour. */
-function relativeLuminance(hex: string): number {
-  const [r = 0, g = 0, b = 0] = [1, 3, 5]
-    .map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
-    .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-}
-
-function contrast(a: string, b: string): number {
-  const light = Math.max(relativeLuminance(a), relativeLuminance(b));
-  const dark = Math.min(relativeLuminance(a), relativeLuminance(b));
-  return (light + 0.05) / (dark + 0.05);
-}
-
 /** The colour a theme block gives `name`, following its var() into the palette. */
 function resolve(css: string, selector: string, name: string): string {
   const palette = extractBlock(css, ':root');
@@ -132,32 +120,97 @@ function resolve(css: string, selector: string, name: string): string {
   return reference ? (palette[reference] ?? '') : value;
 }
 
-/* Accent fills — primary Button, a checked Checkbox, Radio, Switch, the current page — are
-   --color-text-accent, with --color-text-on-accent drawn on them. In dark mode the accent is
-   light, so the text on it must be dark. */
-describe('text on an accent fill', () => {
-  const themes = [
-    ['light', "[data-theme='light']"],
-    ['dark', "[data-theme='dark']"],
-    ['dark system preference', ":root:not([data-theme='light'])"],
-  ] as const;
+const THEMES = [
+  ['light', "[data-theme='light']"],
+  ['dark', "[data-theme='dark']"],
+  ['dark system preference', ":root:not([data-theme='light'])"],
+] as const;
 
-  it.each(themes)('meets AAA (7:1) in the default brand, %s', (_label, selector) => {
-    const fill = resolve(generated, selector, '--color-text-accent');
-    const text = resolve(generated, selector, '--color-text-on-accent');
-    expect(contrast(fill, text)).toBeGreaterThanOrEqual(7);
+/** Every requirement a brand's CSS misses, as readable lines; empty when it meets them all. */
+function contrastFailures(css: string): string[] {
+  return THEMES.flatMap(([theme, selector]) =>
+    CONTRAST_REQUIREMENTS.flatMap(({ foreground, background, min }) => {
+      const ratio = contrastRatio(
+        resolve(css, selector, foreground),
+        resolve(css, selector, background),
+      );
+      return ratio >= min
+        ? []
+        : [`${theme}: ${foreground} on ${background} ${ratio.toFixed(2)} < ${min}`];
+    }),
+  );
+}
+
+/** Hue, saturation and lightness of a seed grid: every hue, muted to vivid, dark to light. */
+function seedGrid(): string[] {
+  const seeds: string[] = [];
+  for (let hue = 0; hue < 360; hue += 15)
+    for (const saturation of [15, 45, 75, 100])
+      for (const lightness of [15, 30, 45, 60, 75]) {
+        const a = (saturation / 100) * Math.min(lightness / 100, 1 - lightness / 100);
+        const channel = (n: number) => {
+          const k = (n + hue / 30) % 12;
+          const value = lightness / 100 - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+          return Math.round(value * 255)
+            .toString(16)
+            .padStart(2, '0');
+        };
+        seeds.push(`#${channel(0)}${channel(8)}${channel(4)}`);
+      }
+  return seeds;
+}
+
+/* The contrast contract: every pair of tokens @arun-dev/ui draws one on the other meets its
+   WCAG ratio, in light and dark — for the default brand, and for a brand seeded with any colour. */
+describe('contrast requirements', () => {
+  it('lists the pairings the components draw', () => {
+    const pairs = CONTRAST_REQUIREMENTS.map(
+      ({ foreground, background }) => `${foreground} on ${background}`,
+    );
+    expect(pairs).toContain('--color-text-on-accent on --color-text-accent');
+    expect(pairs).toContain('--color-text-accent on --color-bg-primary');
+    expect(pairs).toContain('--color-status-info on --color-status-info-bg');
   });
 
-  // Blue, red, green, teal, purple and pink seeds, saturated and muted. Yellows are left out:
-  // their generated brand-700 is too light for white text in light mode, a palette issue.
-  it.each(['#0000b3', '#2563eb', '#dc2626', '#16a34a', '#0d9488', '#7c3aed', '#db2777', '#64748b'])(
-    'meets AA (4.5:1) in dark mode for a brand seeded with %s',
-    (seed) => {
-      const css = createBrand({ name: 'seeded', seed });
-      const selector = "[data-theme='dark']";
-      const fill = resolve(css, selector, '--color-text-accent');
-      const text = resolve(css, selector, '--color-text-on-accent');
-      expect(contrast(fill, text)).toBeGreaterThanOrEqual(4.5);
-    },
-  );
+  it('are met by the default brand', () => {
+    expect(contrastFailures(generated)).toEqual([]);
+    expect(contrastFailures(`${paletteCss}\n${semanticCss}`)).toEqual([]);
+  });
+
+  it.each([
+    '#ffff00',
+    '#b3b300',
+    '#00ff00',
+    '#00ffff',
+    '#0000ff',
+    '#ff0000',
+    '#000000',
+    '#ffffff',
+    '#808080',
+    '#7c3aed',
+  ])('are met by a brand seeded with %s', (seed) => {
+    expect(contrastFailures(createBrand({ name: 'seeded', seed }))).toEqual([]);
+  });
+
+  it('are met by a brand seeded with any of 480 colours across the wheel', () => {
+    const failures = seedGrid().flatMap((seed) =>
+      contrastFailures(createBrand({ name: 'seeded', seed })).map((line) => `${seed} ${line}`),
+    );
+    expect(failures).toEqual([]);
+  });
+
+  it("keep a fitted palette in order, light to dark, and on the seed's hue", () => {
+    const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+    for (const seed of ['#ffff00', '#b3b300', '#00ffff', '#0000b3', ...seedGrid().slice(0, 60)]) {
+      const palette = extractBlock(createBrand({ name: 'seeded', seed }), ':root');
+      const lightness = shades.map((shade) =>
+        contrastRatio(palette[`--color-brand-${shade}`] ?? '', '#000000'),
+      );
+      for (let i = 1; i < lightness.length; i++) {
+        expect(lightness[i], `${seed} brand-${shades[i]}`).toBeLessThan(
+          lightness[i - 1] ?? Infinity,
+        );
+      }
+    }
+  });
 });

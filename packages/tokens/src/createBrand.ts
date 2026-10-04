@@ -96,6 +96,21 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${f(0)}${f(8)}${f(4)}`;
 }
 
+/** WCAG 2 relative luminance of a #rrggbb colour. */
+function relativeLuminance(hex: string): number {
+  const [r, g, b] = hexToRgb(hex).map((v) =>
+    v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4,
+  ) as [number, number, number];
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** WCAG 2 contrast ratio between two #rrggbb colours, from 1 to 21. */
+export function contrastRatio(a: string, b: string): number {
+  const lighter = Math.max(relativeLuminance(a), relativeLuminance(b));
+  const darker = Math.min(relativeLuminance(a), relativeLuminance(b));
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
 /** Lightness targets for each shade step */
 const SHADE_LIGHTNESS: Record<Shade, number> = {
   50: 97,
@@ -206,7 +221,8 @@ function deriveLight(): Record<string, string> {
     '--color-border-strong': 'var(--color-neutral-300)',
     '--color-border-accent': 'var(--color-brand-300)',
     ...STATUS_LIGHT,
-    '--color-status-info': 'var(--color-brand-500)',
+    // 600, not 500: the info Badge's text sits on brand-50, and 500 there was 3.99:1.
+    '--color-status-info': 'var(--color-brand-600)',
     '--color-status-info-bg': 'var(--color-brand-50)',
   };
 }
@@ -235,6 +251,119 @@ function deriveDark(): Record<string, string> {
   };
 }
 
+// ─── Contrast ─────────────────────────────────────────────────────────────────
+
+/**
+ * Every pairing of semantic tokens that @arun-dev/ui draws one on the other, with the WCAG
+ * contrast it needs: 7 where the default brand is audited AAA, 4.5 for other text, 3 for
+ * icons, accent bars and focus outlines. A brand that skips createBrand should meet these too.
+ */
+export const CONTRAST_REQUIREMENTS: readonly {
+  foreground: keyof BrandSemanticContract;
+  background: keyof BrandSemanticContract;
+  min: number;
+}[] = [
+  // Body text on every page surface.
+  { foreground: '--color-text-primary', background: '--color-bg-primary', min: 7 },
+  { foreground: '--color-text-primary', background: '--color-bg-secondary', min: 7 },
+  { foreground: '--color-text-primary', background: '--color-bg-surface', min: 4.5 },
+  { foreground: '--color-text-secondary', background: '--color-bg-primary', min: 7 },
+  { foreground: '--color-text-muted', background: '--color-bg-primary', min: 4.5 },
+  { foreground: '--color-text-inverse', background: '--color-bg-inverse', min: 7 },
+  // The accent as text: links, accent chips, focus outlines.
+  { foreground: '--color-text-accent', background: '--color-bg-primary', min: 7 },
+  { foreground: '--color-text-accent', background: '--color-bg-secondary', min: 4.5 },
+  { foreground: '--color-text-accent', background: '--color-bg-surface', min: 4.5 },
+  { foreground: '--color-text-accent', background: '--color-bg-accent', min: 4.5 },
+  // The accent as a fill: primary Button, checked Checkbox and Radio, the current page.
+  { foreground: '--color-text-on-accent', background: '--color-text-accent', min: 7 },
+  // Status tones: a Badge's text on its tint, an Alert's or Toast's accent on the page.
+  { foreground: '--color-status-success', background: '--color-status-success-bg', min: 4.5 },
+  { foreground: '--color-status-error', background: '--color-status-error-bg', min: 4.5 },
+  { foreground: '--color-status-warning', background: '--color-status-warning-bg', min: 4.5 },
+  { foreground: '--color-status-info', background: '--color-status-info-bg', min: 4.5 },
+  { foreground: '--color-status-info', background: '--color-bg-primary', min: 3 },
+];
+
+const BRAND_VAR = /^var\(--color-brand-(\d+)\)$/;
+const NEUTRAL_VAR = /^var\(--color-neutral-(\d+)\)$/;
+
+/** The colour a semantic value stands for: a brand shade, a neutral shade or a literal. */
+function resolveColor(value: string, palette: BrandPalette, neutral: NeutralPalette): string {
+  const brand = BRAND_VAR.exec(value);
+  if (brand) return palette[Number(brand[1]) as Shade];
+  const gray = NEUTRAL_VAR.exec(value);
+  if (gray) return neutral[Number(gray[1]) as NeutralShade];
+  return value;
+}
+
+/** The same colour, lighter or darker by `step` HSL points; its hue and saturation kept. */
+function shiftLightness(hex: string, step: number): string {
+  const [h, s, l] = rgbToHsl(...hexToRgb(hex));
+  return hslToHex(h, s, Math.min(100, Math.max(0, l + step)));
+}
+
+const SHADES = Object.keys(SHADE_LIGHTNESS).map(Number) as Shade[];
+
+/**
+ * Moves the shades of a seeded palette until every pairing in CONTRAST_REQUIREMENTS passes in
+ * both themes. HSL lightness is not how light a colour looks — a yellow at the 700 step is
+ * still bright — so fixed steps alone cannot promise contrast.
+ *
+ * In each failing pair the brand shade moves, away from the colour it sits on or under: the
+ * foreground's when both are brand shades. Hue and saturation stay, so the brand still reads
+ * as its seed. The scale is then kept in order, light to dark, by moving its neighbours on.
+ */
+function fitContrast(palette: BrandPalette, neutral: NeutralPalette): BrandPalette {
+  const fitted = { ...palette };
+  const themes = [deriveLight(), deriveDark()];
+
+  for (let pass = 0; pass < 4; pass++) {
+    let moved = false;
+    for (const theme of themes) {
+      for (const { foreground, background, min } of CONTRAST_REQUIREMENTS) {
+        const fgValue = theme[foreground] ?? '';
+        const bgValue = theme[background] ?? '';
+        const fgShade = BRAND_VAR.exec(fgValue)?.[1];
+        const bgShade = BRAND_VAR.exec(bgValue)?.[1];
+        const shade = Number(fgShade ?? bgShade) as Shade;
+        if (!fgShade && !bgShade) continue;
+        const other = resolveColor(fgShade ? bgValue : fgValue, fitted, neutral);
+        // Away from the other colour: darker against a light one, lighter against a dark one.
+        const step = relativeLuminance(other) > 0.18 ? -1 : 1;
+        for (let i = 0; i < 100 && contrastRatio(fitted[shade], other) < min; i++) {
+          fitted[shade] = shiftLightness(fitted[shade], step);
+          moved = true;
+        }
+      }
+    }
+    // Keep the scale in order: each shade darker than the one before it.
+    const middle = SHADES.indexOf(500);
+    for (let i = middle + 1; i < SHADES.length; i++) {
+      const [before, shade] = [SHADES[i - 1] as Shade, SHADES[i] as Shade];
+      for (
+        let n = 0;
+        n < 100 && relativeLuminance(fitted[shade]) >= relativeLuminance(fitted[before]);
+        n++
+      ) {
+        fitted[shade] = shiftLightness(fitted[shade], -1);
+      }
+    }
+    for (let i = middle - 1; i >= 0; i--) {
+      const [after, shade] = [SHADES[i + 1] as Shade, SHADES[i] as Shade];
+      for (
+        let n = 0;
+        n < 100 && relativeLuminance(fitted[shade]) <= relativeLuminance(fitted[after]);
+        n++
+      ) {
+        fitted[shade] = shiftLightness(fitted[shade], 1);
+      }
+    }
+    if (!moved) break;
+  }
+  return fitted;
+}
+
 // ─── CSS generation ───────────────────────────────────────────────────────────
 
 function toVars(tokens: Record<string, string>, indent = '  '): string {
@@ -261,7 +390,10 @@ function neutralVars(neutral: NeutralPalette): string {
  */
 export function createBrand(input: CreateBrandInput): string {
   const { name, neutral = DEFAULT_NEUTRAL } = input;
-  const palette = 'seed' in input ? generatePaletteFromSeed(input.seed) : input.palette;
+  // A seeded palette is fitted to the contrast requirements. A palette passed in is the
+  // consumer's own choice and is used as given: check it against CONTRAST_REQUIREMENTS.
+  const palette =
+    'seed' in input ? fitContrast(generatePaletteFromSeed(input.seed), neutral) : input.palette;
 
   const light = deriveLight();
   const dark = deriveDark();
