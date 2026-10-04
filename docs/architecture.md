@@ -211,8 +211,12 @@ same reason: an indicator cannot go inside an `<input>` either.
 but knows nothing of the React state behind `aria-checked` and the `data-*` attributes,
 so a reset form would show one value and submit another. `core/useFormReset` closes it
 for both components — it restores the state the component mounted with, through the same
-setter a click goes through, once the `reset` event has finished dispatching and no
-listener has cancelled it. It is internal: shared between components, not exported.
+setter a click goes through, once the `reset` event has finished dispatching, no
+listener has cancelled it, and the page has re-rendered. That last part matters for form
+libraries: react-hook-form's `reset()` sets its own values and then calls `form.reset()`, so
+the component compares against the value on screen after that render, through the handler of
+that render, and reports nothing the library already did. It is internal: shared between
+components, not exported.
 
 Checkbox is what shows the cost of _not_ having that. Native `indeterminate` is a DOM
 property with no attribute behind it, so React cannot set it declaratively, the first

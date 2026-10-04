@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import { useControlled } from '../core/useControlled';
+import { afterReset, useLatest } from '../core/useLatest';
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
 import {
@@ -126,17 +127,18 @@ export function OtpInputRoot({
   // so the reset would change nothing. Return to the mount-time value instead, through the
   // same setter typing uses — a native input would go back to its default.
   const { current: initialValue } = useRef(value);
+  const latest = useLatest(commit);
   useEffect(() => {
     const form = inputRef.current?.form;
     if (!form) return;
     function onReset(event: Event) {
-      queueMicrotask(() => {
-        if (!event.defaultPrevented) commit(initialValue);
-      });
+      // Once the reset has settled, through the setter on screen then (see `afterReset`):
+      // it compares with the current value, so a reset a form library made is not repeated.
+      afterReset(event, () => latest.current(initialValue));
     }
     form.addEventListener('reset', onReset);
     return () => form.removeEventListener('reset', onReset);
-  }, [commit, initialValue]);
+  }, [latest, initialValue]);
 
   const context = useMemo(
     () => ({

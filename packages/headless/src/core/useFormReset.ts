@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
+import { afterReset, useLatest } from './useLatest';
 
 /**
  * Returns a control to the state it mounted with when its form is reset.
@@ -14,8 +15,8 @@ import type { RefObject } from 'react';
  * React writes the mount-time value as the input's default, so "the state it mounted
  * with" is exactly what the platform resets the input to.
  *
- * `reset` fires before the form resets, and a listener that runs after this one can
- * still cancel it, so the work waits for a microtask, when dispatch has finished.
+ * The work runs after the reset has settled, against the state on screen then — see
+ * `afterReset` — so a form library that reset the value itself is not told about it again.
  *
  * `inputChecked` is the already-derived boolean rather than a `value => boolean`
  * function on purpose: a function would be a new identity every render and re-subscribe
@@ -40,6 +41,7 @@ export function useFormReset<T>({
   commit: (next: T) => void;
 }): void {
   const { current: initialValue } = useRef(value);
+  const latest = useLatest({ value, inputChecked, commit });
 
   useEffect(() => {
     // `.form` also honours a `form="id"` attribute on the element.
@@ -47,17 +49,17 @@ export function useFormReset<T>({
     if (!form) return;
 
     function onReset(event: Event) {
-      queueMicrotask(() => {
-        if (event.defaultPrevented) return;
+      afterReset(event, () => {
+        const { value: current, inputChecked: checked, commit: set } = latest.current;
         // Undo the platform's reset of the input: it follows the component, and only
         // moves when the state below does — which a controlled parent may decline.
-        if (inputRef.current) inputRef.current.checked = inputChecked;
-        if (value === initialValue) return;
-        commit(initialValue);
+        if (inputRef.current) inputRef.current.checked = checked;
+        if (current === initialValue) return;
+        set(initialValue);
       });
     }
 
     form.addEventListener('reset', onReset);
     return () => form.removeEventListener('reset', onReset);
-  }, [elementRef, inputRef, value, inputChecked, commit, initialValue]);
+  }, [elementRef, inputRef, latest, initialValue]);
 }

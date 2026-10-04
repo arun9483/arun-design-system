@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useId, useMemo, useRef } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
+import { afterReset, useLatest } from '../core/useLatest';
 import { useControlled } from '../core/useControlled';
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
@@ -115,6 +116,7 @@ export function RadioGroupRoot({
 
   const elementRef = useRef<HTMLElement | null>(null);
   const { current: initialValue } = useRef(value);
+  const latest = useLatest({ value, commit: commitValue });
 
   useEffect(() => {
     // `.form` honours a `form="id"` attribute, which a lookup by ancestor would not.
@@ -122,23 +124,22 @@ export function RadioGroupRoot({
     if (!owner) return;
 
     function onReset(event: Event) {
-      // `reset` fires before the form resets, and a later listener can still cancel it,
-      // so the work waits until dispatch has finished.
-      queueMicrotask(() => {
-        if (event.defaultPrevented) return;
+      // Once the reset has settled, against the value on screen then (see `afterReset`).
+      afterReset(event, () => {
+        const { value: current, commit } = latest.current;
         // Undo the platform's reset of the inputs: they follow the group, and only move
         // when the value below does — which a controlled parent may decline.
         for (const input of radiosIn(elementRef.current, name)) {
-          input.checked = input.value === value;
+          input.checked = input.value === current;
         }
-        if (value === initialValue) return;
-        commitValue(initialValue);
+        if (current === initialValue) return;
+        commit(initialValue);
       });
     }
 
     owner.addEventListener('reset', onReset);
     return () => owner.removeEventListener('reset', onReset);
-  }, [name, value, commitValue, initialValue]);
+  }, [name, latest, initialValue]);
 
   const state: RadioGroupState = useMemo(
     () => ({ value, disabled, required, name, form, select: commitValue }),
