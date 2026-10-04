@@ -239,7 +239,11 @@ describe('RadioGroup — forms', () => {
 
 describe('RadioGroup — form reset', () => {
   const reset = (container: HTMLElement) =>
-    act(async () => container.querySelector('form')?.reset());
+    act(async () => {
+      container.querySelector('form')?.reset();
+      // The component settles a reset a task later, after any re-render it caused.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
 
   it('returns to the value it mounted with, and reports it', async () => {
     const onValueChange = vi.fn();

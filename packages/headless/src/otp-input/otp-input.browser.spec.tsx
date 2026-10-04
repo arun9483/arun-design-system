@@ -183,7 +183,8 @@ describe('OtpInput (browser)', () => {
     expect(new FormData(form).get('code')).toBe('123456');
     expect(form).toHaveAttribute('aria-label', 'Verify');
     await userEvent.click(screen.getByRole('button', { name: 'Reset' }));
-    expect(input()).toHaveValue('12');
+    // A reset settles a task later, after any re-render it caused.
+    await expect.poll(() => input().value).toBe('12');
     expect(slotText()).toBe('12');
   });
 

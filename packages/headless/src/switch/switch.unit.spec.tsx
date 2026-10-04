@@ -176,7 +176,11 @@ describe('Switch — forms', () => {
 
 describe('Switch — form reset', () => {
   const reset = (container: HTMLElement) =>
-    act(async () => container.querySelector('form')?.reset());
+    act(async () => {
+      container.querySelector('form')?.reset();
+      // The component settles a reset a task later, after any re-render it caused.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
 
   it.each([false, true])('returns to its initial state (defaultChecked=%s)', async (initial) => {
     const { container } = render(

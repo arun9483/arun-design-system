@@ -71,7 +71,8 @@ The id is the Field's. Don't give the control an `id` of your own, or the label 
 
 Field checks nothing. Set `invalid` from wherever you validate:
 
-- **react-hook-form:** `invalid={!!fieldState.error}`, and the message in `Field.Error`.
+- **react-hook-form:** `invalid={!!fieldState.error}`, and the message in `Field.Error`. See
+  [a whole form](/guides/react-hook-form/#a-whole-form) with every control.
 - **The browser:** `required` on the Root makes the control `required`, so the browser stops
   the form and shows its own message.
 

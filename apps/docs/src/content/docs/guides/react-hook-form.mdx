@@ -4,6 +4,8 @@ description: Why these controls need Controller rather than register, and what w
 ---
 
 import { Aside } from '@astrojs/starlight/components';
+import Example from '@/components/Example.astro';
+import ReactHookFormSignup from '@/examples/react-hook-form-signup';
 
 Every control that carries a value — [Checkbox](/components/checkbox/),
 [Radio group](/components/radio-group/), [Switch](/components/switch/) and
@@ -15,6 +17,32 @@ know; the rest of this page explains why, and what you get once the binding is r
 [Input](/components/input/), [Textarea](/components/textarea/) and [Select](/components/select/)
 are the exceptions: each is a plain native element with no state of its own, so
 [`register()` is the binding](#input-textarea-and-select-use-register).
+
+## A whole form
+
+Every control in one sign-up form: each wrapped in a [Field](/components/field/) for its label,
+hint and error, bound with `register()` or `Controller` as the rest of this page explains, and
+validated by react-hook-form.
+
+<Example name="react-hook-form-signup" layout="stack">
+  <ReactHookFormSignup client:load />
+</Example>
+
+Things to try:
+
+- **Submit it empty.** Every rule fails at once, each message appears under its control, and
+  focus moves to the first one.
+- **Fix a field.** After a submit, each error updates as you type and disappears once the rule
+  passes.
+- **Pick the Free plan with more than 3 seats.** The seats rule reads another field, and `deps`
+  re-checks it when the plan changes.
+- **Enter a wrong code.** The form submits, the server check fails, and `setError` puts its
+  message on the code and focuses it. 123456 is the right one.
+- **Reset.** `reset()` returns every control to its default, the Controller-bound ones included.
+
+Radio group and the interests are groups of controls, so they are a `<fieldset>` with a
+`<legend>` rather than a Field, which names one control. Their error is tied to the group with
+`aria-describedby`.
 
 ## Use Controller
 

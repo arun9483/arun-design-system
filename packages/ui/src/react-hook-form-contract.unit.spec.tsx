@@ -198,7 +198,11 @@ describe.each(CONTROLS)('$label with react-hook-form', (control) => {
 
     // The platform resets the hidden input; useFormReset reports the change through
     // onCheckedChange, which is the only reason react-hook-form hears about it at all.
-    await act(async () => fireEvent.click(screen.getByText('Reset')));
+    await act(async () => {
+      fireEvent.click(screen.getByText('Reset'));
+      // The control settles a reset a task later, after any re-render it caused.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
 
     expect(screen.getByRole(control.role)).toHaveAttribute('aria-checked', 'false');
     expect(seen.at(-1)).toBe(false);
@@ -450,7 +454,11 @@ describe('RadioGroup with react-hook-form', () => {
 
     // The platform resets the inputs; the group reports the change through
     // onValueChange, which is the only reason react-hook-form hears about it at all.
-    await act(async () => fireEvent.click(screen.getByText('Reset')));
+    await act(async () => {
+      fireEvent.click(screen.getByText('Reset'));
+      // The control settles a reset a task later, after any re-render it caused.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
 
     expect(radio('free')).toBeChecked();
     expect(seen.at(-1)).toBe('free');
@@ -803,5 +811,116 @@ describe('OtpInput with react-hook-form', () => {
     await act(async () => fireEvent.click(screen.getByText('Verify')));
     expect(onSubmit).not.toHaveBeenCalled();
     expect(document.querySelectorAll('.otp-input-slot[data-filled]')).toHaveLength(3);
+  });
+});
+
+describe('reset() across a whole form', () => {
+  // react-hook-form's reset() sets its own values and then calls the native form.reset(). The
+  // controls must not then report a reset of their own through the handlers of the render
+  // before: a checkbox group sharing one array would write the old array back.
+  type Values = { name: string; tags: string[]; plan: string | null; on: boolean; code: string };
+  const defaults: Values = { name: '', tags: [], plan: null, on: false, code: '' };
+
+  function setup() {
+    const api: { form?: ReturnType<typeof useForm<Values>> } = {};
+    function Form() {
+      const form = useForm<Values>({ defaultValues: defaults });
+      api.form = form;
+      return (
+        <form>
+          <Input aria-label="Name" {...form.register('name')} />
+          <Controller
+            control={form.control}
+            name="tags"
+            render={({ field }) => (
+              <>
+                {['a', 'b'].map((tag) => (
+                  <Checkbox.Root
+                    key={tag}
+                    aria-label={tag}
+                    checked={field.value.includes(tag)}
+                    onCheckedChange={(checked) =>
+                      field.onChange(
+                        checked === true
+                          ? [...field.value, tag]
+                          : field.value.filter((t) => t !== tag),
+                      )
+                    }
+                  />
+                ))}
+              </>
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="plan"
+            render={({ field }) => (
+              <RadioGroup.Root
+                aria-label="Plan"
+                name={field.name}
+                value={field.value}
+                onValueChange={field.onChange}
+              >
+                <RadioGroup.Item value="free" aria-label="Free" />
+                <RadioGroup.Item value="pro" aria-label="Pro" />
+              </RadioGroup.Root>
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="on"
+            render={({ field }) => (
+              <Switch.Root aria-label="On" checked={field.value} onCheckedChange={field.onChange} />
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="code"
+            render={({ field }) => (
+              <OtpInput
+                aria-label="Code"
+                length={4}
+                value={field.value}
+                onValueChange={field.onChange}
+              />
+            )}
+          />
+          <button type="button" onClick={() => form.reset()}>
+            Reset
+          </button>
+        </form>
+      );
+    }
+    render(<Form />);
+    return api;
+  }
+
+  it('returns every control to its default, and the form with it', async () => {
+    const api = setup();
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Ada' } });
+    fireEvent.click(screen.getByLabelText('a'));
+    fireEvent.click(screen.getByLabelText('b'));
+    fireEvent.click(screen.getByLabelText('Pro'));
+    fireEvent.click(screen.getByLabelText('On'));
+    fireEvent.change(screen.getByLabelText('Code'), { target: { value: '1234' } });
+    expect(api.form?.getValues()).toEqual({
+      name: 'Ada',
+      tags: ['a', 'b'],
+      plan: 'pro',
+      on: true,
+      code: '1234',
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('Reset'));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    expect(api.form?.getValues()).toEqual(defaults);
+    expect(screen.getByLabelText('a')).toHaveAttribute('aria-checked', 'false');
+    expect(screen.getByLabelText('b')).toHaveAttribute('aria-checked', 'false');
+    expect(screen.getByLabelText('Pro')).not.toBeChecked();
+    expect(screen.getByLabelText('On')).toHaveAttribute('aria-checked', 'false');
+    expect(screen.getByLabelText('Code')).toHaveValue('');
   });
 });
