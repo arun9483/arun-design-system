@@ -13,6 +13,7 @@ import {
   Drawer,
   HoverCard,
   Link,
+  Stepper,
   Input,
   RadioGroup,
   Select,
@@ -468,6 +469,32 @@ export function HoverCardPlayground() {
           </HoverCard.Trigger>
           <HoverCard.Popup {...props} />
         </HoverCard.Root>
+      )}
+    />
+  );
+}
+
+const STEPPER_CONTROLS: Control[] = [
+  {
+    name: 'orientation',
+    type: 'select',
+    options: ['horizontal', 'vertical'],
+    initial: 'horizontal',
+  },
+];
+
+export function StepperPlayground() {
+  return (
+    <Playground
+      component="Stepper.Root"
+      controls={STEPPER_CONTROLS}
+      children="…"
+      render={(props: ComponentProps<typeof Stepper.Root>) => (
+        <Stepper.Root {...props} aria-label="Playground steps" style={{ inlineSize: '100%' }}>
+          <Stepper.Item status="complete">Details</Stepper.Item>
+          <Stepper.Item status="current">Plan</Stepper.Item>
+          <Stepper.Item>Payment</Stepper.Item>
+        </Stepper.Root>
       )}
     />
   );

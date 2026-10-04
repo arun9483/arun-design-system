@@ -49,6 +49,7 @@ const CSS_LAYERS = [
   { layer: 'toast', src: 'src/components/toast/toast.css' },
   { layer: 'breadcrumb', src: 'src/components/breadcrumb/breadcrumb.css' },
   { layer: 'pagination', src: 'src/components/pagination/pagination.css' },
+  { layer: 'stepper', src: 'src/components/stepper/stepper.css' },
   { layer: 'table', src: 'src/components/table/table.css' },
   { layer: 'kbd', src: 'src/components/kbd/kbd.css' },
   { layer: 'toggle', src: 'src/components/toggle/toggle.css' },

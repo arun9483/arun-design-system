@@ -73,6 +73,8 @@ import type {
   ProgressProps,
   SeparatorProps,
   StackProps,
+  StepperItemProps,
+  StepperRootProps,
   HeadingProps,
   ParagraphProps,
   TextProps,
@@ -124,6 +126,8 @@ type Unknown =
   | OnlyRealProps<Documented<'Toast.Viewport'>, ToastViewportProps>
   | OnlyRealProps<Documented<'Separator'>, SeparatorProps>
   | OnlyRealProps<Documented<'Stack'>, StackProps>
+  | OnlyRealProps<Documented<'Stepper.Root'>, StepperRootProps>
+  | OnlyRealProps<Documented<'Stepper.Item'>, StepperItemProps>
   | OnlyRealProps<Documented<'Heading'>, HeadingProps>
   | OnlyRealProps<Documented<'Paragraph'>, ParagraphProps>
   | OnlyRealProps<Documented<'Text'>, TextProps>

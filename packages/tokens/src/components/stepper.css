@@ -1,0 +1,30 @@
+/* Stepper component tokens — the numbered steps of a multi-step flow and the lines between.
+   Override any of these to restyle steppers without moving other components. */
+:root {
+  /* Indicator */
+  --stepper-indicator-size: var(--space-lg);
+  --stepper-indicator-border-width: var(--space-2px);
+  --stepper-indicator-font-size: var(--text-sm);
+  --stepper-indicator-bg: var(--color-bg-primary);
+
+  /* States — complete is the accent fill, as a checked Checkbox; current is outlined in it */
+  --stepper-upcoming-color: var(--color-text-muted);
+  --stepper-current-color: var(--color-text-accent);
+  --stepper-complete-bg: var(--color-text-accent);
+  --stepper-complete-color: var(--color-text-on-accent);
+
+  /* Label */
+  --stepper-label-color: var(--color-text-secondary);
+  --stepper-current-label-color: var(--color-text-primary);
+  --stepper-label-font-size: var(--text-sm);
+  --stepper-label-gap: var(--space-2xs);
+
+  /* Connector */
+  --stepper-connector-color: var(--color-border-default);
+  --stepper-connector-thickness: var(--space-2px);
+  --stepper-connector-gap: var(--space-2xs);
+
+  /* Vertical — a wider gap and a tighter connector, so the line between steps reads as one */
+  --stepper-vertical-gap: var(--space-lg);
+  --stepper-vertical-connector-gap: var(--space-3xs);
+}

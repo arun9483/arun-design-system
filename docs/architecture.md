@@ -1283,3 +1283,34 @@ cards, as Tooltip has: cards are not read one after another along a toolbar.
 
 **Rules out:** opening on touch (long press included); a HoverCard whose content is the only
 path to an action; `popover="hint"`, for Tooltip's reason — Safari lacks it.
+
+---
+
+## 25. Stepper: an ordered list, the step is yours
+
+A stepper shows the steps of a multi-step flow and how far along it is. By decision 7's test it
+needs no JavaScript — which step is current changes only when the consumer moves on — so it is
+`@arun-dev/ui` alone, like Breadcrumb and Pagination (decision 17).
+
+**`Root` is an `<ol role="list">`, `Item` an `<li>`.** The list gives the position ("2 of 4")
+for free. `role="list"` because the markers are drawn, not the list's own, and Safari can drop
+list semantics from a list without `list-style`.
+
+**Status is a prop on each Item, not an index on the Root.** `complete`, `current` or
+`upcoming`. The consumer already knows each step's state — usually from the URL — and a status
+per item allows what an index cannot: a step completed out of order, or a skipped optional one.
+`current` sets `aria-current="step"`.
+
+**The indicator is drawn and hidden.** The number is a CSS counter, the tick generated content,
+both in an `aria-hidden` span; the connector is an `::after` line. What they say visually is
+said in words: the list position, `aria-current`, and for a complete step a visually hidden
+"(completed)", translatable through the Root's `labels`, as Pagination's are. Classes
+(`stepper-item-complete`) carry the status to CSS, since `data-*` is reserved for what headless
+emits.
+
+**Parts, fewest first (decision 11):** `Root`, `Item`. A step's label, description or link back
+is the consumer's content inside the Item.
+
+**Rules out:** a Stepper that holds the current step, or moves focus between steps; an error
+status (a step's errors are its form's — Field and Alert); a step-content part that shows the
+current panel, which is the consumer's routing.
