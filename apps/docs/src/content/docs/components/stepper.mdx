@@ -59,6 +59,32 @@ as the page is yours for [Pagination](/components/pagination/). The Stepper hold
 
 A screen reader also hears each step's position, such as "2 of 4", from the list.
 
+## Steps and their content
+
+The Stepper shows progress; the step's content is yours. Render the current step's form or
+summary next to it, from the same state that sets the statuses, as the example above does.
+There's no content part, because which content shows is your routing: often each step is its
+own page.
+
+When the step changes without a page load, move focus to the new step's heading (give it
+`tabIndex={-1}`), so a screen reader announces where you are.
+
+## Finishing the flow
+
+The last step completes the same way as the others: when you leave it. On the last step, the
+button that moves on is the one that finishes, such as "Place order". Pressing it marks every
+step `complete`, so no step is current, and shows a confirmation in place of the step content.
+
+| Where you are    | Statuses                                        |
+| ---------------- | ----------------------------------------------- |
+| On step 1        | step 1 `current`, the rest `upcoming`           |
+| On step 3        | steps 1–2 `complete`, 3 `current`, 4 `upcoming` |
+| On the last step | all but the last `complete`, the last `current` |
+| Finished         | every step `complete`                           |
+
+On the last step it's still `current`, not `complete`: you're reviewing it, and nothing is
+done until you confirm. Try it in the example, or pick **Finished** in the playground below.
+
 ## Going back
 
 A step's label is your content. Make a complete step a [Link](/components/link/) to its URL,
@@ -84,7 +110,7 @@ label.
 - Name the list with `aria-label`, such as "Checkout progress".
 - The number and tick are drawn and hidden from screen readers. The list position and the
   hidden "completed" text say the same in words, so the state never depends on the tick alone.
-- Exactly one step should be `current`.
+- At most one step is `current`, and none once the flow is finished.
 
 ## Props
 
