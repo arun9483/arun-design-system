@@ -46,6 +46,12 @@
 }
 
 /* Playground */
+/* The printed JSX scrolls inside its box: a long line must never widen the page, which on a
+   phone makes the browser zoom out the whole layout. */
+.ds-playground-output {
+  overflow-x: auto;
+}
+
 .ds-playground-controls {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));

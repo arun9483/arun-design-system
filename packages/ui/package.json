@@ -77,7 +77,8 @@
     "./css/stack": "./dist/css/stack.css",
     "./css/grid": "./dist/css/grid.css",
     "./css/heading": "./dist/css/heading.css",
-    "./css/paragraph": "./dist/css/paragraph.css"
+    "./css/paragraph": "./dist/css/paragraph.css",
+    "./css/drawer": "./dist/css/drawer.css"
   },
   "publishConfig": {
     "access": "public"
@@ -111,7 +112,7 @@
     "vitest": "4.1.11"
   },
   "peerDependencies": {
-    "@arun-dev/headless": ">=4.18.0",
+    "@arun-dev/headless": ">=4.20.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
   }

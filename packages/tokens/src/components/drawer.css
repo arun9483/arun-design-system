@@ -1,0 +1,32 @@
+/* Drawer component tokens — a modal panel attached to one edge of the viewport. */
+:root {
+  /* Panel */
+  --drawer-size: 22rem; /* width of a left or right drawer */
+  --drawer-viewport-gap: var(--space-2xl); /* backdrop left showing beside or above it */
+  --drawer-padding: var(--space-md);
+  --drawer-radius: var(--radius-lg);
+  --drawer-bg: var(--color-bg-primary);
+  --drawer-color: var(--color-text-primary);
+  --drawer-border-width: var(--space-px);
+  --drawer-border-color: var(--color-border-subtle);
+  --drawer-shadow: var(--shadow-xl);
+
+  /* Grab bar on a bottom drawer */
+  --drawer-handle-width: var(--space-xl);
+  --drawer-handle-height: var(--space-3xs);
+  --drawer-handle-color: var(--color-border-default);
+
+  /* Title */
+  --drawer-title-font-size: var(--text-lg);
+  --drawer-title-font-weight: var(--font-weight-semibold);
+  --drawer-title-gap: var(--space-xs);
+
+  /* Backdrop — a neutral scrim, the same value as Dialog's, in every brand and mode. */
+  --drawer-backdrop: rgb(0 0 0 / 0.5);
+
+  /* Motion */
+  --drawer-duration: var(--duration-normal);
+
+  /* Set on the element by @arun-dev/headless while it is pulled toward closing. */
+  --drawer-swipe: 0px;
+}
