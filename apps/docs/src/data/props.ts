@@ -351,6 +351,30 @@ export const PROPS = {
         'A font weight: the `--font-weight-*` token of the same name. Inherited from the text around it.',
     },
   ],
+  'Stepper.Root': [
+    {
+      name: 'orientation',
+      type: "'horizontal' | 'vertical'",
+      default: "'horizontal'",
+      description: 'Steps in a row, or down a column with each label beside its number.',
+    },
+    {
+      name: 'labels',
+      type: '{ complete?: string }',
+      default: "{ complete: 'completed' }",
+      description:
+        "Text read out but not shown, for translating: `complete` follows a complete step's label.",
+    },
+  ],
+  'Stepper.Item': [
+    {
+      name: 'status',
+      type: "'complete' | 'current' | 'upcoming'",
+      default: "'upcoming'",
+      description:
+        'Done, in progress, or ahead. `current` sets `aria-current="step"`; `complete` draws a tick and adds the hidden completed label.',
+    },
+  ],
   Progress: [
     {
       name: 'value',

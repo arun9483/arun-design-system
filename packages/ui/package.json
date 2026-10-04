@@ -79,7 +79,8 @@
     "./css/heading": "./dist/css/heading.css",
     "./css/paragraph": "./dist/css/paragraph.css",
     "./css/drawer": "./dist/css/drawer.css",
-    "./css/hover-card": "./dist/css/hover-card.css"
+    "./css/hover-card": "./dist/css/hover-card.css",
+    "./css/stepper": "./dist/css/stepper.css"
   },
   "publishConfig": {
     "access": "public"

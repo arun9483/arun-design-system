@@ -98,3 +98,5 @@ export type { ParagraphProps } from './components/paragraph';
 export { Text } from './components/text';
 export type { TextProps } from './components/text';
 export type { TextColor, TextSize, TextWeight } from './lib/typography';
+export { Stepper } from './components/stepper';
+export type { StepperItemProps, StepperRootProps, StepperStatus } from './components/stepper';

@@ -1,0 +1,105 @@
+---
+title: Stepper
+description: The named steps of a multi-step flow, and which one you're on — an ordered list, styled.
+---
+
+import Example from '@/components/Example.astro';
+import StepperBasics from '@/examples/stepper-basics';
+import StepperVertical from '@/examples/stepper-vertical';
+import PropTable from '@/components/PropTable.astro';
+import { StepperPlayground } from '@/components/playgrounds';
+
+## When to use
+
+- A checkout, sign-up or setup that takes several screens, in order
+- Showing how many steps are left, and letting people go back to one they've done
+
+Not for a single task's percentage — use [Progress](/components/progress/) — or for views
+people switch between freely, which are [Tabs](/components/tabs/).
+
+**Choosing between showing progress, loading or a measurement:**
+
+| Component                         | Use it for                                                              | For example                                   |
+| --------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------- |
+| [Progress](/components/progress/) | A task whose completion is known, moving toward done                    | Upload at 40%, step 2 of 5                    |
+| **Stepper**                       | The named steps of a multi-step flow, and which one you're on           | Checkout: Cart, Shipping, Payment             |
+| [Meter](/components/meter/)       | A measurement within a known range, not a task                          | Disk usage, password strength, a score        |
+| [Spinner](/components/spinner/)   | Work of unknown length, in a small space                                | A button saying "Saving…", a panel refreshing |
+| [Skeleton](/components/skeleton/) | Content still loading whose shape is known, so the layout does not jump | Placeholder rows in a list, a profile card    |
+
+<Example name="stepper-basics">
+  <StepperBasics client:load />
+</Example>
+
+## Anatomy
+
+```tsx
+import { Stepper } from '@arun-dev/ui';
+
+<Stepper.Root aria-label="Checkout progress">
+  <Stepper.Item status="complete">Cart</Stepper.Item>
+  <Stepper.Item status="current">Shipping</Stepper.Item>
+  <Stepper.Item>Payment</Stepper.Item>
+</Stepper.Root>;
+```
+
+| Part   | Renders            | Does                                              |
+| ------ | ------------------ | ------------------------------------------------- |
+| `Root` | `<ol role="list">` | the list of steps; name it with `aria-label`      |
+| `Item` | `<li>`             | one step: a drawn number or tick, then your label |
+
+**The current step is yours.** Keep it in state or the URL and give each Item its `status`,
+as the page is yours for [Pagination](/components/pagination/). The Stepper holds nothing.
+
+| `status`             | Looks                          | Read out                      |
+| -------------------- | ------------------------------ | ----------------------------- |
+| `complete`           | a filled circle with a tick    | the label, then "completed"   |
+| `current`            | an outlined circle, bold label | the label, and "current step" |
+| `upcoming` (default) | a muted outlined circle        | the label                     |
+
+A screen reader also hears each step's position, such as "2 of 4", from the list.
+
+## Going back
+
+A step's label is your content. Make a complete step a [Link](/components/link/) to its URL,
+or a button, so people can go back to it. Leave upcoming steps as text if they can't be
+skipped to.
+
+## Vertical
+
+<Example name="stepper-vertical">
+  <StepperVertical client:load />
+</Example>
+
+`orientation="vertical"` puts each label beside its number, with the line running down. It
+suits a side panel, or many steps on a phone, where a row would leave too little room for each
+label.
+
+## Playground
+
+<StepperPlayground client:load />
+
+## Accessibility
+
+- Name the list with `aria-label`, such as "Checkout progress".
+- The number and tick are drawn and hidden from screen readers. The list position and the
+  hidden "completed" text say the same in words, so the state never depends on the tick alone.
+- Exactly one step should be `current`.
+
+## Props
+
+### `Stepper.Root`
+
+<PropTable component="Stepper.Root" />
+
+### `Stepper.Item`
+
+<PropTable component="Stepper.Item" />
+
+## Notes
+
+- In a row, each step takes an equal share of the width and its label wraps. Past four or five
+  steps on a phone, use `orientation="vertical"`.
+- Restyle with the `--stepper-*` tokens, such as `--stepper-indicator-size` or
+  `--stepper-complete-bg`.
+- Translate the hidden text with `labels={{ complete: '…' }}`.

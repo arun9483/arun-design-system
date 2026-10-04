@@ -1,0 +1,119 @@
+@layer stepper {
+  /* An ordered list of steps. The number in each indicator is a CSS counter and the tick is
+     drawn, so neither is read out: a screen reader hears the list position, and "completed"
+     from hidden text. */
+  .stepper {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: stepper;
+  }
+
+  /* Across: each step takes an equal share, the indicator above its label, centred. */
+  .stepper-item {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--stepper-label-gap);
+    min-inline-size: 0;
+    text-align: center;
+    counter-increment: stepper;
+  }
+
+  .stepper-indicator {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--stepper-indicator-size);
+    block-size: var(--stepper-indicator-size);
+    border: var(--stepper-indicator-border-width) solid var(--stepper-upcoming-color);
+    border-radius: var(--radius-full);
+    background-color: var(--stepper-indicator-bg);
+    color: var(--stepper-upcoming-color);
+    font-size: var(--stepper-indicator-font-size);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .stepper-indicator::before {
+    content: counter(stepper);
+  }
+
+  .stepper-label {
+    color: var(--stepper-label-color);
+    font-size: var(--stepper-label-font-size);
+    line-height: var(--line-height-snug);
+    overflow-wrap: anywhere;
+  }
+
+  /* The connector: from this indicator to the next, behind both. */
+  .stepper-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    inset-block-start: calc(var(--stepper-indicator-size) / 2);
+    inset-inline: calc(50% + var(--stepper-indicator-size) / 2 + var(--stepper-connector-gap))
+      calc(-50% + var(--stepper-indicator-size) / 2 + var(--stepper-connector-gap));
+    block-size: var(--stepper-connector-thickness);
+    translate: 0 -50%;
+    background-color: var(--stepper-connector-color);
+  }
+
+  /* Complete: a filled indicator with a tick, and the line on to the next step filled too. */
+  .stepper-item-complete .stepper-indicator {
+    border-color: var(--stepper-complete-bg);
+    background-color: var(--stepper-complete-bg);
+    color: var(--stepper-complete-color);
+  }
+
+  .stepper-item-complete .stepper-indicator::before {
+    content: '✓';
+  }
+
+  .stepper-item-complete:not(:last-child)::after {
+    background-color: var(--stepper-complete-bg);
+  }
+
+  /* Current: an outlined indicator in the accent, and a stronger label. */
+  .stepper-item-current .stepper-indicator {
+    border-color: var(--stepper-current-color);
+    color: var(--stepper-current-color);
+  }
+
+  .stepper-item-current .stepper-label {
+    color: var(--stepper-current-label-color);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* Down: the indicator beside its label, and the connector running down to the next one. */
+  .stepper-vertical {
+    flex-direction: column;
+    gap: var(--stepper-vertical-gap);
+  }
+
+  .stepper-vertical .stepper-item {
+    flex-direction: row;
+    align-items: flex-start;
+    text-align: start;
+  }
+
+  /* At least as tall as the indicator and centred on it: one line sits level with the
+     number, and a longer label grows downward. */
+  .stepper-vertical .stepper-label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-block-size: var(--stepper-indicator-size);
+  }
+
+  .stepper-vertical .stepper-item:not(:last-child)::after {
+    inset-block: calc(var(--stepper-indicator-size) + var(--stepper-vertical-connector-gap))
+      calc(-1 * var(--stepper-vertical-gap) + var(--stepper-vertical-connector-gap));
+    inset-inline: calc(var(--stepper-indicator-size) / 2) auto;
+    inline-size: var(--stepper-connector-thickness);
+    block-size: auto;
+    translate: -50% 0;
+  }
+}
