@@ -1,0 +1,52 @@
+---
+title: Lists
+description: Bulleted and numbered lists in running text, and lists used as layout.
+---
+
+import Example from '@/components/Example.astro';
+import ListsBasics from '@/examples/lists-basics';
+import { ListPlayground } from '@/components/playgrounds';
+
+Lists are plain `<ul>` and `<ol>` elements; there is no List component. The reset in
+`@arun-dev/ui/components.css` styles them in two ways.
+
+| Markup             | Use it for                                                   | Markers and indent                      |
+| ------------------ | ------------------------------------------------------------ | --------------------------------------- |
+| `<ul>`             | Items in running text, in no particular order                | Bullets, indented by `--space-lg`       |
+| `<ol>`             | Steps or a ranking, in order                                 | Numbers, indented by `--space-lg`       |
+| `<ul role="list">` | A list used as layout: a nav, a row of tags, cards in a grid | None, and no indent — style it yourself |
+
+<Example name="lists-basics">
+  <ListsBasics client:load />
+</Example>
+
+## Playground
+
+<ListPlayground client:load />
+
+## Lists as layout
+
+A nav, a row of tags or a set of cards is still a list, because people using a screen reader
+hear how many items there are. It just isn't drawn as one. Add `role="list"`: the reset drops its
+markers and indent, and VoiceOver in Safari, which can stop announcing a list styled with
+`list-style: none`, keeps announcing it as a list.
+
+A [Stack](/components/stack/) or a [Grid](/components/grid/) rendered as a list drops the markers
+itself. Give it `role="list"` too, for Safari:
+
+```tsx
+<Stack direction="row" gap="2xs" wrap render={<ul role="list" aria-label="Tags" />}>
+  <Chip render={<li />}>React</Chip>
+  <Chip render={<li />}>CSS</Chip>
+</Stack>
+```
+
+[Breadcrumb](/components/breadcrumb/) and [Pagination](/components/pagination/) render their own
+lists and need nothing.
+
+## Notes
+
+- The space between list items is the browser's. For more, put the items' content in a
+  [Stack](/components/stack/), or set a gap on the list.
+- Before `@arun-dev/ui` 5.0.0, the reset removed the markers from every list. When upgrading,
+  add `role="list"` to the lists used as layout.
