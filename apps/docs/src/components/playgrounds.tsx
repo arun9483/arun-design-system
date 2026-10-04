@@ -2,7 +2,7 @@
  * Playground bindings — one per component. Kept together so the controls stay
  * consistent, and so each MDX page needs a single import.
  */
-import type { ComponentProps } from 'react';
+import { useState, type ComponentProps } from 'react';
 import {
   Accordion,
   Badge,
@@ -368,5 +368,61 @@ export function TooltipPlayground() {
         </div>
       )}
     />
+  );
+}
+
+const LIST_ITEMS = ['Design', 'Engineering', 'Product'];
+
+/**
+ * Lists are plain elements, not a component, so the generic Playground — which prints one
+ * component's props — does not fit: here the element itself is a control. Same markup and
+ * classes, so it looks like every other playground.
+ */
+export function ListPlayground() {
+  const [element, setElement] = useState<'ul' | 'ol'>('ul');
+  const [role, setRole] = useState<'' | 'list'>('');
+  const List = element;
+  const open = role ? `<${element} role="list">` : `<${element}>`;
+  const jsx = [open, ...LIST_ITEMS.map((item) => `  <li>${item}</li>`), `</${element}>`].join('\n');
+
+  return (
+    <div className="ds-example not-content">
+      <div className="ds-example-preview">
+        <List role={role || undefined}>
+          {LIST_ITEMS.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </List>
+      </div>
+
+      <div className="ds-playground-controls">
+        <label className="ds-control" htmlFor="pg-list-element">
+          <span>element</span>
+          <select
+            id="pg-list-element"
+            value={element}
+            onChange={(e) => setElement(e.target.value as 'ul' | 'ol')}
+          >
+            <option value="ul">ul</option>
+            <option value="ol">ol</option>
+          </select>
+        </label>
+        <label className="ds-control" htmlFor="pg-list-role">
+          <span>role</span>
+          <select
+            id="pg-list-role"
+            value={role}
+            onChange={(e) => setRole(e.target.value as '' | 'list')}
+          >
+            <option value="">(none)</option>
+            <option value="list">list</option>
+          </select>
+        </label>
+      </div>
+
+      <pre className="ds-playground-output">
+        <code>{jsx}</code>
+      </pre>
+    </div>
   );
 }
