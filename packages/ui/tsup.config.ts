@@ -15,6 +15,8 @@ const CSS_LAYERS = [
   // Layout before components: a component's own styles win on an element that is both.
   { layer: 'stack', src: 'src/components/stack/stack.css' },
   { layer: 'grid', src: 'src/components/grid/grid.css' },
+  { layer: 'heading', src: 'src/components/heading/heading.css' },
+  { layer: 'paragraph', src: 'src/components/paragraph/paragraph.css' },
   { layer: 'chip', src: 'src/components/chip/chip.css' },
   { layer: 'card', src: 'src/components/card/card.css' },
   { layer: 'btn', src: 'src/components/button/button.css' },

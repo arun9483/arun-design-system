@@ -1,0 +1,12 @@
+@layer heading {
+  /* Size and leading come from the .text-size-* utility the component adds; the rest is the
+     heading's own, from its tokens. */
+  .heading {
+    font-family: var(--heading-font-family);
+    font-weight: var(--heading-font-weight);
+    letter-spacing: var(--heading-letter-spacing);
+    color: var(--heading-color);
+    /* Lines of a wrapping heading come out even, rather than one word left on the last. */
+    text-wrap: balance;
+  }
+}

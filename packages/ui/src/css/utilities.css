@@ -38,6 +38,9 @@
   }
 
   /* ── Font weight — mirrors --font-weight-{name} tokens ── */
+  .font-weight-normal {
+    font-weight: var(--font-weight-normal);
+  }
   .font-weight-medium {
     font-weight: var(--font-weight-medium);
   }

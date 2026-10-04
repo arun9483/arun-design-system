@@ -1,0 +1,7 @@
+/* Heading component tokens. Size comes from the type scale, per heading. */
+:root {
+  --heading-font-family: var(--font-heading);
+  --heading-font-weight: var(--font-weight-semibold);
+  --heading-letter-spacing: var(--letter-spacing-tight);
+  --heading-color: var(--color-text-primary);
+}

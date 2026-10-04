@@ -1,0 +1,43 @@
+---
+title: Text
+description: A run of text with a size, colour or weight from the tokens.
+---
+
+import Example from '@/components/Example.astro';
+import TextBasics from '@/examples/text-basics';
+import PropTable from '@/components/PropTable.astro';
+
+## When to use
+
+- A date, a count or a name styled apart from the text around it
+- A label or a value in a layout, at a size and colour from the tokens
+
+**Choosing between showing text:**
+
+| Component                           | Use it for                                                 | Renders       | For example                    |
+| ----------------------------------- | ---------------------------------------------------------- | ------------- | ------------------------------ |
+| [Heading](/components/heading/)     | The title of a page or a section, at a rank in the outline | `<h1>`–`<h6>` | A page title, a card title     |
+| [Paragraph](/components/paragraph/) | A block of running text                                    | `<p>`         | Body copy, a description       |
+| **Text**                            | A run of text inside other text, styled from the tokens    | `<span>`      | A date, a count, a name        |
+| [Kbd](/components/kbd/)             | A key or a shortcut                                        | `<kbd>`       | <kbd>Ctrl</kbd> + <kbd>K</kbd> |
+| [Link](/components/link/)           | Text that goes somewhere                                   | `<a>`         | Read more                      |
+
+<Example name="text-basics">
+  <TextBasics client:load />
+</Example>
+
+`Text` is a `<span>`, which means nothing to assistive technology. When the styling carries
+meaning, render the element that says so: `render={<strong />}` for importance,
+`render={<em />}` for stress, `render={<time />}` for a date.
+
+Each prop left out is inherited from the text around it.
+
+## Props
+
+<PropTable component="Text" />
+
+## Notes
+
+- Without React, the same classes are utilities: `text-size-*`, `text-color-*` and
+  `font-weight-*`.
+- To cut a line short with an ellipsis, add the `truncate` class to a block element.

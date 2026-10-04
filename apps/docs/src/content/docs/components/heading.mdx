@@ -1,0 +1,46 @@
+---
+title: Heading
+description: The title of a page or a section — a native h1 to h6, sized apart from its level.
+---
+
+import Example from '@/components/Example.astro';
+import HeadingBasics from '@/examples/heading-basics';
+import PropTable from '@/components/PropTable.astro';
+
+## When to use
+
+- A page's title, once, as level 1
+- The title of each section, a level below the section it sits in
+
+**Choosing between showing text:**
+
+| Component                           | Use it for                                                 | Renders       | For example                    |
+| ----------------------------------- | ---------------------------------------------------------- | ------------- | ------------------------------ |
+| **Heading**                         | The title of a page or a section, at a rank in the outline | `<h1>`–`<h6>` | A page title, a card title     |
+| [Paragraph](/components/paragraph/) | A block of running text                                    | `<p>`         | Body copy, a description       |
+| [Text](/components/text/)           | A run of text inside other text, styled from the tokens    | `<span>`      | A date, a count, a name        |
+| [Kbd](/components/kbd/)             | A key or a shortcut                                        | `<kbd>`       | <kbd>Ctrl</kbd> + <kbd>K</kbd> |
+| [Link](/components/link/)           | Text that goes somewhere                                   | `<a>`         | Read more                      |
+
+<Example name="heading-basics">
+  <HeadingBasics client:load />
+</Example>
+
+`level` is the heading's rank in the outline, and picks the element: `level={3}` is an `<h3>`.
+Screen reader users move through a page by its headings, so choose the level by structure — the
+section it heads — and never skip one to get a smaller look.
+
+`size` is the look, a step on the type scale. Left out, each level has its own size, from
+`4xl` for level 1 down to `base` for level 6.
+
+## Props
+
+<PropTable component="Heading" />
+
+## Notes
+
+- A wrapping heading's lines are balanced, so no word is left alone on the last line.
+- Restyle every heading with `--heading-font-family`, `--heading-font-weight`,
+  `--heading-letter-spacing` and `--heading-color`.
+- Heading text that only looks like a heading, such as a label above a value, isn't one. Use
+  [Text](/components/text/).
