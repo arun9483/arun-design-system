@@ -1,0 +1,7 @@
+/* Grid component tokens. Each Grid sets these on itself from its props — columns,
+   minItemSize, gap — so the values here are only what hand-written `.layout-grid` markup reads. */
+:root {
+  --grid-columns: 1;
+  --grid-min-item-size: 0px;
+  --grid-gap: var(--space-sm);
+}

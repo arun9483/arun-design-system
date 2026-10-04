@@ -1,0 +1,45 @@
+---
+title: Stack
+description: Children in one line, down or across, with a gap from the spacing scale between them.
+---
+
+import Example from '@/components/Example.astro';
+import StackBasics from '@/examples/stack-basics';
+import PropTable from '@/components/PropTable.astro';
+
+## When to use
+
+- A form's fields, or a card's lines, down the page
+- A row of buttons, or tags that wrap onto new lines
+
+The space between children belongs to the Stack, not to margins on the children. A CSS reset
+can't collapse it, and two margins never add up.
+
+**Choosing between laying out:**
+
+| Component                       | Use it for                                                     | For example                             |
+| ------------------------------- | -------------------------------------------------------------- | --------------------------------------- |
+| **Stack**                       | Children in one line, down or across, with a gap between them  | A form's fields, a row of buttons, tags |
+| [Grid](/components/grid/)       | Children in equal columns, wrapping into rows                  | Cards, a gallery, a dashboard's tiles   |
+| [Table](/components/table/)     | Records compared across the same columns                       | Invoices, users, order lines            |
+| [Toolbar](/components/toolbar/) | A row of controls reached with the arrow keys, as one Tab stop | A text editor's formatting controls     |
+
+<Example name="stack-basics">
+  <StackBasics client:load />
+</Example>
+
+`Stack` is a flex container. `gap` takes a step on the spacing scale — `0`, `3xs` up to
+`3xl` — the `--space-*` token of the same name.
+
+## Props
+
+<PropTable component="Stack" />
+
+## Notes
+
+- It renders a `<div>`. Use `render` for the element the content needs: `render={<ul />}` for
+  a list, `render={<form />}` for a form.
+- For a layout that changes at a width, such as a column on phones and a row on wide screens,
+  add your own class with a media query. Or use a [Grid](/components/grid/) with `minItemSize`,
+  which needs no breakpoints.
+- Without React, the `stack` and `space-*` utility classes give a column with a gap.

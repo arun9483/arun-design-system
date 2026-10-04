@@ -1,0 +1,75 @@
+@layer stack {
+  /* `layout-`, not `stack`: `.stack` is already a utility class, in a later layer, that would
+     override every modifier here. */
+  .layout-stack {
+    display: flex;
+    flex-direction: column;
+  }
+  .layout-stack-row {
+    flex-direction: row;
+  }
+  .layout-stack-wrap {
+    flex-wrap: wrap;
+  }
+
+  /* Gap — one class per step of the spacing scale. */
+  .layout-stack-gap-0 {
+    gap: 0;
+  }
+  .layout-stack-gap-3xs {
+    gap: var(--space-3xs);
+  }
+  .layout-stack-gap-2xs {
+    gap: var(--space-2xs);
+  }
+  .layout-stack-gap-xs {
+    gap: var(--space-xs);
+  }
+  .layout-stack-gap-sm {
+    gap: var(--space-sm);
+  }
+  .layout-stack-gap-md {
+    gap: var(--space-md);
+  }
+  .layout-stack-gap-lg {
+    gap: var(--space-lg);
+  }
+  .layout-stack-gap-xl {
+    gap: var(--space-xl);
+  }
+  .layout-stack-gap-2xl {
+    gap: var(--space-2xl);
+  }
+  .layout-stack-gap-3xl {
+    gap: var(--space-3xl);
+  }
+
+  .layout-stack-align-start {
+    align-items: flex-start;
+  }
+  .layout-stack-align-center {
+    align-items: center;
+  }
+  .layout-stack-align-end {
+    align-items: flex-end;
+  }
+  .layout-stack-align-baseline {
+    align-items: baseline;
+  }
+  .layout-stack-align-stretch {
+    align-items: stretch;
+  }
+
+  .layout-stack-justify-start {
+    justify-content: flex-start;
+  }
+  .layout-stack-justify-center {
+    justify-content: center;
+  }
+  .layout-stack-justify-end {
+    justify-content: flex-end;
+  }
+  .layout-stack-justify-between {
+    justify-content: space-between;
+  }
+}

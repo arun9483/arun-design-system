@@ -84,3 +84,8 @@ export { ToggleGroup } from './components/toggle-group';
 export type { ToggleGroupProps } from './components/toggle-group';
 export { Toolbar } from './components/toolbar';
 export { Avatar } from './components/avatar';
+export { Stack } from './components/stack';
+export type { StackProps } from './components/stack';
+export { Grid } from './components/grid';
+export type { GridProps } from './components/grid';
+export type { Space } from './lib/space';

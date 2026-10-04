@@ -1,0 +1,50 @@
+---
+title: Grid
+description: Children in equal columns — a fixed number, or as many as fit.
+---
+
+import Example from '@/components/Example.astro';
+import GridBasics from '@/examples/grid-basics';
+import PropTable from '@/components/PropTable.astro';
+
+## When to use
+
+- Cards, products or a gallery, in rows of equal columns
+- Tiles that should drop to fewer columns on a narrow screen
+
+**Choosing between laying out:**
+
+| Component                       | Use it for                                                     | For example                             |
+| ------------------------------- | -------------------------------------------------------------- | --------------------------------------- |
+| [Stack](/components/stack/)     | Children in one line, down or across, with a gap between them  | A form's fields, a row of buttons, tags |
+| **Grid**                        | Children in equal columns, wrapping into rows                  | Cards, a gallery, a dashboard's tiles   |
+| [Table](/components/table/)     | Records compared across the same columns                       | Invoices, users, order lines            |
+| [Toolbar](/components/toolbar/) | A row of controls reached with the arrow keys, as one Tab stop | A text editor's formatting controls     |
+
+<Example name="grid-basics">
+  <GridBasics client:load />
+</Example>
+
+`Grid` is a CSS grid, in one of two modes:
+
+| Props                       | Columns                                                                |
+| --------------------------- | ---------------------------------------------------------------------- |
+| `columns`                   | Exactly that many, at every width                                      |
+| `minItemSize`               | As many as fit at that width each, filling the row                     |
+| `minItemSize` and `columns` | As many as fit, but no more than `columns`: fewer as the space narrows |
+
+With `minItemSize` the grid is responsive with no breakpoints. A column is never wider than the
+grid itself, so one column still fits on a phone. A short last row keeps the same column width,
+rather than stretching across.
+
+## Props
+
+<PropTable component="Grid" />
+
+## Notes
+
+- It renders a `<div>`. Use `render={<ul />}` for a list of cards, with each card as an `<li>`.
+- `gap` takes a step on the spacing scale, as in [Stack](/components/stack/), for rows and
+  columns alike.
+- The columns reach the CSS as `--grid-columns` and `--grid-min-item-size` on the element. A
+  grid nested in another sets its own, so it never takes the outer grid's.
