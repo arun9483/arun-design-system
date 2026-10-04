@@ -18,7 +18,7 @@ export default function GridBasics() {
 
       {/* Fitted: as many 6rem columns as there is room for, at most three — four would fit
           here. Narrow the window and they drop to two. */}
-      <Grid minItemSize="6rem" columns={3} render={<ul aria-label="Plans" />}>
+      <Grid minItemSize="6rem" columns={3} render={<ul role="list" aria-label="Plans" />}>
         {plans.map((plan) => (
           <Card key={plan} render={<li />} style={tile}>
             {plan}

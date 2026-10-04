@@ -10,7 +10,7 @@ export default function StackBasics() {
       </Stack>
 
       {/* A row that wraps: chips move to a new line when they run out of room. */}
-      <Stack direction="row" gap="2xs" wrap render={<ul aria-label="Tags" />}>
+      <Stack direction="row" gap="2xs" wrap render={<ul role="list" aria-label="Tags" />}>
         {['React', 'TypeScript', 'CSS', 'Accessibility', 'Design tokens'].map((tag) => (
           <Chip key={tag} render={<li />}>
             {tag}
