@@ -1,11 +1,15 @@
+import { createElement } from 'react';
 import type {
   ComponentPropsWithRef,
+  FocusEvent as ReactFocusEvent,
   KeyboardEvent as ReactKeyboardEvent,
+  PointerEvent as ReactPointerEvent,
   ReactElement,
   Ref,
 } from 'react';
 import { useRender } from '../core/useRender';
-import type { UnknownProps } from '../core/mergeProps';
+import { mergeProps, type UnknownProps } from '../core/mergeProps';
+import { DETAILS_DELAY } from './useDayInfo';
 import { addDays, addMonths, dayOfWeek, endOfMonth, formatDate } from './dates';
 import { useCalendarRootContext } from './CalendarRootContext';
 import { calendarDayDataAttributes } from './calendarDataAttributes';
@@ -59,7 +63,16 @@ export function CalendarGrid({ offset = 0, className, render, ...rest }: Calenda
     addDays(A_SUNDAY, (firstDayOfWeek + index) % 7),
   );
 
+  const { details, dayInfo, dayProps, loading } = calendar;
+
   const onKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
+    if (event.key === 'Escape' && details.date !== null) {
+      // Esc hides the card first. Cancelling the keydown keeps it from closing a picker's
+      // popup too; the next Esc does that.
+      event.preventDefault();
+      details.show(null);
+      return;
+    }
     const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
     const forward = rtl ? -1 : 1;
     const fromWeekStart = (dayOfWeek(focusedDate) - firstDayOfWeek + 7) % 7;
@@ -83,10 +96,19 @@ export function CalendarGrid({ offset = 0, className, render, ...rest }: Calenda
     defaultTagName: 'table',
     props: {
       role: 'grid',
+      'aria-busy': loading || undefined,
       className,
       onKeyDown,
-      onPointerLeave() {
+      onPointerLeave(event: ReactPointerEvent<HTMLElement>) {
         setHovered(null);
+        // The pointer's card closes with it; a card for the day with focus stays.
+        const focusInside = event.currentTarget.contains(document.activeElement);
+        details.show(focusInside && details.date === focusedDate ? details.date : null);
+      },
+      onBlur(event: ReactFocusEvent<HTMLElement>) {
+        // Focus leaving every grid of the calendar closes the card.
+        const next = event.relatedTarget as Element | null;
+        if (!next?.closest('[role="grid"]')) details.show(null);
       },
       children: (
         <>
@@ -107,34 +129,55 @@ export function CalendarGrid({ offset = 0, className, render, ...rest }: Calenda
                 {days.map((day, index) => {
                   if (day === null) return <td key={index} />;
                   const state = calendar.dayState(day);
+                  const info = dayInfo(day);
+                  const hasDetails = info.details != null && info.details !== false;
+                  const cardOpen = details.date === day && hasDetails;
+                  const name = formatDate(day, locale, {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  });
+                  const own = {
+                    type: 'button',
+                    ref: (element: HTMLElement | null) => registerDay(day, element),
+                    tabIndex: day === focusedDate ? 0 : -1,
+                    'aria-label': info.description ? `${name}, ${info.description}` : name,
+                    'aria-current': state.today ? 'date' : undefined,
+                    'aria-disabled': state.disabled || undefined,
+                    // The open card describes its day, as a tooltip does.
+                    'aria-describedby': cardOpen ? details.id : undefined,
+                    'data-tags': info.tags.length > 0 ? info.tags.join(' ') : undefined,
+                    'data-mark': info.mark ?? undefined,
+                    ...calendarDayDataAttributes(state),
+                    // The card is placed against the day it is open for.
+                    style: details.date === day ? { anchorName: details.anchorName } : undefined,
+                    onClick: () => select(day),
+                    onFocus: () => {
+                      focusDate(day, false);
+                      setHovered(day);
+                      // Focus — a key, a click, a tap — opens the card at once.
+                      details.show(hasDetails ? day : null);
+                    },
+                    onPointerEnter: (event: ReactPointerEvent) => {
+                      setHovered(day);
+                      // A resting mouse opens it after a delay; touch opens it through focus.
+                      if (event.pointerType === 'mouse') {
+                        details.show(hasDetails ? day : null, hasDetails ? DETAILS_DELAY : 0);
+                      }
+                    },
+                    children: formatDate(day, locale, { day: 'numeric' }),
+                  };
                   return (
                     <td
                       key={day}
                       aria-selected={state.selected || state.inRange}
                       aria-disabled={state.disabled || undefined}
                     >
-                      <button
-                        type="button"
-                        ref={(element) => registerDay(day, element)}
-                        tabIndex={day === focusedDate ? 0 : -1}
-                        aria-label={formatDate(day, locale, {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                        aria-current={state.today ? 'date' : undefined}
-                        aria-disabled={state.disabled || undefined}
-                        {...calendarDayDataAttributes(state)}
-                        onClick={() => select(day)}
-                        onFocus={() => {
-                          focusDate(day, false);
-                          setHovered(day);
-                        }}
-                        onPointerEnter={() => setHovered(day)}
-                      >
-                        {formatDate(day, locale, { day: 'numeric' })}
-                      </button>
+                      {createElement(
+                        'button',
+                        mergeProps(own, dayProps?.(day, info) as UnknownProps | undefined),
+                      )}
                     </td>
                   );
                 })}

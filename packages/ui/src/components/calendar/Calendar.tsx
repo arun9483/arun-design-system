@@ -1,6 +1,41 @@
 import { Calendar as Headless } from '@arun-dev/headless/calendar';
-import type { CalendarRangeRootProps, CalendarRootProps } from '@arun-dev/headless/calendar';
+import type {
+  CalendarDayPropsGetter,
+  CalendarRangeRootProps,
+  CalendarRootProps,
+} from '@arun-dev/headless/calendar';
+import type { CSSProperties } from 'react';
 import { cn } from '../../lib/cn';
+
+/** The shape of a day's mark. `strike` crosses the number out; `none` draws nothing. */
+export type CalendarMarkShape = 'dot' | 'ring' | 'star' | 'diamond' | 'bar' | 'strike' | 'none';
+
+/** How a tag's mark looks: its colour, any CSS colour or token, and its shape. */
+export type CalendarTagStyle = { color?: string; mark?: CalendarMarkShape };
+
+/**
+ * `tagStyles` as per-day attributes: the marking tag's colour as `--calendar-day-mark-color` and
+ * its shape as a class, merged with the consumer's own `dayProps`.
+ */
+function tagDayProps(
+  tagStyles: Record<string, CalendarTagStyle> | undefined,
+  dayProps: CalendarDayPropsGetter | undefined,
+): CalendarDayPropsGetter | undefined {
+  if (!tagStyles) return dayProps;
+  return (date, info) => {
+    const own = dayProps?.(date, info);
+    const style = info.mark ? tagStyles[info.mark] : undefined;
+    if (!style) return own;
+    return {
+      ...own,
+      className: cn(style.mark && `calendar-mark-${style.mark}`, own?.className),
+      style: {
+        ...(style.color ? { '--calendar-day-mark-color': style.color } : {}),
+        ...own?.style,
+      } as CSSProperties,
+    };
+  };
+}
 
 function Chevron() {
   return (
@@ -47,6 +82,8 @@ function CalendarBody({
           <Headless.Grid key={offset} offset={offset} className="calendar-grid" />
         ))}
       </div>
+      {/* Shown only for days whose getDayInfo returns details. */}
+      <Headless.DayDetails className="calendar-details" />
     </>
   );
 }
@@ -57,6 +94,12 @@ type CaptionOptions = {
    * of birth, decades back. The years run from `min`'s to `max`'s, or 100 years back to 10 ahead.
    */
   captionLayout?: CalendarCaptionLayout;
+  /**
+   * The colour and shape of each tag's mark, such as
+   * `{ holiday: { color: 'var(--color-status-error)', mark: 'dot' } }`. Tags left out keep the
+   * built-in look, from the `--calendar-tag-*` tokens.
+   */
+  tagStyles?: Record<string, CalendarTagStyle>;
 };
 
 export type CalendarProps = Omit<CalendarRootProps, 'children'> & CaptionOptions;
@@ -65,12 +108,15 @@ export type CalendarProps = Omit<CalendarRootProps, 'children'> & CaptionOptions
 export function Calendar({
   months = 1,
   captionLayout = 'label',
+  tagStyles,
+  dayProps,
   className,
   ...props
 }: CalendarProps) {
   return (
     <Headless.Root
       {...props}
+      dayProps={tagDayProps(tagStyles, dayProps)}
       months={months}
       className={cn('calendar', months > 1 && 'calendar-multiple', className)}
     >
@@ -85,12 +131,15 @@ export type RangeCalendarProps = Omit<CalendarRangeRootProps, 'children'> & Capt
 export function RangeCalendar({
   months = 1,
   captionLayout = 'label',
+  tagStyles,
+  dayProps,
   className,
   ...props
 }: RangeCalendarProps) {
   return (
     <Headless.RangeRoot
       {...props}
+      dayProps={tagDayProps(tagStyles, dayProps)}
       months={months}
       className={cn('calendar', months > 1 && 'calendar-multiple', className)}
     >

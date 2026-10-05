@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+import type { CalendarDayPropsGetter, CalendarDayTags } from './useDayInfo';
 
 /** A range of days, both ends included: ISO dates, `start` on or before `end`. */
 export type DateRange = { start: string; end: string };
@@ -61,6 +62,19 @@ export type CalendarRootContextValue = {
   setHovered: (iso: string | null) => void;
   registerDay: (iso: string, element: HTMLElement | null) => void;
   labels: CalendarLabels;
+  /** What `getDayInfo` says about a day: its tags, its mark, its description and details. */
+  dayInfo: (iso: string) => CalendarDayTags;
+  /** Extra attributes for a day's button. */
+  dayProps: CalendarDayPropsGetter | undefined;
+  /** The details card: the day it is open for, its id, the anchor it follows, and the setter. */
+  details: {
+    date: string | null;
+    id: string;
+    anchorName: string;
+    show: (date: string | null, delay?: number) => void;
+  };
+  /** Day information is still loading. */
+  loading: boolean;
 };
 
 export const CalendarRootContext = createContext<CalendarRootContextValue | null>(null);

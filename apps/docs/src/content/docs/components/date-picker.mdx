@@ -126,7 +126,15 @@ for the end, so the range covers whole days.
 hours. Once the first day is picked, the calendar disables the days 40 hours can't reach from the
 start's time — from 10:00, the third day is the last. A pick whose end time would run past the
 cap is pulled back to exactly start + 40 hours, and the end field's `max` follows the start, so a
-typed or edited end past it is invalid and won't submit. With `maxDays` too, the shorter wins.
+typed or edited end past it is invalid and won't submit. Moving the start, typed or in the popup, pulls an end that would
+then run past the cap back to it, so the range never exceeds 40 hours. With `maxDays` too, the shorter wins.
+
+## Tags, marks and details
+
+The pickers take Calendar's day information too — `getDayInfo`, `tagPriority`, `tagStyles`,
+`onVisibleRangeChange`, `loading` and `dayProps` — and pass it to the calendar in their popup:
+holidays, festivals, birthdays and bookings marked on the days, and a details card on hover,
+focus or a tap. See [Calendar](/components/calendar/#what-each-day-is-tags-marks-and-details).
 
 ## Limits
 

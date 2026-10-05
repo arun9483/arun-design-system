@@ -1343,6 +1343,43 @@ export const PROPS = {
         'Names for the Previous and Next buttons and the month and year selects, in English unless replaced.',
     },
     {
+      name: 'getDayInfo',
+      type: '(date: string) => { tags?; description?; details? }',
+      description:
+        'What each day is: `tags` for marks and styling, a `description` added to its spoken name, and `details` for the card. A lookup in data already loaded. Optional.',
+    },
+    {
+      name: 'tagPriority',
+      type: 'string[]',
+      default: "['booked', 'holiday', 'festival', 'birthday']",
+      description:
+        'The tags that may mark a day, the first winning: a day shows one mark, for its tag highest here. Other tags style, but mark nothing.',
+    },
+    {
+      name: 'tagStyles',
+      type: "Record<string, { color?: string; mark?: 'dot' | 'ring' | 'star' | 'diamond' | 'bar' | 'strike' | 'none' }>",
+      description:
+        'The colour and shape of each tag’s mark. Tags left out keep the built-in look, from the `--calendar-tag-*` tokens.',
+    },
+    {
+      name: 'onVisibleRangeChange',
+      type: '(range: { start: string; end: string }) => void',
+      description:
+        'Called with the first and last day shown when the calendar mounts and whenever the months shown change: fetch their information here.',
+    },
+    {
+      name: 'loading',
+      type: 'boolean',
+      default: 'false',
+      description: 'Day information is loading: the grids are `aria-busy`, and the marks wait.',
+    },
+    {
+      name: 'dayProps',
+      type: '(date, info) => button attributes',
+      description:
+        'Extra attributes for each day’s button, from its date and tags: per-day styling.',
+    },
+    {
       name: 'captionLayout',
       type: "'label' | 'dropdown'",
       default: "'label'",
@@ -1413,6 +1450,43 @@ export const PROPS = {
       type: '{ previous?; next?; month?; year? }',
       description:
         'Names for the Previous and Next buttons and the month and year selects, in English unless replaced.',
+    },
+    {
+      name: 'getDayInfo',
+      type: '(date: string) => { tags?; description?; details? }',
+      description:
+        'What each day is: `tags` for marks and styling, a `description` added to its spoken name, and `details` for the card. A lookup in data already loaded. Optional.',
+    },
+    {
+      name: 'tagPriority',
+      type: 'string[]',
+      default: "['booked', 'holiday', 'festival', 'birthday']",
+      description:
+        'The tags that may mark a day, the first winning: a day shows one mark, for its tag highest here. Other tags style, but mark nothing.',
+    },
+    {
+      name: 'tagStyles',
+      type: "Record<string, { color?: string; mark?: 'dot' | 'ring' | 'star' | 'diamond' | 'bar' | 'strike' | 'none' }>",
+      description:
+        'The colour and shape of each tag’s mark. Tags left out keep the built-in look, from the `--calendar-tag-*` tokens.',
+    },
+    {
+      name: 'onVisibleRangeChange',
+      type: '(range: { start: string; end: string }) => void',
+      description:
+        'Called with the first and last day shown when the calendar mounts and whenever the months shown change: fetch their information here.',
+    },
+    {
+      name: 'loading',
+      type: 'boolean',
+      default: 'false',
+      description: 'Day information is loading: the grids are `aria-busy`, and the marks wait.',
+    },
+    {
+      name: 'dayProps',
+      type: '(date, info) => button attributes',
+      description:
+        'Extra attributes for each day’s button, from its date and tags: per-day styling.',
     },
     {
       name: 'captionLayout',
@@ -1503,6 +1577,43 @@ export const PROPS = {
       type: '{ choose?; dialog?; start?; end?; unavailable?; time?; startTime?; endTime? }',
       description:
         'Names for the calendar button and popup, the range inputs, the time fields in the popup, and the unavailable message, in English unless replaced.',
+    },
+    {
+      name: 'getDayInfo',
+      type: '(date: string) => { tags?; description?; details? }',
+      description:
+        'What each day is: `tags` for marks and styling, a `description` added to its spoken name, and `details` for the card. A lookup in data already loaded. Optional.',
+    },
+    {
+      name: 'tagPriority',
+      type: 'string[]',
+      default: "['booked', 'holiday', 'festival', 'birthday']",
+      description:
+        'The tags that may mark a day, the first winning: a day shows one mark, for its tag highest here. Other tags style, but mark nothing.',
+    },
+    {
+      name: 'tagStyles',
+      type: "Record<string, { color?: string; mark?: 'dot' | 'ring' | 'star' | 'diamond' | 'bar' | 'strike' | 'none' }>",
+      description:
+        'The colour and shape of each tag’s mark. Tags left out keep the built-in look, from the `--calendar-tag-*` tokens.',
+    },
+    {
+      name: 'onVisibleRangeChange',
+      type: '(range: { start: string; end: string }) => void',
+      description:
+        'Called with the first and last day shown when the calendar mounts and whenever the months shown change: fetch their information here.',
+    },
+    {
+      name: 'loading',
+      type: 'boolean',
+      default: 'false',
+      description: 'Day information is loading: the grids are `aria-busy`, and the marks wait.',
+    },
+    {
+      name: 'dayProps',
+      type: '(date, info) => button attributes',
+      description:
+        'Extra attributes for each day’s button, from its date and tags: per-day styling.',
     },
     {
       name: 'captionLayout',
@@ -1636,6 +1747,43 @@ export const PROPS = {
       type: '{ choose?; dialog?; start?; end?; unavailable?; time?; startTime?; endTime? }',
       description:
         'Names for the calendar button and popup, the range inputs, the time fields in the popup, and the unavailable message, in English unless replaced.',
+    },
+    {
+      name: 'getDayInfo',
+      type: '(date: string) => { tags?; description?; details? }',
+      description:
+        'What each day is: `tags` for marks and styling, a `description` added to its spoken name, and `details` for the card. A lookup in data already loaded. Optional.',
+    },
+    {
+      name: 'tagPriority',
+      type: 'string[]',
+      default: "['booked', 'holiday', 'festival', 'birthday']",
+      description:
+        'The tags that may mark a day, the first winning: a day shows one mark, for its tag highest here. Other tags style, but mark nothing.',
+    },
+    {
+      name: 'tagStyles',
+      type: "Record<string, { color?: string; mark?: 'dot' | 'ring' | 'star' | 'diamond' | 'bar' | 'strike' | 'none' }>",
+      description:
+        'The colour and shape of each tag’s mark. Tags left out keep the built-in look, from the `--calendar-tag-*` tokens.',
+    },
+    {
+      name: 'onVisibleRangeChange',
+      type: '(range: { start: string; end: string }) => void',
+      description:
+        'Called with the first and last day shown when the calendar mounts and whenever the months shown change: fetch their information here.',
+    },
+    {
+      name: 'loading',
+      type: 'boolean',
+      default: 'false',
+      description: 'Day information is loading: the grids are `aria-busy`, and the marks wait.',
+    },
+    {
+      name: 'dayProps',
+      type: '(date, info) => button attributes',
+      description:
+        'Extra attributes for each day’s button, from its date and tags: per-day styling.',
     },
     {
       name: 'captionLayout',

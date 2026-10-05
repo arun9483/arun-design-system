@@ -6,3 +6,10 @@ export type { CalendarHeadingProps } from './CalendarHeading';
 export type { CalendarNavButtonProps } from './CalendarPrevButton';
 export type { CalendarGridProps } from './CalendarGrid';
 export type { CalendarSelectProps } from './CalendarMonthSelect';
+export type { CalendarDayDetailsProps } from './CalendarDayDetails';
+export type {
+  CalendarDayInfo,
+  CalendarDayTags,
+  CalendarVisibleRange,
+  CalendarDayPropsGetter,
+} from './useDayInfo';

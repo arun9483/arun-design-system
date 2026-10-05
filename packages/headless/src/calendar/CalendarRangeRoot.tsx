@@ -41,6 +41,11 @@ export function CalendarRangeRoot({
   locale,
   firstDayOfWeek,
   labels,
+  getDayInfo,
+  tagPriority,
+  onVisibleRangeChange,
+  loading = false,
+  dayProps,
   className,
   children,
   render,
@@ -74,12 +79,17 @@ export function CalendarRangeRoot({
     firstDayOfWeek,
     labels,
     openCount: binding?.openCount,
+    getDayInfo,
+    tagPriority,
+    onVisibleRangeChange,
+    loading,
+    dayProps,
   });
 
   const element = useRender({
     render,
     defaultTagName: 'div',
-    props: { className, children },
+    props: { 'data-loading': loading ? '' : undefined, className, children },
     consumerProps: rest as UnknownProps,
   });
 

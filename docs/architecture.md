@@ -1440,7 +1440,9 @@ new ends get 00:00 and 23:59, so a picked range covers whole days.
 end, which no number of days can say: 40 hours from 14:00 ends at 06:00 on the third day. The
 calendar gets the days it spans as its `maxDays`, the shorter of the two when both are set; a
 pick's end past the cap is pulled back to it; and the end input's `max` is start + `maxHours`, to
-the minute, so the browser rejects a typed end. Arithmetic on local date-times is elapsed time,
+the minute, so the browser rejects a typed end. A start that moves the limit past the end — typed, or a time
+set in the Popup — pulls the end back to it, for `maxDays` as for `maxHours`, so the range keeps
+its limit however either end changes. Arithmetic on local date-times is elapsed time,
 through `Date`, so a daylight-saving night counts its real hours. Without a time it is ignored
 (not ruled out by the types), as a day has no hours to count.
 
@@ -1461,3 +1463,42 @@ sight.
 
 **Rules out:** a hand-built segmented field; a date library or time zones in values; a `mode`
 prop on one component; ranges across unavailable days; a modal popup.
+
+---
+
+## 28. Calendar day information: tags, one mark, a details card
+
+A calendar often has to say what its days are — holidays, festivals, birthdays, bookings — and
+show more about a day on demand. Measured against react-day-picker's modifiers, React Aria's
+cell render props and MUI's day slots (October 2026). All of it is optional: without
+`getDayInfo` the calendar is decision 27's.
+
+**One function says what a day is.** `getDayInfo(date)` returns `tags`, a `description` and
+`details`. It is called for every day shown, during render, so it is a lookup, never a fetch.
+Fetching is the consumer's: `onVisibleRangeChange` reports the days shown on mount and on every
+change of month — one request per view — and `loading` marks the grids `aria-busy`. Caching,
+races and errors stay in the consumer's data layer; the calendar holds none of it.
+
+**Tags are data, marks are a priority.** A day's tags are emitted as one static attribute,
+`data-tags="weekend holiday"`, matched with `~=`: any number, any overlap, the consumer's own
+names included, and the state-attribute contract still holds, since the attribute's name is
+fixed. A day draws at most one mark, for its tag highest in `tagPriority` (default booked,
+holiday, festival, birthday), named in `data-mark`. One mark keeps a dense month readable; the
+rest is the card's. The priority is a prop because CSS cannot reorder a cascade at runtime.
+
+**Colour and shape are `@arun-dev/ui`'s.** Built-in tags get a token colour and a shape — dot,
+star, diamond, strike — so no mark rests on colour alone (WCAG 1.4.1), and the colour pairs are
+in the contrast requirements. `tagStyles` overrides either per tag; ui applies it through a
+generic `dayProps(date, info)` on the Root, which headless merges onto each day's button: the
+colour as a per-day `--calendar-day-mark-color`, the shape as a class.
+
+**One details card, read-only.** `Calendar.DayDetails` is a single `popover="manual"` anchored
+to the day it shows, rather than a popup per day: a resting mouse opens it after 400 ms, focus
+at once — a key, a click, and so a tap, since phones have no hover — and Esc hides it, its
+keydown cancelled so a DatePicker's popup stays open. It is `role="tooltip"`, the day's
+`aria-describedby`. It holds no links or buttons: the grid owns the arrow keys and Tab, so they
+could not be reached. HoverCard (decision 24) was weighed and left alone: it previews a link,
+and never opens on touch.
+
+**Rules out:** an async `getDayInfo`; a mark per tag; a popup per day; interactive content in
+the card; a fixed CSS priority.

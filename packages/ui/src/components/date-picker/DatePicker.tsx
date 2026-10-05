@@ -7,7 +7,12 @@ import type {
   DatePickerSharedProps,
 } from '@arun-dev/headless/date-picker';
 import type { CalendarLabels } from '@arun-dev/headless/calendar';
-import { Calendar, RangeCalendar, type CalendarCaptionLayout } from '../calendar';
+import {
+  Calendar,
+  RangeCalendar,
+  type CalendarCaptionLayout,
+  type CalendarProps,
+} from '../calendar';
 import { Button } from '../button';
 import { cn } from '../../lib/cn';
 
@@ -28,6 +33,18 @@ type CalendarOptions = {
   firstDayOfWeek?: number;
   /** Labels for the calendar's Previous and Next buttons. */
   calendarLabels?: Partial<CalendarLabels>;
+  /** What each day is, for marks, screen readers and the details card. See Calendar. */
+  getDayInfo?: CalendarProps['getDayInfo'];
+  /** The tags that may mark a day, the first winning. See Calendar. */
+  tagPriority?: CalendarProps['tagPriority'];
+  /** The colour and shape of each tag's mark. See Calendar. */
+  tagStyles?: CalendarProps['tagStyles'];
+  /** Called with the days the calendar shows, to fetch their information. See Calendar. */
+  onVisibleRangeChange?: CalendarProps['onVisibleRangeChange'];
+  /** Day information is loading. See Calendar. */
+  loading?: boolean;
+  /** Extra attributes for each day's button. See Calendar. */
+  dayProps?: CalendarProps['dayProps'];
   /** `dropdown` adds month and year selects to the calendar, for dates far away: a date of birth. */
   captionLayout?: CalendarCaptionLayout;
   /** The text of the button that closes the popup, shown with `withTime`. */
@@ -90,6 +107,12 @@ export function DatePicker({
   calendarLabels,
   doneLabel = 'Done',
   captionLayout,
+  getDayInfo,
+  tagPriority,
+  tagStyles,
+  onVisibleRangeChange,
+  loading,
+  dayProps,
   className,
   ...inputProps
 }: DatePickerProps) {
@@ -111,6 +134,7 @@ export function DatePicker({
           firstDayOfWeek={firstDayOfWeek}
           labels={calendarLabels}
           captionLayout={captionLayout}
+          {...{ getDayInfo, tagPriority, tagStyles, onVisibleRangeChange, loading, dayProps }}
         />
         {withTime && (
           <TimeRow doneLabel={doneLabel}>
@@ -173,6 +197,12 @@ export function DateRangePicker({
   calendarLabels,
   doneLabel = 'Done',
   captionLayout,
+  getDayInfo,
+  tagPriority,
+  tagStyles,
+  onVisibleRangeChange,
+  loading,
+  dayProps,
   startInputProps,
   endInputProps,
   required,
@@ -211,6 +241,7 @@ export function DateRangePicker({
           firstDayOfWeek={firstDayOfWeek}
           labels={calendarLabels}
           captionLayout={captionLayout}
+          {...{ getDayInfo, tagPriority, tagStyles, onVisibleRangeChange, loading, dayProps }}
         />
         {withTime && (
           <TimeRow doneLabel={doneLabel}>

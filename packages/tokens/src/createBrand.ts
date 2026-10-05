@@ -285,6 +285,10 @@ export const CONTRAST_REQUIREMENTS: readonly {
   { foreground: '--color-status-warning', background: '--color-status-warning-bg', min: 4.5 },
   { foreground: '--color-status-info', background: '--color-status-info-bg', min: 4.5 },
   { foreground: '--color-status-info', background: '--color-bg-primary', min: 3 },
+  // Calendar day tags: a holiday's number as text, the other marks as shapes on the page.
+  { foreground: '--color-status-error', background: '--color-bg-primary', min: 4.5 },
+  { foreground: '--color-status-warning', background: '--color-bg-primary', min: 3 },
+  { foreground: '--color-status-success', background: '--color-bg-primary', min: 3 },
 ];
 
 const BRAND_VAR = /^var\(--color-brand-(\d+)\)$/;

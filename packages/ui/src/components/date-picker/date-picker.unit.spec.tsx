@@ -26,6 +26,27 @@ describe('Calendar (ui)', () => {
     );
   });
 
+  it('applies tagStyles to the marking tag: its colour as a property, its shape as a class', () => {
+    render(
+      <Calendar
+        locale="en-US"
+        defaultValue="2026-10-05"
+        getDayInfo={(date) =>
+          date === '2026-10-20' ? { tags: ['festival'], description: 'Diwali' } : null
+        }
+        tagStyles={{ festival: { color: 'rebeccapurple', mark: 'ring' } }}
+        dayProps={() => ({ title: 'mine' })}
+      />,
+    );
+    const diwali = screen.getByRole('button', { name: 'Tuesday, October 20, 2026, Diwali' });
+    expect(diwali).toHaveAttribute('data-mark', 'festival');
+    expect(diwali).toHaveClass('calendar-mark-ring');
+    expect(diwali.style.getPropertyValue('--calendar-day-mark-color')).toBe('rebeccapurple');
+    // The consumer's own dayProps still apply.
+    expect(diwali).toHaveAttribute('title', 'mine');
+    expect(document.querySelector('.calendar-details')).toHaveAttribute('role', 'tooltip');
+  });
+
   it('is a range calendar too', () => {
     render(
       <RangeCalendar locale="en-US" defaultValue={{ start: '2026-10-05', end: '2026-10-07' }} />,
@@ -56,6 +77,21 @@ describe('DatePicker (ui)', () => {
     expect(time).toHaveValue('09:30');
     expect(time).toHaveClass('date-picker-time-input');
     expect(screen.getByRole('button', { name: 'Done', hidden: true })).toHaveClass('btn-primary');
+  });
+
+  it('passes day information to its calendar', () => {
+    render(
+      <DatePicker
+        aria-label="Due"
+        defaultValue="2026-10-05"
+        locale="en-US"
+        getDayInfo={(date) => (date === '2026-10-24' ? { tags: ['holiday'] } : null)}
+        loading
+      />,
+    );
+    const day = screen.getByRole('button', { name: 'Saturday, October 24, 2026', hidden: true });
+    expect(day).toHaveAttribute('data-mark', 'holiday');
+    expect(screen.getByRole('grid', { hidden: true })).toHaveAttribute('aria-busy', 'true');
   });
 
   it('without withTime, has no time field', () => {

@@ -9,6 +9,7 @@ import {
   type CalendarLabels,
 } from './CalendarRootContext';
 import { useCalendarRoot } from './useCalendarRoot';
+import type { CalendarDayInfo, CalendarDayPropsGetter, CalendarVisibleRange } from './useDayInfo';
 
 /** What both Roots take besides their selection. */
 export type CalendarSharedProps = {
@@ -26,6 +27,23 @@ export type CalendarSharedProps = {
   firstDayOfWeek?: number;
   /** Labels for the Previous and Next buttons, in English unless replaced. */
   labels?: Partial<CalendarLabels>;
+  /**
+   * What a day is, for marks, screen readers and a details card: `tags`, a `description` and
+   * `details`. Called with each day shown, so it is a lookup in data already loaded; fetch it
+   * from `onVisibleRangeChange`. Optional: without it the calendar shows no tags.
+   */
+  getDayInfo?: (date: string) => CalendarDayInfo | null | undefined;
+  /**
+   * The tags that may mark a day, the first winning: a day shows one mark, for its tag highest
+   * here. Defaults to booked, holiday, festival, birthday. Other tags mark nothing.
+   */
+  tagPriority?: readonly string[];
+  /** Called with the days shown when the calendar mounts and whenever the months shown change. */
+  onVisibleRangeChange?: (range: CalendarVisibleRange) => void;
+  /** Day information is loading: the grids are `aria-busy`. */
+  loading?: boolean;
+  /** Extra attributes for each day's button, from its date and tags: per-day styling. */
+  dayProps?: CalendarDayPropsGetter;
   /** Element to render instead of the default `<div>`. Props and ref are merged onto it. */
   render?: ReactElement;
   /** Ref to the rendered element. Merged with any ref on the `render` element. */
@@ -61,6 +79,11 @@ export function CalendarRoot({
   locale,
   firstDayOfWeek,
   labels,
+  getDayInfo,
+  tagPriority,
+  onVisibleRangeChange,
+  loading = false,
+  dayProps,
   className,
   children,
   render,
@@ -95,12 +118,17 @@ export function CalendarRoot({
     firstDayOfWeek,
     labels,
     openCount: binding?.openCount,
+    getDayInfo,
+    tagPriority,
+    onVisibleRangeChange,
+    loading,
+    dayProps,
   });
 
   const element = useRender({
     render,
     defaultTagName: 'div',
-    props: { className, children },
+    props: { 'data-loading': loading ? '' : undefined, className, children },
     consumerProps: rest as UnknownProps,
   });
 

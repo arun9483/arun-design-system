@@ -327,6 +327,47 @@ describe('DatePicker range (browser)', () => {
     expect(end().validity.rangeOverflow).toBe(true);
   });
 
+  it('with maxHours, pulls the end back when the start moves past the limit', async () => {
+    const onValueChange = vi.fn();
+    render(
+      <Range
+        withTime
+        maxHours={40}
+        defaultValue={{ start: '2026-10-16T10:00', end: '2026-10-17T22:00' }}
+        onValueChange={onValueChange}
+      />,
+    );
+    // 36 hours; moving the start to 03:00 would make it 43.
+    await userEvent.fill(startInput(), '2026-10-16T03:00');
+    expect(end()).toHaveValue('2026-10-17T19:00');
+    expect(end().validity.valid).toBe(true);
+    expect(onValueChange).toHaveBeenLastCalledWith({
+      start: '2026-10-16T03:00',
+      end: '2026-10-17T19:00',
+    });
+    // From the Popup's start time too.
+    await userEvent.click(rangeTrigger());
+    await userEvent.fill(screen.getByLabelText('Start time'), '01:00');
+    expect(end()).toHaveValue('2026-10-17T17:00');
+    // A start that keeps within the limit leaves the end alone.
+    await userEvent.fill(screen.getByLabelText('Start time'), '05:00');
+    expect(end()).toHaveValue('2026-10-17T17:00');
+  });
+
+  it('with maxDays, pulls the end back when the start moves', async () => {
+    const onValueChange = vi.fn();
+    render(
+      <Range
+        maxDays={7}
+        defaultValue={{ start: '2026-10-10', end: '2026-10-16' }}
+        onValueChange={onValueChange}
+      />,
+    );
+    await userEvent.fill(startInput(), '2026-10-05');
+    expect(end()).toHaveValue('2026-10-11');
+    expect(onValueChange).toHaveBeenLastCalledWith({ start: '2026-10-05', end: '2026-10-11' });
+  });
+
   it('without withTime, ignores maxHours', async () => {
     render(<Range maxHours={40} defaultValue={{ start: '2026-10-12', end: '2026-10-13' }} />);
     expect(end()).not.toHaveAttribute('max');
