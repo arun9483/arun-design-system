@@ -1,0 +1,130 @@
+---
+title: TreeView
+description: A hierarchy people move through with the arrow keys, opening and closing branches and selecting items, such as files and folders.
+---
+
+import Example from '@/components/Example.astro';
+import TreeViewBasics from '@/examples/tree-view-basics';
+import TreeViewMultiple from '@/examples/tree-view-multiple';
+import PropTable from '@/components/PropTable.astro';
+import { TreeViewPlayground } from '@/components/playgrounds';
+
+## When to use
+
+- Files and folders, as in an editor's explorer
+- Choosing from nested categories, or settings grouped in levels
+
+Not for a site's navigation. A tree is one Tab stop that is driven with the arrow keys, which
+few people expect of a menu of links. Use nested lists of [Links](/components/link/), with an
+[Accordion](/components/accordion/) for sections that open.
+
+**Choosing between nested and grouped content:**
+
+| Component                           | Use it for                                                         | For example                               |
+| ----------------------------------- | ------------------------------------------------------------------ | ----------------------------------------- |
+| **TreeView**                        | A hierarchy to move through and select from, any number of levels  | Files and folders, nested categories      |
+| [Accordion](/components/accordion/) | Sections of content that open one at a time or together, one level | An FAQ, a settings page's groups          |
+| [Menu](/components/menu/)           | Actions opened from a button, with submenus for more               | "More actions ⋯", a View menu             |
+| [Tabs](/components/tabs/)           | Views of one thing that people switch between                      | Overview, Activity and Settings of a repo |
+
+<Example name="tree-view-basics">
+  <TreeViewBasics client:load />
+</Example>
+
+## Anatomy
+
+```tsx
+import { TreeView } from '@arun-dev/ui';
+
+<TreeView.Root aria-label="Project files" defaultExpanded={['src']}>
+  <TreeView.Item value="src" label="src">
+    <TreeView.Item value="src/main.ts" label="main.ts" />
+  </TreeView.Item>
+  <TreeView.Item value="README.md" label="README.md" />
+</TreeView.Root>;
+```
+
+| Part   | Renders                | Does                                                                  |
+| ------ | ---------------------- | --------------------------------------------------------------------- |
+| `Root` | `<ul role="tree">`     | holds the selection and the open Items; name it with `aria-label`     |
+| `Item` | `<li role="treeitem">` | one node: a row with its `label`, and its child Items while it's open |
+
+**Nesting Items makes a parent.** An Item with child Items opens and closes, with a chevron
+that turns. One without is a leaf. The row and the `<ul role="group">` around the children are
+drawn by the Item, so there are no parts for them.
+
+**Values identify Items.** Each Item's `value` must be unique in the tree. A path, such as
+`src/main.ts`, is unique and useful once selected. The Root's `value` lists the selected
+Items, and `expanded` lists the open ones. Each can be controlled or left to the tree.
+
+## Keyboard
+
+The tree is one Tab stop: the Item last focused, or the selected one, or the first.
+
+| Key        | Does                                                                   |
+| ---------- | ---------------------------------------------------------------------- |
+| ↓ / ↑      | Moves to the next or previous Item shown. Does not wrap.               |
+| →          | Opens a closed parent; on an open one, moves to its first child        |
+| ←          | Closes an open parent; anywhere else, moves to the Item it's nested in |
+| Home / End | Moves to the first or last Item shown                                  |
+| Enter      | Selects the Item, and opens or closes a parent, as a click does        |
+| Space      | Selects the Item, without opening it                                   |
+| `*`        | Opens every parent beside the focused Item                             |
+| A letter   | Moves to the next Item whose label starts with what you type           |
+
+In a right-to-left tree, → and ← swap, so the arrow points toward the children.
+
+## Selecting several
+
+<Example name="tree-view-multiple">
+  <TreeViewMultiple client:load />
+</Example>
+
+With `multiple`, Space, Enter or a click adds an Item to the selection or removes it.
+Shift with ↓ or ↑ moves and toggles the next Item, and Ctrl or ⌘ with A selects every Item
+shown. Selecting a parent selects that Item alone: the tree does not cascade to the children
+or show a parent as partly selected. If the children should follow, set them in
+`onValueChange`.
+
+## Disabled Items
+
+A `disabled` Item is drawn faded, can't be focused, selected, opened or closed, and the arrow
+keys skip it. A screen reader still finds it when reading the whole tree, announced as unavailable.
+
+## Labels
+
+`label` is what the row shows and what a screen reader reads, so an icon goes in it, marked
+`aria-hidden` when it adds nothing to the words. Typing moves to the next Item whose label
+starts with what's typed, using the text found in `label`. When `label` is a component that
+renders its own text, give the Item a `textValue` for typing to match.
+
+## Playground
+
+<TreeViewPlayground client:load />
+
+## Accessibility
+
+- Name the tree with `aria-label`, such as "Project files".
+- Each Item is named by its label alone, not by the children nested in it.
+- `aria-expanded`, `aria-selected` and `aria-level` are set for you, and
+  `aria-multiselectable` with `multiple`.
+- Selection is shown by a tint and a bar on the row's leading edge, so it doesn't depend on
+  colour alone, and the focused row has its own outline.
+
+## Props
+
+### `TreeView.Root`
+
+<PropTable component="TreeView.Root" />
+
+### `TreeView.Item`
+
+<PropTable component="TreeView.Item" />
+
+## Notes
+
+- An Item's children render only while it's open, so a large tree costs only what's shown.
+  To load children when a folder opens, set them from `onExpandedChange`. Until they arrive,
+  a placeholder child Item, such as "Loading…", keeps the folder a parent.
+- Restyle with the `--tree-view-*` tokens, such as `--tree-view-indent` or
+  `--tree-view-item-bg-selected`.

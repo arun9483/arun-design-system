@@ -1,0 +1,104 @@
+@layer tree-view {
+  /* The tree and its groups are lists as layout: no markers, no indent of their own. */
+  .tree-view,
+  .tree-view [role='group'] {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tree-view {
+    color: var(--tree-view-color);
+    font-size: var(--tree-view-font-size);
+  }
+
+  .tree-view [role='group'] {
+    padding-inline-start: var(--tree-view-indent);
+  }
+
+  /* An Item holds its children, so it is focused as a whole but drawn as its row: the
+     focus ring goes on the row, not around the subtree. */
+  .tree-view-item {
+    outline: none;
+  }
+
+  /* The row: the Item's first child, placed by @arun-dev/headless. */
+  .tree-view-item > :first-child {
+    display: flex;
+    align-items: center;
+    gap: var(--tree-view-item-gap);
+    padding: var(--tree-view-item-padding-block) var(--tree-view-item-padding-inline);
+    border-radius: var(--tree-view-item-radius);
+    cursor: pointer;
+  }
+
+  .tree-view-item > :first-child:hover {
+    background-color: var(--tree-view-item-bg-hover);
+  }
+
+  .tree-view-item[data-selected] > :first-child {
+    background-color: var(--tree-view-item-bg-selected);
+    color: var(--tree-view-item-color-selected);
+    box-shadow: inset var(--tree-view-selected-bar-width) 0 0 var(--tree-view-selected-bar-color);
+  }
+
+  .tree-view-item[data-selected]:dir(rtl) > :first-child {
+    box-shadow: inset calc(-1 * var(--tree-view-selected-bar-width)) 0 0
+      var(--tree-view-selected-bar-color);
+  }
+
+  .tree-view-item:focus-visible > :first-child {
+    outline: var(--space-2px) solid var(--tree-view-focus-color);
+    outline-offset: calc(-1 * var(--space-2px));
+  }
+
+  .tree-view-item[data-disabled] > :first-child {
+    opacity: var(--tree-view-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  .tree-view-item[data-disabled] > :first-child:hover {
+    background: none;
+  }
+
+  .tree-view-chevron {
+    flex-shrink: 0;
+    inline-size: var(--tree-view-chevron-size);
+    block-size: var(--tree-view-chevron-size);
+    fill: none;
+    stroke: var(--tree-view-chevron-color);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: rotate var(--tree-view-duration) var(--ease-smooth);
+  }
+
+  /* On a selected row the chevron takes the row's colour, which meets contrast on it. */
+  .tree-view-item[data-selected] > :first-child > .tree-view-chevron {
+    stroke: currentColor;
+  }
+
+  /* Drawn on every Item, hidden on a leaf, so leaves line up with parents. */
+  .tree-view-item:not([data-expanded], [data-collapsed]) > :first-child > .tree-view-chevron {
+    visibility: hidden;
+  }
+
+  .tree-view-item[data-expanded] > :first-child > .tree-view-chevron {
+    rotate: 90deg;
+  }
+
+  /* Right to left, a closed Item's chevron points left, toward its children. */
+  .tree-view-item:dir(rtl) > :first-child > .tree-view-chevron {
+    scale: -1 1;
+  }
+
+  .tree-view-item[data-expanded]:dir(rtl) > :first-child > .tree-view-chevron {
+    rotate: -90deg;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tree-view-chevron {
+      transition: none;
+    }
+  }
+}

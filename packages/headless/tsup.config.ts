@@ -24,6 +24,7 @@ export default defineConfig({
     'src/switch/index.ts',
     'src/tabs/index.ts',
     'src/tooltip/index.ts',
+    'src/tree-view/index.ts',
   ],
   format: ['esm', 'cjs'],
   dts: true,

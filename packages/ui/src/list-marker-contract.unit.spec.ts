@@ -39,6 +39,7 @@ describe('list markers', () => {
       ['components/grid/grid.css', /^:where\(ul, ol\)\.layout-grid$/],
       ['components/breadcrumb/breadcrumb.css', /^\.breadcrumb-list$/],
       ['components/pagination/pagination.css', /^\.pagination-list$/],
+      ['components/tree-view/tree-view.css', /^\.tree-view,\s*\.tree-view \[role='group'\]$/],
     ] as const) {
       const rules = rulesFor(css(file), selector);
       expect(rules, `${selector} in ${file}`).toHaveLength(1);

@@ -1284,6 +1284,81 @@ export const PROPS = {
       description: "Flush with the Trigger's start or end edge, or centred on it.",
     },
   ],
+  'TreeView.Root': [
+    {
+      name: 'value',
+      type: 'string[]',
+      description:
+        "Controlled: the selected Items' values. Provide `onValueChange` alongside it. Never pass `undefined` — the mode is fixed at mount.",
+    },
+    {
+      name: 'defaultValue',
+      type: 'string[]',
+      default: '[]',
+      description: 'Initial selection when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onValueChange',
+      type: '(value: string[]) => void',
+      description: 'Called with the whole selection whenever it changes.',
+    },
+    {
+      name: 'multiple',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Lets more than one Item be selected: Space, Enter or a click toggles one, Shift with an arrow key toggles the next, and Ctrl or ⌘ with A selects every Item shown. Without it, selecting an Item replaces the selection.',
+    },
+    {
+      name: 'expanded',
+      type: 'string[]',
+      description:
+        "Controlled: the open parent Items' values. Provide `onExpandedChange` alongside it. Never pass `undefined` — the mode is fixed at mount.",
+    },
+    {
+      name: 'defaultExpanded',
+      type: 'string[]',
+      default: '[]',
+      description: 'Initially open parent Items when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onExpandedChange',
+      type: '(expanded: string[]) => void',
+      description: 'Called with every open Item whenever one opens or closes.',
+    },
+  ],
+  'TreeView.Item': [
+    {
+      name: 'value',
+      type: 'string',
+      description:
+        "Identifies the Item in the Root's `value` and `expanded`. Unique in the tree. Required.",
+    },
+    {
+      name: 'label',
+      type: 'ReactNode',
+      description:
+        "What the row shows, and the Item's accessible name. Icons go in it too. Required.",
+    },
+    {
+      name: 'textValue',
+      type: 'string',
+      description:
+        'What typeahead matches, when the text in `label` is not it — or when `label` is a component that renders its own text.',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Cannot be focused, selected, opened or closed. Skipped by the arrow keys.',
+    },
+    {
+      name: 'children',
+      type: 'ReactNode',
+      description:
+        'Child Items. With any, the Item is a parent: it opens and closes, and renders them only while open.',
+    },
+  ],
   'Tabs.Root': [
     {
       name: 'value',

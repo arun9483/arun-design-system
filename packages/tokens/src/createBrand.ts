@@ -270,6 +270,8 @@ export const CONTRAST_REQUIREMENTS: readonly {
   { foreground: '--color-text-secondary', background: '--color-bg-primary', min: 7 },
   { foreground: '--color-text-muted', background: '--color-bg-primary', min: 4.5 },
   { foreground: '--color-text-inverse', background: '--color-bg-inverse', min: 7 },
+  // A selected row: a TreeView Item's text on its tint.
+  { foreground: '--color-text-primary', background: '--color-bg-accent', min: 7 },
   // The accent as text: links, accent chips, focus outlines.
   { foreground: '--color-text-accent', background: '--color-bg-primary', min: 7 },
   { foreground: '--color-text-accent', background: '--color-bg-secondary', min: 4.5 },

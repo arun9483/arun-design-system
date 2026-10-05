@@ -91,6 +91,7 @@ import type { ToggleGroupProps } from '@arun-dev/headless/toggle-group';
 import type { ToolbarRootProps } from '@arun-dev/headless/toolbar';
 import type { AvatarFallbackProps } from '@arun-dev/headless/avatar';
 import type { TabsListProps, TabsPanelProps, TabsTabProps } from '@arun-dev/headless/tabs';
+import type { TreeViewItemProps, TreeViewRootProps } from '@arun-dev/headless/tree-view';
 import type { COMMON, PROPS } from './props';
 
 type Documented<Key extends keyof typeof PROPS> = (typeof PROPS)[Key][number]['name'];
@@ -185,7 +186,9 @@ type Unknown =
   | OnlyRealProps<Documented<'Tabs.Root'>, ComponentProps<typeof Tabs.Root>>
   | OnlyRealProps<Documented<'Tabs.List'>, TabsListProps>
   | OnlyRealProps<Documented<'Tabs.Tab'>, TabsTabProps>
-  | OnlyRealProps<Documented<'Tabs.Panel'>, TabsPanelProps>;
+  | OnlyRealProps<Documented<'Tabs.Panel'>, TabsPanelProps>
+  | OnlyRealProps<Documented<'TreeView.Root'>, TreeViewRootProps>
+  | OnlyRealProps<Documented<'TreeView.Item'>, TreeViewItemProps>;
 
 /**
  * `never` means every documented name resolves. Anything else is the name that does

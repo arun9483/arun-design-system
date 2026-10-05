@@ -223,6 +223,16 @@
         "types": "./dist/tooltip/index.d.cts",
         "default": "./dist/tooltip/index.cjs"
       }
+    },
+    "./tree-view": {
+      "import": {
+        "types": "./dist/tree-view/index.d.ts",
+        "default": "./dist/tree-view/index.js"
+      },
+      "require": {
+        "types": "./dist/tree-view/index.d.cts",
+        "default": "./dist/tree-view/index.cjs"
+      }
     }
   },
   "publishConfig": {

@@ -25,6 +25,9 @@ type ToggleGroupOwnProps = {
   ref?: Ref<HTMLElement>;
 };
 
+/** The fallback default: one array, so a re-render does not read as a changed default. */
+const NONE: readonly string[] = [];
+
 export type ToggleGroupProps = ToggleGroupOwnProps &
   Omit<ComponentPropsWithRef<'div'>, keyof ToggleGroupOwnProps>;
 
@@ -48,7 +51,7 @@ export function ToggleGroup({
 }: ToggleGroupProps) {
   const [value, setValueState] = useControlled<readonly string[]>({
     controlled: valueProp,
-    default: defaultValue ?? [],
+    default: defaultValue ?? NONE,
     name: 'ToggleGroup',
     state: 'value',
   });
