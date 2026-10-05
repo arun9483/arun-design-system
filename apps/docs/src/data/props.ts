@@ -1662,13 +1662,13 @@ export const PROPS = {
       name: 'maxDays',
       type: 'number',
       description:
-        'The most days the range may cover, both ends included. The calendar stops a pick going further, and the end input’s `max` stops a typed one.',
+        'The most days the range may cover, both ends included. The calendar stops a pick going further, the end input’s `max` stops a typed one, and a moved start pulls a later end back. With `maxHours` too, whichever ends earlier applies.',
     },
     {
       name: 'maxHours',
       type: 'number',
       description:
-        'With `withTime`, the most hours from start to end, such as `40` for a booking. The calendar disables days out of reach, a pick’s end is pulled back to start + `maxHours`, and the end input’s `max` stops a typed one. Ignored without `withTime`.',
+        'With `withTime`, the most hours from start to end, such as `40` for a booking. The calendar disables days out of reach, a picked end or one a moved start passes is pulled back to start + `maxHours`, and the end input’s `max` stops a typed one. With `maxDays` too, whichever ends earlier applies. Ignored without `withTime`.',
     },
     {
       name: 'startInputProps',

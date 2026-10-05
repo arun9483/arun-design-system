@@ -127,7 +127,7 @@ hours. Once the first day is picked, the calendar disables the days 40 hours can
 start's time — from 10:00, the third day is the last. A pick whose end time would run past the
 cap is pulled back to exactly start + 40 hours, and the end field's `max` follows the start, so a
 typed or edited end past it is invalid and won't submit. Moving the start, typed or in the popup, pulls an end that would
-then run past the cap back to it, so the range never exceeds 40 hours. With `maxDays` too, the shorter wins.
+then run past the cap back to it, so the range never exceeds 40 hours.
 
 ## Tags, marks and details
 
@@ -135,6 +135,21 @@ The pickers take Calendar's day information too — `getDayInfo`, `tagPriority`,
 `onVisibleRangeChange`, `loading` and `dayProps` — and pass it to the calendar in their popup:
 holidays, festivals, birthdays and bookings marked on the days, and a details card on hover,
 focus or a tap. See [Calendar](/components/calendar/#what-each-day-is-tags-marks-and-details).
+
+### `maxDays` and `maxHours` together
+
+They aren't exclusive: set both, and the range keeps to **whichever ends earlier**. Each gives a
+latest end — the last of `maxDays` days at 23:59, and `maxHours` after the start — and the earlier
+of the two is used everywhere: the days the calendar disables, the end field's `max`, and the end
+a pick or a moved start is pulled back to. They never contradict; one is simply stricter.
+
+| Start            | Props                         | Latest end       | The limit that applies |
+| ---------------- | ----------------------------- | ---------------- | ---------------------- |
+| Fri 16 Oct 10:00 | `maxDays={1}` `maxHours={40}` | Fri 16 Oct 23:59 | `maxDays`              |
+| Fri 16 Oct 10:00 | `maxDays={7}` `maxHours={40}` | Sun 18 Oct 02:00 | `maxHours`             |
+| Fri 16 Oct 22:00 | `maxDays={2}` `maxHours={30}` | Sat 17 Oct 23:59 | `maxDays`              |
+
+Without `withTime`, `maxHours` is ignored and `maxDays` alone applies.
 
 ## Limits
 
