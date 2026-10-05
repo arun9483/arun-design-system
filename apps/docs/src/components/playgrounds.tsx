@@ -682,6 +682,7 @@ export function DatePickerPlayground() {
   const [maxDays, setMaxDays] = useState('');
   const [months, setMonths] = useState(1);
   const [noWeekends, setNoWeekends] = useState(false);
+  const [dropdown, setDropdown] = useState(false);
   const [single, setSingle] = useState<string | null>(null);
   const [both, setBoth] = useState<{ start: string | null; end: string | null }>({
     start: null,
@@ -692,6 +693,7 @@ export function DatePickerPlayground() {
     withTime,
     months,
     isDateUnavailable: noWeekends ? isWeekend : undefined,
+    captionLayout: dropdown ? ('dropdown' as const) : undefined,
   };
   const attributes = [
     range ? 'aria-label="Dates"' : 'aria-label="Date"',
@@ -699,6 +701,7 @@ export function DatePickerPlayground() {
     ...(range && maxDays ? [`maxDays={${maxDays}}`] : []),
     ...(months > 1 ? [`months={${months}}`] : []),
     ...(noWeekends ? ['isDateUnavailable={isWeekend}'] : []),
+    ...(dropdown ? ['captionLayout="dropdown"'] : []),
     'value={value}',
     'onValueChange={setValue}',
   ];
@@ -764,6 +767,15 @@ export function DatePickerPlayground() {
             onChange={(e) => setNoWeekends(e.target.checked)}
           />
           <span>weekends unavailable</span>
+        </label>
+        <label className="ds-control ds-control-inline" htmlFor="pg-date-dropdown">
+          <input
+            id="pg-date-dropdown"
+            type="checkbox"
+            checked={dropdown}
+            onChange={(e) => setDropdown(e.target.checked)}
+          />
+          <span>month and year selects</span>
         </label>
         <label className="ds-control" htmlFor="pg-date-months">
           <span>months</span>

@@ -221,6 +221,15 @@ export function useCalendarRoot({
     canGoNext,
     goPrevious: () => page(-1),
     goNext: () => page(1),
+    showMonth(firstOfMonth: string) {
+      const [y = 0, m = 1] = firstOfMonth.split('-').map(Number);
+      const [vy = 0, vm = 1] = visibleStart.split('-').map(Number);
+      const months_ = (y - vy) * 12 + (m - vm);
+      if (months_ !== 0) page(months_);
+    },
+    min,
+    max,
+    today: todayIso,
     dayState,
     select,
     focusDate,

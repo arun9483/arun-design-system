@@ -105,6 +105,25 @@ export function timePart(value: string | null | undefined): string | null {
   return value && value.length > 10 ? value.slice(11, 16) : null;
 }
 
+/**
+ * A local date-time `hours` later, as an input value: elapsed time, so across a daylight-saving
+ * change the wall clock moves by an hour more or less.
+ */
+export function addHours(value: string, hours: number): string {
+  const date = new Date(value);
+  date.setTime(date.getTime() + hours * 3_600_000);
+  return `${pad(date.getFullYear(), 4)}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+/**
+ * The calendar days a span of `hours` can touch from a start at `time` (`HH:mm`), both ends
+ * counted: 40 hours from 14:00 ends at 06:00 on the third day.
+ */
+export function daysSpanned(time: string, hours: number): number {
+  const [h = 0, m = 0] = time.split(':').map(Number);
+  return Math.floor((h * 60 + m + hours * 60) / 1440) + 1;
+}
+
 /* ── Locale ── */
 
 const formatters = new Map<string, Intl.DateTimeFormat>();

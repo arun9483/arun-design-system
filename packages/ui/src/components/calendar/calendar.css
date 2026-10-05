@@ -19,6 +19,40 @@
     text-align: center;
   }
 
+  .calendar-selects {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    gap: var(--calendar-gap);
+  }
+
+  .calendar-select {
+    min-block-size: var(--calendar-nav-size);
+    padding-inline: var(--calendar-select-padding-inline);
+    border: var(--space-px) solid var(--calendar-select-border-color);
+    border-radius: var(--calendar-day-radius);
+    background-color: var(--calendar-select-bg);
+    color: inherit;
+    font: inherit;
+    font-weight: var(--calendar-heading-font-weight);
+    cursor: pointer;
+  }
+
+  .calendar-select:focus-visible {
+    outline: var(--space-2px) solid var(--calendar-focus-color);
+    outline-offset: var(--space-px);
+  }
+
+  /* With the selects, the heading stays a live region for screen readers, out of sight. */
+  .calendar-heading-hidden {
+    position: absolute;
+    inline-size: var(--space-px);
+    block-size: var(--space-px);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   .calendar-nav {
     display: inline-flex;
     align-items: center;

@@ -75,11 +75,21 @@ The grid is one Tab stop: the selected day, or today.
 Moving past the month shows the next one. A day that doesn't exist, such as the 31st of a
 shorter month, becomes its last day.
 
+## Jumping to a month and year
+
+`captionLayout="dropdown"` replaces the month heading with month and year selects, for dates
+far from today, such as a date of birth. The years run from `min`'s to `max`'s, or else from 100
+years back to 10 ahead. The heading is kept out of sight, still announcing each new month.
+
+```tsx
+<Calendar aria-label="Date of birth" captionLayout="dropdown" min="1900-01-01" max={today} />
+```
+
 ## Locale
 
 Month and weekday names, digits and the first day of the week come from the browser's locale, or
 `locale`: `en-US` starts on Sunday, `en-GB` on Monday. `firstDayOfWeek` overrides the week's
-start, 0 for Sunday to 6 for Saturday. Translate the Previous and Next buttons' names with
+start, 0 for Sunday to 6 for Saturday. Translate the names of the Previous and Next buttons and the month and year selects with
 `labels`.
 
 ## Accessibility

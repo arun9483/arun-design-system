@@ -5,3 +5,4 @@ export type { CalendarRangeRootProps } from './CalendarRangeRoot';
 export type { CalendarHeadingProps } from './CalendarHeading';
 export type { CalendarNavButtonProps } from './CalendarPrevButton';
 export type { CalendarGridProps } from './CalendarGrid';
+export type { CalendarSelectProps } from './CalendarMonthSelect';

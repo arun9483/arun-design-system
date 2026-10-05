@@ -24,6 +24,11 @@
   --calendar-day-disabled-opacity: 0.6;
   --calendar-focus-color: var(--color-text-accent);
 
+  /* Month and year selects, with captionLayout="dropdown" */
+  --calendar-select-padding-inline: var(--space-2xs);
+  --calendar-select-border-color: var(--color-border-default);
+  --calendar-select-bg: var(--color-bg-primary);
+
   /* Previous and Next */
   --calendar-nav-size: 2rem;
   --calendar-nav-color: var(--color-text-secondary);

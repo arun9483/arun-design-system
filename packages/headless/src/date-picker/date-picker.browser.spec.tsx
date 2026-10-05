@@ -300,6 +300,41 @@ describe('DatePicker range (browser)', () => {
     });
   });
 
+  it('with maxHours, books at most that long: the calendar, a pick and a typed end all keep to it', async () => {
+    const onValueChange = vi.fn();
+    render(
+      <Range
+        withTime
+        maxHours={40}
+        defaultValue={{ start: '2026-10-12T14:00', end: '2026-10-12T18:00' }}
+        onValueChange={onValueChange}
+      />,
+    );
+    // Typed: no later than 40 hours after the start.
+    expect(end()).toHaveAttribute('max', '2026-10-14T06:00');
+    await userEvent.click(rangeTrigger());
+    await userEvent.click(day('Monday, October 12, 2026'));
+    // From 14:00, 40 hours reach 06:00 on Wednesday: Thursday is out of reach.
+    expect(day('Wednesday, October 14, 2026')).not.toHaveAttribute('data-disabled');
+    expect(day('Thursday, October 15, 2026')).toHaveAttribute('data-disabled');
+    await userEvent.click(day('Wednesday, October 14, 2026'));
+    // The end keeps its 18:00, which is past the cap, so it is pulled back to it.
+    expect(onValueChange).toHaveBeenLastCalledWith({
+      start: '2026-10-12T14:00',
+      end: '2026-10-14T06:00',
+    });
+    await userEvent.fill(screen.getByLabelText('End time'), '09:00');
+    expect(end().validity.rangeOverflow).toBe(true);
+  });
+
+  it('without withTime, ignores maxHours', async () => {
+    render(<Range maxHours={40} defaultValue={{ start: '2026-10-12', end: '2026-10-13' }} />);
+    expect(end()).not.toHaveAttribute('max');
+    await userEvent.click(rangeTrigger());
+    await userEvent.click(day('Monday, October 12, 2026'));
+    expect(day('Friday, October 23, 2026')).not.toHaveAttribute('data-disabled');
+  });
+
   it('follows a controlled range', async () => {
     function Controlled() {
       const [value, setValue] = useState<DateRangeValue>({

@@ -6,7 +6,7 @@ import {
   type CalendarBinding,
   type DateRange,
 } from '../calendar/CalendarRootContext';
-import { addDays, datePart, timePart } from '../calendar/dates';
+import { addDays, addHours, datePart, daysSpanned, timePart } from '../calendar/dates';
 import { DatePickerRootContext, type DatePickerLabels } from './DatePickerRootContext';
 import type { DatePickerSharedProps } from './DatePickerRoot';
 import { inputBound, useDateInput } from './useDateInput';
@@ -32,6 +32,12 @@ export type DatePickerRangeRootProps = DatePickerSharedProps & {
    * Calendar stops a pick going further, and the end input's `max` stops a typed one.
    */
   maxDays?: number;
+  /**
+   * With `withTime`, the most hours from start to end: `40` for a 40-hour booking. The calendar
+   * disables the days out of reach, a pick's end time is pulled back to start + `maxHours`, and
+   * the end input's `max` stops a typed one. Ignored without `withTime`.
+   */
+  maxHours?: number;
 };
 
 const DEFAULT_LABELS: DatePickerLabels = {
@@ -60,6 +66,7 @@ export function DatePickerRangeRoot({
   defaultValue,
   onValueChange,
   maxDays,
+  maxHours,
   withTime = false,
   min,
   max,
@@ -108,6 +115,12 @@ export function DatePickerRangeRoot({
   const endTime = timePart(end.shown) ?? draftEndTime;
   const minDate = datePart(min) ?? undefined;
   const maxDate = datePart(max) ?? undefined;
+  const hoursLimit = withTime && maxHours ? maxHours : undefined;
+  // In days, for the calendar: what `maxHours` from the start's time can reach, or `maxDays`,
+  // whichever is shorter.
+  const hoursDays = hoursLimit ? daysSpanned(startTime ?? '00:00', hoursLimit) : undefined;
+  const calendarMaxDays =
+    hoursDays && maxDays ? Math.min(hoursDays, maxDays) : (hoursDays ?? maxDays);
   const binding: CalendarBinding = useMemo(
     () => ({
       mode: 'range',
@@ -116,13 +129,18 @@ export function DatePickerRangeRoot({
       min: minDate,
       max: maxDate,
       isDateUnavailable,
-      maxDays,
+      maxDays: calendarMaxDays,
       openCount,
       pick(range: DateRange) {
         const next = {
           start: withTime ? `${range.start}T${startTime ?? '00:00'}` : range.start,
           end: withTime ? `${range.end}T${endTime ?? '23:59'}` : range.end,
         };
+        // An end past `maxHours` is pulled back to it: the last day is reachable, not all of it.
+        if (hoursLimit) {
+          const cap = addHours(next.start, hoursLimit);
+          if (next.end > cap) next.end = cap;
+        }
         // Both inputs hear their change; the range is reported once, whole.
         start.write(next.start, true);
         end.write(next.end, true);
@@ -141,7 +159,8 @@ export function DatePickerRangeRoot({
       minDate,
       maxDate,
       isDateUnavailable,
-      maxDays,
+      calendarMaxDays,
+      hoursLimit,
       openCount,
       withTime,
       setOpen,
@@ -152,6 +171,10 @@ export function DatePickerRangeRoot({
   // The end's latest: `max`, or `maxDays` from the start, whichever comes first.
   const reach = startDate && maxDays ? addDays(startDate, maxDays - 1) : undefined;
   const endMax = reach && (!maxDate || reach < maxDate) ? reach : max;
+  // With `maxHours`, no later than that from the start, to the minute.
+  const endMaxInput = inputBound(endMax, withTime, 'end');
+  const hoursCap = hoursLimit && start.shown ? addHours(start.shown, hoursLimit) : undefined;
+  const endInputMax = hoursCap && (!endMaxInput || hoursCap < endMaxInput) ? hoursCap : endMaxInput;
 
   const timeSlot = (
     input: typeof start,
@@ -191,7 +214,7 @@ export function DatePickerRangeRoot({
     }),
     end: end.slot({
       min: inputBound(start.shown ?? min, withTime, 'start'),
-      max: inputBound(endMax, withTime, 'end'),
+      max: endInputMax,
       unavailable: isDateUnavailable,
       unavailableMessage: labels.unavailable,
       label: labels.end,
