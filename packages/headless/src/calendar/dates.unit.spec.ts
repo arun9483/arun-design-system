@@ -5,6 +5,8 @@ import {
   clamp,
   dayOfWeek,
   daysBetween,
+  addHours,
+  daysSpanned,
   endOfMonth,
   firstDayOfWeekFor,
   timePart,
@@ -59,5 +61,13 @@ describe('calendar dates', () => {
     expect(firstDayOfWeekFor('en-GB')).toBe(1);
     expect(firstDayOfWeekFor('de-DE')).toBe(1);
     expect(firstDayOfWeekFor('ar-EG')).toBe(6);
+  });
+
+  it('adds hours to a local date-time, and counts the days a span touches', () => {
+    expect(addHours('2026-10-12T14:00', 40)).toBe('2026-10-14T06:00');
+    expect(addHours('2026-10-12T23:30', 1.5)).toBe('2026-10-13T01:00');
+    expect(daysSpanned('14:00', 40)).toBe(3);
+    expect(daysSpanned('00:00', 24)).toBe(2);
+    expect(daysSpanned('09:00', 8)).toBe(1);
   });
 });

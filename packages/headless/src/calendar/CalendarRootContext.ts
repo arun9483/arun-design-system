@@ -20,11 +20,17 @@ export type CalendarDayState = {
 export type CalendarLabels = {
   previous: string;
   next: string;
+  /** The MonthSelect's name. */
+  month: string;
+  /** The YearSelect's name. */
+  year: string;
 };
 
 export const DEFAULT_CALENDAR_LABELS: CalendarLabels = {
   previous: 'Previous month',
   next: 'Next month',
+  month: 'Month',
+  year: 'Year',
 };
 
 /** What Calendar's Root shares with its parts. */
@@ -41,6 +47,12 @@ export type CalendarRootContextValue = {
   canGoNext: boolean;
   goPrevious: () => void;
   goNext: () => void;
+  /** Shows the month starting on this day as the first one, the Tab stop moving with it. */
+  showMonth: (firstOfMonth: string) => void;
+  min: string | undefined;
+  max: string | undefined;
+  /** Today, or `null` until the client knows it. */
+  today: string | null;
   dayState: (iso: string) => CalendarDayState;
   select: (iso: string) => void;
   /** Moves the Tab stop to a day, showing its month; `moveFocus` focuses it too. */

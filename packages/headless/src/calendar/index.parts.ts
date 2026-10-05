@@ -4,3 +4,5 @@ export { CalendarHeading as Heading } from './CalendarHeading';
 export { CalendarPrevButton as PrevButton } from './CalendarPrevButton';
 export { CalendarNextButton as NextButton } from './CalendarNextButton';
 export { CalendarGrid as Grid } from './CalendarGrid';
+export { CalendarMonthSelect as MonthSelect } from './CalendarMonthSelect';
+export { CalendarYearSelect as YearSelect } from './CalendarYearSelect';

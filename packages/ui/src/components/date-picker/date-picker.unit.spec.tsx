@@ -17,6 +17,15 @@ describe('Calendar (ui)', () => {
     expect(screen.getByRole('button', { name: 'Next month' })).toHaveClass('calendar-nav-next');
   });
 
+  it('with captionLayout="dropdown", shows month and year selects, the heading kept for screen readers', () => {
+    render(<Calendar locale="en-US" defaultValue="1990-06-15" captionLayout="dropdown" />);
+    expect(screen.getByRole('combobox', { name: 'Month' })).toHaveValue('06');
+    expect(screen.getByRole('combobox', { name: 'Year' })).toHaveValue('1990');
+    expect(screen.getByText('June 1990', { selector: '.calendar-heading' })).toHaveClass(
+      'calendar-heading-hidden',
+    );
+  });
+
   it('is a range calendar too', () => {
     render(
       <RangeCalendar locale="en-US" defaultValue={{ start: '2026-10-05', end: '2026-10-07' }} />,
@@ -38,6 +47,20 @@ describe('DatePicker (ui)', () => {
     expect(input).toHaveClass('date-picker-input');
     expect(input.parentElement).toHaveClass('date-picker', 'wide');
     expect(screen.getByRole('button', { name: 'Choose date' })).toHaveClass('date-picker-trigger');
+  });
+
+  it('with withTime, adds the time field and Done to the popup', () => {
+    render(<DatePicker aria-label="Starts" withTime defaultValue="2026-10-05T09:30" />);
+    const time = screen.getByLabelText('Time');
+    expect(time).toHaveAttribute('type', 'time');
+    expect(time).toHaveValue('09:30');
+    expect(time).toHaveClass('date-picker-time-input');
+    expect(screen.getByRole('button', { name: 'Done', hidden: true })).toHaveClass('btn-primary');
+  });
+
+  it('without withTime, has no time field', () => {
+    render(<DatePicker aria-label="Due" />);
+    expect(screen.queryByLabelText('Time')).toBeNull();
   });
 
   it('takes a Field: the label, the description and the invalid state reach the input', () => {
@@ -72,5 +95,30 @@ describe('DatePicker (ui)', () => {
     expect(start).toHaveAttribute('name', 'from');
     expect(end).toHaveAttribute('name', 'to');
     expect(end).toBeRequired();
+  });
+
+  it('passes maxHours to the picker, not to the box', () => {
+    render(
+      <DateRangePicker
+        aria-label="Hall"
+        withTime
+        maxHours={40}
+        defaultValue={{ start: '2026-10-12T14:00', end: null }}
+      />,
+    );
+    expect(screen.getByRole('group')).not.toHaveAttribute('maxhours');
+    expect(screen.getByLabelText('End date')).toHaveAttribute('max', '2026-10-14T06:00');
+  });
+
+  it('a range with times has a start and an end time field', () => {
+    render(
+      <DateRangePicker
+        aria-label="Booking"
+        withTime
+        defaultValue={{ start: '2026-10-05T14:00', end: '2026-10-07T11:00' }}
+      />,
+    );
+    expect(screen.getByLabelText('Start time')).toHaveValue('14:00');
+    expect(screen.getByLabelText('End time')).toHaveValue('11:00');
   });
 });

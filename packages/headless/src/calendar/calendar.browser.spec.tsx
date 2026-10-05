@@ -285,4 +285,53 @@ describe('Calendar (browser)', () => {
     await userEvent.keyboard('{Enter}{Enter}');
     expect(onValueChange).toHaveBeenCalledWith({ start: '2026-10-05', end: '2026-10-05' });
   });
+
+  it('jumps to a month and a year with native selects, for a date of birth', async () => {
+    render(
+      <Calendar.Root locale="en-US" defaultValue="2026-10-05" min="1926-03-15" max="2026-10-05">
+        <Calendar.MonthSelect />
+        <Calendar.YearSelect />
+        <Calendar.Heading data-testid="heading" />
+        <Calendar.Grid />
+      </Calendar.Root>,
+    );
+    const month = screen.getByRole('combobox', { name: 'Month' });
+    const year = screen.getByRole('combobox', { name: 'Year' });
+    expect(month).toHaveValue('10');
+    expect(year).toHaveValue('2026');
+    // From min's year to max's.
+    const years = within(year).getAllByRole('option');
+    expect(years[0]).toHaveTextContent('1926');
+    expect(years.at(-1)).toHaveTextContent('2026');
+    // Months after max are not offered in max's year.
+    expect(within(month).getByRole('option', { name: 'November' })).toBeDisabled();
+    await userEvent.selectOptions(year, '1990');
+    expect(heading()).toHaveTextContent('October 1990');
+    // The Tab stop moves with the month shown.
+    expect(day('Friday, October 5, 1990')).toHaveAttribute('tabindex', '0');
+    await userEvent.selectOptions(month, 'June');
+    expect(heading()).toHaveTextContent('June 1990');
+    await userEvent.click(day('Friday, June 15, 1990'));
+    expect(day('Friday, June 15, 1990')).toHaveAttribute('data-selected');
+    // The keys move the selects too.
+    await userEvent.keyboard('{PageDown}');
+    expect(month).toHaveValue('07');
+    await userEvent.keyboard('{Shift>}{PageUp}{/Shift}');
+    expect(year).toHaveValue('1989');
+  });
+
+  it('keeps a year pick within min and max', async () => {
+    render(
+      <Calendar.Root locale="en-US" defaultValue="2026-10-05" min="1926-03-15">
+        <Calendar.YearSelect />
+        <Calendar.Heading data-testid="heading" />
+        <Calendar.Grid />
+      </Calendar.Root>,
+    );
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Year' }), '1926');
+    // October 1926 is after min, so it is shown as it is.
+    expect(heading()).toHaveTextContent('October 1926');
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Year' }), '2036');
+    expect(heading()).toHaveTextContent('October 2036');
+  });
 });

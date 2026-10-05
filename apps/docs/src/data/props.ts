@@ -1338,8 +1338,16 @@ export const PROPS = {
     },
     {
       name: 'labels',
-      type: '{ previous?: string; next?: string }',
-      description: 'Names for the Previous and Next buttons, in English unless replaced.',
+      type: '{ previous?; next?; month?; year? }',
+      description:
+        'Names for the Previous and Next buttons and the month and year selects, in English unless replaced.',
+    },
+    {
+      name: 'captionLayout',
+      type: "'label' | 'dropdown'",
+      default: "'label'",
+      description:
+        "`dropdown` shows month and year selects above the days, to jump to a far-off month such as a date of birth. Years run from `min`'s to `max`'s, or 100 years back to 10 ahead.",
     },
   ],
   RangeCalendar: [
@@ -1402,8 +1410,16 @@ export const PROPS = {
     },
     {
       name: 'labels',
-      type: '{ previous?: string; next?: string }',
-      description: 'Names for the Previous and Next buttons, in English unless replaced.',
+      type: '{ previous?; next?; month?; year? }',
+      description:
+        'Names for the Previous and Next buttons and the month and year selects, in English unless replaced.',
+    },
+    {
+      name: 'captionLayout',
+      type: "'label' | 'dropdown'",
+      default: "'label'",
+      description:
+        "`dropdown` shows month and year selects above the days, to jump to a far-off month such as a date of birth. Years run from `min`'s to `max`'s, or 100 years back to 10 ahead.",
     },
   ],
   DatePicker: [
@@ -1430,7 +1446,7 @@ export const PROPS = {
       type: 'boolean',
       default: 'false',
       description:
-        'Adds the time: each input becomes `datetime-local`, and each value `YYYY-MM-DDTHH:mm`.',
+        'Adds the time: each input becomes `datetime-local`, each value `YYYY-MM-DDTHH:mm`, and the popup gets time fields and Done, staying open after a pick.',
     },
     {
       name: 'min',
@@ -1484,9 +1500,22 @@ export const PROPS = {
     },
     {
       name: 'labels',
-      type: '{ choose?; dialog?; start?; end?; unavailable? }',
+      type: '{ choose?; dialog?; start?; end?; unavailable?; time?; startTime?; endTime? }',
       description:
-        'Names for the calendar button and popup, the range inputs, and the unavailable message, in English unless replaced.',
+        'Names for the calendar button and popup, the range inputs, the time fields in the popup, and the unavailable message, in English unless replaced.',
+    },
+    {
+      name: 'captionLayout',
+      type: "'label' | 'dropdown'",
+      default: "'label'",
+      description:
+        "`dropdown` shows month and year selects above the days, to jump to a far-off month such as a date of birth. Years run from `min`'s to `max`'s, or 100 years back to 10 ahead.",
+    },
+    {
+      name: 'doneLabel',
+      type: 'string',
+      default: "'Done'",
+      description: 'The text of the button that closes the popup, shown with `withTime`.',
     },
     {
       name: 'calendarLabels',
@@ -1525,6 +1554,12 @@ export const PROPS = {
         'The most days the range may cover, both ends included. The calendar stops a pick going further, and the end input’s `max` stops a typed one.',
     },
     {
+      name: 'maxHours',
+      type: 'number',
+      description:
+        'With `withTime`, the most hours from start to end, such as `40` for a booking. The calendar disables days out of reach, a pick’s end is pulled back to start + `maxHours`, and the end input’s `max` stops a typed one. Ignored without `withTime`.',
+    },
+    {
       name: 'startInputProps',
       type: 'input props',
       description: "For the start input: its `name`, or everything `register('from')` returns.",
@@ -1544,7 +1579,7 @@ export const PROPS = {
       type: 'boolean',
       default: 'false',
       description:
-        'Adds the time: each input becomes `datetime-local`, and each value `YYYY-MM-DDTHH:mm`.',
+        'Adds the time: each input becomes `datetime-local`, each value `YYYY-MM-DDTHH:mm`, and the popup gets time fields and Done, staying open after a pick.',
     },
     {
       name: 'min',
@@ -1598,9 +1633,22 @@ export const PROPS = {
     },
     {
       name: 'labels',
-      type: '{ choose?; dialog?; start?; end?; unavailable? }',
+      type: '{ choose?; dialog?; start?; end?; unavailable?; time?; startTime?; endTime? }',
       description:
-        'Names for the calendar button and popup, the range inputs, and the unavailable message, in English unless replaced.',
+        'Names for the calendar button and popup, the range inputs, the time fields in the popup, and the unavailable message, in English unless replaced.',
+    },
+    {
+      name: 'captionLayout',
+      type: "'label' | 'dropdown'",
+      default: "'label'",
+      description:
+        "`dropdown` shows month and year selects above the days, to jump to a far-off month such as a date of birth. Years run from `min`'s to `max`'s, or 100 years back to 10 ahead.",
+    },
+    {
+      name: 'doneLabel',
+      type: 'string',
+      default: "'Done'",
+      description: 'The text of the button that closes the popup, shown with `withTime`.',
     },
     {
       name: 'calendarLabels',

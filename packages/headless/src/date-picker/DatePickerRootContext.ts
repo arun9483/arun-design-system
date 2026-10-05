@@ -13,6 +13,19 @@ export type DatePickerLabels = {
   end: string;
   /** The validation message for a typed date that `isDateUnavailable` rules out. */
   unavailable: string;
+  /** The time field in the Popup, with `withTime`. */
+  time: string;
+  /** A range's first time field in the Popup. */
+  startTime: string;
+  /** A range's last time field in the Popup. */
+  endTime: string;
+};
+
+/** A time field in the Popup: the time part of an input's value, or the one chosen before a date. */
+export type TimeInputSlot = {
+  value: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  label: string;
 };
 
 /** One native input, as the Root runs it. */
@@ -37,6 +50,8 @@ export type DatePickerRootContextValue = {
   single: DateInputSlot | null;
   start: DateInputSlot | null;
   end: DateInputSlot | null;
+  /** The Popup's time fields, with `withTime`. */
+  time: { single: TimeInputSlot | null; start: TimeInputSlot | null; end: TimeInputSlot | null };
   /** The Trigger's name, with the chosen date or range. */
   triggerLabel: string;
   labels: DatePickerLabels;

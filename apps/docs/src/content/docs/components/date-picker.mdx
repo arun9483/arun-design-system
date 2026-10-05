@@ -7,6 +7,9 @@ import Example from '@/components/Example.astro';
 import DatePickerBasics from '@/examples/date-picker-basics';
 import DatePickerTime from '@/examples/date-picker-time';
 import DatePickerIso from '@/examples/date-picker-iso';
+import DatePickerBirth from '@/examples/date-picker-birth';
+import DatePickerAnniversary from '@/examples/date-picker-anniversary';
+import DateRangePickerHours from '@/examples/date-range-picker-hours';
 import DateRangePickerBasics from '@/examples/date-range-picker-basics';
 import DateRangePickerTime from '@/examples/date-range-picker-time';
 import PropTable from '@/components/PropTable.astro';
@@ -44,8 +47,33 @@ These are the strings the native inputs hold, in the user's local time, with no 
   <DatePickerTime client:load />
 </Example>
 
-`withTime` makes the field a `datetime-local` input. Picking a day in the calendar keeps the
-time already set, or uses midnight.
+`withTime` makes the field a `datetime-local` input, and adds a **Time** field and a **Done**
+button under the calendar. The Time field is the browser's own time input, so in Chrome its clock
+button opens the same hour, minute and AM/PM columns as the native picker.
+
+With a time, picking a day keeps the popup open, so the time can be set next; Done, Esc or a
+click outside closes it. A picked day keeps the time already set, or uses the time chosen in the
+popup, or midnight. Both fields stay in step: change either, and the value follows.
+
+## Far-off dates: a date of birth
+
+<Example name="date-picker-birth">
+  <DatePickerBirth client:load />
+</Example>
+
+Paging a month at a time is fine for next week, not for 1990. `captionLayout="dropdown"` puts
+**month and year selects** above the days: native `<select>`s, so typing "1990" or a phone's
+wheel jumps straight there, and the arrow keys and Page Up/Down still move the calendar, the
+selects following. The years run from `min`'s to `max`'s, or else from 100 years back to 10
+ahead; for a birthday, `max` is today. It works the same in a range, and on its own
+[Calendar](/components/calendar/).
+
+A wedding anniversary is the same kind of date: in the past, often decades back, and with no
+time.
+
+<Example name="date-picker-anniversary">
+  <DatePickerAnniversary client:load />
+</Example>
 
 ## ISO input
 
@@ -83,8 +111,22 @@ end.
   <DateRangePickerTime client:load />
 </Example>
 
-With `withTime`, each end has its own time. Picking a range keeps both times; an end with none
-yet gets 00:00 for the start and 23:59 for the end, so the range covers whole days.
+With `withTime`, each end has its own time, set in its field or in the popup's **Start time**
+and **End time** fields under the range calendar. The popup stays open after a range is picked,
+until Done. Picking keeps both times; an end with none yet gets 00:00 for the start and 23:59
+for the end, so the range covers whole days.
+
+### A limit in hours
+
+<Example name="date-range-picker-hours">
+  <DateRangePickerHours client:load />
+</Example>
+
+`maxHours`, with `withTime`, caps the time from start to end: a hall booked for at most 40
+hours. Once the first day is picked, the calendar disables the days 40 hours can't reach from the
+start's time — from 10:00, the third day is the last. A pick whose end time would run past the
+cap is pulled back to exactly start + 40 hours, and the end field's `max` follows the start, so a
+typed or edited end past it is invalid and won't submit. With `maxDays` too, the shorter wins.
 
 ## Limits
 

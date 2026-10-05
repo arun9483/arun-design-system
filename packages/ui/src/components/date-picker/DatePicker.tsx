@@ -7,7 +7,8 @@ import type {
   DatePickerSharedProps,
 } from '@arun-dev/headless/date-picker';
 import type { CalendarLabels } from '@arun-dev/headless/calendar';
-import { Calendar, RangeCalendar } from '../calendar';
+import { Calendar, RangeCalendar, type CalendarCaptionLayout } from '../calendar';
+import { Button } from '../button';
 import { cn } from '../../lib/cn';
 
 function CalendarIcon() {
@@ -27,9 +28,37 @@ type CalendarOptions = {
   firstDayOfWeek?: number;
   /** Labels for the calendar's Previous and Next buttons. */
   calendarLabels?: Partial<CalendarLabels>;
+  /** `dropdown` adds month and year selects to the calendar, for dates far away: a date of birth. */
+  captionLayout?: CalendarCaptionLayout;
+  /** The text of the button that closes the popup, shown with `withTime`. */
+  doneLabel?: string;
   /** Classes for the box around the input and the button. */
   className?: string;
 };
+
+/**
+ * With `withTime`, the popup's last row: the time fields — the browser's own time inputs,
+ * labelled — and Done, since a pick leaves the popup open for the time.
+ */
+function TimeRow({ children, doneLabel }: { children: React.ReactNode; doneLabel: string }) {
+  return (
+    <div className="date-picker-time">
+      {children}
+      <Headless.Close render={<Button variant="primary" />} className="date-picker-done">
+        {doneLabel}
+      </Headless.Close>
+    </div>
+  );
+}
+
+function TimeField({ label, children }: { label: string; children: React.ReactElement }) {
+  return (
+    <label className="date-picker-time-field">
+      <span className="date-picker-time-label">{label}</span>
+      {children}
+    </label>
+  );
+}
 
 type RootKeys = keyof DatePickerRootProps | 'children';
 
@@ -59,6 +88,8 @@ export function DatePicker({
   months,
   firstDayOfWeek,
   calendarLabels,
+  doneLabel = 'Done',
+  captionLayout,
   className,
   ...inputProps
 }: DatePickerProps) {
@@ -79,7 +110,15 @@ export function DatePicker({
           months={months}
           firstDayOfWeek={firstDayOfWeek}
           labels={calendarLabels}
+          captionLayout={captionLayout}
         />
+        {withTime && (
+          <TimeRow doneLabel={doneLabel}>
+            <TimeField label={labels?.time ?? 'Time'}>
+              <Headless.TimeInput className="date-picker-time-input" />
+            </TimeField>
+          </TimeRow>
+        )}
       </Headless.Popup>
     </Headless.Root>
   );
@@ -118,6 +157,7 @@ export function DateRangePicker({
   defaultValue,
   onValueChange,
   maxDays,
+  maxHours,
   withTime,
   min,
   max,
@@ -131,6 +171,8 @@ export function DateRangePicker({
   months,
   firstDayOfWeek,
   calendarLabels,
+  doneLabel = 'Done',
+  captionLayout,
   startInputProps,
   endInputProps,
   required,
@@ -143,7 +185,8 @@ export function DateRangePicker({
   const shared = { required, 'aria-describedby': describedBy, 'aria-invalid': invalid };
   return (
     <Headless.RangeRoot
-      {...{ value, defaultValue, onValueChange, maxDays, withTime, min, max, isDateUnavailable }}
+      {...{ value, defaultValue, onValueChange, maxDays, maxHours, withTime, min, max }}
+      isDateUnavailable={isDateUnavailable}
       {...{ disabled, open, defaultOpen, onOpenChange, locale, labels }}
     >
       <div role="group" {...rest} className={cn('date-picker', 'date-range-picker', className)}>
@@ -167,7 +210,18 @@ export function DateRangePicker({
           months={months}
           firstDayOfWeek={firstDayOfWeek}
           labels={calendarLabels}
+          captionLayout={captionLayout}
         />
+        {withTime && (
+          <TimeRow doneLabel={doneLabel}>
+            <TimeField label={labels?.startTime ?? 'Start time'}>
+              <Headless.StartTimeInput className="date-picker-time-input" />
+            </TimeField>
+            <TimeField label={labels?.endTime ?? 'End time'}>
+              <Headless.EndTimeInput className="date-picker-time-input" />
+            </TimeField>
+          </TimeRow>
+        )}
       </Headless.Popup>
     </Headless.RangeRoot>
   );
