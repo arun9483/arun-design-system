@@ -1,0 +1,23 @@
+/* TreeView component tokens — nested Items, each a row with a chevron and its label.
+   Override any of these to restyle trees without moving other components. */
+:root {
+  --tree-view-font-size: var(--text-sm);
+  --tree-view-color: var(--color-text-primary);
+  --tree-view-item-padding-block: var(--space-3xs);
+  --tree-view-item-padding-inline: var(--space-2xs);
+  --tree-view-item-gap: var(--space-3xs);
+  --tree-view-item-radius: var(--radius-sm);
+  --tree-view-item-bg-hover: var(--color-bg-secondary);
+  --tree-view-item-bg-selected: var(--color-bg-accent);
+  --tree-view-item-color-selected: var(--color-text-primary);
+  /* A bar on the selected row's leading edge, so selection is not shown by colour alone. */
+  --tree-view-selected-bar-width: var(--space-2px);
+  --tree-view-selected-bar-color: var(--color-text-accent);
+  --tree-view-chevron-size: 1rem;
+  --tree-view-chevron-color: var(--color-text-secondary);
+  /* Each level in by a chevron and a gap, so a child's chevron sits under its parent's label. */
+  --tree-view-indent: calc(var(--tree-view-chevron-size) + var(--tree-view-item-gap));
+  --tree-view-focus-color: var(--color-text-accent);
+  --tree-view-disabled-opacity: 0.5;
+  --tree-view-duration: var(--duration-fast);
+}

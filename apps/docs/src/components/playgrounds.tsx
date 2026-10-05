@@ -21,6 +21,7 @@ import {
   Tabs,
   Textarea,
   Tooltip,
+  TreeView,
 } from '@arun-dev/ui';
 import { Playground, type Control } from './Playground';
 
@@ -546,6 +547,121 @@ export function StepperPlayground() {
             ))}
             <option value={STEPPER_STEPS.length}>Finished</option>
           </select>
+        </label>
+      </div>
+
+      <pre className="ds-playground-output" tabIndex={0}>
+        <code>{jsx}</code>
+      </pre>
+    </div>
+  );
+}
+
+/** A small tree of folders and files: `children` makes a parent. */
+const TREE_VIEW_ITEMS: {
+  value: string;
+  label: string;
+  children?: { value: string; label: string }[];
+}[] = [
+  {
+    value: 'src',
+    label: 'src',
+    children: [
+      { value: 'src/App.tsx', label: 'App.tsx' },
+      { value: 'src/main.tsx', label: 'main.tsx' },
+    ],
+  },
+  {
+    value: 'public',
+    label: 'public',
+    children: [{ value: 'public/favicon.svg', label: 'favicon.svg' }],
+  },
+  { value: 'index.html', label: 'index.html' },
+];
+
+export function TreeViewPlayground() {
+  const [multiple, setMultiple] = useState(false);
+  const [rtl, setRtl] = useState(false);
+  const [value, setValue] = useState<string[]>([]);
+  const [expanded, setExpanded] = useState<string[]>(['src']);
+
+  // Turning multiple off keeps one selection at most, as the tree would.
+  const toggleMultiple = (next: boolean) => {
+    setMultiple(next);
+    if (!next) setValue((current) => current.slice(0, 1));
+  };
+
+  const attributes = [
+    'aria-label="Files"',
+    ...(multiple ? ['multiple'] : []),
+    ...(rtl ? ['dir="rtl"'] : []),
+    'value={value}',
+    'onValueChange={setValue}',
+    'expanded={expanded}',
+    'onExpandedChange={setExpanded}',
+  ];
+  const item = (
+    indent: string,
+    { value: v, label, children }: (typeof TREE_VIEW_ITEMS)[number],
+  ): string[] =>
+    children
+      ? [
+          `${indent}<TreeView.Item value="${v}" label="${label}">`,
+          ...children.flatMap((child) => item(`${indent}  `, child)),
+          `${indent}</TreeView.Item>`,
+        ]
+      : [`${indent}<TreeView.Item value="${v}" label="${label}" />`];
+  const jsx = [
+    `// value: ${JSON.stringify(value)}`,
+    `// expanded: ${JSON.stringify(expanded)}`,
+    '<TreeView.Root',
+    ...attributes.map((a) => `  ${a}`),
+    '>',
+    ...TREE_VIEW_ITEMS.flatMap((i) => item('  ', i)),
+    '</TreeView.Root>',
+  ].join('\n');
+
+  return (
+    <div className="ds-example not-content">
+      <div className="ds-example-preview" data-layout="stack">
+        <TreeView.Root
+          aria-label="Files"
+          multiple={multiple}
+          dir={rtl ? 'rtl' : undefined}
+          value={value}
+          onValueChange={setValue}
+          expanded={expanded}
+          onExpandedChange={setExpanded}
+          style={{ inlineSize: '100%', maxInlineSize: '16rem' }}
+        >
+          {TREE_VIEW_ITEMS.map(({ value: v, label, children }) => (
+            <TreeView.Item key={v} value={v} label={label}>
+              {children?.map((child) => (
+                <TreeView.Item key={child.value} value={child.value} label={child.label} />
+              ))}
+            </TreeView.Item>
+          ))}
+        </TreeView.Root>
+      </div>
+
+      <div className="ds-playground-controls">
+        <label className="ds-control ds-control-inline" htmlFor="pg-tree-view-multiple">
+          <input
+            id="pg-tree-view-multiple"
+            type="checkbox"
+            checked={multiple}
+            onChange={(e) => toggleMultiple(e.target.checked)}
+          />
+          <span>multiple</span>
+        </label>
+        <label className="ds-control ds-control-inline" htmlFor="pg-tree-view-rtl">
+          <input
+            id="pg-tree-view-rtl"
+            type="checkbox"
+            checked={rtl}
+            onChange={(e) => setRtl(e.target.checked)}
+          />
+          <span>right to left</span>
         </label>
       </div>
 

@@ -87,6 +87,14 @@ describe('ToggleGroup (browser)', () => {
     expect(button('Right')).toHaveAttribute('aria-pressed', 'false');
   });
 
+  it('re-renders without a defaultValue and reports no changed default', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(<Alignment />);
+    await userEvent.click(button('Left'));
+    expect(error).not.toHaveBeenCalledWith(expect.stringContaining('cannot change the default'));
+    error.mockRestore();
+  });
+
   it('presses several with multiple', async () => {
     render(<Alignment multiple />);
     await userEvent.click(button('Left'));

@@ -1314,3 +1314,58 @@ is the consumer's content inside the Item.
 **Rules out:** a Stepper that holds the current step, or moves focus between steps; an error
 status (a step's errors are its form's — Field and Alert); a step-content part that shows the
 current panel, which is the consumer's routing.
+
+---
+
+## 26. TreeView: nested Items, a label prop, children shown only when open
+
+A tree view lets people move through a hierarchy, open and close branches, and select items —
+files and folders, nested categories. Measured against APG's tree view pattern, MUI's
+`SimpleTreeView` and React Aria's `Tree` (October 2026).
+
+**No native element passes.** Nested `<details>` gives open and closed branches, but every
+`<summary>` is its own Tab stop, with no tree semantics and no arrow keys, and selection is
+not a concept at all. So the behaviour is in `@arun-dev/headless`, by APG: `role="tree"`, one
+Tab stop, the arrow keys to move, open and close. A tree is not a site's navigation: APG warns
+that its keyboard model is unexpected there, and nested lists of links with a disclosure are the
+right shape for that.
+
+**Two parts: `Root` and `Item`, with the label as a prop.** An Item is an `<li role="treeitem">`
+holding its row — a `<div>` with the `label` — and, while open, its children in a
+`<ul role="group">`. By decision 11 the row and the group are not parts: the Item can place both
+unaided, the row first and the group after. Nesting Items in Items is the whole API, as in MUI's
+`TreeItem`; Ark's six parts (Branch, BranchControl, BranchContent…) would be the symmetry decision
+11 rules out. The row is styled as the Item's first child.
+
+- **The treeitem is focused, the row is drawn.** The `<li>` holds its subtree, so a focus ring
+  on it would surround every child. `@arun-dev/ui` draws the ring and the selection on the row.
+- **Named by `aria-labelledby` to the row**, not from content, which would read every nested
+  label as part of the parent's name.
+- **A parent is decided from props:** an Item with any children. It is known on the first
+  render, the server's included, so `aria-expanded` is never added late.
+
+**Children render only while open.** A large tree costs what is shown, and the registered
+Items are exactly the visible ones, in document order, so the arrow keys, typeahead and
+Ctrl+A need no visibility check. Expansion lives in the Root's `expanded` list, so a closed
+branch keeps its nested branches' state. To load children lazily, the consumer sets them from
+`onExpandedChange`, with a placeholder child keeping the folder a parent meanwhile.
+
+**Selection is a list of values, in every mode,** as ToggleGroup's is: `value: string[]`,
+`multiple` to allow more than one. It does not follow focus: Enter, Space or a click selects, so
+moving through a tree to reach an item selects nothing on the way. Selecting the selected Item
+again keeps it, as a click on a selected file does. With `multiple`, APG's recommended keys:
+Space toggles, Shift with an arrow moves and toggles, Ctrl or ⌘ with A selects every Item
+shown. Selection does not cascade: a parent and its children are independent, and a
+partly-selected parent state is ruled out.
+
+**Keyboard, by APG.** ↓ and ↑ move through the Items shown, without wrapping. → opens a closed
+parent, then moves to its first child; ← closes an open parent, else moves to its parent. The
+two swap in a right-to-left tree, as Menu's submenu keys do (decision 19). Home and End, `*` to
+open every sibling parent, and typeahead from `core/typeahead` with `textValue` as Menu's
+(decision 18). Enter also opens or closes a parent, as a click does; Space only selects. Disabled
+Items are skipped (decision 13) and are not focusable at all, so a click on one cannot focus the
+Item around it.
+
+**Rules out:** a tree for site navigation; a separate content or label part; selection that
+follows focus; cascading or indeterminate selection; a `selectionMode="none"` before someone
+needs it (adding it later is not breaking, decision 9).

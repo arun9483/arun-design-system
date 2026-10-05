@@ -15,7 +15,7 @@ export type { TextareaProps } from './components/textarea';
 export { Select } from './components/select';
 export type { SelectProps } from './components/select';
 
-// Checkbox, RadioGroup, Switch, Dialog, Drawer, Popover, Menu, Combobox, Tooltip, HoverCard and Tabs are backed by @arun-dev/headless, which owns its props
+// Checkbox, RadioGroup, Switch, Dialog, Drawer, Popover, Menu, Combobox, Tooltip, HoverCard, Tabs and TreeView are backed by @arun-dev/headless, which owns its props
 // types. See docs/architecture.md decision 6 — consumers derive them with ComponentProps.
 export { Checkbox } from './components/checkbox';
 export { RadioGroup } from './components/radio-group';
@@ -29,6 +29,7 @@ export type { ComboboxInputProps } from './components/combobox';
 export { Tooltip } from './components/tooltip';
 export { HoverCard } from './components/hover-card';
 export { Tabs } from './components/tabs';
+export { TreeView } from './components/tree-view';
 export { Field } from './components/field';
 export { Link } from './components/link';
 export type { LinkProps } from './components/link';
