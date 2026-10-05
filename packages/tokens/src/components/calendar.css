@@ -29,6 +29,26 @@
   --calendar-select-border-color: var(--color-border-default);
   --calendar-select-bg: var(--color-bg-primary);
 
+  /* Day tags — a muted weekend, and one mark per day for its highest-priority tag */
+  --calendar-tag-weekend-color: var(--color-text-secondary);
+  --calendar-tag-holiday-color: var(--color-status-error);
+  --calendar-tag-festival-color: var(--color-status-warning);
+  --calendar-tag-birthday-color: var(--color-status-info);
+  --calendar-tag-booked-color: var(--color-text-muted);
+  /* A day's mark colour: set per tag, or per day by tagStyles; the text's colour otherwise. */
+  --calendar-day-mark-color: currentColor;
+  --calendar-mark-size: 0.3125rem;
+  --calendar-mark-offset: var(--space-3xs);
+
+  /* The details card */
+  --calendar-details-max-width: 16rem;
+  --calendar-details-padding: var(--space-2xs);
+  --calendar-details-radius: var(--radius-sm);
+  --calendar-details-bg: var(--color-bg-inverse);
+  --calendar-details-color: var(--color-text-inverse);
+  --calendar-details-font-size: var(--text-xs);
+  --calendar-details-offset: var(--space-3xs);
+
   /* Previous and Next */
   --calendar-nav-size: 2rem;
   --calendar-nav-color: var(--color-text-secondary);

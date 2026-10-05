@@ -83,11 +83,30 @@ export function DatePickerRangeRoot({
   const locale = useLocale(localeProp);
   const controlled = value !== undefined;
   // Each input reports the whole range: its own new end, and the other end as it stands.
+  /**
+   * The latest end a start allows: `maxHours` after it, with a time, and the last of `maxDays`
+   * days — whichever is earlier. `null` when neither limits it.
+   */
+  const latestEnd = (from: string): string | null => {
+    const limits = [
+      withTime && maxHours ? addHours(from, maxHours) : null,
+      maxDays ? `${addDays(datePart(from) ?? from, maxDays - 1)}${withTime ? 'T23:59' : ''}` : null,
+    ].filter((limit): limit is string => limit !== null);
+    return limits.length > 0 ? limits.reduce((a, b) => (a < b ? a : b)) : null;
+  };
+
   const start = useDateInput({
     value: controlled ? (value?.start ?? null) : undefined,
     defaultValue: defaultValue?.start,
     withTime,
-    onValueChange: (next) => onValueChange?.({ start: next, end: end.shown }),
+    onValueChange: (next) => {
+      // A start that moves the limit past the end pulls the end back to it, so the range keeps
+      // to maxHours and maxDays however the start changed — typed, or a time in the Popup.
+      const limit = next ? latestEnd(next) : null;
+      const nextEnd = limit && end.shown && end.shown > limit ? limit : end.shown;
+      if (nextEnd !== end.shown) end.write(nextEnd, true);
+      onValueChange?.({ start: next, end: nextEnd });
+    },
   });
   const end = useDateInput({
     value: controlled ? (value?.end ?? null) : undefined,

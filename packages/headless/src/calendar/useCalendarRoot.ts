@@ -10,6 +10,12 @@ import {
 } from './dates';
 import { useLocale, useToday } from './useClientDates';
 import {
+  useDayInfo,
+  type CalendarDayInfo,
+  type CalendarDayPropsGetter,
+  type CalendarVisibleRange,
+} from './useDayInfo';
+import {
   DEFAULT_CALENDAR_LABELS,
   type CalendarDayState,
   type CalendarLabels,
@@ -37,6 +43,11 @@ export type CalendarConfig = {
   labels: Partial<CalendarLabels> | undefined;
   /** Changes each time a DatePicker opens: start again at the selected day, and take focus. */
   openCount: number | undefined;
+  getDayInfo: ((date: string) => CalendarDayInfo | null | undefined) | undefined;
+  tagPriority: readonly string[] | undefined;
+  onVisibleRangeChange: ((range: CalendarVisibleRange) => void) | undefined;
+  loading: boolean;
+  dayProps: CalendarDayPropsGetter | undefined;
 };
 
 function ordered(a: string, b: string): [string, string] {
@@ -58,6 +69,11 @@ export function useCalendarRoot({
   firstDayOfWeek: firstDayOfWeekProp,
   labels,
   openCount,
+  getDayInfo,
+  tagPriority,
+  onVisibleRangeChange,
+  loading,
+  dayProps,
 }: CalendarConfig): CalendarRootContextValue {
   const locale = useLocale(localeProp);
   const todayIso = useToday();
@@ -199,6 +215,14 @@ export function useCalendarRoot({
     }
   };
 
+  const { dayInfo, details } = useDayInfo({
+    getDayInfo,
+    tagPriority,
+    onVisibleRangeChange,
+    visibleStart,
+    months,
+  });
+
   const canGoPrevious = min === undefined || visibleStart > startOfMonth(min);
   const canGoNext = max === undefined || lastVisibleStart < startOfMonth(max);
   // A page moves by a month, and the Tab stop with it, kept inside what is shown.
@@ -236,5 +260,9 @@ export function useCalendarRoot({
     setHovered,
     registerDay,
     labels: { ...DEFAULT_CALENDAR_LABELS, ...labels },
+    dayInfo,
+    dayProps,
+    details,
+    loading,
   };
 }

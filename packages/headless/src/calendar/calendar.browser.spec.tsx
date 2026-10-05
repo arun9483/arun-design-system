@@ -4,6 +4,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { Calendar } from './index';
 import type { CalendarRootProps } from './CalendarRoot';
 import type { CalendarRangeRootProps } from './CalendarRangeRoot';
+import type { CalendarDayInfo } from './useDayInfo';
+import { DatePicker } from '../date-picker';
 import { today } from './dates';
 
 /** Runs in Chromium: real focus, keys, Intl and layout direction. */
@@ -333,5 +335,183 @@ describe('Calendar (browser)', () => {
     expect(heading()).toHaveTextContent('October 1926');
     await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Year' }), '2036');
     expect(heading()).toHaveTextContent('October 2036');
+  });
+
+  describe('day information', () => {
+    const isWeekend = (date: string) => [0, 6].includes(new Date(date).getUTCDay());
+    const INFO: Record<string, CalendarDayInfo> = {
+      '2026-10-20': {
+        tags: ['festival', 'holiday'],
+        description: 'Diwali',
+        details: 'Diwali — office closed',
+      },
+      '2026-10-24': {
+        tags: ['holiday', 'birthday'],
+        description: "UN Day, Asha's birthday",
+        details: 'UN Day',
+      },
+      '2026-10-14': { tags: ['booked'], description: 'Booked' },
+      '2026-10-15': { tags: ['maintenance'] },
+    };
+    const getDayInfo = (date: string): CalendarDayInfo => ({
+      ...INFO[date],
+      tags: [isWeekend(date) && 'weekend', ...(INFO[date]?.tags ?? [])],
+    });
+
+    function Tagged(props: CalendarRootProps) {
+      return (
+        <>
+          <button type="button">Outside</button>
+          <Single defaultValue="2026-10-05" getDayInfo={getDayInfo} {...props} />
+        </>
+      );
+    }
+
+    function WithCard(props: CalendarRootProps) {
+      return (
+        <>
+          <button type="button">Outside</button>
+          <Calendar.Root
+            locale="en-US"
+            defaultValue="2026-10-05"
+            getDayInfo={getDayInfo}
+            {...props}
+          >
+            <Calendar.Grid />
+            <Calendar.DayDetails data-testid="card" />
+          </Calendar.Root>
+        </>
+      );
+    }
+    const card = () => screen.getByTestId('card');
+    const cardOpen = () => card().matches(':popover-open');
+
+    it('tags each day, a weekend holiday with both, and marks it with its highest-priority tag', () => {
+      render(<Tagged />);
+      const saturday = day("Saturday, October 24, 2026, UN Day, Asha's birthday");
+      expect(saturday).toHaveAttribute('data-tags', 'weekend holiday birthday');
+      expect(saturday).toHaveAttribute('data-mark', 'holiday');
+      expect(day('Tuesday, October 20, 2026, Diwali')).toHaveAttribute('data-mark', 'holiday');
+      expect(day('Wednesday, October 14, 2026, Booked')).toHaveAttribute('data-mark', 'booked');
+      // A tag outside tagPriority styles, but marks nothing.
+      const maintenance = day('Thursday, October 15, 2026');
+      expect(maintenance).toHaveAttribute('data-tags', 'maintenance');
+      expect(maintenance).not.toHaveAttribute('data-mark');
+      expect(day('Sunday, October 4, 2026')).toHaveAttribute('data-tags', 'weekend');
+      expect(day('Sunday, October 4, 2026')).not.toHaveAttribute('data-mark');
+      expect(day('Monday, October 5, 2026')).not.toHaveAttribute('data-tags');
+    });
+
+    it('takes the priority from tagPriority, and per-day attributes from dayProps', () => {
+      render(
+        <Tagged
+          tagPriority={['festival', 'maintenance', 'holiday']}
+          dayProps={(_date, info) =>
+            info.mark === 'festival' ? { className: 'fest', style: { color: 'red' } } : undefined
+          }
+        />,
+      );
+      const diwali = day('Tuesday, October 20, 2026, Diwali');
+      expect(diwali).toHaveAttribute('data-mark', 'festival');
+      expect(diwali).toHaveClass('fest');
+      expect(diwali.style.color).toBe('red');
+      expect(day('Thursday, October 15, 2026')).toHaveAttribute('data-mark', 'maintenance');
+      expect(day("Saturday, October 24, 2026, UN Day, Asha's birthday")).toHaveAttribute(
+        'data-mark',
+        'holiday',
+      );
+    });
+
+    it('shows the details card on keyboard focus at once, describing the day, and Esc hides it', async () => {
+      render(<WithCard />);
+      expect(cardOpen()).toBe(false);
+      day('Monday, October 19, 2026').focus();
+      await userEvent.keyboard('{ArrowRight}');
+      const diwali = day('Tuesday, October 20, 2026, Diwali');
+      expect(focused()).toBe(diwali);
+      await expect.poll(cardOpen).toBe(true);
+      expect(card()).toHaveTextContent('Diwali — office closed');
+      expect(card()).toHaveAttribute('role', 'tooltip');
+      expect(diwali).toHaveAccessibleDescription('Diwali — office closed');
+      // A day with no details closes it.
+      await userEvent.keyboard('{ArrowRight}');
+      await expect.poll(cardOpen).toBe(false);
+      await userEvent.keyboard('{ArrowLeft}');
+      await expect.poll(cardOpen).toBe(true);
+      await userEvent.keyboard('{Escape}');
+      await expect.poll(cardOpen).toBe(false);
+      expect(focused()).toBe(diwali);
+    });
+
+    it('opens on a resting mouse after a delay, and closes when the pointer leaves', async () => {
+      render(<WithCard />);
+      await userEvent.hover(day('Tuesday, October 20, 2026, Diwali'));
+      expect(cardOpen()).toBe(false);
+      await expect.poll(cardOpen, { timeout: 1500 }).toBe(true);
+      await userEvent.hover(screen.getByRole('button', { name: 'Outside' }));
+      await expect.poll(cardOpen).toBe(false);
+    });
+
+    it('opens on a tap, through the focus it gives', async () => {
+      render(<WithCard />);
+      await userEvent.click(day('Tuesday, October 20, 2026, Diwali'));
+      await expect.poll(cardOpen).toBe(true);
+      await userEvent.click(screen.getByRole('button', { name: 'Outside' }));
+      await expect.poll(cardOpen).toBe(false);
+    });
+
+    it('opens over a DatePicker popup without closing it; Esc hides the card, then the popup', async () => {
+      render(
+        <DatePicker.Root defaultValue="2026-10-19" locale="en-US">
+          <DatePicker.Input aria-label="Day" />
+          <DatePicker.Trigger />
+          <DatePicker.Popup data-testid="popup">
+            <Calendar.Root locale="en-US" getDayInfo={getDayInfo}>
+              <Calendar.Grid />
+              <Calendar.DayDetails data-testid="card" />
+            </Calendar.Root>
+          </DatePicker.Popup>
+        </DatePicker.Root>,
+      );
+      const popupOpen = () => screen.getByTestId('popup').matches(':popover-open');
+      await userEvent.click(screen.getByRole('button', { name: /^Choose date/ }));
+      await expect.poll(focused).toBe(day('Monday, October 19, 2026'));
+      await userEvent.keyboard('{ArrowRight}');
+      await expect.poll(cardOpen).toBe(true);
+      expect(popupOpen()).toBe(true);
+      await userEvent.keyboard('{Escape}');
+      await expect.poll(cardOpen).toBe(false);
+      expect(popupOpen()).toBe(true);
+      await userEvent.keyboard('{Escape}');
+      await expect.poll(popupOpen).toBe(false);
+    });
+
+    it('reports the days shown, and marks the grid busy while loading', async () => {
+      const onVisibleRangeChange = vi.fn();
+      render(
+        <Calendar.Root
+          locale="en-US"
+          defaultValue="2026-10-05"
+          months={2}
+          loading
+          onVisibleRangeChange={onVisibleRangeChange}
+        >
+          <Calendar.NextButton />
+          <Calendar.Grid />
+          <Calendar.Grid offset={1} />
+        </Calendar.Root>,
+      );
+      expect(onVisibleRangeChange).toHaveBeenLastCalledWith({
+        start: '2026-10-01',
+        end: '2026-11-30',
+      });
+      expect(screen.getAllByRole('grid')[0]).toHaveAttribute('aria-busy', 'true');
+      await userEvent.click(screen.getByRole('button', { name: 'Next month' }));
+      expect(onVisibleRangeChange).toHaveBeenLastCalledWith({
+        start: '2026-11-01',
+        end: '2026-12-31',
+      });
+      expect(onVisibleRangeChange).toHaveBeenCalledTimes(2);
+    });
   });
 });

@@ -6,3 +6,4 @@ export { CalendarNextButton as NextButton } from './CalendarNextButton';
 export { CalendarGrid as Grid } from './CalendarGrid';
 export { CalendarMonthSelect as MonthSelect } from './CalendarMonthSelect';
 export { CalendarYearSelect as YearSelect } from './CalendarYearSelect';
+export { CalendarDayDetails as DayDetails } from './CalendarDayDetails';

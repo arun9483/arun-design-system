@@ -6,6 +6,7 @@ description: A month of days to pick one from, or a range — on the page, or in
 import Example from '@/components/Example.astro';
 import CalendarBasics from '@/examples/calendar-basics';
 import CalendarRange from '@/examples/calendar-range';
+import CalendarHall from '@/examples/calendar-hall';
 import PropTable from '@/components/PropTable.astro';
 
 ## When to use
@@ -74,6 +75,61 @@ The grid is one Tab stop: the selected day, or today.
 
 Moving past the month shows the next one. A day that doesn't exist, such as the 31st of a
 shorter month, becomes its last day.
+
+## What each day is: tags, marks and details
+
+<Example name="calendar-hall">
+  <CalendarHall client:load />
+</Example>
+
+All optional. `getDayInfo` says what a day is; without it the calendar is as above.
+
+```tsx
+getDayInfo={(date) => ({
+  tags: [isWeekend(date) && 'weekend', 'festival', 'holiday'], // any number; falsy ones dropped
+  description: 'Diwali, public holiday',                        // added to the spoken name
+  details: <ul>…</ul>,                                          // the card, on hover, focus or tap
+})}
+```
+
+**Tags** can overlap freely: a festival that is a holiday, on a weekend, with a birthday. Each day
+lists them in `data-tags`, so your CSS can style any tag: `[data-tags~='maintenance']`.
+
+**One mark per day.** The day shows a mark for its tag highest in `tagPriority` — by default
+booked, holiday, festival, birthday — named in `data-mark`; the rest are for the details card.
+Tags outside `tagPriority` style, but mark nothing. Mark the exceptions, not the usual: a dot on
+every free day is noise.
+
+| Tag (built in) | Looks                                 | Token                           |
+| -------------- | ------------------------------------- | ------------------------------- |
+| `weekend`      | a muted number, no mark               | `--calendar-tag-weekend-color`  |
+| `holiday`      | a number in the holiday colour, a dot | `--calendar-tag-holiday-color`  |
+| `festival`     | a star                                | `--calendar-tag-festival-color` |
+| `birthday`     | a diamond                             | `--calendar-tag-birthday-color` |
+| `booked`       | struck through                        | `--calendar-tag-booked-color`   |
+
+**Your own colours and shapes** go in `tagStyles`, for built-in tags or your own:
+`{ festival: { color: '#db2777', mark: 'star' } }`. Shapes are `dot`, `ring`, `star`,
+`diamond`, `bar`, `strike` and `none`. Every mark is a shape as well as a colour, so it does not
+rest on colour alone; show a legend beside the calendar, as the example does. On the selected day
+the mark takes the day's colour. For anything else per day, `dayProps` adds attributes to its
+button.
+
+**The details card** shows a day's `details`: after a short rest of the mouse, at once on keyboard
+focus — so the arrow keys show each day's card in turn — and on a tap, which focuses the day. Esc
+hides it; inside a DatePicker, a second Esc closes the picker. It describes its day to screen
+readers, as a tooltip does, and it is for reading: links or buttons in it can't be reached, since
+the arrow keys and Tab belong to the grid. Put actions beside the calendar, acting on the selected
+day, as the example's list does.
+
+### Loading from an API
+
+`getDayInfo` is called for every day shown, so it is a lookup in data already loaded. Fetch it
+from `onVisibleRangeChange`, called with the first and last day shown when the calendar mounts
+and whenever the months shown change — one request per view. While it loads, `loading` marks the
+grids busy and holds the marks back. Keep the latest request only, as the example does, or let a
+data library such as React Query cache each month; whether days can be picked before the data
+arrives is yours, through `isDateUnavailable`.
 
 ## Jumping to a month and year
 
