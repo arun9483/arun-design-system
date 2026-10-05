@@ -44,6 +44,16 @@
         "default": "./dist/button/index.cjs"
       }
     },
+    "./calendar": {
+      "import": {
+        "types": "./dist/calendar/index.d.ts",
+        "default": "./dist/calendar/index.js"
+      },
+      "require": {
+        "types": "./dist/calendar/index.d.cts",
+        "default": "./dist/calendar/index.cjs"
+      }
+    },
     "./checkbox": {
       "import": {
         "types": "./dist/checkbox/index.d.ts",
@@ -62,6 +72,16 @@
       "require": {
         "types": "./dist/combobox/index.d.cts",
         "default": "./dist/combobox/index.cjs"
+      }
+    },
+    "./date-picker": {
+      "import": {
+        "types": "./dist/date-picker/index.d.ts",
+        "default": "./dist/date-picker/index.js"
+      },
+      "require": {
+        "types": "./dist/date-picker/index.d.cts",
+        "default": "./dist/date-picker/index.cjs"
       }
     },
     "./dialog": {

@@ -81,7 +81,9 @@
     "./css/drawer": "./dist/css/drawer.css",
     "./css/hover-card": "./dist/css/hover-card.css",
     "./css/stepper": "./dist/css/stepper.css",
-    "./css/tree-view": "./dist/css/tree-view.css"
+    "./css/tree-view": "./dist/css/tree-view.css",
+    "./css/calendar": "./dist/css/calendar.css",
+    "./css/date-picker": "./dist/css/date-picker.css"
   },
   "publishConfig": {
     "access": "public"
@@ -115,7 +117,7 @@
     "vitest": "4.1.11"
   },
   "peerDependencies": {
-    "@arun-dev/headless": ">=4.22.0",
+    "@arun-dev/headless": ">=4.23.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
   }

@@ -1,0 +1,156 @@
+---
+title: DatePicker
+description: A date field with a calendar button — one date, or a range, with an optional time. The field is the browser's own date input.
+---
+
+import Example from '@/components/Example.astro';
+import DatePickerBasics from '@/examples/date-picker-basics';
+import DatePickerTime from '@/examples/date-picker-time';
+import DatePickerIso from '@/examples/date-picker-iso';
+import DateRangePickerBasics from '@/examples/date-range-picker-basics';
+import DateRangePickerTime from '@/examples/date-range-picker-time';
+import PropTable from '@/components/PropTable.astro';
+import { DatePickerPlayground } from '@/components/playgrounds';
+
+## When to use
+
+- A date people may type or pick: a due date, a birthday, a booking
+- A range with a start and an end, optionally with times: a trip, leave, a booking window
+
+To pick from a calendar with no field, as part of the page, use [Calendar](/components/calendar/).
+
+<Example name="date-picker-basics">
+  <DatePickerBasics client:load />
+</Example>
+
+## How it works
+
+The field is a native `<input type="date">`, so typing, the format of the user's locale, the
+phone's own picker and the form are the browser's. The button beside it opens a
+[Calendar](/components/calendar/) in a popover; picking a day fills the field and closes it.
+
+| Value                | Shape                              | For example                                  |
+| -------------------- | ---------------------------------- | -------------------------------------------- |
+| A date               | `YYYY-MM-DD`                       | `'2026-10-16'`                               |
+| With `withTime`      | `YYYY-MM-DDTHH:mm`                 | `'2026-10-16T09:30'`                         |
+| A range              | `{ start, end }`, each as above    | `{ start: '2026-10-12', end: '2026-10-16' }` |
+| Nothing (or not yet) | `null`, or a `null` end in a range | `{ start: '2026-10-12', end: null }`         |
+
+These are the strings the native inputs hold, in the user's local time, with no time zone.
+
+## With a time
+
+<Example name="date-picker-time">
+  <DatePickerTime client:load />
+</Example>
+
+`withTime` makes the field a `datetime-local` input. Picking a day in the calendar keeps the
+time already set, or uses midnight.
+
+## ISO input
+
+<Example name="date-picker-iso">
+  <DatePickerIso client:load />
+</Example>
+
+`value` and `defaultValue` take any ISO 8601 date or date-time. One with `Z` or an offset, such
+as an instant from an API, is shown in the user's time zone. Seconds are dropped.
+`onValueChange` always gives the local shape in the table above.
+
+To send an instant back, `new Date(value).toISOString()` — a local date-time parses as local
+time. A date alone, `new Date('2026-10-16')`, parses as UTC midnight, so keep dates as strings.
+
+## A range
+
+<Example name="date-range-picker-basics">
+  <DateRangePickerBasics client:load />
+</Example>
+
+`DateRangePicker` has two fields, named "Start date" and "End date", and a range calendar: the
+first press starts the range, the second ends it, in either order. Name the group with
+`aria-label` or `aria-labelledby`.
+
+**`maxDays` limits its length**, both ends counted: `maxDays={14}` allows the 12th to the 25th.
+Once the first day is picked, days further away are disabled in the calendar, and the end
+field's `max` follows the start, so the browser rejects a typed end that is too far.
+
+The fields keep each other in step: the end can't be before the start, nor the start after the
+end.
+
+### A range with times
+
+<Example name="date-range-picker-time">
+  <DateRangePickerTime client:load />
+</Example>
+
+With `withTime`, each end has its own time. Picking a range keeps both times; an end with none
+yet gets 00:00 for the start and 23:59 for the end, so the range covers whole days.
+
+## Limits
+
+- `min` and `max` are set on the fields, so the browser validates a typed date, and the calendar
+  disables the days outside them and won't page past their months.
+- `isDateUnavailable` disables days in the calendar. A typed unavailable day makes the field
+  invalid, with "This date is unavailable." as its message (`labels.unavailable`), so a form
+  won't submit it.
+
+## Forms
+
+The field holds its value, as an [Input](/components/input/) does, so a form submits it under its
+`name` and react-hook-form binds it with `register()`, both ways:
+
+```tsx
+const { register } = useForm({ defaultValues: { due: '2026-10-16' } });
+
+<DatePicker aria-label="Due date" {...register('due', { required: true })} />
+
+<DateRangePicker
+  aria-label="Trip dates"
+  startInputProps={register('from')}
+  endInputProps={register('to')}
+/>
+```
+
+`setValue` and `reset()` reach the field, and the calendar opens on whatever it holds. Inside a
+[Field](/components/field/), `Field.Control render={<DatePicker />}` connects the label,
+description and invalid state.
+
+## Playground
+
+<DatePickerPlayground client:load />
+
+## Keyboard
+
+| Where    | Key                     | Does                                                      |
+| -------- | ----------------------- | --------------------------------------------------------- |
+| Field    | Arrows, digits          | The browser's: moves between and changes day, month, year |
+| Button   | Enter, Space            | Opens the calendar on the chosen day, or today            |
+| Calendar | Arrows, Page Up/Down, … | See [Calendar](/components/calendar/#keyboard)            |
+| Calendar | Enter, Space            | Picks the day, closes, and returns focus to the button    |
+| Calendar | Esc                     | Closes without picking, and returns focus to the button   |
+
+## Accessibility
+
+- The button is named "Choose date", then the chosen date in full, such as "Choose date, Friday,
+  October 16, 2026", so a screen reader hears what's set without opening it.
+- The popup is a non-modal dialog named "Choose date". Focus moves into the calendar on open
+  and back to the button on close.
+- Label the field as any input: a `<label>`, a Field, or `aria-label`.
+
+## Props
+
+### `DatePicker`
+
+<PropTable component="DatePicker" />
+
+### `DateRangePicker`
+
+<PropTable component="DateRangePicker" />
+
+## Notes
+
+- The browser draws the field, so its look varies a little by browser. Chrome's own calendar
+  icon is hidden in favour of the button; in Firefox and Safari a click on the field may also
+  open the browser's picker. On phones, the browser's picker is the usual way in.
+- Import the `calendar` and `date-picker` stylesheets, or the full `@arun-dev/ui` CSS.
+- Restyle with the `--date-picker-*` and `--calendar-*` tokens.

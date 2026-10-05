@@ -4,6 +4,7 @@ import { useForm, Controller, useController, useWatch } from 'react-hook-form';
 import type { ControllerRenderProps } from 'react-hook-form';
 import { Button } from './components/button';
 import { Checkbox } from './components/checkbox';
+import { DatePicker, DateRangePicker } from './components/date-picker';
 import { Input } from './components/input';
 import { OtpInput } from './components/otp-input';
 import { RadioGroup } from './components/radio-group';
@@ -811,6 +812,117 @@ describe('OtpInput with react-hook-form', () => {
     await act(async () => fireEvent.click(screen.getByText('Verify')));
     expect(onSubmit).not.toHaveBeenCalled();
     expect(document.querySelectorAll('.otp-input-slot[data-filled]')).toHaveLength(3);
+  });
+});
+
+describe('DatePicker with react-hook-form', () => {
+  // DatePicker's input is a native <input type="date"> that holds the value, as Input's does,
+  // so register() is the binding both ways: a Calendar pick goes through the input, and the
+  // calendar reads the input when it opens, so a setValue is shown there too.
+  type Values = { due: string };
+
+  function setup() {
+    const api: { form?: ReturnType<typeof useForm<Values>> } = {};
+    const onSubmit = vi.fn();
+
+    function Form() {
+      const form = useForm<Values>({ defaultValues: { due: '2026-10-05' } });
+      api.form = form;
+      return (
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <DatePicker
+            aria-label="Due"
+            locale="en-US"
+            {...form.register('due', { required: true })}
+          />
+          <button type="submit">Save</button>
+        </form>
+      );
+    }
+
+    render(<Form />);
+    return { api, onSubmit, input: screen.getByLabelText<HTMLInputElement>('Due') };
+  }
+
+  it('shows defaultValues, and reads what is typed and what is picked', () => {
+    const { api, input } = setup();
+    expect(input.value).toBe('2026-10-05');
+    fireEvent.change(input, { target: { value: '2026-11-01' } });
+    expect(api.form?.getValues('due')).toBe('2026-11-01');
+    fireEvent.click(screen.getByRole('button', { name: /^Choose date/ }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Tuesday, November 3, 2026', hidden: true }),
+    );
+    expect(input.value).toBe('2026-11-03');
+    expect(api.form?.getValues('due')).toBe('2026-11-03');
+  });
+
+  it('is driven by setValue and reset, and the calendar opens on what was set', () => {
+    const { api, input } = setup();
+    act(() => api.form?.setValue('due', '2026-12-25'));
+    expect(input.value).toBe('2026-12-25');
+    fireEvent.click(screen.getByRole('button', { name: /^Choose date/ }));
+    expect(
+      screen.getByRole('button', { name: 'Friday, December 25, 2026', hidden: true }),
+    ).toHaveAttribute('data-selected');
+    act(() => api.form?.reset());
+    expect(input.value).toBe('2026-10-05');
+  });
+
+  it('submits the date, and blocks submit when it is required and empty', async () => {
+    const { onSubmit, input } = setup();
+    await act(async () => fireEvent.click(screen.getByText('Save')));
+    expect(onSubmit.mock.calls[0]?.[0]).toEqual({ due: '2026-10-05' });
+    fireEvent.change(input, { target: { value: '' } });
+    await act(async () => fireEvent.click(screen.getByText('Save')));
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('DateRangePicker with react-hook-form', () => {
+  // Each end is its own native input, so each is its own registered field, through
+  // startInputProps and endInputProps. A pick in the calendar goes through both inputs.
+  type Values = { from: string; to: string };
+
+  function setup() {
+    const api: { form?: ReturnType<typeof useForm<Values>> } = {};
+    function Form() {
+      const form = useForm<Values>({ defaultValues: { from: '2026-10-05', to: '2026-10-09' } });
+      api.form = form;
+      return (
+        <DateRangePicker
+          aria-label="Trip"
+          locale="en-US"
+          startInputProps={form.register('from')}
+          endInputProps={form.register('to')}
+        />
+      );
+    }
+    render(<Form />);
+    return {
+      api,
+      start: screen.getByLabelText<HTMLInputElement>('Start date'),
+      end: screen.getByLabelText<HTMLInputElement>('End date'),
+    };
+  }
+
+  it('binds each end, and a pick in the calendar sets both', () => {
+    const { api, start, end } = setup();
+    expect([start.value, end.value]).toEqual(['2026-10-05', '2026-10-09']);
+    fireEvent.click(screen.getByRole('button', { name: /^Choose dates/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Monday, October 12, 2026', hidden: true }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Thursday, October 15, 2026', hidden: true }),
+    );
+    expect(api.form?.getValues()).toEqual({ from: '2026-10-12', to: '2026-10-15' });
+  });
+
+  it('is driven by setValue and reset', () => {
+    const { api, end } = setup();
+    act(() => api.form?.setValue('to', '2026-10-20'));
+    expect(end.value).toBe('2026-10-20');
+    act(() => api.form?.reset());
+    expect(end.value).toBe('2026-10-09');
   });
 });
 

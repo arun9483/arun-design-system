@@ -81,6 +81,10 @@ import type {
   GridProps,
   SliderProps,
   Tabs,
+  CalendarProps,
+  RangeCalendarProps,
+  DatePickerProps,
+  DateRangePickerProps,
 } from '@arun-dev/ui';
 import type { FieldControlProps, FieldRootProps } from '@arun-dev/headless/field';
 import type { DrawerPopupProps } from '@arun-dev/headless/drawer';
@@ -188,7 +192,11 @@ type Unknown =
   | OnlyRealProps<Documented<'Tabs.Tab'>, TabsTabProps>
   | OnlyRealProps<Documented<'Tabs.Panel'>, TabsPanelProps>
   | OnlyRealProps<Documented<'TreeView.Root'>, TreeViewRootProps>
-  | OnlyRealProps<Documented<'TreeView.Item'>, TreeViewItemProps>;
+  | OnlyRealProps<Documented<'TreeView.Item'>, TreeViewItemProps>
+  | OnlyRealProps<Documented<'Calendar'>, CalendarProps>
+  | OnlyRealProps<Documented<'RangeCalendar'>, RangeCalendarProps>
+  | OnlyRealProps<Documented<'DatePicker'>, DatePickerProps>
+  | OnlyRealProps<Documented<'DateRangePicker'>, DateRangePickerProps>;
 
 /**
  * `never` means every documented name resolves. Anything else is the name that does

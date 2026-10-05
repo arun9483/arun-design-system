@@ -1284,6 +1284,330 @@ export const PROPS = {
       description: "Flush with the Trigger's start or end edge, or centred on it.",
     },
   ],
+  Calendar: [
+    {
+      name: 'value',
+      type: 'string | null',
+      description:
+        'Controlled: the selected day, `YYYY-MM-DD`. Provide `onValueChange` alongside it.',
+    },
+    {
+      name: 'defaultValue',
+      type: 'string | null',
+      description: 'Initial selection when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onValueChange',
+      type: '(value: string) => void',
+      description: 'Called with the day picked.',
+    },
+    {
+      name: 'min',
+      type: 'string',
+      description:
+        'The earliest day that can be picked, as an ISO date. Earlier months cannot be shown.',
+    },
+    {
+      name: 'max',
+      type: 'string',
+      description:
+        'The latest day that can be picked, as an ISO date. Later months cannot be shown.',
+    },
+    {
+      name: 'isDateUnavailable',
+      type: '(date: string) => boolean',
+      description:
+        'Days that cannot be picked, such as weekends or booked dates. Called with an ISO date.',
+    },
+    {
+      name: 'months',
+      type: 'number',
+      default: '1',
+      description: 'How many months to show side by side. They wrap when there is no room.',
+    },
+    {
+      name: 'locale',
+      type: 'string',
+      description:
+        "The locale for month and weekday names, digits and the first day of the week. Defaults to the browser's.",
+    },
+    {
+      name: 'firstDayOfWeek',
+      type: 'number',
+      description: "0 for Sunday to 6 for Saturday. Defaults to the locale's.",
+    },
+    {
+      name: 'labels',
+      type: '{ previous?: string; next?: string }',
+      description: 'Names for the Previous and Next buttons, in English unless replaced.',
+    },
+  ],
+  RangeCalendar: [
+    {
+      name: 'value',
+      type: '{ start: string; end: string } | null',
+      description:
+        'Controlled: the selected range, ISO dates with both ends included. Provide `onValueChange` alongside it.',
+    },
+    {
+      name: 'defaultValue',
+      type: '{ start: string; end: string } | null',
+      description: 'Initial range when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onValueChange',
+      type: '(value: { start: string; end: string }) => void',
+      description: 'Called once a range is complete: after the second pick, never the first.',
+    },
+    {
+      name: 'maxDays',
+      type: 'number',
+      description:
+        'The most days the range may cover, both ends included: `7` allows the 1st to the 7th. Once a first day is picked, days further away are disabled.',
+    },
+    {
+      name: 'min',
+      type: 'string',
+      description:
+        'The earliest day that can be picked, as an ISO date. Earlier months cannot be shown.',
+    },
+    {
+      name: 'max',
+      type: 'string',
+      description:
+        'The latest day that can be picked, as an ISO date. Later months cannot be shown.',
+    },
+    {
+      name: 'isDateUnavailable',
+      type: '(date: string) => boolean',
+      description:
+        'Days that cannot be picked, such as weekends or booked dates. Called with an ISO date.',
+    },
+    {
+      name: 'months',
+      type: 'number',
+      default: '1',
+      description: 'How many months to show side by side. They wrap when there is no room.',
+    },
+    {
+      name: 'locale',
+      type: 'string',
+      description:
+        "The locale for month and weekday names, digits and the first day of the week. Defaults to the browser's.",
+    },
+    {
+      name: 'firstDayOfWeek',
+      type: 'number',
+      description: "0 for Sunday to 6 for Saturday. Defaults to the locale's.",
+    },
+    {
+      name: 'labels',
+      type: '{ previous?: string; next?: string }',
+      description: 'Names for the Previous and Next buttons, in English unless replaced.',
+    },
+  ],
+  DatePicker: [
+    {
+      name: 'value',
+      type: 'string | null',
+      description:
+        'Controlled: the date, ISO 8601. A value with `Z` or an offset is shown in local time. Provide `onValueChange` alongside it.',
+    },
+    {
+      name: 'defaultValue',
+      type: 'string | null',
+      description:
+        'Initial value when uncontrolled. Read once, at mount; `form.reset()` returns to it. Uncontrolled, `register()` binds the input.',
+    },
+    {
+      name: 'onValueChange',
+      type: '(value: string | null) => void',
+      description:
+        'Called with `YYYY-MM-DD`, or `YYYY-MM-DDTHH:mm` with `withTime`, typed or picked; `null` once cleared.',
+    },
+    {
+      name: 'withTime',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Adds the time: each input becomes `datetime-local`, and each value `YYYY-MM-DDTHH:mm`.',
+    },
+    {
+      name: 'min',
+      type: 'string',
+      description:
+        'The earliest date, ISO 8601. Set on the input, so the browser validates a typed date, and kept by the calendar.',
+    },
+    {
+      name: 'max',
+      type: 'string',
+      description: 'The latest date, ISO 8601. Set on the input and kept by the calendar.',
+    },
+    {
+      name: 'isDateUnavailable',
+      type: '(date: string) => boolean',
+      description:
+        'Days that cannot be picked. A typed one makes the input invalid, with `labels.unavailable` as its message.',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Disables the inputs and the calendar button.',
+    },
+    {
+      name: 'months',
+      type: 'number',
+      default: '1',
+      description: 'How many months the calendar shows side by side.',
+    },
+    {
+      name: 'locale',
+      type: 'string',
+      description:
+        "The locale for the calendar and the button's name. The inputs' format is the browser's.",
+    },
+    {
+      name: 'firstDayOfWeek',
+      type: 'number',
+      description: "0 for Sunday to 6 for Saturday. Defaults to the locale's.",
+    },
+    {
+      name: 'open',
+      type: 'boolean',
+      description: 'Controlled: whether the calendar is open. Provide `onOpenChange` alongside it.',
+    },
+    {
+      name: 'onOpenChange',
+      type: '(open: boolean) => void',
+      description: 'Called when the calendar opens or closes.',
+    },
+    {
+      name: 'labels',
+      type: '{ choose?; dialog?; start?; end?; unavailable? }',
+      description:
+        'Names for the calendar button and popup, the range inputs, and the unavailable message, in English unless replaced.',
+    },
+    {
+      name: 'calendarLabels',
+      type: '{ previous?: string; next?: string }',
+      description: "Names for the calendar's Previous and Next buttons.",
+    },
+    {
+      name: '…rest',
+      type: 'input props',
+      description:
+        '`name`, `id`, `required`, `aria-*`, a Field’s attributes and a `register()` ref go on the input. `className` goes on the box.',
+    },
+  ],
+  DateRangePicker: [
+    {
+      name: 'value',
+      type: '{ start: string | null; end: string | null } | null',
+      description:
+        'Controlled: the range, each end ISO 8601. Either end may be empty while it is typed. Provide `onValueChange` alongside it.',
+    },
+    {
+      name: 'defaultValue',
+      type: '{ start: string | null; end: string | null } | null',
+      description:
+        'Initial range when uncontrolled. Read once, at mount; `form.reset()` returns to it.',
+    },
+    {
+      name: 'onValueChange',
+      type: '(value: { start; end }) => void',
+      description: 'Called whenever either end is typed, or once with both when a range is picked.',
+    },
+    {
+      name: 'maxDays',
+      type: 'number',
+      description:
+        'The most days the range may cover, both ends included. The calendar stops a pick going further, and the end input’s `max` stops a typed one.',
+    },
+    {
+      name: 'startInputProps',
+      type: 'input props',
+      description: "For the start input: its `name`, or everything `register('from')` returns.",
+    },
+    {
+      name: 'endInputProps',
+      type: 'input props',
+      description: "For the end input: its `name`, or everything `register('to')` returns.",
+    },
+    {
+      name: 'required',
+      type: 'boolean',
+      description: 'Both inputs must be filled.',
+    },
+    {
+      name: 'withTime',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Adds the time: each input becomes `datetime-local`, and each value `YYYY-MM-DDTHH:mm`.',
+    },
+    {
+      name: 'min',
+      type: 'string',
+      description:
+        'The earliest date, ISO 8601. Set on the input, so the browser validates a typed date, and kept by the calendar.',
+    },
+    {
+      name: 'max',
+      type: 'string',
+      description: 'The latest date, ISO 8601. Set on the input and kept by the calendar.',
+    },
+    {
+      name: 'isDateUnavailable',
+      type: '(date: string) => boolean',
+      description:
+        'Days that cannot be picked. A typed one makes the input invalid, with `labels.unavailable` as its message.',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Disables the inputs and the calendar button.',
+    },
+    {
+      name: 'months',
+      type: 'number',
+      default: '1',
+      description: 'How many months the calendar shows side by side.',
+    },
+    {
+      name: 'locale',
+      type: 'string',
+      description:
+        "The locale for the calendar and the button's name. The inputs' format is the browser's.",
+    },
+    {
+      name: 'firstDayOfWeek',
+      type: 'number',
+      description: "0 for Sunday to 6 for Saturday. Defaults to the locale's.",
+    },
+    {
+      name: 'open',
+      type: 'boolean',
+      description: 'Controlled: whether the calendar is open. Provide `onOpenChange` alongside it.',
+    },
+    {
+      name: 'onOpenChange',
+      type: '(open: boolean) => void',
+      description: 'Called when the calendar opens or closes.',
+    },
+    {
+      name: 'labels',
+      type: '{ choose?; dialog?; start?; end?; unavailable? }',
+      description:
+        'Names for the calendar button and popup, the range inputs, and the unavailable message, in English unless replaced.',
+    },
+    {
+      name: 'calendarLabels',
+      type: '{ previous?: string; next?: string }',
+      description: "Names for the calendar's Previous and Next buttons.",
+    },
+  ],
   'TreeView.Root': [
     {
       name: 'value',

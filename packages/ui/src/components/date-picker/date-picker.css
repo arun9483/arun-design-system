@@ -1,0 +1,145 @@
+@layer date-picker {
+  /* The box draws the frame, as Input's does; the native inputs inside it are borderless.
+     State is the platform's, read with :has(). */
+  .date-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--date-picker-gap);
+    max-inline-size: 100%;
+    min-block-size: var(--date-picker-height);
+    padding-inline: var(--date-picker-padding-inline);
+    padding-inline-end: calc(var(--date-picker-padding-inline) / 3);
+    border: var(--date-picker-border-width) solid var(--date-picker-border-color);
+    border-radius: var(--date-picker-radius);
+    background-color: var(--date-picker-bg);
+    color: var(--date-picker-color);
+    font-size: var(--date-picker-font-size);
+    transition: border-color var(--date-picker-duration) var(--ease-smooth);
+  }
+
+  .date-picker:hover {
+    border-color: var(--date-picker-border-color-hover);
+  }
+
+  .date-picker:has(> .date-picker-input:focus-visible) {
+    border-color: var(--date-picker-border-color-focus);
+    outline: var(--date-picker-border-width) solid var(--date-picker-border-color-focus);
+  }
+
+  /* Invalid by the platform — past min or max, a typed unavailable day — or by a Field. */
+  .date-picker:has(> .date-picker-input:user-invalid),
+  .date-picker:has(> .date-picker-input[aria-invalid='true']) {
+    border-color: var(--date-picker-border-color-invalid);
+  }
+
+  .date-picker:has(> .date-picker-input:disabled) {
+    opacity: var(--date-picker-disabled-opacity);
+  }
+
+  .date-picker:has(> .date-picker-input:disabled):hover {
+    border-color: var(--date-picker-border-color);
+  }
+
+  /* The inputs fill the box, which puts the button at its end without a margin a reset
+     could remove. They never shrink below their text: a range wraps instead. */
+  .date-picker-input {
+    flex: 1 0 auto;
+    align-self: stretch;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The calendar button replaces the browser's own, where one can be removed. */
+  .date-picker-input::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+
+  .date-picker-input:disabled {
+    cursor: not-allowed;
+  }
+
+  /* Two date-time fields do not fit a phone's width: the end wraps onto a second line. */
+  .date-range-picker {
+    flex-wrap: wrap;
+    row-gap: 0;
+  }
+
+  .date-range-picker-separator {
+    color: var(--date-picker-separator-color);
+  }
+
+  .date-picker-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    inline-size: var(--date-picker-trigger-size);
+    block-size: var(--date-picker-trigger-size);
+    padding: 0;
+    border: none;
+    border-radius: var(--date-picker-radius);
+    background: none;
+    color: var(--date-picker-trigger-color);
+    cursor: pointer;
+  }
+
+  .date-picker-trigger:hover:not(:disabled) {
+    background-color: var(--date-picker-trigger-bg-hover);
+  }
+
+  .date-picker-trigger:focus-visible {
+    outline: var(--space-2px) solid var(--date-picker-border-color-focus);
+    outline-offset: calc(-1 * var(--space-2px));
+  }
+
+  .date-picker-trigger:disabled {
+    cursor: not-allowed;
+  }
+
+  .date-picker-icon {
+    inline-size: 1rem;
+    block-size: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Placement is set inline by @arun-dev/headless, as for Popover; the gap is an inset on
+     the axis it opens along — see popover.css. */
+  .date-picker-popup {
+    inset: 0;
+    margin: 0;
+    inline-size: max-content;
+    max-inline-size: calc(100vw - 2 * var(--date-picker-popup-offset));
+    max-block-size: 100%;
+    padding: var(--date-picker-popup-padding);
+    border: var(--date-picker-border-width) solid var(--date-picker-popup-border-color);
+    border-radius: var(--date-picker-popup-radius);
+    background-color: var(--date-picker-popup-bg);
+    color: var(--date-picker-color);
+    box-shadow: var(--date-picker-popup-shadow);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  .date-picker-popup:is([data-side='top'], [data-side='bottom']) {
+    inset-block: var(--date-picker-popup-offset);
+  }
+
+  .date-picker-popup:is([data-side='left'], [data-side='right']) {
+    inset-inline: var(--date-picker-popup-offset);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .date-picker {
+      transition-duration: 0ms;
+    }
+  }
+}

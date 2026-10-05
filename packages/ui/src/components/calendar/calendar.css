@@ -1,0 +1,172 @@
+@layer calendar {
+  .calendar {
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--calendar-gap);
+    color: var(--calendar-color);
+    font-size: var(--calendar-font-size);
+  }
+
+  .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--calendar-gap);
+  }
+
+  .calendar-heading {
+    font-weight: var(--calendar-heading-font-weight);
+    text-align: center;
+  }
+
+  .calendar-nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    inline-size: var(--calendar-nav-size);
+    block-size: var(--calendar-nav-size);
+    padding: 0;
+    border: none;
+    border-radius: var(--calendar-day-radius);
+    background: none;
+    color: var(--calendar-nav-color);
+    cursor: pointer;
+  }
+
+  .calendar-nav:hover:not(:disabled) {
+    background-color: var(--calendar-nav-bg-hover);
+  }
+
+  .calendar-nav:focus-visible {
+    outline: var(--space-2px) solid var(--calendar-focus-color);
+    outline-offset: var(--space-px);
+  }
+
+  .calendar-nav:disabled {
+    opacity: var(--calendar-nav-disabled-opacity);
+    cursor: not-allowed;
+  }
+
+  .calendar-nav-icon {
+    inline-size: 1rem;
+    block-size: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* The icon points back; Next turns it, and right to left both swap. */
+  .calendar-nav-next .calendar-nav-icon,
+  .calendar-nav:dir(rtl) .calendar-nav-icon {
+    scale: -1 1;
+  }
+
+  .calendar-nav-next:dir(rtl) .calendar-nav-icon {
+    scale: 1 1;
+  }
+
+  .calendar-months {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--calendar-months-gap);
+  }
+
+  .calendar-grid {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  /* Each grid's caption names it. With one month the Heading already shows it, so the
+     caption is kept for screen readers only; with several it titles its month. */
+  .calendar-grid caption {
+    padding-block-end: var(--calendar-gap);
+    font-weight: var(--calendar-heading-font-weight);
+  }
+
+  .calendar:not(.calendar-multiple) .calendar-grid caption {
+    position: absolute;
+    inline-size: var(--space-px);
+    block-size: var(--space-px);
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .calendar-grid th {
+    block-size: var(--calendar-day-size);
+    padding: 0;
+    color: var(--calendar-weekday-color);
+    font-size: var(--calendar-weekday-font-size);
+    font-weight: var(--calendar-weekday-font-weight);
+  }
+
+  .calendar-grid td {
+    padding: 0;
+  }
+
+  .calendar-grid td button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--calendar-day-size);
+    block-size: var(--calendar-day-size);
+    padding: 0;
+    border: none;
+    border-radius: var(--calendar-day-radius);
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+
+  .calendar-grid td button:hover:not([data-disabled], [data-selected]) {
+    background-color: var(--calendar-day-bg-hover);
+  }
+
+  /* Over its neighbours, so the ring is not cut off by the next day. */
+  .calendar-grid td button:focus-visible {
+    z-index: 1;
+    outline: var(--space-2px) solid var(--calendar-focus-color);
+    outline-offset: var(--space-px);
+  }
+
+  .calendar-grid td button[data-today] {
+    color: var(--calendar-day-today-color);
+    font-weight: var(--calendar-day-today-font-weight);
+  }
+
+  /* A range is one band: square between its ends, rounded at them. */
+  .calendar-grid td button[data-in-range] {
+    border-radius: 0;
+    background-color: var(--calendar-day-range-bg);
+    color: var(--calendar-day-range-color);
+  }
+
+  .calendar-grid td button[data-range-start] {
+    border-start-start-radius: var(--calendar-day-radius);
+    border-end-start-radius: var(--calendar-day-radius);
+  }
+
+  .calendar-grid td button[data-range-end] {
+    border-start-end-radius: var(--calendar-day-radius);
+    border-end-end-radius: var(--calendar-day-radius);
+  }
+
+  .calendar-grid td button[data-selected] {
+    background-color: var(--calendar-day-selected-bg);
+    color: var(--calendar-day-selected-color);
+  }
+
+  .calendar-grid td button[data-disabled] {
+    color: var(--calendar-day-disabled-color);
+    opacity: var(--calendar-day-disabled-opacity);
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+}

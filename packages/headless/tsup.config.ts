@@ -6,8 +6,10 @@ export default defineConfig({
   entry: [
     'src/index.ts',
     'src/button/index.ts',
+    'src/calendar/index.ts',
     'src/checkbox/index.ts',
     'src/combobox/index.ts',
+    'src/date-picker/index.ts',
     'src/dialog/index.ts',
     'src/drawer/index.ts',
     'src/hover-card/index.ts',

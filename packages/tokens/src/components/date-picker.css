@@ -1,0 +1,30 @@
+/* DatePicker component tokens — the box around the native date inputs and the calendar
+   button, matching Input's, and the popover the calendar opens in. */
+:root {
+  --date-picker-height: 2.25rem;
+  --date-picker-padding-inline: var(--space-xs);
+  --date-picker-gap: var(--space-2xs);
+  --date-picker-radius: var(--radius-md);
+  --date-picker-bg: var(--color-bg-primary);
+  --date-picker-color: var(--color-text-primary);
+  --date-picker-font-size: var(--text-sm);
+  --date-picker-border-width: var(--space-px);
+  --date-picker-border-color: var(--color-border-default);
+  --date-picker-border-color-hover: var(--color-border-strong);
+  --date-picker-border-color-focus: var(--color-text-accent);
+  --date-picker-border-color-invalid: var(--color-status-error);
+  --date-picker-separator-color: var(--color-text-secondary);
+  --date-picker-trigger-size: 1.75rem;
+  --date-picker-trigger-color: var(--color-text-secondary);
+  --date-picker-trigger-bg-hover: var(--color-bg-secondary);
+  --date-picker-disabled-opacity: 0.5;
+  --date-picker-duration: var(--duration-fast);
+
+  /* The popover */
+  --date-picker-popup-offset: var(--space-2xs);
+  --date-picker-popup-padding: var(--space-sm);
+  --date-picker-popup-radius: var(--radius-md);
+  --date-picker-popup-bg: var(--color-bg-primary);
+  --date-picker-popup-border-color: var(--color-border-default);
+  --date-picker-popup-shadow: var(--shadow-lg);
+}
