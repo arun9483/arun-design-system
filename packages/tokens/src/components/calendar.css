@@ -1,0 +1,32 @@
+/* Calendar component tokens — a month of days to pick from, alone or in a DatePicker.
+   Override any of these to restyle calendars without moving other components. */
+:root {
+  --calendar-gap: var(--space-xs);
+  --calendar-months-gap: var(--space-lg);
+  --calendar-font-size: var(--text-sm);
+  --calendar-color: var(--color-text-primary);
+  --calendar-heading-font-weight: var(--font-weight-semibold);
+  --calendar-weekday-color: var(--color-text-secondary);
+  --calendar-weekday-font-size: var(--text-xs);
+  --calendar-weekday-font-weight: var(--font-weight-medium);
+
+  /* Days */
+  --calendar-day-size: 2.25rem;
+  --calendar-day-radius: var(--radius-md);
+  --calendar-day-bg-hover: var(--color-bg-secondary);
+  --calendar-day-today-color: var(--color-text-accent);
+  --calendar-day-today-font-weight: var(--font-weight-bold);
+  --calendar-day-selected-bg: var(--color-text-accent);
+  --calendar-day-selected-color: var(--color-text-on-accent);
+  --calendar-day-range-bg: var(--color-bg-accent);
+  --calendar-day-range-color: var(--color-text-primary);
+  --calendar-day-disabled-color: var(--color-text-muted);
+  --calendar-day-disabled-opacity: 0.6;
+  --calendar-focus-color: var(--color-text-accent);
+
+  /* Previous and Next */
+  --calendar-nav-size: 2rem;
+  --calendar-nav-color: var(--color-text-secondary);
+  --calendar-nav-bg-hover: var(--color-bg-secondary);
+  --calendar-nav-disabled-opacity: 0.4;
+}

@@ -1,0 +1,108 @@
+---
+title: Calendar
+description: A month of days to pick one from, or a range — on the page, or inside a DatePicker.
+---
+
+import Example from '@/components/Example.astro';
+import CalendarBasics from '@/examples/calendar-basics';
+import CalendarRange from '@/examples/calendar-range';
+import PropTable from '@/components/PropTable.astro';
+
+## When to use
+
+- Choosing a day where the calendar is the content: a delivery slot, an availability view
+- Choosing a range of days on the page, such as leave or a stay
+
+When people may also type the date, or space is short, use a
+[DatePicker](/components/date-picker/), which opens this calendar from a field.
+
+<Example name="calendar-basics">
+  <CalendarBasics client:load />
+</Example>
+
+## Anatomy
+
+```tsx
+import { Calendar, RangeCalendar } from '@arun-dev/ui';
+
+<Calendar aria-label="Delivery day" value={date} onValueChange={setDate} />
+<RangeCalendar aria-label="Leave" value={range} onValueChange={setRange} maxDays={5} />
+```
+
+Each draws Previous and Next buttons, the month, and a grid of days: a table with the weekdays
+as column headers and a button per day, named with its full date. Dates are ISO strings,
+`YYYY-MM-DD`, in no time zone.
+
+## Picking a range
+
+<Example name="calendar-range">
+  <CalendarRange client:load />
+</Example>
+
+The first press starts the range and the second ends it, in either order; pressing the same day
+twice picks a single day. In between, the range follows the pointer or focus, and
+`onValueChange` is called only once it is complete.
+
+`maxDays` limits the range's length, both ends counted. Once the first day is picked, days
+further away are disabled. A range can't span a day that can't be picked, so days past the first
+unavailable one are disabled too.
+
+## Limits
+
+| Prop                | Does                                                       |
+| ------------------- | ---------------------------------------------------------- |
+| `min`, `max`        | Days outside are disabled; months past them can't be shown |
+| `isDateUnavailable` | A function of the ISO date: `true` disables that day       |
+| `maxDays`           | (Range) the longest range, in days, counting both ends     |
+
+A disabled day is drawn struck through and faded. It stays focusable, so the arrow keys keep
+moving by the calendar, and a screen reader announces it as unavailable — but it can't be
+picked.
+
+## Keyboard
+
+The grid is one Tab stop: the selected day, or today.
+
+| Key                    | Moves focus to                                               |
+| ---------------------- | ------------------------------------------------------------ |
+| ← / →                  | The previous or next day (swapped in a right-to-left layout) |
+| ↑ / ↓                  | The same day of the previous or next week                    |
+| Home / End             | The first or last day of the week                            |
+| Page Up / Page Down    | The same day of the previous or next month                   |
+| Shift + Page Up / Down | The same day of the previous or next year                    |
+| Enter / Space          | Picks the focused day                                        |
+
+Moving past the month shows the next one. A day that doesn't exist, such as the 31st of a
+shorter month, becomes its last day.
+
+## Locale
+
+Month and weekday names, digits and the first day of the week come from the browser's locale, or
+`locale`: `en-US` starts on Sunday, `en-GB` on Monday. `firstDayOfWeek` overrides the week's
+start, 0 for Sunday to 6 for Saturday. Translate the Previous and Next buttons' names with
+`labels`.
+
+## Accessibility
+
+- Each day is a button named with its full date, such as "Friday, October 16, 2026"; today has
+  `aria-current="date"`, and the selected days `aria-selected`.
+- The month heading is a live region, so a screen reader announces the new month as it changes.
+- Each grid is named by its month. Give the calendar an `aria-label` saying what is picked.
+- Selection is drawn as a filled day, and a range as a band between filled ends; today is bold
+  and in the accent colour.
+
+## Props
+
+### `Calendar`
+
+<PropTable component="Calendar" />
+
+### `RangeCalendar`
+
+<PropTable component="RangeCalendar" />
+
+## Notes
+
+- Several months sit side by side with `months`, and wrap onto rows where there's no room.
+- Restyle with the `--calendar-*` tokens, such as `--calendar-day-size` or
+  `--calendar-day-selected-bg`.

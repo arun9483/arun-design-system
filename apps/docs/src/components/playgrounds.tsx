@@ -10,6 +10,8 @@ import {
   Card,
   Checkbox,
   Chip,
+  DatePicker,
+  DateRangePicker,
   Drawer,
   HoverCard,
   Link,
@@ -662,6 +664,131 @@ export function TreeViewPlayground() {
             onChange={(e) => setRtl(e.target.checked)}
           />
           <span>right to left</span>
+        </label>
+      </div>
+
+      <pre className="ds-playground-output" tabIndex={0}>
+        <code>{jsx}</code>
+      </pre>
+    </div>
+  );
+}
+
+const isWeekend = (date: string) => [0, 6].includes(new Date(date).getUTCDay());
+
+export function DatePickerPlayground() {
+  const [range, setRange] = useState(false);
+  const [withTime, setWithTime] = useState(false);
+  const [maxDays, setMaxDays] = useState('');
+  const [months, setMonths] = useState(1);
+  const [noWeekends, setNoWeekends] = useState(false);
+  const [single, setSingle] = useState<string | null>(null);
+  const [both, setBoth] = useState<{ start: string | null; end: string | null }>({
+    start: null,
+    end: null,
+  });
+
+  const shared = {
+    withTime,
+    months,
+    isDateUnavailable: noWeekends ? isWeekend : undefined,
+  };
+  const attributes = [
+    range ? 'aria-label="Dates"' : 'aria-label="Date"',
+    ...(withTime ? ['withTime'] : []),
+    ...(range && maxDays ? [`maxDays={${maxDays}}`] : []),
+    ...(months > 1 ? [`months={${months}}`] : []),
+    ...(noWeekends ? ['isDateUnavailable={isWeekend}'] : []),
+    'value={value}',
+    'onValueChange={setValue}',
+  ];
+  const jsx = [
+    `// value: ${JSON.stringify(range ? both : single)}`,
+    `<${range ? 'DateRangePicker' : 'DatePicker'}`,
+    ...attributes.map((a) => `  ${a}`),
+    '/>',
+  ].join('\n');
+
+  return (
+    <div className="ds-example not-content">
+      <div className="ds-example-preview" data-layout="stack">
+        {range ? (
+          <DateRangePicker
+            key={`range-${withTime}`}
+            aria-label="Dates"
+            {...shared}
+            maxDays={maxDays ? Number(maxDays) : undefined}
+            value={both}
+            onValueChange={setBoth}
+          />
+        ) : (
+          <DatePicker
+            key={`single-${withTime}`}
+            aria-label="Date"
+            {...shared}
+            value={single}
+            onValueChange={setSingle}
+          />
+        )}
+      </div>
+
+      <div className="ds-playground-controls">
+        <label className="ds-control ds-control-inline" htmlFor="pg-date-range">
+          <input
+            id="pg-date-range"
+            type="checkbox"
+            checked={range}
+            onChange={(e) => setRange(e.target.checked)}
+          />
+          <span>range</span>
+        </label>
+        <label className="ds-control ds-control-inline" htmlFor="pg-date-time">
+          <input
+            id="pg-date-time"
+            type="checkbox"
+            checked={withTime}
+            onChange={(e) => {
+              // Values change shape with the time, so start again.
+              setWithTime(e.target.checked);
+              setSingle(null);
+              setBoth({ start: null, end: null });
+            }}
+          />
+          <span>withTime</span>
+        </label>
+        <label className="ds-control ds-control-inline" htmlFor="pg-date-weekends">
+          <input
+            id="pg-date-weekends"
+            type="checkbox"
+            checked={noWeekends}
+            onChange={(e) => setNoWeekends(e.target.checked)}
+          />
+          <span>weekends unavailable</span>
+        </label>
+        <label className="ds-control" htmlFor="pg-date-months">
+          <span>months</span>
+          <select
+            id="pg-date-months"
+            value={months}
+            onChange={(e) => setMonths(Number(e.target.value))}
+          >
+            <option value={1}>1</option>
+            <option value={2}>2</option>
+          </select>
+        </label>
+        <label className="ds-control" htmlFor="pg-date-max-days">
+          <span>maxDays (range)</span>
+          <select
+            id="pg-date-max-days"
+            value={maxDays}
+            disabled={!range}
+            onChange={(e) => setMaxDays(e.target.value)}
+          >
+            <option value="">none</option>
+            <option value="3">3</option>
+            <option value="7">7</option>
+            <option value="14">14</option>
+          </select>
         </label>
       </div>
 

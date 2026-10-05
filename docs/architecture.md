@@ -1369,3 +1369,72 @@ Item around it.
 **Rules out:** a tree for site navigation; a separate content or label part; selection that
 follows focus; cascading or indeterminate selection; a `selectionMode="none"` before someone
 needs it (adding it later is not breaking, decision 9).
+
+---
+
+## 27. Calendar and DatePicker: native date inputs, a calendar beside them
+
+A date picker lets people type a date or pick it from a calendar: one date, or a range, with an
+optional time. Measured against APG's date picker dialog, React Aria's DatePicker and
+DateRangePicker, MUI X, react-day-picker and the native date inputs (October 2026). Base UI has
+none yet.
+
+**The field is the platform's.** React Aria and MUI build a field of segments — day, month,
+year — by hand. By decision 7's table a text field is unrecoverable once left, and a native
+`<input type="date">` or `datetime-local` already is a segmented field: typing in the locale's
+format, the phone's own picker, `min`, `max`, `required` and the form. Its value is ISO
+(`YYYY-MM-DD`, `YYYY-MM-DDTHH:mm`) in every locale, which is the value this design uses. What the
+platform lacks — a range, and a calendar that can be styled — is added beside it. The cost:
+desktop Firefox and Safari also open their own picker from the field, and Chrome's is hidden by
+CSS.
+
+**Uncontrolled, the input holds the value, as Input's does,** so react-hook-form's `register()`
+binds it both ways. The Root keeps a copy from the input's own events, and reads the input at the
+two moments something may have set it without one: when the picker opens (a `setValue`), and
+after `form.reset()`. A calendar pick goes through the input — the prototype's value setter and
+an `input` event — so the input's listeners, a form library's included, hear it as typing.
+Reading the input at those moments is decision 20's rule, "read from the input's events", not
+decision 10's state read back from the DOM: the input is the state. Controlled, React sets the
+input from `value`, as for any input.
+
+**Dates are ISO strings in no time zone.** A value is the user's local calendar date, or
+date-time: what the input holds. A value with `Z` or an offset — an instant from an API — is
+converted to local time on the way in; seconds are dropped. Arithmetic goes through a `Date` at
+UTC midnight, where every day is 24 hours, so daylight saving moves nothing. There is no date
+library: `Intl.DateTimeFormat` names months and weekdays, `Intl.Locale#getWeekInfo` gives the
+week's first day, with a region table where it is missing. Only the Gregorian calendar.
+
+**Two components, two Roots.** DatePicker and DateRangePicker, Calendar and RangeCalendar: a
+range's value is always `{ start, end }`, never a type that depends on a `mode` prop.
+
+| Headless part                           | Element                                      |
+| --------------------------------------- | -------------------------------------------- |
+| `Calendar.Root`, `Calendar.RangeRoot`   | `<div>`: selection, month shown, focused day |
+| `Calendar.Heading`                      | the month, a polite live region              |
+| `Calendar.PrevButton`, `NextButton`     | `<button>`, disabled at `min` and `max`      |
+| `Calendar.Grid`                         | one month, `<table role="grid">`, `offset`   |
+| `DatePicker.Root`, `RangeRoot`          | none: value, open state, constraints         |
+| `DatePicker.Input`, `StartInput`, `End` | the native inputs                            |
+| `DatePicker.Trigger`, `Popup`           | a Popover's trigger and popup (decision 12)  |
+
+The Grid places the weekday headers and the day buttons itself (decision 11); a Calendar inside
+a picker's Popup takes the picker's value and constraints through context, and its own props
+win. `@arun-dev/ui` composes each into one component.
+
+**The calendar, by APG's grid.** One Tab stop; arrows by day and week, Home and End to the week's
+ends, Page Up and Down by month, with Shift by year, a missing day becoming the month's last.
+**Disabled days stay focusable** — an exception to decision 13: in a grid the arrows move by
+the calendar, and skipping a day would make ↓ land somewhere other than a week later. They are
+`aria-disabled` and cannot be picked; focus is clamped to `min` and `max`. The popup is
+non-modal, a Popover, as React Aria's is; APG's dialog is modal. It takes focus on open, and
+returns it to the Trigger on a pick or Esc.
+
+**A range is picked in two presses**, in either order, previewing toward the pointer or focus in
+between; `onValueChange` waits for the second. **`maxDays` counts days, both ends included** —
+react-day-picker counts nights — and after the first press disables the days out of reach, as
+does any unavailable day in the way: a range never spans one. Typed, the end input's `max`
+follows the start, so the browser enforces `maxDays` too. With times, each end keeps its own;
+new ends get 00:00 and 23:59, so a picked range covers whole days.
+
+**Rules out:** a hand-built segmented field; a date library or time zones in values; a `mode`
+prop on one component; ranges across unavailable days; a modal popup.
