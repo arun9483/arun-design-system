@@ -1430,7 +1430,7 @@ export const PROPS = {
       type: 'boolean',
       default: 'false',
       description:
-        'Adds the time: each input becomes `datetime-local`, and each value `YYYY-MM-DDTHH:mm`.',
+        'Adds the time: each input becomes `datetime-local`, each value `YYYY-MM-DDTHH:mm`, and the popup gets time fields and Done, staying open after a pick.',
     },
     {
       name: 'min',
@@ -1484,9 +1484,15 @@ export const PROPS = {
     },
     {
       name: 'labels',
-      type: '{ choose?; dialog?; start?; end?; unavailable? }',
+      type: '{ choose?; dialog?; start?; end?; unavailable?; time?; startTime?; endTime? }',
       description:
-        'Names for the calendar button and popup, the range inputs, and the unavailable message, in English unless replaced.',
+        'Names for the calendar button and popup, the range inputs, the time fields in the popup, and the unavailable message, in English unless replaced.',
+    },
+    {
+      name: 'doneLabel',
+      type: 'string',
+      default: "'Done'",
+      description: 'The text of the button that closes the popup, shown with `withTime`.',
     },
     {
       name: 'calendarLabels',
@@ -1544,7 +1550,7 @@ export const PROPS = {
       type: 'boolean',
       default: 'false',
       description:
-        'Adds the time: each input becomes `datetime-local`, and each value `YYYY-MM-DDTHH:mm`.',
+        'Adds the time: each input becomes `datetime-local`, each value `YYYY-MM-DDTHH:mm`, and the popup gets time fields and Done, staying open after a pick.',
     },
     {
       name: 'min',
@@ -1598,9 +1604,15 @@ export const PROPS = {
     },
     {
       name: 'labels',
-      type: '{ choose?; dialog?; start?; end?; unavailable? }',
+      type: '{ choose?; dialog?; start?; end?; unavailable?; time?; startTime?; endTime? }',
       description:
-        'Names for the calendar button and popup, the range inputs, and the unavailable message, in English unless replaced.',
+        'Names for the calendar button and popup, the range inputs, the time fields in the popup, and the unavailable message, in English unless replaced.',
+    },
+    {
+      name: 'doneLabel',
+      type: 'string',
+      default: "'Done'",
+      description: 'The text of the button that closes the popup, shown with `withTime`.',
     },
     {
       name: 'calendarLabels',

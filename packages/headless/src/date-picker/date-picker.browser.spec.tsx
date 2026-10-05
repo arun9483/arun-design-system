@@ -27,6 +27,8 @@ function Single(props: DatePickerRootProps & { name?: string }) {
           <Calendar.Heading />
           <Calendar.Grid />
         </Calendar.Root>
+        {root.withTime && <DatePicker.TimeInput />}
+        <DatePicker.Close>Done</DatePicker.Close>
       </DatePicker.Popup>
     </DatePicker.Root>
   );
@@ -42,6 +44,12 @@ function Range(props: DatePickerRangeRootProps) {
         <Calendar.RangeRoot locale="en-US">
           <Calendar.Grid />
         </Calendar.RangeRoot>
+        {props.withTime && (
+          <>
+            <DatePicker.StartTimeInput />
+            <DatePicker.EndTimeInput />
+          </>
+        )}
       </DatePicker.Popup>
     </DatePicker.RangeRoot>
   );
@@ -88,7 +96,7 @@ describe('DatePicker (browser)', () => {
     await expect.poll(focused).toBe(day('Friday, December 25, 2026'));
   });
 
-  it('with withTime, is a datetime-local input, and a pick keeps the time', async () => {
+  it('with withTime, is a datetime-local input, and a pick keeps the time and the Popup open', async () => {
     const onValueChange = vi.fn();
     render(<Single withTime defaultValue="2026-10-05T14:30" onValueChange={onValueChange} />);
     expect(input()).toHaveAttribute('type', 'datetime-local');
@@ -97,9 +105,34 @@ describe('DatePicker (browser)', () => {
     await userEvent.click(day('Friday, October 9, 2026'));
     expect(input()).toHaveValue('2026-10-09T14:30');
     expect(onValueChange).toHaveBeenLastCalledWith('2026-10-09T14:30');
+    // Still open, for the time.
+    expect(isOpen()).toBe(true);
   });
 
-  it('with withTime and no time yet, picks midnight', async () => {
+  it('sets the time from the Popup, and Done closes it, returning focus', async () => {
+    const onValueChange = vi.fn();
+    render(<Single withTime defaultValue="2026-10-05T14:30" onValueChange={onValueChange} />);
+    await userEvent.click(trigger());
+    const time = screen.getByLabelText('Time');
+    expect(time).toHaveAttribute('type', 'time');
+    expect(time).toHaveValue('14:30');
+    await userEvent.fill(time, '16:45');
+    expect(input()).toHaveValue('2026-10-05T16:45');
+    expect(onValueChange).toHaveBeenLastCalledWith('2026-10-05T16:45');
+    await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+    expect(isOpen()).toBe(false);
+    expect(focused()).toBe(trigger());
+  });
+
+  it('keeps a time chosen before any date for the first pick, and midnight otherwise', async () => {
+    const { unmount } = render(<Single withTime />);
+    await userEvent.click(trigger());
+    await userEvent.fill(screen.getByLabelText('Time'), '09:15');
+    expect(input()).toHaveValue('');
+    await expect.poll(focused).toHaveProperty('tagName', 'INPUT');
+    (document.querySelector('[data-today]') as HTMLElement).click();
+    expect(input().value).toMatch(/T09:15$/);
+    unmount();
     render(<Single withTime />);
     await userEvent.click(trigger());
     await expect.poll(focused).toHaveProperty('tagName', 'BUTTON');
@@ -243,6 +276,27 @@ describe('DatePicker range (browser)', () => {
     expect(onValueChange).toHaveBeenCalledWith({
       start: '2026-10-07T09:15',
       end: '2026-10-10T23:59',
+    });
+    expect(popup().matches(':popover-open')).toBe(true);
+  });
+
+  it("with withTime, sets each end's time from the Popup", async () => {
+    const onValueChange = vi.fn();
+    render(
+      <Range
+        withTime
+        defaultValue={{ start: '2026-10-05T09:15', end: '2026-10-07T18:00' }}
+        onValueChange={onValueChange}
+      />,
+    );
+    await userEvent.click(rangeTrigger());
+    expect(screen.getByLabelText('Start time')).toHaveValue('09:15');
+    expect(screen.getByLabelText('End time')).toHaveValue('18:00');
+    await userEvent.fill(screen.getByLabelText('End time'), '20:30');
+    expect(end()).toHaveValue('2026-10-07T20:30');
+    expect(onValueChange).toHaveBeenLastCalledWith({
+      start: '2026-10-05T09:15',
+      end: '2026-10-07T20:30',
     });
   });
 

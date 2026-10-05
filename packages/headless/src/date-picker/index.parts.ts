@@ -7,3 +7,9 @@ export {
 } from './DatePickerInput';
 export { DatePickerTrigger as Trigger } from './DatePickerTrigger';
 export { DatePickerPopup as Popup } from './DatePickerPopup';
+export {
+  DatePickerTimeInput as TimeInput,
+  DatePickerStartTimeInput as StartTimeInput,
+  DatePickerEndTimeInput as EndTimeInput,
+} from './DatePickerTimeInput';
+export { DatePickerClose as Close } from './DatePickerClose';

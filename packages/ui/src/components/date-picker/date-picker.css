@@ -137,6 +137,48 @@
     inset-inline: var(--date-picker-popup-offset);
   }
 
+  /* With a time: the time fields and Done, under the calendar. */
+  .date-picker-time {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--date-picker-gap);
+    margin-block-start: var(--date-picker-popup-padding);
+    padding-block-start: var(--date-picker-popup-padding);
+    border-block-start: var(--date-picker-border-width) solid var(--date-picker-popup-border-color);
+  }
+
+  .date-picker-time-field {
+    display: grid;
+    gap: var(--space-3xs);
+  }
+
+  .date-picker-time-label {
+    color: var(--date-picker-separator-color);
+    font-size: var(--text-xs);
+  }
+
+  /* A small field of its own, framed as the box is. The browser's own time picker stays. */
+  .date-picker-time-input {
+    min-block-size: var(--date-picker-height);
+    padding-inline: var(--date-picker-padding-inline);
+    border: var(--date-picker-border-width) solid var(--date-picker-border-color);
+    border-radius: var(--date-picker-radius);
+    background-color: var(--date-picker-bg);
+    color: inherit;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .date-picker-time-input:focus-visible {
+    border-color: var(--date-picker-border-color-focus);
+    outline: var(--date-picker-border-width) solid var(--date-picker-border-color-focus);
+  }
+
+  .date-picker-done {
+    margin-inline-start: auto;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .date-picker {
       transition-duration: 0ms;

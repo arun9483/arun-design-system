@@ -1436,5 +1436,13 @@ does any unavailable day in the way: a range never spans one. Typed, the end inp
 follows the start, so the browser enforces `maxDays` too. With times, each end keeps its own;
 new ends get 00:00 and 23:59, so a picked range covers whole days.
 
+**The time is set in the Popup too, with the platform's time input.** With `withTime`, the Popup
+adds an `<input type="time">` — `TimeInput`, or `StartTimeInput` and `EndTimeInput` — that
+writes the time part through the date input, as a pick writes the date, and a Close part for
+Done. A pick then leaves the Popup open, so the time can follow; without a time it still closes.
+A time chosen before any date waits in the Root for the first pick. Building hour and minute
+columns was weighed and ruled out: the native time input brings them in Chrome, with typing, the
+locale's 12- or 24-hour clock and a phone's wheel, as the date input does.
+
 **Rules out:** a hand-built segmented field; a date library or time zones in values; a `mode`
 prop on one component; ranges across unavailable days; a modal popup.

@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import type { ChangeEvent } from 'react';
 import { PopoverRoot } from '../popover/PopoverRoot';
 import {
   CalendarBindingContext,
@@ -39,6 +40,9 @@ const DEFAULT_LABELS: DatePickerLabels = {
   start: 'Start date',
   end: 'End date',
   unavailable: 'This date is unavailable.',
+  time: 'Time',
+  startTime: 'Start time',
+  endTime: 'End time',
 };
 
 /**
@@ -48,7 +52,8 @@ const DEFAULT_LABELS: DatePickerLabels = {
  * range. Renders no element: StartInput, EndInput, Trigger and Popup are its parts.
  *
  * Picking keeps each end's time already set; without one, the start is midnight and the end
- * 23:59, so the range covers whole days.
+ * 23:59, so the range covers whole days. With `withTime` the Popup stays open after a pick, and
+ * StartTimeInput and EndTimeInput in it set the times.
  */
 export function DatePickerRangeRoot({
   value,
@@ -96,8 +101,11 @@ export function DatePickerRangeRoot({
 
   const startDate = datePart(start.shown);
   const endDate = datePart(end.shown);
-  const startTime = timePart(start.shown);
-  const endTime = timePart(end.shown);
+  // Times chosen in the Popup before their dates: the pick uses them.
+  const [draftStartTime, setDraftStartTime] = useState<string | null>(null);
+  const [draftEndTime, setDraftEndTime] = useState<string | null>(null);
+  const startTime = timePart(start.shown) ?? draftStartTime;
+  const endTime = timePart(end.shown) ?? draftEndTime;
   const minDate = datePart(min) ?? undefined;
   const maxDate = datePart(max) ?? undefined;
   const binding: CalendarBinding = useMemo(
@@ -119,7 +127,8 @@ export function DatePickerRangeRoot({
         start.write(next.start, true);
         end.write(next.end, true);
         onValueChange?.(next);
-        setOpen(false);
+        // With times, the Popup stays open for them; Done, Esc or a click outside closes it.
+        if (!withTime) setOpen(false);
       },
     }),
     // write reads refs; the rest is listed.
@@ -144,10 +153,35 @@ export function DatePickerRangeRoot({
   const reach = startDate && maxDays ? addDays(startDate, maxDays - 1) : undefined;
   const endMax = reach && (!maxDate || reach < maxDate) ? reach : max;
 
+  const timeSlot = (
+    input: typeof start,
+    date: string | null,
+    shownTime: string | null,
+    setDraft: (time: string) => void,
+    label: string,
+  ) => ({
+    value: shownTime ?? '',
+    label,
+    onChange(event: ChangeEvent<HTMLInputElement>) {
+      const next = event.currentTarget.value;
+      // Emptied, the time is kept: a date-time needs one.
+      if (!next) return;
+      if (date) input.write(`${date}T${next}`);
+      else setDraft(next);
+    },
+  });
+
   const context = {
     withTime,
     disabled,
     single: null,
+    time: {
+      single: null,
+      start: withTime
+        ? timeSlot(start, startDate, startTime, setDraftStartTime, labels.startTime)
+        : null,
+      end: withTime ? timeSlot(end, endDate, endTime, setDraftEndTime, labels.endTime) : null,
+    },
     start: start.slot({
       min: inputBound(min, withTime, 'start'),
       max: inputBound(end.shown ?? max, withTime, 'end'),

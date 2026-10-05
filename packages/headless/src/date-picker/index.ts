@@ -5,3 +5,5 @@ export type { DatePickerRangeRootProps, DateRangeValue } from './DatePickerRange
 export type { DatePickerInputProps } from './DatePickerInput';
 export type { DatePickerTriggerProps } from './DatePickerTrigger';
 export type { DatePickerPopupProps } from './DatePickerPopup';
+export type { DatePickerTimeInputProps } from './DatePickerTimeInput';
+export type { DatePickerCloseProps } from './DatePickerClose';

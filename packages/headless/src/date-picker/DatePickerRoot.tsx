@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import type { ReactNode } from 'react';
+import { useMemo, useState } from 'react';
+import type { ChangeEvent, ReactNode } from 'react';
 import { PopoverRoot } from '../popover/PopoverRoot';
 import { CalendarBindingContext, type CalendarBinding } from '../calendar/CalendarRootContext';
 import { datePart, timePart } from '../calendar/dates';
@@ -51,6 +51,9 @@ const DEFAULT_LABELS: DatePickerLabels = {
   start: 'Start date',
   end: 'End date',
   unavailable: 'This date is unavailable.',
+  time: 'Time',
+  startTime: 'Start time',
+  endTime: 'End time',
 };
 
 /**
@@ -59,7 +62,8 @@ const DEFAULT_LABELS: DatePickerLabels = {
  * format and the form are the platform's. Renders no element: Input, Trigger and Popup are its
  * parts, and a Calendar in the Popup picks for it.
  *
- * Picking a day keeps the time already set, or uses midnight.
+ * Picking a day keeps the time already set, or uses midnight. With `withTime` the Popup stays
+ * open after a pick, and a TimeInput in it sets the time.
  */
 export function DatePickerRoot({
   value,
@@ -94,7 +98,9 @@ export function DatePickerRoot({
   });
 
   const shownDate = datePart(input.shown);
-  const time = timePart(input.shown);
+  // A time chosen in the Popup before any date: the first pick uses it.
+  const [draftTime, setDraftTime] = useState<string | null>(null);
+  const time = timePart(input.shown) ?? draftTime;
   const minDate = datePart(min) ?? undefined;
   const maxDate = datePart(max) ?? undefined;
   const binding: CalendarBinding = useMemo(
@@ -107,7 +113,8 @@ export function DatePickerRoot({
       openCount,
       pick(date: string) {
         input.write(withTime ? `${date}T${time ?? '00:00'}` : date);
-        setOpen(false);
+        // With a time, the Popup stays open for it; Done, Esc or a click outside closes it.
+        if (!withTime) setOpen(false);
       },
     }),
     // input.write reads refs; the rest is listed.
@@ -127,6 +134,23 @@ export function DatePickerRoot({
     }),
     start: null,
     end: null,
+    time: {
+      single: withTime
+        ? {
+            value: time ?? '',
+            label: labels.time,
+            onChange(event: ChangeEvent<HTMLInputElement>) {
+              const next = event.currentTarget.value;
+              // Emptied, the time is kept: a date-time needs one.
+              if (!next) return;
+              if (shownDate) input.write(`${shownDate}T${next}`);
+              else setDraftTime(next);
+            },
+          }
+        : null,
+      start: null,
+      end: null,
+    },
     triggerLabel: input.shown
       ? `${labels.choose}, ${describeValue(input.shown, locale)}`
       : labels.choose,

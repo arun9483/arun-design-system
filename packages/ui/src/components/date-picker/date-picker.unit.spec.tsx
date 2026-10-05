@@ -40,6 +40,20 @@ describe('DatePicker (ui)', () => {
     expect(screen.getByRole('button', { name: 'Choose date' })).toHaveClass('date-picker-trigger');
   });
 
+  it('with withTime, adds the time field and Done to the popup', () => {
+    render(<DatePicker aria-label="Starts" withTime defaultValue="2026-10-05T09:30" />);
+    const time = screen.getByLabelText('Time');
+    expect(time).toHaveAttribute('type', 'time');
+    expect(time).toHaveValue('09:30');
+    expect(time).toHaveClass('date-picker-time-input');
+    expect(screen.getByRole('button', { name: 'Done', hidden: true })).toHaveClass('btn-primary');
+  });
+
+  it('without withTime, has no time field', () => {
+    render(<DatePicker aria-label="Due" />);
+    expect(screen.queryByLabelText('Time')).toBeNull();
+  });
+
   it('takes a Field: the label, the description and the invalid state reach the input', () => {
     render(
       <Field.Root invalid>
@@ -72,5 +86,17 @@ describe('DatePicker (ui)', () => {
     expect(start).toHaveAttribute('name', 'from');
     expect(end).toHaveAttribute('name', 'to');
     expect(end).toBeRequired();
+  });
+
+  it('a range with times has a start and an end time field', () => {
+    render(
+      <DateRangePicker
+        aria-label="Booking"
+        withTime
+        defaultValue={{ start: '2026-10-05T14:00', end: '2026-10-07T11:00' }}
+      />,
+    );
+    expect(screen.getByLabelText('Start time')).toHaveValue('14:00');
+    expect(screen.getByLabelText('End time')).toHaveValue('11:00');
   });
 });
