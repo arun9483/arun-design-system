@@ -18,3 +18,9 @@ reason = "braces <= 3.0.3 stack-exhaustion DoS on deeply nested patterns; 3.0.3 
 id = "GHSA-ch52-4w7c-c8xp"
 ignoreUntil = 2027-01-01
 reason = "http-cache-semantics <= 4.2.0 max-stale handling can serve one user's cached response to another from a shared cache; 4.2.0 is the latest release and no fix is published. Reached only through astro (^4.2.0, latest astro included) in the private @arun-dev/docs app, which builds a static site served from GitHub Pages — no shared HTTP cache runs our code, and it is not in any published package. Remove once http-cache-semantics ships a fix."
+
+# Owner: arun9483. Waived 2026-10-08 (#155).
+[[IgnoredVulns]]
+id = "GHSA-hp3w-g68c-fv3c"
+ignoreUntil = 2027-01-01
+reason = "sprintf-js <= 1.1.3 DoS through unbounded precision specifiers; no fix is published. Reached only through argparse 1 / js-yaml 3 / read-yaml-file in @changesets/cli 2.x (a root devDependency), which formats the repo's own messages, never untrusted input, and is not in any published package. Same exit as GHSA-vfj7-8cjw-p6xm: changesets 3 drops js-yaml 3. Remove once sprintf-js ships a fix or that migration lands."
