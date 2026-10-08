@@ -367,7 +367,7 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
 
   // `form.reset()` returns the selection and the text to what they mounted with. Hidden
   // inputs are not reset by the platform, so only React's state needs restoring.
-  const { current: initial } = useRef({ value, inputValue });
+  const [initial] = useState({ value, inputValue });
   useEffect(() => {
     // `.form` also honours a `form="id"` attribute.
     const owner = inputRef.current?.form;

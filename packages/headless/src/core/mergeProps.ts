@@ -183,3 +183,11 @@ export function mergeProps(...objects: (UnknownProps | undefined)[]): UnknownPro
 
   return merged;
 }
+
+/**
+ * `mergeProps` for props built during render that carry a ref. Uses no hooks; as with
+ * `useRender`, the `use` prefix tells React's lint that the ref passed in is not read here.
+ */
+export function useMergedProps(...objects: (UnknownProps | undefined)[]): UnknownProps {
+  return mergeProps(...objects);
+}

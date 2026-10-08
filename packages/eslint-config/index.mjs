@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import { fixupConfigRules } from '@eslint/compat';
 import tseslint from 'typescript-eslint';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
@@ -28,9 +29,11 @@ export const baseConfig = [
 
 export const reactConfig = [
   ...baseConfig,
-  reactPlugin.configs.flat.recommended,
-  reactHooksPlugin.configs['recommended-latest'],
-  jsxA11yPlugin.flatConfigs.recommended,
+  // eslint-plugin-react and eslint-plugin-jsx-a11y stop at ESLint 9: react calls context
+  // methods ESLint 10 removed. fixupConfigRules puts them back; drop it once both support 10.
+  ...fixupConfigRules(reactPlugin.configs.flat.recommended),
+  reactHooksPlugin.configs.flat['recommended-latest'],
+  ...fixupConfigRules(jsxA11yPlugin.flatConfigs.recommended),
   {
     rules: {
       'react/react-in-jsx-scope': 'off',
@@ -45,17 +48,7 @@ export const reactConfig = [
 ];
 
 export const ignores = {
-  ignores: [
-    'node_modules/**',
-    '.next/**',
-    'dist/**',
-    'build/**',
-    'coverage/**',
-    // tsup bundles its config to a temporary `tsup.config.bundled_<id>.mjs` beside it and
-    // deletes it after. A lint running alongside a build can list the file and then fail
-    // to open it (ENOENT), so it is never linted.
-    '**/*.bundled_*.{mjs,cjs}',
-  ],
+  ignores: ['node_modules/**', '.next/**', 'dist/**', 'build/**', 'coverage/**'],
 };
 
 export default [ignores, ...baseConfig];

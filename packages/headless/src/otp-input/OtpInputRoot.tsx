@@ -126,7 +126,7 @@ export function OtpInputRoot({
   // `form.reset()` restores the input's default, which React keeps equal to the current value,
   // so the reset would change nothing. Return to the mount-time value instead, through the
   // same setter typing uses — a native input would go back to its default.
-  const { current: initialValue } = useRef(value);
+  const [initialValue] = useState(value);
   const latest = useLatest(commit);
   useEffect(() => {
     const form = inputRef.current?.form;

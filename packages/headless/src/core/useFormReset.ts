@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import type { RefObject } from 'react';
 import { afterReset, useLatest } from './useLatest';
 
@@ -40,7 +40,8 @@ export function useFormReset<T>({
   /** The component's single setter — the same one a click goes through. */
   commit: (next: T) => void;
 }): void {
-  const { current: initialValue } = useRef(value);
+  // Latched at mount; state rather than a ref because render reads it.
+  const [initialValue] = useState(value);
   const latest = useLatest({ value, inputChecked, commit });
 
   useEffect(() => {

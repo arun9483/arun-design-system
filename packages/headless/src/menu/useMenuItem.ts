@@ -29,6 +29,8 @@ export function useMenuItem(
 
   return {
     closeAll,
+    // Also on its own, for a part that composes it with a ref of its own.
+    itemRef: ref,
     itemProps: {
       type: 'button',
       tabIndex: -1,

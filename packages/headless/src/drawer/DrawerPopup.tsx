@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { PointerEvent as ReactPointerEvent, MouseEvent as ReactMouseEvent } from 'react';
 import { DialogPopup, type DialogPopupProps } from '../dialog/DialogPopup';
 import { useDialogRootContext } from '../dialog/DialogRootContext';
-import { mergeProps, type UnknownProps } from '../core/mergeProps';
+import { useMergedProps, type UnknownProps } from '../core/mergeProps';
 
 /** The edge of the viewport a drawer is attached to, and slides back to when it closes. */
 export type DrawerSide = 'top' | 'right' | 'bottom' | 'left';
@@ -215,7 +215,7 @@ export function DrawerPopup({ side = 'bottom', ...rest }: DrawerPopupProps) {
 
   // The drawer's props first and the consumer's last, as everywhere: refs are merged, and the
   // consumer's handlers run first and can stop these (decision 8).
-  const props = mergeProps(
+  const props = useMergedProps(
     {
       ref: elementRef,
       'data-side': side,

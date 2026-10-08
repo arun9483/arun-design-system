@@ -29,7 +29,7 @@ jobs:
     name: Browser tests
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
     env:
       # The image's browsers live here; without it Playwright looks under $HOME/.cache.
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright

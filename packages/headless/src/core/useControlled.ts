@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 /**
  * Supports both controlled and uncontrolled use of a single value.
@@ -22,10 +22,11 @@ export function useControlled<T>({
   name?: string;
   state?: string;
 }): [T, (next: T) => void] {
-  // Captured at mount on purpose — see above.
-  const { current: isControlled } = useRef(controlled !== undefined);
+  // Captured at mount on purpose — see above. State that is never set, rather than a ref,
+  // because render reads it.
+  const [isControlled] = useState(controlled !== undefined);
   const [uncontrolled, setUncontrolled] = useState(defaultValue);
-  const defaultRef = useRef(defaultValue);
+  const [initialDefault] = useState(defaultValue);
 
   const value = isControlled ? (controlled as T) : uncontrolled;
 
@@ -42,7 +43,7 @@ export function useControlled<T>({
     // in uncontrolled mode the default captured at mount is compared against this render's
     // `default`, so this is true only when the parent changed it after mount, e.g.
     // defaultChecked={false} then defaultChecked={true} — useState already ignored the new one.
-    if (!isControlled && defaultRef.current !== defaultValue) {
+    if (!isControlled && initialDefault !== defaultValue) {
       console.error(
         `${name}: cannot change the default \`${state}\` after mount. ` +
           `It is only read once, so later changes are silently ignored.`,

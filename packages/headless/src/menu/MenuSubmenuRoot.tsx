@@ -44,16 +44,17 @@ export function MenuSubmenuRoot({
     parent,
   );
   const { open, setOpen, triggerRef } = context;
+  const { openSubmenuRef } = parent;
 
   // Tells the parent which submenu is open, so moving to another of its items closes it.
   useEffect(() => {
     if (!open) return;
     const entry = { close: () => setOpen(false), triggerRef };
-    parent.openSubmenuRef.current = entry;
+    openSubmenuRef.current = entry;
     return () => {
-      if (parent.openSubmenuRef.current === entry) parent.openSubmenuRef.current = null;
+      if (openSubmenuRef.current === entry) openSubmenuRef.current = null;
     };
-  }, [open, setOpen, triggerRef, parent]);
+  }, [open, setOpen, triggerRef, openSubmenuRef]);
 
   return <MenuRootContext.Provider value={context}>{children}</MenuRootContext.Provider>;
 }

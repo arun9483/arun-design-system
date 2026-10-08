@@ -34,7 +34,7 @@ export function useDateInput({
 }) {
   const ref = useRef<HTMLInputElement | null>(null);
   // Latched at mount, as useControlled does.
-  const { current: controlled } = useRef(value !== undefined);
+  const [controlled] = useState(value !== undefined);
   const [current, setCurrent] = useState(() => toInputValue(defaultValue, withTime));
   const [initial] = useState(() => toInputValue(defaultValue, withTime) ?? undefined);
   const shown = controlled ? toInputValue(value, withTime) : current;
