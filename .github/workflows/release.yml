@@ -23,7 +23,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+      # pnpm only (the version from packageManager): Node and its pnpm cache stay with
+      # actions/setup-node, and the install is the frozen one below.
+      - uses: pnpm/setup@v3
+        with:
+          node-version-file: false
+          install: false
 
       - uses: actions/setup-node@v7
         with:
