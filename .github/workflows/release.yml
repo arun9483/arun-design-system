@@ -5,8 +5,7 @@ on:
     branches: [main]
 
 env:
-  # Git hooks are redundant in CI (the workflow runs the same checks) and the
-  # changesets version commit would fail the commitlint commit-msg hook.
+  # Git hooks are redundant in CI: the workflow runs the same checks.
   HUSKY: 0
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
@@ -34,23 +33,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Still v1, and v1 already targets node24 — this pin costs no deprecation
-      # warning. v2 requires github-token as an explicit input rather than the
-      # GITHUB_TOKEN environment variable and renames several inputs, a migration
-      # that touches the publish path and cannot be rehearsed without cutting a real
-      # release. Worth doing deliberately, not as part of a runtime bump.
+      # Pinned to a release: unlike v1, v2 has no moving major tag.
+      # v2 works only with @changesets/cli 3. It learns what was published from the
+      # CHANGESETS_OUTPUT file `changeset publish` writes (v1 parsed log lines that
+      # cli 3 no longer prints), so tags and GitHub releases follow every publish.
+      # The GitHub token defaults to this job's; the release commit, PR and tags go
+      # through the GitHub API and are signed.
       - name: Create release PR or publish to npm
-        uses: changesets/action@v1
+        uses: changesets/action@v2.1.2
         with:
-          publish: pnpm release
-          version: pnpm run version-packages
-          commit: 'chore(release): version packages'
-          title: 'chore(release): version packages'
-        # No NPM_TOKEN: without it, changesets/action writes no token .npmrc and
-        # leaves auth to npm trusted publishing. `pnpm publish` packs, then runs
-        # `npm publish` — npm >= 11.5.1 (Node 24's) does the OIDC exchange, and
-        # attaches provenance. Each package's trusted publisher on npmjs.com names
-        # this repository and this workflow file, release.yml: rename it and
-        # publishing stops.
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          publish-script: pnpm release
+          version-script: pnpm run version-packages
+          commit-message: 'chore(release): version packages'
+          pr-title: 'chore(release): version packages'
+        # No npm token anywhere: `pnpm publish` packs, then runs `npm publish`, and
+        # npm >= 11.5.1 (Node 24's) exchanges this job's OIDC token for a publish
+        # credential and attaches provenance. Each package's trusted publisher on
+        # npmjs.com names this repository and this workflow file, release.yml, and
+        # must allow direct publishing: rename the file and publishing stops.
