@@ -86,7 +86,8 @@
     "./css/date-picker": "./dist/css/date-picker.css"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "scripts": {
     "build": "tsdown",

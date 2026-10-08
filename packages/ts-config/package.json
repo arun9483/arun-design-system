@@ -17,6 +17,7 @@
     "directory": "packages/ts-config"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   }
 }

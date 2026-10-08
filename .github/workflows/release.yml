@@ -23,7 +23,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+      # pnpm only (the version from packageManager): Node and its pnpm cache stay with
+      # actions/setup-node, and the install is the frozen one below.
+      - uses: pnpm/setup@v3
+        with:
+          node-version-file: false
+          install: false
 
       - uses: actions/setup-node@v7
         with:
@@ -46,8 +51,9 @@ jobs:
           version-script: pnpm run version-packages
           commit-message: 'chore(release): version packages'
           pr-title: 'chore(release): version packages'
-        # No npm token anywhere: `pnpm publish` packs, then runs `npm publish`, and
-        # npm >= 11.5.1 (Node 24's) exchanges this job's OIDC token for a publish
-        # credential and attaches provenance. Each package's trusted publisher on
-        # npmjs.com names this repository and this workflow file, release.yml, and
-        # must allow direct publishing: rename the file and publishing stops.
+        # No npm token anywhere: `pnpm publish` (pnpm 11 publishes itself, without the
+        # npm CLI) exchanges this job's OIDC token for a publish credential, and each
+        # package's publishConfig.provenance attaches provenance. Each package's
+        # trusted publisher on npmjs.com names this repository and this workflow
+        # file, release.yml, and must allow direct publishing: rename the file and
+        # publishing stops.
