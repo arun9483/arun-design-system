@@ -43,7 +43,7 @@ jobs:
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Setup
-        uses: arun9483/frontend-platform-kit/actions/setup-node-pnpm@v1
+        uses: arun9483/frontend-platform-kit/actions/setup-node-pnpm@feat/pnpm-setup-for-pnpm-11
 
       - name: Browser tests
         run: pnpm test:browser
