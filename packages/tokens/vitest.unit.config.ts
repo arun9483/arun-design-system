@@ -5,6 +5,8 @@ export default defineConfig({
     name: 'unit',
     environment: 'node',
     globals: true,
+    // The parity specs read stylesheets as text (`?raw`); without this Vitest empties them.
+    css: true,
     include: ['src/**/*.unit.spec.ts'],
     exclude: ['node_modules', 'dist'],
     coverage: {

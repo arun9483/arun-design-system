@@ -6,6 +6,8 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./tests/setup.ts'],
+    // The contract specs read stylesheets as text (`?raw`); without this Vitest empties them.
+    css: true,
     include: ['src/**/*.unit.spec.ts', 'src/**/*.unit.spec.tsx'],
     exclude: ['node_modules', 'dist'],
     coverage: {

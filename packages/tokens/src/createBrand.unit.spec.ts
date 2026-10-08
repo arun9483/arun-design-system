@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+/// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 import {
   contrastRatio,
@@ -8,18 +8,12 @@ import {
   DEFAULT_NEUTRAL,
   type BrandPalette,
 } from './createBrand';
+import semanticCss from './brands/default/semantic.css?raw';
+import paletteCss from './brands/default/palette.css?raw';
 
 /* Parity guard: src/brands/default/semantic.css is the hand-audited source of truth (AAA
    contrast). These tests assert createBrand() generates identical semantic tokens for the
    default brand, so the two can never drift apart again. */
-
-const semanticCss = readFile('./brands/default/semantic.css');
-const paletteCss = readFile('./brands/default/palette.css');
-
-function readFile(relative: string): string {
-  // eslint-disable-next-line security/detect-non-literal-fs-filename -- fixed files of this package
-  return readFileSync(new URL(relative, import.meta.url), 'utf8');
-}
 
 function stripComments(css: string): string {
   return css.replace(/\/\*[\s\S]*?\*\//g, '');

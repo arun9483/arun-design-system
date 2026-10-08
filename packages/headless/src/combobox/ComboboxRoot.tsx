@@ -1,4 +1,5 @@
 import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useLatest } from '../core/useLatest';
 import type { ReactNode, RefObject } from 'react';
 import { anchorNameFor } from '../core/anchoring';
 import { byDocumentOrder } from '../core/rovingFocus';
@@ -236,11 +237,11 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
 
   // A new result list invalidates the index; nothing is highlighted until a key or the
   // pointer says so.
+  // Only when the list changes, not when the setter's identity does.
+  const latestSetHighlight = useLatest(setHighlight);
   useEffect(() => {
-    if (highlight.get().index !== -1) setHighlight(-1, 'none');
-    // Only when the list changes, not when the setter's identity does.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredItems]);
+    if (highlight.get().index !== -1) latestSetHighlight.current(-1, 'none');
+  }, [filteredItems, highlight, latestSetHighlight]);
 
   // The one path each piece of state takes, so the state and the report of it cannot drift.
   const setValue = useCallback(
@@ -329,13 +330,13 @@ export function ComboboxRoot<T, Multiple extends boolean = false>({
   // reason, so whoever tracks the text through onInputValueChange stays in step.
   const selectedKey = !multiple && selectedItems[0] != null ? itemToKey(selectedItems[0]) : null;
   const lastSelectedKeyRef = useRef(selectedKey);
+  // Only when the selection changes; the label and the setter are read as they are then.
+  const showSelectedLabel = useLatest(() => setInputValue(selectedLabel, 'value-change'));
   useEffect(() => {
     if (lastSelectedKeyRef.current === selectedKey) return;
     lastSelectedKeyRef.current = selectedKey;
-    setInputValue(selectedLabel, 'value-change');
-    // Only when the selection changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedKey]);
+    showSelectedLabel.current();
+  }, [selectedKey, showSelectedLabel]);
 
   const [chips, setChips] = useState<ComboboxChipEntry[]>([]);
   const registerChip = useCallback((entry: ComboboxChipEntry) => {

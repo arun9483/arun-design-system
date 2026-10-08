@@ -7,12 +7,14 @@ export type ChipVariant = 'default' | 'accent';
 type ChipOwnProps = {
   variant?: ChipVariant;
   className?: string;
-  children: React.ReactNode;
+  /** The content. Optional when `render` brings its own, as a link's text does. */
+  children?: React.ReactNode;
   /**
    * Element or component to render instead of the default `<span>`. Props, className
-   * and ref are merged onto it.
+   * and ref are merged onto it, and its own children win.
    *
    * @example <Chip render={<li />}>React</Chip>
+   * @example <Chip render={<a href="/tags/react">React</a>} />
    * @example <Chip render={<button type="button" />} onClick={…}>React</Chip>
    */
   render?: React.ReactElement;

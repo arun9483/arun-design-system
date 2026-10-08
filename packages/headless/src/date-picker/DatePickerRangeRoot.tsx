@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { PopoverRoot } from '../popover/PopoverRoot';
 import {
@@ -95,6 +95,9 @@ export function DatePickerRangeRoot({
     return limits.length > 0 ? limits.reduce((a, b) => (a < b ? a : b)) : null;
   };
 
+  // The end input, for the start's change, which runs after render: read through a ref so the
+  // start's handler does not hold — and React Compiler need not assume it changes — the end.
+  const endRef = useRef<ReturnType<typeof useDateInput> | null>(null);
   const start = useDateInput({
     value: controlled ? (value?.start ?? null) : undefined,
     defaultValue: defaultValue?.start,
@@ -102,9 +105,11 @@ export function DatePickerRangeRoot({
     onValueChange: (next) => {
       // A start that moves the limit past the end pulls the end back to it, so the range keeps
       // to maxHours and maxDays however the start changed — typed, or a time in the Popup.
+      const endInput = endRef.current;
+      const shown = endInput?.shown ?? null;
       const limit = next ? latestEnd(next) : null;
-      const nextEnd = limit && end.shown && end.shown > limit ? limit : end.shown;
-      if (nextEnd !== end.shown) end.write(nextEnd, true);
+      const nextEnd = limit && shown && shown > limit ? limit : shown;
+      if (endInput && nextEnd !== shown) endInput.write(nextEnd, true);
       onValueChange?.({ start: next, end: nextEnd });
     },
   });
@@ -113,6 +118,9 @@ export function DatePickerRangeRoot({
     defaultValue: defaultValue?.end,
     withTime,
     onValueChange: (next) => onValueChange?.({ start: start.shown, end: next }),
+  });
+  useLayoutEffect(() => {
+    endRef.current = end;
   });
   const { open, setOpen, openCount } = usePickerOpen({
     open: openProp,
@@ -140,6 +148,8 @@ export function DatePickerRangeRoot({
   const hoursDays = hoursLimit ? daysSpanned(startTime ?? '00:00', hoursLimit) : undefined;
   const calendarMaxDays =
     hoursDays && maxDays ? Math.min(hoursDays, maxDays) : (hoursDays ?? maxDays);
+  const { write: writeStart } = start;
+  const { write: writeEnd } = end;
   const binding: CalendarBinding = useMemo(
     () => ({
       mode: 'range',
@@ -161,15 +171,13 @@ export function DatePickerRangeRoot({
           if (next.end > cap) next.end = cap;
         }
         // Both inputs hear their change; the range is reported once, whole.
-        start.write(next.start, true);
-        end.write(next.end, true);
+        writeStart(next.start, true);
+        writeEnd(next.end, true);
         onValueChange?.(next);
         // With times, the Popup stays open for them; Done, Esc or a click outside closes it.
         if (!withTime) setOpen(false);
       },
     }),
-    // write reads refs; the rest is listed.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- see above
     [
       startDate,
       endDate,
@@ -184,6 +192,8 @@ export function DatePickerRangeRoot({
       withTime,
       setOpen,
       onValueChange,
+      writeStart,
+      writeEnd,
     ],
   );
 

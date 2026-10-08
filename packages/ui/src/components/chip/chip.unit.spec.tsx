@@ -41,14 +41,8 @@ describe('Chip', () => {
     expect(el).toHaveClass('chip', 'chip-default');
   });
 
-  it('merges className onto the rendered element', () => {
-    // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Chip's children
-    const link = <a href="/tags/react" />;
-    render(
-      <Chip render={link} className="shrink-0" variant="accent">
-        React
-      </Chip>,
-    );
+  it('merges className onto the rendered element, whose own content it shows', () => {
+    render(<Chip render={<a href="/tags/react">React</a>} className="shrink-0" variant="accent" />);
     const el = screen.getByText('React');
     expect(el.tagName).toBe('A');
     expect(el).toHaveAttribute('href', '/tags/react');

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { afterReset, useLatest } from '../core/useLatest';
 import { datePart, toInputValue } from '../calendar/dates';
@@ -52,24 +52,28 @@ export function useDateInput({
   };
 
   /** Sets the value: through the input, so its listeners — a form library's — hear it. */
-  const write = (next: string | null, silently = false) => {
-    if (controlled) {
-      if (!silently) report.current(next);
-      return;
-    }
-    const input = ref.current;
-    if (!input) return;
-    quiet.current = silently;
-    // React tracks the value it last set; the prototype's setter goes around it, so the
-    // `input` event reaches onChange like a typed change.
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(
-      input,
-      next ?? '',
-    );
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-    input.dispatchEvent(new Event('change', { bubbles: true }));
-    quiet.current = false;
-  };
+  // Stable: it reads only refs and the mode latched at mount, so a Root can depend on it.
+  const write = useCallback(
+    (next: string | null, silently = false) => {
+      if (controlled) {
+        if (!silently) report.current(next);
+        return;
+      }
+      const input = ref.current;
+      if (!input) return;
+      quiet.current = silently;
+      // React tracks the value it last set; the prototype's setter goes around it, so the
+      // `input` event reaches onChange like a typed change.
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(
+        input,
+        next ?? '',
+      );
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      quiet.current = false;
+    },
+    [controlled, report],
+  );
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     const next = event.currentTarget.value || null;

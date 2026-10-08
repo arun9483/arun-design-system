@@ -1,7 +1,4 @@
-/* eslint-disable security/detect-non-literal-fs-filename --
-   the paths are fixed source files of this package, joined to __dirname. */
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+/// <reference types="vite/client" />
 import { describe, it, expect } from 'vitest';
 
 /**
@@ -9,7 +6,17 @@ import { describe, it, expect } from 'vitest';
  * content, so the reset strips them only from a list that opts out with `role="list"`. The
  * components that render a list as layout remove them themselves.
  */
-const css = (path: string) => readFileSync(join(__dirname, path), 'utf8');
+// Every stylesheet of this package, read when the test loads.
+const sources = import.meta.glob<string>('./**/*.css', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+const css = (path: string) => {
+  const source = sources[`./${path}`];
+  if (source === undefined) throw new Error(`No stylesheet at src/${path}`);
+  return source;
+};
 
 /** Every rule whose selector list is exactly these selectors, comments removed. */
 function rulesFor(source: string, selector: RegExp) {
