@@ -30,6 +30,7 @@ export default function Gallery() {
         <Chip>default</Chip>
         <Chip variant="accent">accent</Chip>
         <Chip render={<button type="button" />}>button</Chip>
+        {/* eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Chip's children */}
         <Chip render={<a href={docsUrl('/components/link/')} />}>link</Chip>
       </div>
 

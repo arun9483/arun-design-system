@@ -17,6 +17,7 @@ const semanticCss = readFile('./brands/default/semantic.css');
 const paletteCss = readFile('./brands/default/palette.css');
 
 function readFile(relative: string): string {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- fixed files of this package
   return readFileSync(new URL(relative, import.meta.url), 'utf8');
 }
 
@@ -91,9 +92,10 @@ describe('createBrand output structure', () => {
 
   it('accepts a seed color and emits a full palette', () => {
     const css = createBrand({ name: 'seeded', seed: '#0ea5e9' });
-    for (const shade of [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]) {
-      expect(css).toMatch(new RegExp(`--color-brand-${shade}: #[0-9a-f]{6};`));
-    }
+    const shades = [...css.matchAll(/--color-brand-(\d+): #[0-9a-f]{6};/g)].map(([, s]) => +s);
+    expect(shades).toEqual(
+      expect.arrayContaining([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]),
+    );
   });
 });
 

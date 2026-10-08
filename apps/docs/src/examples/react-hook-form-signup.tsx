@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import {
   Button,
   Checkbox,
@@ -80,12 +80,12 @@ export default function ReactHookFormSignup() {
     handleSubmit,
     reset,
     setError,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<Values>({ defaultValues });
 
-  const plan = watch('plan');
-  const seats = watch('seats');
+  // useWatch rather than watch(), which React Compiler cannot memoize around.
+  const plan = useWatch({ control, name: 'plan' });
+  const seats = useWatch({ control, name: 'seats' });
 
   async function onSubmit(values: Values) {
     setSubmitted(null);

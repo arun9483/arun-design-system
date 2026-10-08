@@ -24,6 +24,7 @@ if (files.length === 0) {
 }
 
 for (const file of files) {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- listed from src/diagrams above
   const src = readFileSync(`src/diagrams/${file}`, 'utf8');
   try {
     await mermaid.parse(src);

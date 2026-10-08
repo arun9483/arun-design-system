@@ -49,7 +49,6 @@ describe('Switch — ARIA switch pattern', () => {
 
   it('is named by a wrapping label on its own, without htmlFor', () => {
     render(
-      // eslint-disable-next-line jsx-a11y/label-has-associated-control -- the case under test
       <label>
         <Switch.Root />
         Notifications

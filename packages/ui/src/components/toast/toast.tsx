@@ -12,12 +12,7 @@ import { cn } from '../../lib/cn';
 
 /** A corner of the window, or the middle of its top or bottom edge. */
 export type ToastPosition =
-  | 'top-left'
-  | 'top-center'
-  | 'top-right'
-  | 'bottom-left'
-  | 'bottom-center'
-  | 'bottom-right';
+  'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
 
 export type ToastViewportUiProps = ToastViewportProps & {
   /** Accessible name of each toast's close button. */

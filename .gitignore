@@ -3,6 +3,8 @@ node_modules/
 
 # Build output
 dist/
+# Astro's generated types and content cache (apps/docs)
+.astro/
 
 # Turbo
 .turbo/
@@ -12,6 +14,8 @@ dist/
 
 # Testing
 coverage/
+# Vitest's failure screenshots and other attachments (.vitest-attachments before Vitest 5)
+.vitest/
 .vitest-attachments/
 __screenshots__/
 *.lcov

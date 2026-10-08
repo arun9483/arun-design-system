@@ -13,6 +13,7 @@ export default function CardBasics() {
       </Card>
 
       {/* A card that opens something: hover it to see it rise. */}
+      {/* eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Card's children */}
       <Card lift render={<a href="#card" />} style={box}>
         <p className="font-weight-semibold">lift — hover me</p>
         <p className="text-size-sm text-color-secondary">
