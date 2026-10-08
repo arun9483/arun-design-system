@@ -105,8 +105,11 @@ export function MenubarTrigger({
       onFocus() {
         bar.setTabStop(triggerRef);
       },
-      onPointerEnter(event: ReactPointerEvent) {
-        if (event.pointerType === 'mouse') bar.onTriggerPointerEnter(triggerRef);
+      // On a move, not an enter: the browser also reports an enter when the bar is laid out
+      // under a pointer that has not moved, and that must not take the open menu from the
+      // keyboard. As SubmenuTrigger opens on a move.
+      onPointerMove(event: ReactPointerEvent) {
+        if (event.pointerType === 'mouse') bar.onTriggerPointerMove(triggerRef);
       },
       onKeyDown(event: ReactKeyboardEvent) {
         if (bar.onTriggerKeyDown(event, triggerRef) || disabled) return;

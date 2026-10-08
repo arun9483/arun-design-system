@@ -34,8 +34,8 @@ export type MenubarContextValue = {
    * first item. Returns whether there was another menu to move to.
    */
   moveFromMenu: (ref: RefObject<HTMLElement | null>, step: 1 | -1) => boolean;
-  /** The pointer reached a Trigger. While another menu is open, this one opens in its place. */
-  onTriggerPointerEnter: (ref: RefObject<HTMLElement | null>) => void;
+  /** The pointer moved on a Trigger. While another menu is open, this one opens in its place. */
+  onTriggerPointerMove: (ref: RefObject<HTMLElement | null>) => void;
 };
 
 export const MenubarContext = createContext<MenubarContextValue | null>(null);

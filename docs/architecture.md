@@ -1533,9 +1533,11 @@ and a submenu's ‚Üê, which keep their meaning (decision 19). In a vertical bar ‚
 its Trigger. Disabled Triggers follow decision 13: skipped, or `aria-disabled` and unopenable with
 the Root's `focusableWhenDisabled`.
 
-**Pointer.** A click toggles a menu. While one menu is open, the pointer reaching another Trigger
-opens that one in its place, and focus follows, so the keyboard carries on from it; with no menu
-open, hovering opens nothing.
+**Pointer.** A click toggles a menu. While one menu is open, the pointer moving onto another
+Trigger opens that one in its place, and focus follows, so the keyboard carries on from it; with no
+menu open, hovering opens nothing. It is a `pointermove`, as for SubmenuTrigger, not a
+`pointerenter`: the browser also reports an enter when the bar is laid out under a pointer that has
+not moved, and that would take a menu the keyboard just opened.
 
 **Rules out:** Menu's parts changing behaviour inside a bar; a modal or scroll-locking bar; plain
 buttons in the bar, which are a Toolbar's (decision 17); collapsing to a single menu on narrow

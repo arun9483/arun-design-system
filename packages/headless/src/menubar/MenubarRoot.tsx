@@ -125,7 +125,7 @@ export function MenubarRoot({
         goTo(target, 'first');
         return true;
       },
-      onTriggerPointerEnter(ref) {
+      onTriggerPointerMove(ref) {
         const open = entries.find((e) => e.open);
         const target = entries.find((e) => e.ref === ref);
         if (!open || !target || open === target || target.disabled) return;

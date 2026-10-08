@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { describe, it, expect, vi } from 'vitest';
 import { Menubar } from './index';
@@ -173,6 +173,20 @@ describe('Menubar (browser)', () => {
     await userEvent.hover(trigger('View'));
     expect(isOpen('view')).toBe(false);
     expect(isOpen('edit')).toBe(true);
+  });
+
+  it('switches menus only when the pointer moves, not when the bar appears under a still one', async () => {
+    // A bar laid out under a pointer that has not moved gets an enter from the browser; the
+    // keyboard's open menu must stay.
+    render(<Editor />);
+    await userEvent.hover(trigger('File'));
+    cleanup();
+    render(<Editor />);
+    trigger('Edit').focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect(isOpen('edit')).toBe(true);
+    expect(isOpen('file')).toBe(false);
   });
 
   it('moves to the Trigger starting with a typed character', async () => {
