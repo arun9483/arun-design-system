@@ -13,6 +13,7 @@ import type { UnknownProps } from '../core/mergeProps';
 import { useMenuRootContext, type MenuFocusOnOpen } from './MenuRootContext';
 import { menuDataAttributes } from './menuDataAttributes';
 import { useMenuItem } from './useMenuItem';
+import { useLatest } from '../core/useLatest';
 
 /** How long the pointer rests on a SubmenuTrigger before its submenu opens. */
 export const SUBMENU_OPEN_DELAY = 100;
@@ -59,7 +60,12 @@ export function MenuSubmenuTrigger({
   if (parent === null) {
     throw new Error('<Menu.SubmenuTrigger> must be rendered inside <Menu.SubmenuRoot>.');
   }
-  const { itemProps } = useMenuItem('SubmenuTrigger', { disabled, textValue, children }, parent);
+  const { itemProps, itemRef } = useMenuItem(
+    'SubmenuTrigger',
+    { disabled, textValue, children },
+    parent,
+  );
+  const { openSubmenuRef, graceRef } = parent;
   const { open, setOpen, focusOnOpenRef, navigableItems, triggerRef, popupRef } = submenu;
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -74,11 +80,9 @@ export function MenuSubmenuTrigger({
   };
 
   // The timer calls the latest, so it reads this render's state, not the one that set it.
-  const openAtRef = useRef(openAt);
-  openAtRef.current = openAt;
+  const openAtRef = useLatest(openAt);
 
   // The element is both the parent's item and the submenu's anchor and invoker.
-  const itemRef = itemProps.ref;
   const ref = useCallback(
     (element: HTMLElement | null) => {
       itemRef.current = element;
@@ -115,7 +119,7 @@ export function MenuSubmenuTrigger({
       onPointerMove(event: ReactPointerEvent) {
         if (event.pointerType !== 'mouse' || disabled) return;
         // A sibling's submenu closes as this one is reached.
-        const sibling = parent.openSubmenuRef.current;
+        const sibling = openSubmenuRef.current;
         if (sibling && sibling.triggerRef !== triggerRef) sibling.close();
         if (open || timerRef.current !== undefined) return;
         timerRef.current = setTimeout(() => {
@@ -128,7 +132,7 @@ export function MenuSubmenuTrigger({
         timerRef.current = undefined;
         const popup = popupRef.current;
         if (!open || !popup) return;
-        parent.graceRef.current = {
+        graceRef.current = {
           area: graceArea({ x: event.clientX, y: event.clientY }, popup.getBoundingClientRect()),
           until: performance.now() + SUBMENU_GRACE_PERIOD,
         };

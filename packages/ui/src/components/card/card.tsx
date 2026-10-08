@@ -7,12 +7,14 @@ type CardOwnProps = {
   as?: keyof React.JSX.IntrinsicElements;
   lift?: boolean;
   className?: string;
-  children: React.ReactNode;
+  /** The content. Optional when `render` brings its own, as a link card does. */
+  children?: React.ReactNode;
   /**
    * Element or component to render instead of the default `<div>`. Props, className
-   * and ref are merged onto it.
+   * and ref are merged onto it, and its own children win.
    *
    * @example <Card render={<article />} lift>…</Card>
+   * @example <Card render={<a href="/guide">…</a>} lift />
    */
   render?: React.ReactElement;
   /** Ref to the rendered element. Merged with any ref on the `render` element. */

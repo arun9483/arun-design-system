@@ -37,9 +37,10 @@ export function ButtonPlayground() {
     <Playground
       component="Button"
       controls={BUTTON_CONTROLS}
-      children="Click me"
       render={(props: ComponentProps<typeof Button>) => <Button {...props} />}
-    />
+    >
+      Click me
+    </Playground>
   );
 }
 
@@ -53,11 +54,12 @@ export function CardPlayground() {
     <Playground
       component="Card"
       controls={CARD_CONTROLS}
-      children="Card content"
       render={(props: ComponentProps<typeof Card>) => (
         <Card {...props} style={{ padding: 'var(--space-sm)', borderRadius: 'var(--radius-lg)' }} />
       )}
-    />
+    >
+      Card content
+    </Playground>
   );
 }
 
@@ -70,9 +72,10 @@ export function ChipPlayground() {
     <Playground
       component="Chip"
       controls={CHIP_CONTROLS}
-      children="TypeScript"
       render={(props: ComponentProps<typeof Chip>) => <Chip {...props} />}
-    />
+    >
+      TypeScript
+    </Playground>
   );
 }
 
@@ -90,9 +93,10 @@ export function BadgePlayground() {
     <Playground
       component="Badge"
       controls={BADGE_CONTROLS}
-      children="Status"
       render={(props: ComponentProps<typeof Badge>) => <Badge {...props} />}
-    />
+    >
+      Status
+    </Playground>
   );
 }
 
@@ -107,11 +111,12 @@ export function InputPlayground() {
     <Playground
       component="Input"
       controls={INPUT_CONTROLS}
-      children={null}
       render={(props: ComponentProps<typeof Input>) => (
         <Input {...props} aria-label="Playground input" style={{ maxInlineSize: '20rem' }} />
       )}
-    />
+    >
+      {null}
+    </Playground>
   );
 }
 
@@ -127,11 +132,12 @@ export function TextareaPlayground() {
     <Playground
       component="Textarea"
       controls={TEXTAREA_CONTROLS}
-      children={null}
       render={(props: ComponentProps<typeof Textarea>) => (
         <Textarea {...props} aria-label="Playground textarea" style={{ maxInlineSize: '24rem' }} />
       )}
-    />
+    >
+      {null}
+    </Playground>
   );
 }
 
@@ -147,7 +153,6 @@ export function SelectPlayground() {
       component="Select"
       controls={SELECT_CONTROLS}
       // Printed in the snippet; the preview renders real options instead.
-      children="{options}"
       render={({ children: _printed, ...props }: ComponentProps<typeof Select>) => (
         <Select {...props} aria-label="Playground select" style={{ maxInlineSize: '20rem' }}>
           <option value="">Choose a fruit…</option>
@@ -156,7 +161,9 @@ export function SelectPlayground() {
           <option value="cherry">Cherry</option>
         </Select>
       )}
-    />
+    >
+      {'{options}'}
+    </Playground>
   );
 }
 
@@ -179,7 +186,6 @@ export function CheckboxPlayground() {
     <Playground
       component="Checkbox.Root"
       controls={CHECKBOX_CONTROLS}
-      children="<Checkbox.Indicator />"
       render={(props: ComponentProps<typeof Checkbox.Root>) => (
         // `defaultChecked` is read once, at mount — changing it later is deliberately
         // ignored. Keying on it remounts the checkbox so the control demonstrates what
@@ -193,7 +199,9 @@ export function CheckboxPlayground() {
           <Checkbox.Indicator />
         </Checkbox.Root>
       )}
-    />
+    >
+      {'<Checkbox.Indicator />'}
+    </Playground>
   );
 }
 
@@ -207,7 +215,6 @@ export function SwitchPlayground() {
     <Playground
       component="Switch.Root"
       controls={SWITCH_CONTROLS}
-      children="<Switch.Thumb />"
       render={(props: ComponentProps<typeof Switch.Root>) => (
         // `defaultChecked` is read once, at mount — changing it later is deliberately
         // ignored. Keying on it remounts the switch so the control demonstrates what the
@@ -217,7 +224,9 @@ export function SwitchPlayground() {
           <Switch.Thumb />
         </Switch.Root>
       )}
-    />
+    >
+      {'<Switch.Thumb />'}
+    </Playground>
   );
 }
 
@@ -240,7 +249,6 @@ export function RadioGroupPlayground() {
     <Playground
       component="RadioGroup.Root"
       controls={RADIO_GROUP_CONTROLS}
-      children={'<RadioGroup.Item value="free" /> …'}
       render={({ children: _snippet, ...props }: ComponentProps<typeof RadioGroup.Root>) => (
         // Keyed on `defaultValue` for the same reason as the checkbox above: it is read
         // once, at mount. The key is a playground device and is not part of the snippet.
@@ -256,7 +264,9 @@ export function RadioGroupPlayground() {
           ))}
         </RadioGroup.Root>
       )}
-    />
+    >
+      {'<RadioGroup.Item value="free" /> …'}
+    </Playground>
   );
 }
 
@@ -281,7 +291,6 @@ export function TabsPlayground() {
     <Playground
       component="Tabs.Root"
       controls={TABS_CONTROLS}
-      children="<Tabs.List /> …"
       render={({ children: _snippet, ...props }: ComponentProps<typeof Tabs.Root>) => (
         // `resize` makes the frame draggable, so the narrow layout can be tried without
         // resizing the window — the tabs react to their container's width, not the viewport's.
@@ -315,11 +324,13 @@ export function TabsPlayground() {
           <p style={{ margin: 'var(--space-xs) 0 0', fontSize: 'var(--text-sm)' }}>
             Click a tab, then use the arrow keys: with <code>automatic</code> each arrow selects the
             tab it reaches; with <code>manual</code> it only moves focus, and Enter or Space
-            selects. Drag the frame's bottom-right corner to narrow it.
+            selects. Drag the frame&apos;s bottom-right corner to narrow it.
           </p>
         </div>
       )}
-    />
+    >
+      {'<Tabs.List /> …'}
+    </Playground>
   );
 }
 
@@ -330,7 +341,6 @@ export function AccordionPlayground() {
     <Playground
       component="Accordion.Root"
       controls={ACCORDION_CONTROLS}
-      children="<Accordion.Item /> …"
       render={({ children: _snippet, ...props }: ComponentProps<typeof Accordion.Root>) => (
         <div style={{ inlineSize: '28rem', maxInlineSize: '100%' }}>
           <Accordion.Root {...props}>
@@ -347,7 +357,9 @@ export function AccordionPlayground() {
           </p>
         </div>
       )}
-    />
+    >
+      {'<Accordion.Item /> …'}
+    </Playground>
   );
 }
 
@@ -361,7 +373,6 @@ export function TooltipPlayground() {
     <Playground
       component="Tooltip.Popup"
       controls={TOOLTIP_CONTROLS}
-      children="Saves the draft"
       render={({ children, ...props }: ComponentProps<typeof Tooltip.Popup>) => (
         // Kept open, so the placement can be seen while the controls change. The padding
         // leaves room on every side for it to sit without flipping. Remounted on each change:
@@ -374,7 +385,9 @@ export function TooltipPlayground() {
           </Tooltip.Root>
         </div>
       )}
-    />
+    >
+      Saves the draft
+    </Playground>
   );
 }
 
@@ -443,14 +456,15 @@ export function DrawerPlayground() {
     <Playground
       component="Drawer.Popup"
       controls={DRAWER_CONTROLS}
-      children="Drawer content"
       render={(props: ComponentProps<typeof Drawer.Popup>) => (
         <Drawer.Root>
           <Drawer.Trigger render={<Button />}>Open from the {String(props.side)}</Drawer.Trigger>
           <Drawer.Popup {...props} aria-label="Playground drawer" />
         </Drawer.Root>
       )}
-    />
+    >
+      Drawer content
+    </Playground>
   );
 }
 
@@ -464,7 +478,6 @@ export function HoverCardPlayground() {
     <Playground
       component="HoverCard.Popup"
       controls={HOVER_CARD_CONTROLS}
-      children="Card content"
       render={(props: ComponentProps<typeof HoverCard.Popup>) => (
         <HoverCard.Root>
           <HoverCard.Trigger render={<Link href="#playground" />}>
@@ -473,7 +486,9 @@ export function HoverCardPlayground() {
           <HoverCard.Popup {...props} />
         </HoverCard.Root>
       )}
-    />
+    >
+      Card content
+    </Playground>
   );
 }
 

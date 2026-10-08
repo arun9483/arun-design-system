@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import { fixupConfigRules } from '@eslint/compat';
 import tseslint from 'typescript-eslint';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
@@ -28,13 +29,38 @@ export const baseConfig = [
 
 export const reactConfig = [
   ...baseConfig,
-  reactPlugin.configs.flat.recommended,
-  reactHooksPlugin.configs['recommended-latest'],
-  jsxA11yPlugin.flatConfigs.recommended,
+  // eslint-plugin-react and eslint-plugin-jsx-a11y stop at ESLint 9: react calls context
+  // methods ESLint 10 removed. fixupConfigRules puts them back; drop it once both support 10.
+  ...fixupConfigRules(reactPlugin.configs.flat.recommended),
+  // The automatic JSX runtime: React need not be in scope.
+  ...fixupConfigRules(reactPlugin.configs.flat['jsx-runtime']),
+  reactHooksPlugin.configs.flat['recommended-latest'],
+  ...fixupConfigRules(jsxA11yPlugin.flatConfigs.recommended),
   {
     rules: {
-      'react/react-in-jsx-scope': 'off',
+      // TypeScript checks props.
       'react/prop-types': 'off',
+      // `role="list"` is not redundant on a list whose markers are removed: Safari drops the
+      // list semantics with `list-style: none` (ui 5.0.0).
+      'jsx-a11y/no-redundant-roles': ['error', { nav: ['navigation'], ul: ['list'], ol: ['list'] }],
+      // @arun-dev/ui's form controls, which a wrapping <label> names like a native input.
+      'jsx-a11y/label-has-associated-control': [
+        'error',
+        {
+          controlComponents: [
+            'Checkbox.Root',
+            'Combobox.Input',
+            'DatePicker.Input',
+            'Input',
+            'OtpInput',
+            'RadioGroup.Item',
+            'Select',
+            'Slider',
+            'Switch.Root',
+            'Textarea',
+          ],
+        },
+      ],
     },
     settings: {
       react: {
@@ -45,17 +71,7 @@ export const reactConfig = [
 ];
 
 export const ignores = {
-  ignores: [
-    'node_modules/**',
-    '.next/**',
-    'dist/**',
-    'build/**',
-    'coverage/**',
-    // tsup bundles its config to a temporary `tsup.config.bundled_<id>.mjs` beside it and
-    // deletes it after. A lint running alongside a build can list the file and then fail
-    // to open it (ENOENT), so it is never linted.
-    '**/*.bundled_*.{mjs,cjs}',
-  ],
+  ignores: ['node_modules/**', '.next/**', 'dist/**', 'build/**', 'coverage/**'],
 };
 
 export default [ignores, ...baseConfig];

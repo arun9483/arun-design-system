@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+/// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 import {
   contrastRatio,
@@ -8,17 +8,12 @@ import {
   DEFAULT_NEUTRAL,
   type BrandPalette,
 } from './createBrand';
+import semanticCss from './brands/default/semantic.css?raw';
+import paletteCss from './brands/default/palette.css?raw';
 
 /* Parity guard: src/brands/default/semantic.css is the hand-audited source of truth (AAA
    contrast). These tests assert createBrand() generates identical semantic tokens for the
    default brand, so the two can never drift apart again. */
-
-const semanticCss = readFile('./brands/default/semantic.css');
-const paletteCss = readFile('./brands/default/palette.css');
-
-function readFile(relative: string): string {
-  return readFileSync(new URL(relative, import.meta.url), 'utf8');
-}
 
 function stripComments(css: string): string {
   return css.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -91,9 +86,10 @@ describe('createBrand output structure', () => {
 
   it('accepts a seed color and emits a full palette', () => {
     const css = createBrand({ name: 'seeded', seed: '#0ea5e9' });
-    for (const shade of [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]) {
-      expect(css).toMatch(new RegExp(`--color-brand-${shade}: #[0-9a-f]{6};`));
-    }
+    const shades = [...css.matchAll(/--color-brand-(\d+): #[0-9a-f]{6};/g)].map(([, s]) => +s);
+    expect(shades).toEqual(
+      expect.arrayContaining([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]),
+    );
   });
 });
 

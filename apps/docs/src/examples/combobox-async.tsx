@@ -44,15 +44,21 @@ export default function ComboboxAsync() {
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState<User[]>([]);
 
+  // Loading starts as the query changes, in the handler rather than an effect: an effect that
+  // sets state renders twice.
+  function search(text: string) {
+    // The same text starts no new request, so it must not start loading either.
+    if (text === query) return;
+    setQuery(text);
+    const empty = text.trim() === '';
+    setLoading(!empty);
+    if (empty) setResults([]);
+  }
+
   // Debounce the query, cancel the request it replaces.
   useEffect(() => {
-    if (query.trim() === '') {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
+    if (query.trim() === '') return;
     const controller = new AbortController();
-    setLoading(true);
     const timer = setTimeout(() => {
       searchUsers(query, controller.signal)
         .then((users) => {
@@ -85,7 +91,7 @@ export default function ComboboxAsync() {
         multiple
         value={value}
         onValueChange={setValue}
-        onInputValueChange={(text) => setQuery(text)}
+        onInputValueChange={search}
         loading={loading}
       >
         <Combobox.Input

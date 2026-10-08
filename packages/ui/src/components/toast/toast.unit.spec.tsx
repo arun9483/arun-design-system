@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { act, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { Toast, useToastManager } from './index';
@@ -5,7 +6,10 @@ import type { ToastManager } from '@arun-dev/headless/toast';
 
 let manager: ToastManager;
 function Capture() {
-  manager = useToastManager();
+  const value = useToastManager();
+  useEffect(() => {
+    manager = value;
+  });
   return null;
 }
 

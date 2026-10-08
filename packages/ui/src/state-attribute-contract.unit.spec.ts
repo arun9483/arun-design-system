@@ -1,11 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-/* eslint-disable security/detect-non-literal-fs-filename --
-   Every path here is derived from import.meta.url and stays inside this repository's
-   own source tree; nothing originates from user input or runtime data, so the
-   path-traversal heuristic this rule implements does not apply. */
+/// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -72,13 +65,20 @@ const UNSTYLED_HERE = [
   'data-unselected',
 ];
 
-function filesIn(dir: string, extension: string): string[] {
-  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const path = join(dir, entry.name);
-    if (entry.isDirectory()) return filesIn(path, extension);
-    return entry.name.endsWith(extension) ? [path] : [];
-  });
-}
+// Both sides' sources as text, found relative to this file rather than cwd, so the test works
+// wherever vitest runs.
+const HEADLESS_GLOB = '../../headless/src/**/*.{ts,tsx}';
+const UI_GLOB = './**/*.css';
+const headlessSources = import.meta.glob<string>('../../headless/src/**/*.{ts,tsx}', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+const uiStyles = import.meta.glob<string>('./**/*.css', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
 
 /** Comments hold example selectors and sample mappings, which are not emissions. */
 function stripComments(source: string): string {
@@ -97,14 +97,14 @@ function stripBlockComments(source: string): string {
 }
 
 /** Every `data-*` attribute @arun-dev/headless emits, keyed to the file declaring it. */
-function emittedBy(headlessSrc: string): Map<string, string> {
+function emittedBy(sources: Record<string, string>): Map<string, string> {
   const attributes = new Map<string, string>();
 
-  for (const file of filesIn(headlessSrc, '.ts').concat(filesIn(headlessSrc, '.tsx'))) {
+  for (const [file, source] of Object.entries(sources)) {
     if (file.includes('.spec.')) continue;
 
     const relative = file.slice(file.indexOf('src'));
-    for (const [, name] of stripComments(readFileSync(file, 'utf8')).matchAll(EMISSION)) {
+    for (const [, name] of stripComments(source).matchAll(EMISSION)) {
       if (name && !attributes.has(name)) attributes.set(name, relative);
     }
   }
@@ -112,12 +112,12 @@ function emittedBy(headlessSrc: string): Map<string, string> {
 }
 
 /** Every `[data-*]` selector in this package's CSS, comments excluded. */
-function styledBy(uiSrc: string): Map<string, string> {
+function styledBy(styles: Record<string, string>): Map<string, string> {
   const attributes = new Map<string, string>();
 
-  for (const file of filesIn(uiSrc, '.css')) {
-    const relative = file.slice(file.indexOf('src'));
-    for (const [, name] of stripBlockComments(readFileSync(file, 'utf8')).matchAll(USAGE)) {
+  for (const [file, source] of Object.entries(styles)) {
+    const relative = `src/${file.slice(2)}`;
+    for (const [, name] of stripBlockComments(source).matchAll(USAGE)) {
       if (name && !attributes.has(name)) attributes.set(name, relative);
     }
   }
@@ -125,18 +125,14 @@ function styledBy(uiSrc: string): Map<string, string> {
 }
 
 describe('state attribute contract', () => {
-  // Resolved from this file, not cwd, so the test works regardless of where vitest runs.
-  const UI_SRC = dirname(fileURLToPath(import.meta.url));
-  const HEADLESS_SRC = join(UI_SRC, '..', '..', 'headless', 'src');
-
-  const emitted = emittedBy(HEADLESS_SRC);
-  const styled = styledBy(UI_SRC);
+  const emitted = emittedBy(headlessSources);
+  const styled = styledBy(uiStyles);
 
   it('finds the attributes and selectors it is meant to check', () => {
     // Guards the scan itself: a rename or move would otherwise empty both sets and
     // leave the contract passing while checking nothing.
-    expect(emitted.size, `no data-* attributes found under ${HEADLESS_SRC}`).toBeGreaterThan(0);
-    expect(styled.size, `no [data-*] selectors found under ${UI_SRC}`).toBeGreaterThan(0);
+    expect(emitted.size, `no data-* attributes found in ${HEADLESS_GLOB}`).toBeGreaterThan(0);
+    expect(styled.size, `no [data-*] selectors found in ${UI_GLOB}`).toBeGreaterThan(0);
   });
 
   it('emits every data-* attribute that @arun-dev/ui styles', () => {

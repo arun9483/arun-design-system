@@ -1,9 +1,5 @@
-/* eslint-disable security/detect-non-literal-fs-filename --
-   The output path is derived from import.meta.url and a literal filename; nothing
-   comes from user input, so the path-traversal heuristic does not apply. */
 import { mkdir, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { createBrand } from '@arun-dev/tokens/createBrand';
 
 /**
@@ -22,10 +18,11 @@ import { createBrand } from '@arun-dev/tokens/createBrand';
  * createBrand()'s logic then shows up as a diff in this file, so the generator's
  * effect on a real consumer is visible in the pull request that causes it.
  */
-const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'generated');
+const OUT = join(import.meta.dirname, '..', 'src', 'generated');
 
-const BRAND = { name: 'arun-docs', seed: '#7c3aed' };
-const FILE = `brand-${BRAND.name}.css`;
+const NAME = 'arun-docs';
+const BRAND = { name: NAME, seed: '#7c3aed' };
+const FILE = `brand-${NAME}.css`;
 
 await mkdir(OUT, { recursive: true });
 await writeFile(join(OUT, FILE), createBrand(BRAND), 'utf8');

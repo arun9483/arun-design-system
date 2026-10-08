@@ -1,3 +1,4 @@
+import { unified } from '@astrojs/markdown-remark';
 import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
@@ -11,7 +12,12 @@ export default defineConfig({
   // integration extends this markdown config, so one plugin covers .md and .mdx alike.
   // Tables get a Tab stop: Starlight makes each one a scroll box, which the keyboard must reach.
   markdown: {
-    rehypePlugins: [[rehypeBaseUrl, { base: process.env.DOCS_BASE ?? '/' }], rehypeFocusableTables],
+    processor: unified({
+      rehypePlugins: [
+        [rehypeBaseUrl, { base: process.env.DOCS_BASE ?? '/' }],
+        rehypeFocusableTables,
+      ],
+    }),
   },
   integrations: [
     starlight({

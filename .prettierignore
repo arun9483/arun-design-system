@@ -1,7 +1,6 @@
-node_modules
-.turbo
-dist
-coverage
+# Prettier also reads the root .gitignore, so build output, caches and test artifacts
+# (dist, .turbo, .astro, coverage, .vitest) are already skipped. Listed here: files that
+# are committed but must not be reformatted.
 pnpm-lock.yaml
 CHANGELOG.md
 

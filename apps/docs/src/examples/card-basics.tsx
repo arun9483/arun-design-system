@@ -13,12 +13,18 @@ export default function CardBasics() {
       </Card>
 
       {/* A card that opens something: hover it to see it rise. */}
-      <Card lift render={<a href="#card" />} style={box}>
-        <p className="font-weight-semibold">lift — hover me</p>
-        <p className="text-size-sm text-color-secondary">
-          Rises with a deeper shadow, so it reads as clickable.
-        </p>
-      </Card>
+      <Card
+        lift
+        render={
+          <a href="#card">
+            <p className="font-weight-semibold">lift — hover me</p>
+            <p className="text-size-sm text-color-secondary">
+              Rises with a deeper shadow, so it reads as clickable.
+            </p>
+          </a>
+        }
+        style={box}
+      />
 
       {/* `as` changes the element, not the look: this one is a labelled landmark. */}
       <Card as="nav" aria-label="Example navigation" style={box}>

@@ -36,12 +36,13 @@ export function ToastRoot({ toast, className, children, render, ...rest }: Toast
   // The time left, carried across pauses; a new timeout starts it again.
   const remaining = useRef(timeout);
   const lastTimeout = useRef(timeout);
-  if (lastTimeout.current !== timeout) {
-    lastTimeout.current = timeout;
-    remaining.current = timeout;
-  }
 
   useEffect(() => {
+    // After the previous timer's cleanup has taken its time off, so a new timeout starts full.
+    if (lastTimeout.current !== timeout) {
+      lastTimeout.current = timeout;
+      remaining.current = timeout;
+    }
     if (paused || timeout <= 0) return;
     const started = Date.now();
     const timer = setTimeout(() => close(id), remaining.current);

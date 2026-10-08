@@ -30,7 +30,7 @@ export default function Gallery() {
         <Chip>default</Chip>
         <Chip variant="accent">accent</Chip>
         <Chip render={<button type="button" />}>button</Chip>
-        <Chip render={<a href={docsUrl('/components/link/')} />}>link</Chip>
+        <Chip render={<a href={docsUrl('/components/link/')}>link</a>} />
       </div>
 
       <ul style={{ ...row, listStyle: 'none', padding: 0, margin: 0 }}>

@@ -3,6 +3,7 @@ import type { ComponentPropsWithRef, ReactElement, ReactNode, Ref } from 'react'
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
 import { useComboboxRootContext } from './ComboboxRootContext';
+import { useLatest } from '../core/useLatest';
 
 type ComboboxListOwnProps<T> = {
   /**
@@ -68,8 +69,7 @@ function LoadMoreSentinel() {
   const { open, loading, filteredItems, onLoadMore } = useComboboxRootContext('List');
   const ref = useRef<HTMLDivElement | null>(null);
   // The latest callback, so an inline function does not re-observe on every render.
-  const onLoadMoreRef = useRef(onLoadMore);
-  onLoadMoreRef.current = onLoadMore;
+  const onLoadMoreRef = useLatest(onLoadMore);
 
   // Re-observed when the list grows or loading ends, so a sentinel still in view after a
   // page arrives asks for the next one.
@@ -81,7 +81,7 @@ function LoadMoreSentinel() {
     });
     observer.observe(element);
     return () => observer.disconnect();
-  }, [open, loading, filteredItems.length]);
+  }, [open, loading, filteredItems.length, onLoadMoreRef]);
 
   return <div ref={ref} aria-hidden="true" data-load-more="" style={{ blockSize: 1 }} />;
 }

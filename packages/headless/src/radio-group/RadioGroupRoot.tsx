@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import { afterReset, useLatest } from '../core/useLatest';
 import { useControlled } from '../core/useControlled';
@@ -115,7 +115,7 @@ export function RadioGroupRoot({
   );
 
   const elementRef = useRef<HTMLElement | null>(null);
-  const { current: initialValue } = useRef(value);
+  const [initialValue] = useState(value);
   const latest = useLatest({ value, commit: commitValue });
 
   useEffect(() => {

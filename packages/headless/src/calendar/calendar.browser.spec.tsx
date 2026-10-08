@@ -424,6 +424,9 @@ describe('Calendar (browser)', () => {
 
     it('shows the details card on keyboard focus at once, describing the day, and Esc hides it', async () => {
       render(<WithCard />);
+      // The real mouse stays where an earlier test left it. Over a day of this grid, the
+      // pointer events Chromium sends after layout would move the card to that day.
+      await userEvent.hover(screen.getByRole('button', { name: 'Outside' }));
       expect(cardOpen()).toBe(false);
       day('Monday, October 19, 2026').focus();
       await userEvent.keyboard('{ArrowRight}');

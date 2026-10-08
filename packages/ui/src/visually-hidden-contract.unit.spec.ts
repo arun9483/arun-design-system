@@ -1,7 +1,4 @@
-/* eslint-disable security/detect-non-literal-fs-filename --
-   the paths are fixed source files of this package, joined to __dirname. */
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+/// <reference types="vite/client" />
 import { describe, it, expect } from 'vitest';
 
 /**
@@ -9,8 +6,17 @@ import { describe, it, expect } from 'vitest';
  * whatever else styles the element. `.sr-only-focusable` does the same until it, or something
  * in it, has focus — a skip link appears when tabbed to.
  */
-const css = (path: string) =>
-  readFileSync(join(__dirname, path), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+// Every stylesheet of this package, read when the test loads.
+const sources = import.meta.glob<string>('./**/*.css', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+const css = (path: string) => {
+  const source = sources[`./${path}`];
+  if (source === undefined) throw new Error(`No stylesheet at src/${path}`);
+  return source.replace(/\/\*[\s\S]*?\*\//g, '');
+};
 
 function rule(source: string, selector: string): string {
   const start = source.indexOf(selector);

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { act, render, screen } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { describe, it, expect, vi } from 'vitest';
@@ -9,7 +10,10 @@ import { Dialog } from '../dialog';
 
 let manager: ToastManager;
 function Capture() {
-  manager = useToastManager();
+  const value = useToastManager();
+  useEffect(() => {
+    manager = value;
+  });
   return null;
 }
 
@@ -118,6 +122,17 @@ describe('Toast (browser)', () => {
     act(() => manager.update(id, { title: 'Saved', timeout: 100 }));
     expect(screen.getByText('Saved')).toBeInTheDocument();
     await vi.waitFor(() => expect(screen.queryByText('Saved')).toBeNull());
+  });
+
+  it('starts a changed timeout in full, not less the time the old one ran', async () => {
+    render(<Toaster />);
+    const id = add({ title: 'Uploading', timeout: 400 });
+    await wait(300);
+    act(() => manager.update(id, { timeout: 450 }));
+    // Short by the 300ms already run, it would close about 150ms after the update.
+    await wait(250);
+    expect(screen.getByText('Uploading')).toBeInTheDocument();
+    await vi.waitFor(() => expect(screen.queryByText('Uploading')).toBeNull());
   });
 
   it('shows over a modal Dialog, inert like the rest of the page until it closes', async () => {

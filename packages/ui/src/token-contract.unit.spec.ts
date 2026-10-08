@@ -1,11 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-/* eslint-disable security/detect-non-literal-fs-filename --
-   Every path here is derived from import.meta.url and stays inside this repository's
-   own source tree; nothing originates from user input or runtime data, so the
-   path-traversal heuristic this rule implements does not apply. */
+/// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -23,18 +16,23 @@ import { describe, expect, it } from 'vitest';
 const DEFINITION = /^\s*(--[a-z0-9-]+)\s*:/gm;
 const USAGE = /var\(\s*(--[a-z0-9-]+)\s*(,?)/g;
 
-function cssFilesIn(dir: string): string[] {
-  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const path = join(dir, entry.name);
-    if (entry.isDirectory()) return cssFilesIn(path);
-    return entry.name.endsWith('.css') ? [path] : [];
-  });
-}
+// Both packages' stylesheets as text, found relative to this file rather than cwd, so the test
+// works wherever vitest runs.
+const tokenStyles = import.meta.glob<string>('../../tokens/src/**/*.css', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+const uiStyles = import.meta.glob<string>('./**/*.css', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
 
-function definitionsIn(dir: string): Set<string> {
+function definitionsIn(styles: Record<string, string>): Set<string> {
   const names = new Set<string>();
-  for (const file of cssFilesIn(dir)) {
-    for (const [, name] of readFileSync(file, 'utf8').matchAll(DEFINITION)) {
+  for (const source of Object.values(styles)) {
+    for (const [, name] of source.matchAll(DEFINITION)) {
       if (name) names.add(name);
     }
   }
@@ -42,13 +40,13 @@ function definitionsIn(dir: string): Set<string> {
 }
 
 /** Every `var(--x)` read by the UI package, split by whether it declares a fallback. */
-function usagesIn(dir: string) {
+function usagesIn(styles: Record<string, string>) {
   const required = new Map<string, string>();
   const optional = new Map<string, string>();
 
-  for (const file of cssFilesIn(dir)) {
-    const relative = file.slice(file.indexOf('src'));
-    for (const [, name, comma] of readFileSync(file, 'utf8').matchAll(USAGE)) {
+  for (const [file, source] of Object.entries(styles)) {
+    const relative = `src/${file.slice(2)}`;
+    for (const [, name, comma] of source.matchAll(USAGE)) {
       if (!name) continue;
       const bucket = comma === ',' ? optional : required;
       if (!bucket.has(name)) bucket.set(name, relative);
@@ -58,12 +56,14 @@ function usagesIn(dir: string) {
 }
 
 describe('token contract', () => {
-  // Resolved from this file, not cwd, so the test works regardless of where vitest runs.
-  const UI_SRC = dirname(fileURLToPath(import.meta.url));
-  const TOKENS_SRC = join(UI_SRC, '..', '..', 'tokens', 'src');
+  const defined = definitionsIn(tokenStyles);
+  const { required, optional } = usagesIn(uiStyles);
 
-  const defined = definitionsIn(TOKENS_SRC);
-  const { required, optional } = usagesIn(UI_SRC);
+  it('finds the definitions and usages it is meant to check', () => {
+    // A moved directory would otherwise empty both sets and leave the contract checking nothing.
+    expect(defined.size).toBeGreaterThan(0);
+    expect(required.size).toBeGreaterThan(0);
+  });
 
   it('defines every custom property that @arun-dev/ui requires', () => {
     const missing = [...required]

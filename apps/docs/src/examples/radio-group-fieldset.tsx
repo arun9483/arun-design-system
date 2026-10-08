@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { FormEvent } from 'react';
+import type { SubmitEvent } from 'react';
 import { Button, RadioGroup } from '@arun-dev/ui';
 
 const row = { display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2xs)' };
@@ -7,7 +7,7 @@ const row = { display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2x
 export default function RadioGroupFieldset() {
   const [submitted, setSubmitted] = useState('');
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitted(JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))));
   }

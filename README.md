@@ -161,7 +161,7 @@ Requirements: Node >= 24, pnpm >= 10.32.1.
 
 ```bash
 pnpm install
-pnpm build        # turbo run build (tsup)
+pnpm build        # turbo run build (tsdown)
 pnpm typecheck
 pnpm lint
 pnpm test:unit

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLatest } from '../core/useLatest';
 import {
   addDays,
   addMonths,
@@ -132,18 +133,21 @@ export function useCalendarRoot({
   );
 
   // A DatePicker opened: start again from the selection, and focus it once the popup shows.
-  const seenOpenCount = useRef(openCount);
-  useEffect(() => {
-    if (openCount === undefined || openCount === seenOpenCount.current) return;
-    seenOpenCount.current = openCount;
+  // Only the open itself restarts the calendar, not a change of selection while open: the
+  // restart reads the latest selection through a ref rather than depending on it.
+  const restart = useLatest(() => {
     const day = startingDay();
     setVisibleStart(startOfMonth(day));
     setAnchor(null);
     setHovered(null);
     focusDate(day, true);
-    // Only the open itself restarts the calendar, not a change of selection while open.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- see above
-  }, [openCount]);
+  });
+  const seenOpenCount = useRef(openCount);
+  useEffect(() => {
+    if (openCount === undefined || openCount === seenOpenCount.current) return;
+    seenOpenCount.current = openCount;
+    restart.current();
+  }, [openCount, restart]);
 
   const unavailable = useCallback(
     (iso: string) =>

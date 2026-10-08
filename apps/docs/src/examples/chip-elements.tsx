@@ -15,9 +15,7 @@ export default function ChipElements() {
         button
       </Chip>
 
-      <Chip render={<a href={docsUrl('/components/link/')} />} variant="accent">
-        link
-      </Chip>
+      <Chip render={<a href={docsUrl('/components/link/')}>link</a>} variant="accent" />
     </>
   );
 }

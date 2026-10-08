@@ -1,4 +1,4 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
 export default defineConfig({
   // One entry per public subpath. Components are exported individually so a
@@ -29,8 +29,13 @@ export default defineConfig({
     'src/tree-view/index.ts',
   ],
   format: ['esm', 'cjs'],
-  dts: true,
+  // tsdown follows the tsconfig's sourceMap / declarationMap; tsup did not. The maps would
+  // point at src/, which isn't published, so they stay off.
+  sourcemap: false,
+  dts: { sourcemap: false },
   clean: true,
+  // Keep tsup's names (.js / .cjs, .d.ts / .d.cts) so the exports maps don't change.
+  fixedExtension: false,
   outDir: 'dist',
-  external: ['react', 'react-dom'],
+  deps: { neverBundle: ['react', 'react-dom'] },
 });

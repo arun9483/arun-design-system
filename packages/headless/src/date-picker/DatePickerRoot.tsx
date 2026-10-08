@@ -103,6 +103,7 @@ export function DatePickerRoot({
   const time = timePart(input.shown) ?? draftTime;
   const minDate = datePart(min) ?? undefined;
   const maxDate = datePart(max) ?? undefined;
+  const { write } = input;
   const binding: CalendarBinding = useMemo(
     () => ({
       mode: 'single',
@@ -112,14 +113,12 @@ export function DatePickerRoot({
       isDateUnavailable,
       openCount,
       pick(date: string) {
-        input.write(withTime ? `${date}T${time ?? '00:00'}` : date);
+        write(withTime ? `${date}T${time ?? '00:00'}` : date);
         // With a time, the Popup stays open for it; Done, Esc or a click outside closes it.
         if (!withTime) setOpen(false);
       },
     }),
-    // input.write reads refs; the rest is listed.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- see above
-    [shownDate, time, minDate, maxDate, isDateUnavailable, openCount, withTime, setOpen],
+    [shownDate, time, minDate, maxDate, isDateUnavailable, openCount, withTime, setOpen, write],
   );
 
   const context = {
