@@ -157,7 +157,7 @@ Individual stylesheets are also exported for granular loading: `@arun-dev/ui/css
 
 ## Development
 
-Requirements: Node >= 24, pnpm >= 10.32.1.
+Requirements: Node >= 24, pnpm >= 11.28.5.
 
 ```bash
 pnpm install
