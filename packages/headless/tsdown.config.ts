@@ -14,6 +14,7 @@ export default defineConfig({
     'src/drawer/index.ts',
     'src/hover-card/index.ts',
     'src/menu/index.ts',
+    'src/menubar/index.ts',
     'src/otp-input/index.ts',
     'src/popover/index.ts',
     'src/radio-group/index.ts',

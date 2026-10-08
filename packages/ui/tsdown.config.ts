@@ -29,6 +29,7 @@ const CSS_LAYERS = [
   { layer: 'drawer', src: 'src/components/drawer/drawer.css' },
   { layer: 'popover', src: 'src/components/popover/popover.css' },
   { layer: 'menu', src: 'src/components/menu/menu.css' },
+  { layer: 'menubar', src: 'src/components/menubar/menubar.css' },
   { layer: 'combobox', src: 'src/components/combobox/combobox.css' },
   { layer: 'tooltip', src: 'src/components/tooltip/tooltip.css' },
   { layer: 'hover-card', src: 'src/components/hover-card/hover-card.css' },

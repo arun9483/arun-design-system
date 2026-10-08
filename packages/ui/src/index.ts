@@ -24,6 +24,7 @@ export { Dialog } from './components/dialog';
 export { Drawer } from './components/drawer';
 export { Popover } from './components/popover';
 export { Menu } from './components/menu';
+export { Menubar } from './components/menubar';
 export { Combobox } from './components/combobox';
 export type { ComboboxInputProps } from './components/combobox';
 export { Tooltip } from './components/tooltip';

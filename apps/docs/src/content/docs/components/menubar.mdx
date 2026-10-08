@@ -1,0 +1,92 @@
+---
+title: Menubar
+description: A bar of menus, File, Edit, View, with one Tab stop and the ARIA menubar keyboard pattern.
+---
+
+import Example from '@/components/Example.astro';
+import MenubarBasics from '@/examples/menubar-basics';
+import MenubarVertical from '@/examples/menubar-vertical';
+import MenubarSubmenus from '@/examples/menubar-submenus';
+import { MenubarPlayground } from '@/components/playgrounds';
+import PropTable from '@/components/PropTable.astro';
+
+## When to use
+
+- An application's menus along the top of an editor or a tool: File, Edit, View
+- A side rail of menus in a workspace
+
+Not for a single "More actions ⋯" button, which is a [Menu](/components/menu/), nor for a row of
+buttons, which is a [Toolbar](/components/toolbar/).
+
+**Choosing between menus and rows of controls:**
+
+| Component                       | Use it for                                               | For example                         |
+| ------------------------------- | -------------------------------------------------------- | ----------------------------------- |
+| **Menubar**                     | Several menus side by side, moved between as one bar     | An editor's File / Edit / View      |
+| [Menu](/components/menu/)       | One list of actions or settings opened from a button     | "More actions ⋯" on a row or a card |
+| [Toolbar](/components/toolbar/) | A row of buttons, toggles and fields acting on one thing | An editor's formatting bar          |
+
+<Example name="menubar-basics">
+  <MenubarBasics client:load />
+</Example>
+
+`Menubar` follows the [WAI-ARIA menubar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/).
+The bar is `role="menubar"` and one Tab stop; each `Menubar.Trigger` is one of its items.
+
+- ← and → move along the bar, wrapping; Home and End go to its ends. Typing moves to the Trigger
+  whose text starts with what was typed.
+- ↓, Enter and Space open a menu at its first item; ↑ opens it at its last.
+- Inside an open menu, → and ← move to the next and previous menu and open it. A
+  `SubmenuTrigger`'s → opens its submenu first, and inside a submenu ← closes it first.
+- While a menu is open, moving the pointer onto another Trigger opens that menu instead.
+- Esc, a click outside and Tab close the menu, as for [Menu](/components/menu/).
+
+In a right-to-left bar ← and → swap. Disabled Triggers are skipped, unless the Root sets
+`focusableWhenDisabled`. Name the bar with `aria-label`.
+
+The parts are Menu's, under the bar's name: `Menubar.Menu` holds one menu's state, as
+`Menu.Root` does, and `Menubar.Popup`, `Menubar.Item`, `Menubar.CheckboxItem`,
+`Menubar.RadioGroup`, `Menubar.RadioItem`, `Menubar.ItemIndicator`, `Menubar.Group`,
+`Menubar.GroupLabel`, `Menubar.SubmenuRoot` and `Menubar.SubmenuTrigger` work as on
+[Menu](/components/menu/).
+
+## Submenus
+
+Menus nest to any depth with `Menubar.SubmenuRoot` and `Menubar.SubmenuTrigger`, as on
+[Menu](/components/menu/#submenus): → (or resting the pointer on it) opens a submenu, ← closes it,
+and Esc closes one level at a time. → on an item that opens nothing moves along the bar to the next
+menu, closing every level.
+
+<Example name="menubar-submenus">
+  <MenubarSubmenus client:load />
+</Example>
+
+## Vertical
+
+With `orientation="vertical"`, ↑ and ↓ move along the bar, → opens a menu beside it, and ← closes
+it back to its Trigger. The menus open to the right. In a right-to-left page, pass
+`side="left"` to each `Menubar.Popup`; `side` stays physical, as on every popup.
+
+<Example name="menubar-vertical">
+  <MenubarVertical client:load />
+</Example>
+
+## Playground
+
+<MenubarPlayground client:load />
+
+## Props
+
+### Menubar.Root
+
+<PropTable component="Menubar.Root" />
+
+### Menubar.Menu
+
+<PropTable component="Menubar.Menu" />
+
+### Menubar.Popup
+
+<PropTable component="Menubar.Popup" />
+
+The items take the same props as on [Menu](/components/menu/#props).

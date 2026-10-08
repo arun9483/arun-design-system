@@ -1,0 +1,50 @@
+@layer menubar {
+  /* The bar is framed like a Toolbar; its menus are Menu's lists (menu.css). */
+  .menubar {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--menubar-gap);
+    padding: var(--menubar-padding);
+    border: var(--space-px) solid var(--menubar-border-color);
+    border-radius: var(--menubar-radius);
+    background-color: var(--menubar-bg);
+  }
+
+  .menubar[data-orientation='vertical'] {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .menubar-trigger {
+    display: inline-flex;
+    align-items: center;
+    block-size: var(--menubar-trigger-height);
+    padding: 0 var(--menubar-trigger-padding-inline);
+    border: none;
+    border-radius: var(--menubar-trigger-radius);
+    background: none;
+    color: var(--menubar-trigger-color);
+    font: inherit;
+    font-size: var(--menubar-trigger-font-size);
+    text-align: start;
+    cursor: pointer;
+  }
+
+  /* An open menu keeps its Trigger highlighted, so the bar shows which menu is showing. */
+  .menubar-trigger:hover:not([data-disabled]),
+  .menubar-trigger[data-open] {
+    background-color: var(--menubar-trigger-bg-highlight);
+  }
+
+  .menubar-trigger:focus-visible {
+    outline: var(--space-2px) solid var(--menubar-trigger-focus-color);
+    outline-offset: var(--space-px);
+  }
+
+  /* data-disabled covers both forms: native disabled, and aria-disabled when the Root sets
+     focusableWhenDisabled — a focused disabled Trigger still shows where focus is. */
+  .menubar-trigger[data-disabled] {
+    opacity: var(--menubar-trigger-disabled-opacity);
+    cursor: not-allowed;
+  }
+}

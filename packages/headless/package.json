@@ -124,6 +124,16 @@
         "default": "./dist/menu/index.cjs"
       }
     },
+    "./menubar": {
+      "import": {
+        "types": "./dist/menubar/index.d.ts",
+        "default": "./dist/menubar/index.js"
+      },
+      "require": {
+        "types": "./dist/menubar/index.d.cts",
+        "default": "./dist/menubar/index.cjs"
+      }
+    },
     "./otp-input": {
       "import": {
         "types": "./dist/otp-input/index.d.ts",

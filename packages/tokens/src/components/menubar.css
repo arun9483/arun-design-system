@@ -1,0 +1,20 @@
+/* Menubar component tokens — a bar of menus with one Tab stop. The bar is framed like a
+   Toolbar; its Triggers are buttons that stay highlighted while their menu is open. The menus
+   themselves are Menu's, with --menu-* tokens. */
+:root {
+  --menubar-gap: var(--space-3xs);
+  --menubar-padding: var(--space-3xs);
+  --menubar-radius: var(--radius-md);
+  --menubar-border-color: var(--color-border-default);
+  --menubar-bg: var(--color-bg-primary);
+
+  /* Trigger */
+  --menubar-trigger-height: 2.25rem;
+  --menubar-trigger-padding-inline: var(--space-sm);
+  --menubar-trigger-radius: var(--radius-sm);
+  --menubar-trigger-font-size: var(--text-sm);
+  --menubar-trigger-color: var(--color-text-primary);
+  --menubar-trigger-bg-highlight: var(--color-bg-secondary);
+  --menubar-trigger-focus-color: var(--color-text-accent);
+  --menubar-trigger-disabled-opacity: 0.5;
+}

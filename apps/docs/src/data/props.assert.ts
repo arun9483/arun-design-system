@@ -50,6 +50,11 @@ import type {
   MenuTriggerProps,
 } from '@arun-dev/headless/menu';
 import type {
+  MenubarMenuProps,
+  MenubarPopupProps,
+  MenubarRootProps,
+} from '@arun-dev/headless/menubar';
+import type {
   TooltipPopupProps,
   TooltipRootProps,
   TooltipTriggerProps,
@@ -182,6 +187,9 @@ type Unknown =
   | OnlyRealProps<Documented<'Menu.RadioItem'>, MenuRadioItemProps>
   | OnlyRealProps<Documented<'Menu.SubmenuRoot'>, MenuSubmenuRootProps>
   | OnlyRealProps<Documented<'Menu.SubmenuTrigger'>, MenuSubmenuTriggerProps>
+  | OnlyRealProps<Documented<'Menubar.Root'>, MenubarRootProps>
+  | OnlyRealProps<Documented<'Menubar.Menu'>, MenubarMenuProps>
+  | OnlyRealProps<Documented<'Menubar.Popup'>, MenubarPopupProps>
   | OnlyRealProps<Documented<'Tooltip.Root'>, TooltipRootProps>
   | OnlyRealProps<Documented<'Tooltip.Popup'>, TooltipPopupProps>
   | OnlyRealProps<Documented<'HoverCard.Root'>, HoverCardRootProps>
