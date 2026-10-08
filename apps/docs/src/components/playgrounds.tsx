@@ -15,6 +15,7 @@ import {
   Drawer,
   HoverCard,
   Link,
+  Menubar,
   Stepper,
   Input,
   RadioGroup,
@@ -330,6 +331,73 @@ export function TabsPlayground() {
       )}
     >
       {'<Tabs.List /> …'}
+    </Playground>
+  );
+}
+
+const MENUBAR_CONTROLS: Control[] = [
+  {
+    name: 'orientation',
+    type: 'select',
+    options: ['horizontal', 'vertical'],
+    initial: 'horizontal',
+  },
+  { name: 'focusableWhenDisabled', type: 'boolean', initial: false },
+];
+
+export function MenubarPlayground() {
+  const [last, setLast] = useState('nothing yet');
+  const choose = (label: string) => () => setLast(label);
+  return (
+    <Playground
+      component="Menubar.Root"
+      controls={MENUBAR_CONTROLS}
+      render={({ children: _snippet, ...props }: ComponentProps<typeof Menubar.Root>) => (
+        <div style={{ display: 'grid', gap: 'var(--space-xs)', justifyItems: 'start' }}>
+          <Menubar.Root aria-label="Editor" {...props}>
+            <Menubar.Menu>
+              <Menubar.Trigger>File</Menubar.Trigger>
+              <Menubar.Popup>
+                <Menubar.Item onClick={choose('New')}>New</Menubar.Item>
+                <Menubar.SubmenuRoot>
+                  <Menubar.SubmenuTrigger>Share</Menubar.SubmenuTrigger>
+                  <Menubar.Popup>
+                    <Menubar.Item onClick={choose('Email')}>Email</Menubar.Item>
+                    <Menubar.SubmenuRoot>
+                      <Menubar.SubmenuTrigger>Export as</Menubar.SubmenuTrigger>
+                      <Menubar.Popup>
+                        <Menubar.Item onClick={choose('PDF')}>PDF</Menubar.Item>
+                        <Menubar.Item onClick={choose('PNG')}>PNG</Menubar.Item>
+                      </Menubar.Popup>
+                    </Menubar.SubmenuRoot>
+                  </Menubar.Popup>
+                </Menubar.SubmenuRoot>
+              </Menubar.Popup>
+            </Menubar.Menu>
+            <Menubar.Menu>
+              <Menubar.Trigger>Edit</Menubar.Trigger>
+              <Menubar.Popup>
+                <Menubar.Item onClick={choose('Undo')}>Undo</Menubar.Item>
+                <Menubar.Item onClick={choose('Redo')}>Redo</Menubar.Item>
+              </Menubar.Popup>
+            </Menubar.Menu>
+            <Menubar.Menu>
+              <Menubar.Trigger disabled>Help</Menubar.Trigger>
+              <Menubar.Popup>
+                <Menubar.Item>About</Menubar.Item>
+              </Menubar.Popup>
+            </Menubar.Menu>
+          </Menubar.Root>
+          <span style={{ fontSize: 'var(--text-sm)' }}>Chose: {last}</span>
+          <p style={{ margin: 0, fontSize: 'var(--text-sm)' }}>
+            Tab to the bar and use the arrow keys. Open File, then press → on Share and Export as to
+            go deeper, and → on an item that opens nothing to move to Edit. Help is disabled: with{' '}
+            <code>focusableWhenDisabled</code> the arrows reach it, but it never opens.
+          </p>
+        </div>
+      )}
+    >
+      {'<Menubar.Menu /> …'}
     </Playground>
   );
 }

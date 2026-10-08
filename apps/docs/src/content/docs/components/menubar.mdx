@@ -6,6 +6,8 @@ description: A bar of menus, File, Edit, View, with one Tab stop and the ARIA me
 import Example from '@/components/Example.astro';
 import MenubarBasics from '@/examples/menubar-basics';
 import MenubarVertical from '@/examples/menubar-vertical';
+import MenubarSubmenus from '@/examples/menubar-submenus';
+import { MenubarPlayground } from '@/components/playgrounds';
 import PropTable from '@/components/PropTable.astro';
 
 ## When to use
@@ -48,6 +50,17 @@ The parts are Menu's, under the bar's name: `Menubar.Menu` holds one menu's stat
 `Menubar.GroupLabel`, `Menubar.SubmenuRoot` and `Menubar.SubmenuTrigger` work as on
 [Menu](/components/menu/).
 
+## Submenus
+
+Menus nest to any depth with `Menubar.SubmenuRoot` and `Menubar.SubmenuTrigger`, as on
+[Menu](/components/menu/#submenus): → (or resting the pointer on it) opens a submenu, ← closes it,
+and Esc closes one level at a time. → on an item that opens nothing moves along the bar to the next
+menu, closing every level.
+
+<Example name="menubar-submenus">
+  <MenubarSubmenus client:load />
+</Example>
+
 ## Vertical
 
 With `orientation="vertical"`, ↑ and ↓ move along the bar, → opens a menu beside it, and ← closes
@@ -57,6 +70,10 @@ it back to its Trigger. The menus open to the right. In a right-to-left page, pa
 <Example name="menubar-vertical">
   <MenubarVertical client:load />
 </Example>
+
+## Playground
+
+<MenubarPlayground client:load />
 
 ## Props
 
