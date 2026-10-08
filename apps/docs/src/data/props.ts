@@ -1026,6 +1026,69 @@ export const PROPS = {
     },
   ],
   'Menu.Trigger': [],
+  'Menubar.Root': [
+    {
+      name: 'orientation',
+      type: "'horizontal' | 'vertical'",
+      default: "'horizontal'",
+      description:
+        'Which arrow keys move along the bar. A vertical bar opens its menus with → and to the right.',
+    },
+    {
+      name: 'focusableWhenDisabled',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Keeps disabled Triggers in the arrow-key sequence, so a screen reader announces them as unavailable. They still cannot open.',
+    },
+  ],
+  'Menubar.Menu': [
+    {
+      name: 'open',
+      type: 'boolean',
+      description:
+        'Controlled state. Provide `onOpenChange` alongside it. Never pass `undefined` — the mode is fixed at mount.',
+    },
+    {
+      name: 'defaultOpen',
+      type: 'boolean',
+      default: 'false',
+      description: 'Initial state when uncontrolled. Read once, at mount.',
+    },
+    {
+      name: 'onOpenChange',
+      type: '(open: boolean) => void',
+      description:
+        'Called on every request to open or close, moving along the bar included. A controlled menu moves only if you accept it.',
+    },
+    {
+      name: 'focusableWhenDisabled',
+      type: 'boolean',
+      default: 'false',
+      description:
+        "Keeps this menu's disabled items in the arrow-key sequence. They still cannot be activated.",
+    },
+    {
+      name: 'children',
+      type: 'ReactNode',
+      description: 'The Trigger and the Popup. Menu renders no element of its own.',
+    },
+  ],
+  'Menubar.Popup': [
+    {
+      name: 'side',
+      type: "'top' | 'bottom' | 'left' | 'right'",
+      default: "'bottom'; 'right' in a submenu or a vertical bar",
+      description:
+        'Which side of the Trigger to open on. Flips to the opposite side when there is no room.',
+    },
+    {
+      name: 'align',
+      type: "'start' | 'center' | 'end'",
+      default: "'start'",
+      description: "Flush with the Trigger's start or end edge, or centred on it.",
+    },
+  ],
   'Menu.Item': [
     {
       name: 'disabled',

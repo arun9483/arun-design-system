@@ -1502,3 +1502,41 @@ and never opens on touch.
 
 **Rules out:** an async `getDayInfo`; a mark per tag; a popup per day; interactive content in
 the card; a fixed CSS priority.
+
+---
+
+## 29. Menubar: its own namespace over Menu's internals
+
+Measured against APG's menubar pattern, Radix's Menubar and Base UI's Menubar (October 2026).
+
+**A namespace of its own, Radix's shape.** `Menubar.Root` is `role="menubar"`; `Menubar.Menu`
+holds one menu's state and renders nothing, as `Menu.Root` does; `Menubar.Trigger` is a bar item;
+`Menubar.Popup` is its menu. Base UI instead puts `Menu.Root`s inside a `Menubar`, and Menu's
+Trigger and Popup change behaviour when they find a bar above them. That was built and reverted:
+Menu's parts would answer to two patterns, and a Menu's behaviour would depend on where it is
+placed. Here Menu's files do not know the bar exists.
+
+**Menu's internals, not a copy.** `Menubar.Menu` provides Menu's root context through
+`useMenuRootValue`, so the items inside are Menu's own: `Menubar.Item`, `CheckboxItem`,
+`RadioGroup`, `RadioItem`, `ItemIndicator`, `Group`, `GroupLabel`, `SubmenuRoot` and
+`SubmenuTrigger` are Menu's parts under the bar's name. `Menubar.Popup` is Menu's Popup with the
+bar's keys passed in front of its own, as a consumer's handler is (decision 8): when the bar takes
+a key it stops the Popup's handler. Decision 11's "fewest parts" counts elements and what they
+need; the item names are aliases, not new parts, so a bar reads as one namespace.
+
+**Keyboard, by APG.** One Tab stop. ← and → move along the bar (↑ and ↓ when
+`orientation="vertical"`), wrapping, swapped right-to-left; Home and End go to its ends;
+typeahead matches the Triggers' text (decision 18). ↓, Enter and Space open a menu at its first
+item and ↑ at its last; a vertical bar opens with → and its menus default to `side="right"`. Inside
+an open menu → and ← move to the next and previous menu and open it — after a SubmenuTrigger's →
+and a submenu's ←, which keep their meaning (decision 19). In a vertical bar ← closes a menu back to
+its Trigger. Disabled Triggers follow decision 13: skipped, or `aria-disabled` and unopenable with
+the Root's `focusableWhenDisabled`.
+
+**Pointer.** A click toggles a menu. While one menu is open, the pointer reaching another Trigger
+opens that one in its place, and focus follows, so the keyboard carries on from it; with no menu
+open, hovering opens nothing.
+
+**Rules out:** Menu's parts changing behaviour inside a bar; a modal or scroll-locking bar; plain
+buttons in the bar, which are a Toolbar's (decision 17); collapsing to a single menu on narrow
+screens, which is the consumer's layout.
