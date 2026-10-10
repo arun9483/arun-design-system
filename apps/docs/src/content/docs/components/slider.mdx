@@ -10,20 +10,22 @@ import PropTable from '@/components/PropTable.astro';
 ## When to use
 
 - Volume, brightness, zoom
-- A range filter such as price
 - Values where the rough position matters more than the exact number
+
+Not for a range from–to, such as a price filter — use a [RangeSlider](/components/range-slider/).
 
 Not when the exact value matters — use an Input with `type="number"`.
 
 **Choosing between choosing one option or a value:**
 
-| Component                              | Use it for                                                                          | For example                               |
-| -------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------- |
-| [RadioGroup](/components/radio-group/) | Up to about five options, all visible at once, as a form value                      | Shipping speed, plan size                 |
-| [Select](/components/select/)          | One option from a longer list, in little space, with the system picker              | Country, time zone, sort order in a form  |
-| [Combobox](/components/combobox/)      | A long list people search by typing, several picks, or options loaded from a server | Assign reviewers, search a city, add tags |
-| [ToggleGroup](/components/toggle/)     | A few options shown as buttons that apply at once, not a form field                 | Text alignment, list or grid view         |
-| **Slider**                             | A number in a range, where dragging is easier than typing an exact value            | Volume, brightness, price range           |
+| Component                                | Use it for                                                                          | For example                               |
+| ---------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------- |
+| [RadioGroup](/components/radio-group/)   | Up to about five options, all visible at once, as a form value                      | Shipping speed, plan size                 |
+| [Select](/components/select/)            | One option from a longer list, in little space, with the system picker              | Country, time zone, sort order in a form  |
+| [Combobox](/components/combobox/)        | A long list people search by typing, several picks, or options loaded from a server | Assign reviewers, search a city, add tags |
+| [ToggleGroup](/components/toggle/)       | A few options shown as buttons that apply at once, not a form field                 | Text alignment, list or grid view         |
+| **Slider**                               | A number in a range, where dragging is easier than typing an exact value            | Volume, brightness                        |
+| [RangeSlider](/components/range-slider/) | A from–to range on one track                                                        | Price filter, salary band                 |
 
 <Example name="slider-basics" layout="stack">
   <SliderBasics client:load />
@@ -43,6 +45,6 @@ label.
 
 ## Notes
 
-- One thumb only. For a range from–to, use two sliders, or two number inputs.
+- One thumb only. For a range from–to, use a [RangeSlider](/components/range-slider/).
 - The track and thumb shape are the browser's. Only the colour is themed, through
   `--slider-accent-color`.

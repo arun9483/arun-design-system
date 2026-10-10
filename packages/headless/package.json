@@ -224,6 +224,16 @@
         "default": "./dist/toolbar/index.cjs"
       }
     },
+    "./range-slider": {
+      "import": {
+        "types": "./dist/range-slider/index.d.ts",
+        "default": "./dist/range-slider/index.js"
+      },
+      "require": {
+        "types": "./dist/range-slider/index.d.cts",
+        "default": "./dist/range-slider/index.cjs"
+      }
+    },
     "./switch": {
       "import": {
         "types": "./dist/switch/index.d.ts",

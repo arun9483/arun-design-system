@@ -15,11 +15,12 @@ export type { TextareaProps } from './components/textarea';
 export { Select } from './components/select';
 export type { SelectProps } from './components/select';
 
-// Checkbox, RadioGroup, Switch, Dialog, Drawer, Popover, Menu, Combobox, Tooltip, HoverCard, Tabs, TreeView, Calendar and DatePicker are backed by @arun-dev/headless, which owns its props
+// Checkbox, RadioGroup, Switch, RangeSlider, Dialog, Drawer, Popover, Menu, Combobox, Tooltip, HoverCard, Tabs, TreeView, Calendar and DatePicker are backed by @arun-dev/headless, which owns its props
 // types. See docs/architecture.md decision 6 — consumers derive them with ComponentProps.
 export { Checkbox } from './components/checkbox';
 export { RadioGroup } from './components/radio-group';
 export { Switch } from './components/switch';
+export { RangeSlider } from './components/range-slider';
 export { Dialog } from './components/dialog';
 export { Drawer } from './components/drawer';
 export { Popover } from './components/popover';

@@ -700,6 +700,59 @@ export const PROPS = {
     },
   ],
   'Switch.Thumb': [],
+  'RangeSlider.Root': [
+    {
+      name: 'value',
+      type: 'readonly [number, number]',
+      description:
+        'Controlled range, start then end. Provide `onValueChange` alongside it. Never pass `undefined` — the mode is fixed at mount.',
+    },
+    {
+      name: 'defaultValue',
+      type: 'readonly [number, number]',
+      default: '[min, max]',
+      description:
+        'Initial range when uncontrolled. Read once, at mount; `form.reset()` returns to it.',
+    },
+    {
+      name: 'onValueChange',
+      type: '(value: readonly [number, number]) => void',
+      description: 'Called with the whole range whenever either end moves.',
+    },
+    {
+      name: 'min',
+      type: 'number',
+      default: '0',
+      description: 'The lowest value either thumb can take.',
+    },
+    {
+      name: 'max',
+      type: 'number',
+      default: '100',
+      description: 'The highest value either thumb can take.',
+    },
+    { name: 'step', type: 'number', default: '1', description: 'The step both thumbs move by.' },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Disables both inputs, natively, so neither is submitted.',
+    },
+  ],
+  'RangeSlider.StartInput': [
+    {
+      name: 'name',
+      type: 'string',
+      description: 'Submits the start with the form under this name.',
+    },
+  ],
+  'RangeSlider.EndInput': [
+    {
+      name: 'name',
+      type: 'string',
+      description: 'Submits the end with the form under this name.',
+    },
+  ],
   'Dialog.Root': [
     {
       name: 'open',
