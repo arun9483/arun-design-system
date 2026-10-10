@@ -38,6 +38,7 @@ const CSS_LAYERS = [
   { layer: 'radio-group', src: 'src/components/radio-group/radio-group.css' },
   { layer: 'switch', src: 'src/components/switch/switch.css' },
   { layer: 'field', src: 'src/components/field/field.css' },
+  { layer: 'fieldset', src: 'src/components/fieldset/fieldset.css' },
   { layer: 'link', src: 'src/components/link/link.css' },
   { layer: 'separator', src: 'src/components/separator/separator.css' },
   { layer: 'progress', src: 'src/components/progress/progress.css' },

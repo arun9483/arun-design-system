@@ -49,20 +49,7 @@ const interests = [
 ];
 
 const stack = { display: 'grid', gap: 'var(--space-md)', maxInlineSize: '28rem' };
-const group = { display: 'grid', gap: 'var(--space-2xs)', border: 0, padding: 0, margin: 0 };
 const row = { display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2xs)' };
-// A group's legend and error read like a Field's label and error: the same tokens.
-const legend = {
-  padding: 0,
-  fontSize: 'var(--field-label-font-size)',
-  fontWeight: 'var(--field-label-font-weight)',
-  color: 'var(--field-label-color)',
-};
-const error = {
-  margin: 0,
-  fontSize: 'var(--field-message-font-size)',
-  color: 'var(--field-error-color)',
-};
 
 /** Stands in for your server: only 123456 is the code it sent. */
 async function checkCode(code: string) {
@@ -200,7 +187,7 @@ export default function ReactHookFormSignup() {
         render={({ field, fieldState }) => (
           <RadioGroup.Root
             render={<fieldset />}
-            style={group}
+            className="fieldset"
             name={field.name}
             value={field.value}
             onValueChange={field.onChange}
@@ -208,7 +195,7 @@ export default function ReactHookFormSignup() {
             aria-invalid={fieldState.error ? true : undefined}
             aria-describedby={fieldState.error ? 'signup-plan-error' : undefined}
           >
-            <legend style={legend}>Plan</legend>
+            <legend className="fieldset-legend">Plan</legend>
             {['Free', 'Pro', 'Team'].map((label) => (
               <label key={label} style={row}>
                 <RadioGroup.Item value={label.toLowerCase()} />
@@ -216,7 +203,7 @@ export default function ReactHookFormSignup() {
               </label>
             ))}
             {fieldState.error && (
-              <p id="signup-plan-error" style={error}>
+              <p id="signup-plan-error" className="fieldset-error">
                 {fieldState.error.message}
               </p>
             )}
@@ -230,11 +217,11 @@ export default function ReactHookFormSignup() {
         rules={{ validate: (picked) => picked.length > 0 || 'Pick at least one.' }}
         render={({ field, fieldState }) => (
           <fieldset
-            style={group}
+            className="fieldset"
             aria-invalid={fieldState.error ? true : undefined}
             aria-describedby={fieldState.error ? 'signup-interests-error' : undefined}
           >
-            <legend style={legend}>Interests</legend>
+            <legend className="fieldset-legend">Interests</legend>
             {interests.map(({ value, label }) => (
               <label key={value} htmlFor={`signup-interest-${value}`} style={row}>
                 {/* One array value, shared by the group: each box adds or removes itself. */}
@@ -256,7 +243,7 @@ export default function ReactHookFormSignup() {
               </label>
             ))}
             {fieldState.error && (
-              <p id="signup-interests-error" style={error}>
+              <p id="signup-interests-error" className="fieldset-error">
                 {fieldState.error.message}
               </p>
             )}

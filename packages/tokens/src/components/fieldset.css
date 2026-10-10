@@ -1,0 +1,6 @@
+/* Fieldset component tokens — a native <fieldset> grouping several controls under one <legend>.
+   The legend, description and error read as a Field's label, description and error do, so their
+   type and colour are the --field-* tokens; only the spacing is its own. */
+:root {
+  --fieldset-gap: var(--space-2xs);
+}

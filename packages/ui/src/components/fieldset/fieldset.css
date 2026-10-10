@@ -1,0 +1,41 @@
+@layer fieldset {
+  /* A native <fieldset>: several controls under one <legend>, such as radios or checkboxes. The
+     platform names the group by its legend and disables every control in it with `disabled`;
+     these classes only make it read as a Field does. */
+  .fieldset {
+    display: grid;
+    gap: var(--fieldset-gap);
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  /* A legend is not one of the fieldset's grid items, so the gap does not reach it: the space
+     below it is padding, since a reset's margin: 0 in a later layer would take a margin away. */
+  .fieldset-legend {
+    float: none;
+    padding: 0 0 var(--fieldset-gap);
+    color: var(--field-label-color);
+    font-size: var(--field-label-font-size);
+    font-weight: var(--field-label-font-weight);
+  }
+
+  .fieldset-description,
+  .fieldset-error {
+    margin: 0;
+    font-size: var(--field-message-font-size);
+  }
+
+  .fieldset-description {
+    color: var(--field-description-color);
+  }
+
+  .fieldset-error {
+    color: var(--field-error-color);
+  }
+
+  .fieldset:disabled > .fieldset-legend {
+    opacity: var(--field-disabled-opacity);
+  }
+}

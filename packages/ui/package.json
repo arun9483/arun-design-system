@@ -57,6 +57,7 @@
     "./css/radio-group": "./dist/css/radio-group.css",
     "./css/switch": "./dist/css/switch.css",
     "./css/field": "./dist/css/field.css",
+    "./css/fieldset": "./dist/css/fieldset.css",
     "./css/link": "./dist/css/link.css",
     "./css/separator": "./dist/css/separator.css",
     "./css/progress": "./dist/css/progress.css",
