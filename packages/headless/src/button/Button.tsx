@@ -16,6 +16,11 @@ type ButtonOwnProps = {
    */
   disabled?: boolean;
   /**
+   * Busy with the action it started — a save, say. Disabled while it lasts, natively, so a
+   * second press or Enter in a field cannot start it again, and marked `data-pending`.
+   */
+  pending?: boolean;
+  /**
    * Element or component to render instead of the default. Props, className, event
    * handlers and ref are merged onto it.
    *
@@ -38,10 +43,12 @@ export type ButtonProps = ButtonOwnProps &
  *
  * Navigation is not a button's job — a link belongs to a separate `Link` component.
  *
- * Emits `data-disabled` so one selector styles a disabled control either way.
+ * Emits `data-disabled` so one selector styles a disabled control either way, and
+ * `data-pending` while `pending`.
  */
 export function Button({
-  disabled = false,
+  disabled: disabledProp = false,
+  pending = false,
   type = 'button',
   className,
   children,
@@ -51,6 +58,8 @@ export function Button({
   // `type` and `disabled` only mean anything on a `<button>`, and `render` is the one
   // thing that can move us off one. An element literal says which it is; a component
   // cannot be inspected, so it is left to pass its own `type` if it needs one.
+  // Pending is disabled, natively: the platform already refuses the press and the submit.
+  const disabled = disabledProp || pending;
   const rendersButton = render === undefined || render.type === 'button';
 
   const elementProps: UnknownProps = rendersButton
@@ -63,6 +72,7 @@ export function Button({
     props: {
       ...elementProps,
       'data-disabled': disabled ? '' : undefined,
+      'data-pending': pending ? '' : undefined,
       className,
       children,
     },

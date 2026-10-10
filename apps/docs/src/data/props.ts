@@ -438,9 +438,10 @@ export const PROPS = {
   Button: [
     {
       name: 'variant',
-      type: "'ghost' | 'primary'",
+      type: "'ghost' | 'primary' | 'danger' | 'danger-ghost'",
       default: "'ghost'",
-      description: 'Visual weight. `primary` is the filled call to action.',
+      description:
+        'Visual weight. `primary` is the filled call to action; `danger` and `danger-ghost` delete or discard.',
     },
     {
       name: 'type',
@@ -453,6 +454,13 @@ export const PROPS = {
       type: 'boolean',
       default: 'false',
       description: 'Prevents activation, using the platform rather than synthesising it.',
+    },
+    {
+      name: 'pending',
+      type: 'boolean',
+      default: 'false',
+      description:
+        'Busy with the action it started. Disabled while it lasts, with a Spinner over the label.',
     },
   ],
   Card: [

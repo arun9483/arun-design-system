@@ -5,6 +5,7 @@ description: An action. Renders a button by default, or anything via render.
 
 import Example from '@/components/Example.astro';
 import ButtonVariants from '@/examples/button-variants';
+import ButtonPending from '@/examples/button-pending';
 import PropTable from '@/components/PropTable.astro';
 import { ButtonPlayground } from '@/components/playgrounds';
 
@@ -36,6 +37,27 @@ Not to go to another page — use a Link, so it can be opened in a new tab and i
   <ButtonVariants client:load />
 </Example>
 
+**Choosing a variant:**
+
+| Variant        | Use it for                                        | For example                           |
+| -------------- | ------------------------------------------------- | ------------------------------------- |
+| `primary`      | The one main action of a form or dialog           | "Save", "Create account"              |
+| `ghost`        | Every other action                                | "Cancel", "Edit"                      |
+| `danger`       | The last step of deleting, which cannot be undone | "Delete" in the confirmation Dialog   |
+| `danger-ghost` | Starting a deletion, before a confirmation asks   | "Delete" in a form footer or on a row |
+
+## Pending
+
+While a save is in flight, set `pending`. The button is disabled — a second press, or Enter in a
+field, cannot submit again — and a Spinner turns over the label, which keeps its place so the
+button does not change width. Clear it when the request settles, whether it succeeded or failed.
+
+<Example name="button-pending">
+  <ButtonPending client:load />
+</Example>
+
+With react-hook-form, pass `formState.isSubmitting`: `<Button type="submit" pending={isSubmitting}>`.
+
 ## Playground
 
 <ButtonPlayground client:load />
@@ -50,3 +72,6 @@ Not to go to another page — use a Link, so it can be opened in a new tab and i
   form by accident.
 - `type` is not forwarded to a component supplied through `render` — pass it on the element there.
 - `Button` does not navigate. A link is a separate `Link` component.
+- `pending` disables the button natively, so focus leaves it and assistive technology skips it
+  while it lasts. Announce the outcome — a Toast saying "Saved", or the error — rather than the
+  wait.

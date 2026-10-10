@@ -5,6 +5,8 @@ export default function ButtonVariants() {
     <>
       <Button>Ghost</Button>
       <Button variant="primary">Primary</Button>
+      <Button variant="danger">Delete</Button>
+      <Button variant="danger-ghost">Delete</Button>
       <Button disabled>Disabled</Button>
     </>
   );

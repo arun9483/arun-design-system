@@ -33,6 +33,27 @@ describe('Button', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
+  it('is disabled while pending, and says so', () => {
+    const onClick = vi.fn();
+    const { rerender } = render(
+      <Button type="submit" pending onClick={onClick} data-testid="b">
+        Save
+      </Button>,
+    );
+    expect(el()).toBeDisabled();
+    expect(el()).toHaveAttribute('data-pending');
+    expect(el()).toHaveAttribute('data-disabled');
+    fireEvent.click(el());
+    expect(onClick).not.toHaveBeenCalled();
+    rerender(
+      <Button type="submit" onClick={onClick} data-testid="b">
+        Save
+      </Button>,
+    );
+    expect(el()).toBeEnabled();
+    expect(el()).not.toHaveAttribute('data-pending');
+  });
+
   it('leaves disabling to a render component, which it cannot inspect', () => {
     function Forwarding(props: Record<string, unknown>) {
       return <button {...props} />;
