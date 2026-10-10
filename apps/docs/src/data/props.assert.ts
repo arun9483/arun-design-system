@@ -18,6 +18,7 @@ import type {
 import type { CheckboxIndicatorProps, CheckboxRootProps } from '@arun-dev/headless/checkbox';
 import type { RadioGroupItemProps, RadioGroupRootProps } from '@arun-dev/headless/radio-group';
 import type { SwitchRootProps, SwitchThumbProps } from '@arun-dev/headless/switch';
+import type { RangeSliderRootProps, RangeSliderInputProps } from '@arun-dev/headless/range-slider';
 import type {
   DialogCloseProps,
   DialogPopupProps,
@@ -159,6 +160,9 @@ type Unknown =
   | OnlyRealProps<Documented<'RadioGroup.Item'>, RadioGroupItemProps>
   | OnlyRealProps<Documented<'Switch.Root'>, SwitchRootProps>
   | OnlyRealProps<Documented<'Switch.Thumb'>, SwitchThumbProps>
+  | OnlyRealProps<Documented<'RangeSlider.Root'>, RangeSliderRootProps>
+  | OnlyRealProps<Documented<'RangeSlider.StartInput'>, RangeSliderInputProps>
+  | OnlyRealProps<Documented<'RangeSlider.EndInput'>, RangeSliderInputProps>
   | OnlyRealProps<Documented<'Dialog.Root'>, DialogRootProps>
   | OnlyRealProps<Documented<'Dialog.Popup'>, DialogPopupProps>
   | OnlyRealProps<Documented<'Dialog.Trigger'>, DialogTriggerProps>

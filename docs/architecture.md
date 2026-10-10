@@ -841,8 +841,8 @@ WebKit: there is no `::-webkit-slider-progress`, so a fill needs the value in a 
 updated on every input by script. That is behaviour, which decision 7 keeps out of
 `@arun-dev/ui`, for a visual. `accent-color` draws the native, filled slider in all three
 engines, in the brand's accent, with the platform's thumb, keyboard, `step`, form value and
-`form.reset()`. Size is the platform's. A multi-thumb range slider fails the behaviour test and
-is ruled out: two native inputs side by side are the consumer's pattern.
+`form.reset()`. Size is the platform's. A multi-thumb range slider fails the behaviour test, so it
+is not `Slider`: it is `RangeSlider`, two native inputs on one track (decision 31).
 
 **`Field` ties a label, a description and an error to one control.** Parts, fewest first
 (decision 11): `Root`, `Label`, `Control`, `Description`, `Error`.
@@ -863,8 +863,8 @@ browser's own bubble and `:user-invalid` stay the platform's. Base UI's Field al
 it for every consumer here. A group of controls under one label is a `<fieldset>` with a
 `<legend>`, native, so there is no `Fieldset` part.
 
-**Rules out:** `disabled` on `Link`; a filled track drawn by script on `Slider`; a multi-thumb
-slider; validation inside `Field`; a `Fieldset` part.
+**Rules out:** `disabled` on `Link`; a filled track drawn by script on `Slider`; a second thumb on
+`Slider`; validation inside `Field`; a `Fieldset` part.
 
 ---
 
@@ -1573,3 +1573,42 @@ new semantic token. White on the dark theme's error (`#f87171`) would not have: 
 
 **Rules out:** focusable pending; a `loading` prop that swaps the label for text; a semantic
 `--color-text-on-error` token.
+
+---
+
+## 31. RangeSlider: two native range inputs on one track
+
+A from–to range — a price filter, a salary band on a job post — needs two thumbs on one track.
+Decision 15 kept that out of `Slider`, whose one native input is the whole component. Here the
+two-input pattern it left to consumers becomes a component, because what the two inputs cannot
+do alone is behaviour: keeping the ends in order, and drawing the stretch between them.
+
+**Two native inputs, not `role="slider"` thumbs.** Base UI and Radix draw each thumb as a
+`<span role="slider">` and write the keys, the dragging, `aria-value*` and a hidden input for the
+form. Here each thumb is an `<input type="range">`, stacked over the same track: the arrows, Page
+Up and Down, Home and End, `step`, the slider role, the value and its submission are the
+platform's, in every engine (decision 7's native first). Parts, fewest first: `Root`,
+`StartInput`, `EndInput` — DatePicker's range names (decision 27). Each input carries its own
+`name`, so a form submits `priceMin=200&priceMax=800`.
+
+**What the Root adds.**
+
+- **Order.** A thumb stops where the other stands. The inputs are controlled, so React puts one
+  back if the platform moved it past the other; `onValueChange` reports the whole range.
+- **The fill.** `--range-slider-start` and `--range-slider-end`, set inline as fractions of the
+  track. A fill between two thumbs is what `accent-color` cannot draw, so ui draws the track, the
+  fill and the thumbs itself, from `--range-slider-*` tokens.
+- **The thumb on top.** Stacked inputs overlap where the thumbs meet, and the top one takes the
+  press. `data-raised` marks the one that can still move: the end below the middle, the start
+  past it, so two thumbs at the top can still be pulled apart.
+- **A press on the track.** Only the thumbs take a press (`pointer-events: none` on each input,
+  `auto` on its thumb — the styling's job), so a press elsewhere reaches the Root, which moves the
+  nearer thumb there and focuses it, as a press on a native range's track moves its thumb.
+- **`form.reset()`.** React keeps each input's default equal to its value, so the Root returns to
+  the range it mounted with, as OtpInput does (decision 20).
+
+**react-hook-form binds it with `Controller`.** The value is a pair, one field — `register()`
+binds an input, and here there are two inputs and one value.
+
+**Rules out:** `role="slider"` thumbs in script; more than two thumbs; a minimum distance between
+the thumbs; dragging the filled stretch to move both ends at once.

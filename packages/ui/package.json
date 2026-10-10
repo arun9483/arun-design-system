@@ -62,6 +62,7 @@
     "./css/progress": "./dist/css/progress.css",
     "./css/meter": "./dist/css/meter.css",
     "./css/slider": "./dist/css/slider.css",
+    "./css/range-slider": "./dist/css/range-slider.css",
     "./css/accordion": "./dist/css/accordion.css",
     "./css/alert": "./dist/css/alert.css",
     "./css/spinner": "./dist/css/spinner.css",
@@ -120,7 +121,7 @@
     "vitest": "5.0.3"
   },
   "peerDependencies": {
-    "@arun-dev/headless": ">=4.27.0",
+    "@arun-dev/headless": ">=4.28.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
   }

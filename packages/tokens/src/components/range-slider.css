@@ -1,0 +1,18 @@
+/* RangeSlider component tokens — two native range inputs on one track, drawn here rather than by
+   accent-color, which cannot place a fill between two thumbs. Coloured as Slider is. */
+:root {
+  --range-slider-track-color: var(--color-border-default);
+  --range-slider-track-thickness: 0.25rem;
+  --range-slider-fill-color: var(--color-text-accent);
+  --range-slider-thumb-size: 1.125rem;
+  --range-slider-thumb-color: var(--color-text-accent);
+  --range-slider-thumb-border-width: var(--space-2px);
+  --range-slider-thumb-border-color: var(--color-bg-primary);
+  --range-slider-focus-color: var(--color-text-accent);
+  --range-slider-disabled-opacity: 0.5;
+
+  /* Where the fill starts and ends, as fractions of the track. RangeSlider.Root sets both inline
+     from its value; these are the whole track, for a Root that has not. */
+  --range-slider-start: 0;
+  --range-slider-end: 1;
+}

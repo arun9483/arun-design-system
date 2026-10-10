@@ -1,0 +1,90 @@
+---
+title: RangeSlider
+description: A range from–to picked along one track, as two native range inputs.
+---
+
+import Example from '@/components/Example.astro';
+import RangeSliderPrice from '@/examples/range-slider-price';
+import RangeSliderForm from '@/examples/range-slider-form';
+import PropTable from '@/components/PropTable.astro';
+
+## When to use
+
+- A price, age or date-span filter on a list
+- A band saved with a record: a salary range on a job post, the ages an event is for
+- Working hours, or any from–to where the rough position matters more than the exact number
+
+Not for one value — use a [Slider](/components/slider/). Not when exact numbers matter — use two
+Inputs with `type="number"`.
+
+<Example name="range-slider-price" layout="stack">
+  <RangeSliderPrice client:load />
+</Example>
+
+## How it works
+
+`RangeSlider` is two native `<input type="range">`s, the start and the end, stacked on one track.
+Each thumb's keys — the arrows, Page Up and Down, Home and End — its `step`, its slider role for
+assistive technology and its form value are the browser's. The component adds what two inputs
+cannot do alone:
+
+- A thumb stops where the other stands, so the start never passes the end.
+- The stretch between the thumbs is filled.
+- When the thumbs meet, the one that can still move is on top: the end below the middle, the
+  start past it.
+- A press on the track moves the nearer thumb there, and focuses it.
+
+Each thumb is its own Tab stop, and is named "Minimum" and "Maximum" unless you name it. Name
+the group too, with `aria-label` or `aria-labelledby`, and give each thumb an `aria-valuetext`
+when the number alone does not say it, such as "$200".
+
+## In a form
+
+Each input takes its own `name` and submits its end. `form.reset()` returns the range to where
+it started.
+
+<Example name="range-slider-form" layout="stack">
+  <RangeSliderForm client:load />
+</Example>
+
+With react-hook-form, bind the whole range as one field with `Controller`:
+
+```tsx
+<Controller
+  name="price"
+  control={control}
+  defaultValue={[200, 800]}
+  render={({ field }) => (
+    <RangeSlider.Root
+      aria-label="Price"
+      max={1000}
+      value={field.value}
+      onValueChange={field.onChange}
+    >
+      <RangeSlider.StartInput onBlur={field.onBlur} />
+      <RangeSlider.EndInput onBlur={field.onBlur} />
+    </RangeSlider.Root>
+  )}
+/>
+```
+
+## Props
+
+### `RangeSlider.Root`
+
+<PropTable component="RangeSlider.Root" />
+
+### `RangeSlider.StartInput` and `RangeSlider.EndInput`
+
+Every native input prop goes on them: `name`, `id`, `aria-*`, `aria-valuetext`, `form`.
+
+<PropTable component="RangeSlider.StartInput" />
+
+## Notes
+
+- The track, fill and thumbs are drawn by `@arun-dev/ui`, not the browser, and themed through the
+  `--range-slider-*` tokens.
+- Building your own styling on `@arun-dev/headless`: stack the two inputs, and set
+  `pointer-events: none` on each input and `auto` on its thumb, or the top input takes every press.
+  The Root sets `--range-slider-start` and `--range-slider-end`, the fill's ends as fractions of
+  the track, and marks the thumb on top with `data-raised`.

@@ -43,6 +43,7 @@ const CSS_LAYERS = [
   { layer: 'progress', src: 'src/components/progress/progress.css' },
   { layer: 'meter', src: 'src/components/meter/meter.css' },
   { layer: 'slider', src: 'src/components/slider/slider.css' },
+  { layer: 'range-slider', src: 'src/components/range-slider/range-slider.css' },
   { layer: 'accordion', src: 'src/components/accordion/accordion.css' },
   { layer: 'alert', src: 'src/components/alert/alert.css' },
   { layer: 'spinner', src: 'src/components/spinner/spinner.css' },

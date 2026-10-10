@@ -24,6 +24,7 @@ export default defineConfig({
     'src/toggle/index.ts',
     'src/toggle-group/index.ts',
     'src/toolbar/index.ts',
+    'src/range-slider/index.ts',
     'src/switch/index.ts',
     'src/tabs/index.ts',
     'src/tooltip/index.ts',
