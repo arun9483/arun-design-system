@@ -6,7 +6,7 @@ import { Dialog } from './index';
 import type { DialogRootProps } from './DialogRoot';
 
 /**
- * Runs in Chromium: jsdom has no showModal(), top layer, focus trap or Esc handling, and
+ * Runs in a real browser: jsdom has no showModal(), top layer, focus trap or Esc handling, and
  * those are exactly what Dialog leans on the platform for.
  */
 

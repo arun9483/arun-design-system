@@ -7,7 +7,7 @@ import type { DrawerSide } from './DrawerPopup';
 import type { ComponentEvent } from '../core/mergeProps';
 
 /**
- * Runs in Chromium: the drawer is a modal <dialog>, and the swipe reads geometry. Pointer
+ * Runs in a real browser: the drawer is a modal <dialog>, and the swipe reads geometry. Pointer
  * events are dispatched by hand, as a finger or a mouse would send them.
  */
 

@@ -8,7 +8,7 @@ import type { CalendarDayInfo } from './useDayInfo';
 import { DatePicker } from '../date-picker';
 import { today } from './dates';
 
-/** Runs in Chromium: real focus, keys, Intl and layout direction. */
+/** Runs in a real browser: real focus, keys, Intl and layout direction. */
 
 const focused = () => document.activeElement;
 const day = (name: string | RegExp) => screen.getByRole('button', { name });

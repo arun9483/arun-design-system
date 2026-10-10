@@ -7,7 +7,7 @@ import type { PopoverRootProps } from './PopoverRoot';
 import type { PopoverPopupProps } from './PopoverPopup';
 
 /**
- * Runs in Chromium: jsdom has no popover API, top layer, light dismiss or anchor
+ * Runs in a real browser: jsdom has no popover API, top layer, light dismiss or anchor
  * positioning. Placement is asserted as wiring and as geometry relative to the trigger,
  * not as pixel positions (decision 12).
  */

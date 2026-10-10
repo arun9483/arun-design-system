@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { TreeView } from './index';
 import type { TreeViewRootProps } from './TreeViewRoot';
 
-/** Runs in Chromium: real focus, keys and accessibility tree. */
+/** Runs in a real browser: real focus, keys and accessibility tree. */
 
 const focused = () => document.activeElement;
 const item = (name: string) => screen.getByRole('treeitem', { name });

@@ -105,6 +105,9 @@ export function ComboboxPopup({
         // React carries a nested popover's toggle up the component tree; it isn't ours.
         if (event.target !== event.currentTarget) return;
         if ((event.nativeEvent as ToggleEvent).newState !== 'closed') return;
+        // Hidden here, after the state closed: WebKit can fire this before the re-render that
+        // carries the new input text, and closing again would report the text twice.
+        if (!open) return;
         // Hidden by something other than this component — a script calling hidePopover().
         // Report it; if the state stays open, reopen.
         close('outside-press');

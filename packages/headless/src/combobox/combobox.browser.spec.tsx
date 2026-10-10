@@ -7,7 +7,7 @@ import { Dialog } from '../dialog';
 import { Popover } from '../popover';
 import type { ComboboxRootProps } from './ComboboxRoot';
 
-/** Runs in Chromium: jsdom has no popover API, light dismiss, anchoring or real focus. */
+/** Runs in a real browser: jsdom has no popover API, light dismiss, anchoring or real focus. */
 
 type Product = { id: string; label: string; disabled?: boolean };
 

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { OtpInput } from './index';
 import type { OtpInputRootProps } from './index';
 
-/** Runs in Chromium: real typing, caret, clipboard and forms. */
+/** Runs in a real browser: real typing, caret, clipboard and forms. */
 
 // The input drawn over the slots, transparent, as a styling layer would.
 const css = `
@@ -57,7 +57,10 @@ function phoneDelete(inputType: 'deleteContentBackward' | 'deleteContentForward'
 async function paste(text: string) {
   const data = new DataTransfer();
   data.setData('text/plain', text);
-  input().dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true }));
+  // Firefox drops `clipboardData` from a ClipboardEvent made in script, so it is set here.
+  const event = new ClipboardEvent('paste', { bubbles: true, cancelable: true });
+  Object.defineProperty(event, 'clipboardData', { value: data });
+  input().dispatchEvent(event);
   await Promise.resolve();
 }
 
@@ -86,7 +89,12 @@ describe('OtpInput (browser)', () => {
   });
 
   it('marks the slot the caret is on, only while focused', async () => {
-    render(<Code defaultValue="12" />);
+    render(
+      <>
+        <Code defaultValue="12" />
+        <button type="button">Next</button>
+      </>,
+    );
     await expect.poll(() => isActive(2)).toBe(false);
     // Focus puts the caret at the end of the code, not over the whole of it.
     await userEvent.tab();

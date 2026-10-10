@@ -7,7 +7,7 @@ import type { DatePickerRootProps } from './DatePickerRoot';
 import type { DatePickerRangeRootProps, DateRangeValue } from './DatePickerRangeRoot';
 import { Calendar } from '../calendar';
 
-/** Runs in Chromium: native date inputs, the popover API, real focus and forms. */
+/** Runs in a real browser: native date inputs, the popover API, real focus and forms. */
 
 const focused = () => document.activeElement;
 const day = (name: string) => screen.getByRole('button', { name });

@@ -571,7 +571,7 @@ key handling, and activating one closes the menu through the Root's setter. Part
 first: `Root`, `Trigger`, `Popup`, `Item`. A separator is the consumer's own
 `role="separator"` element, since it needs nothing from the Root (decision 11).
 
-**Testing.** Browser tests run in Chromium only. Placement differs by engine in detail, so
+**Testing.** Browser tests run in Chromium, Firefox and WebKit (WebKit on Linux, as in CI). Placement differs by engine in detail, so
 Popover's specs assert the wiring — the anchor names, `position-area`, open and close — and
 leave pixel positions to a check in each engine before release.
 
