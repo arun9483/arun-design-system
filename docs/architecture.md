@@ -57,6 +57,12 @@ This gives two override granularities:
 --chip-bg: #f4f4f5; /* moves only chips */
 ```
 
+**Every tier is public, so the names are versioned.** Consumers override component tokens to
+restyle one component and hand-write brands against `BrandSemanticContract`, so from
+`@arun-dev/tokens` 1.0.0 a renamed or removed token, or a new contract entry, is a major release;
+a new token is a minor. The 0.x series ran until the first app, arun-dev-platform, adopted the
+current set: every token it reads had kept its name through 0.41.0.
+
 ---
 
 ## 3. Brand and theme live on `:root`

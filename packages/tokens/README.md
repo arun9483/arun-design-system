@@ -89,6 +89,22 @@ the moment they upgrade** — even though nothing in their code changed. Treat s
 breaking regardless of what the version number would otherwise suggest, and say so in the
 changeset.
 
+## Versioning
+
+From 1.0.0, every token name is public API, and the version says what a release does to it:
+
+| Change                                                                       | Release |
+| ---------------------------------------------------------------------------- | ------- |
+| A new token, a new component token set, a new export subpath                 | minor   |
+| A token's value tuned within its intent — a spacing step, a contrast fix     | patch   |
+| A token renamed or removed; a `BrandSemanticContract` entry added or removed | major   |
+| A change to `createBrand()`'s output for the same input (see above)          | major   |
+
+That covers every tier: primitives (`--space-*`, `--text-*`), the semantic layer
+(`--color-text-accent`), and the component tokens (`--btn-danger-bg`, `--slider-accent-color`),
+since consumers override those to restyle one component. A new entry in `BrandSemanticContract`
+is major because a hand-written brand that satisfied the old contract would no longer.
+
 ## `BrandSemanticContract`
 
 The TypeScript type `BrandSemanticContract` (exported from `./createBrand`) lists every semantic
