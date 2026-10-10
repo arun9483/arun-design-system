@@ -59,4 +59,9 @@ import NextLink from 'next/link';
 - There is no `disabled`: it has no meaning on a link. Render plain text instead.
 - Opening in a new tab is your choice, per link: add `target="_blank"` and
   `rel="noreferrer"`, and say so in the text.
-- Restyle with `--link-color`, `--link-color-hover` and `--link-underline-*`.
+- A link to a page already visited takes `--link-color-visited`, as a native link does: the accent
+  pulled toward the text colour, so it stays readable for any brand. Only colours can change on
+  `:visited`; the browser ignores anything else there, for privacy. Breadcrumb, Pagination and
+  link cards don't mark visited pages — they navigate, where every page is one you have seen.
+- Restyle with `--link-color`, `--link-color-hover`, `--link-color-visited` and
+  `--link-underline-*`.

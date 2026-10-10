@@ -2,6 +2,14 @@
 :root {
   --link-color: var(--color-text-accent);
   --link-color-hover: var(--color-text-primary);
+  /* Visited, as a native link shows it: the accent pulled toward the body text. Both meet the
+     required contrast on every page surface, and the mix lies between them, so it does too, for
+     any brand and theme. */
+  --link-color-visited: color-mix(
+    in oklab,
+    var(--color-text-accent) 60%,
+    var(--color-text-primary)
+  );
   --link-underline-color: var(--color-border-accent);
   --link-underline-thickness: var(--space-px);
   --link-underline-offset: 0.2em;

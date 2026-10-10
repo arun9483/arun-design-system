@@ -41,3 +41,18 @@ describe('link underlines', () => {
     }
   });
 });
+
+describe('visited links', () => {
+  const link = css('components/link/link.css');
+
+  it('take their own colour, as a native link does', () => {
+    const start = link.indexOf('.link:visited {');
+    expect(start).toBeGreaterThan(-1);
+    const block = link.slice(start, link.indexOf('}', start));
+    expect(block).toMatch(/color:\s*var\(--link-color-visited\)/);
+  });
+
+  it('still change on hover, which comes after', () => {
+    expect(link.indexOf('.link:hover {')).toBeGreaterThan(link.indexOf('.link:visited {'));
+  });
+});
