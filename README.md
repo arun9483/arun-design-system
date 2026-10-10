@@ -25,10 +25,11 @@ Live examples, interactive playgrounds and a prop reference — an Astro Starlig
 
 The site demonstrates the architecture as well as the components.
 
-The site is itself a consumer, following the documented path exactly: one `createBrand()` call
-from a single seed colour, written to a file, imported in place of
-`@arun-dev/tokens/brands/default`. So every example renders in the docs' own brand rather than
-the default indigo — no component knows a brand exists.
+The site is itself a consumer, following the documented path exactly: one
+`createBrand(ARUN_BRAND)` call from a single seed colour, written to a file, imported in place of
+`@arun-dev/tokens/brands/default`. So every example renders in the arun brand rather than the
+default indigo — no component knows a brand exists. The same brand is published as
+`@arun-dev/tokens/brands/arun`, so other apps share it without generating it.
 
 Theme switching is Starlight's own toggle. It sets `data-theme` on `<html>`, the same hook the
 generated brand's variants use, so it drives the token layer with no glue code.
@@ -52,7 +53,7 @@ behaviour — `Switch`, `Dialog`, `Menu`, `Combobox` and the rest), as are `reac
 // 1. Structural primitives — spacing, radius, typography, motion, shadow, elevation
 import '@arun-dev/tokens/base';
 // 2. Brand — palette + semantic colour tokens. REQUIRED: @arun-dev/ui reads these.
-import '@arun-dev/tokens/brands/default';
+import '@arun-dev/tokens/brands/default'; // or '@arun-dev/tokens/brands/arun'
 // 3. Component styles
 import '@arun-dev/ui/components.css';
 

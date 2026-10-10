@@ -24,6 +24,11 @@ values) and `createBrand()` generates equivalent output for custom brands. The u
 `semantic.css` for every `BrandSemanticContract` variable. If you change one side, change the other
 — the test will fail otherwise.
 
+`packages/tokens/src/brands/arun.css` is the other way round: generated, never edited. It is
+`createBrand(ARUN_BRAND)`, and `src/brands/arun.unit.spec.ts` fails while the two differ. After a
+change to `createBrand()` or `ARUN_BRAND`, run `pnpm --filter @arun-dev/tokens generate:brands` and
+commit the result; a change to its output is a major release of `@arun-dev/tokens`.
+
 ## Workflow
 
 1. Branch from `main`
