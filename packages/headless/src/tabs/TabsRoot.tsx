@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useId, useMemo, useState } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import { byDocumentOrder, type Orientation } from '../core/rovingFocus';

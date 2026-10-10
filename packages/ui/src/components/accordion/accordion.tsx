@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext, useId, useState } from 'react';
 import type React from 'react';
 import { useRender } from '@arun-dev/headless';

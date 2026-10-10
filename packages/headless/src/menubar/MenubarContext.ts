@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, RefObject } from 'react';
 import type { Orientation } from '../core/rovingFocus';

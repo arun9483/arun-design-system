@@ -1,3 +1,5 @@
+'use client';
+
 import { useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 import type {
   ChangeEvent,

@@ -1,3 +1,5 @@
+'use client';
+
 import { Toast as Headless } from '@arun-dev/headless/toast';
 import type {
   ToastViewportProps,

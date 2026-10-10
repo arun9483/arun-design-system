@@ -1,3 +1,5 @@
+'use client';
+
 import { Checkbox as Headless } from '@arun-dev/headless/checkbox';
 import type { CheckboxIndicatorProps } from '@arun-dev/headless/checkbox';
 import { cn } from '../../lib/cn';

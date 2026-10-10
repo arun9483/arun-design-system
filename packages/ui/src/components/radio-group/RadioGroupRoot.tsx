@@ -1,3 +1,5 @@
+'use client';
+
 import { RadioGroup as Headless } from '@arun-dev/headless/radio-group';
 import type { RadioGroupRootProps } from '@arun-dev/headless/radio-group';
 import { cn } from '../../lib/cn';

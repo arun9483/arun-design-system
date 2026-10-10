@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ToastContext } from './ToastContext';

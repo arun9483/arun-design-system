@@ -1,0 +1,96 @@
+---
+title: Server Components
+description: Which components render on the server and which hydrate, and what each needs to be used from a React Server Component.
+---
+
+import Aside from '@/components/Aside';
+
+In a React Server Components app — the Next.js App Router — a module is a **server component**
+unless it starts with `'use client'`. The packages declare it on every module that needs the
+browser: one that holds state, uses a context or an effect, or renders one that does
+(decision 32). Everything else stays on the server.
+
+## Which is which
+
+| Runs as    | Components                                                                                                                                                                                                                                                              |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Server** | Alert, Badge, Breadcrumb, Button, Card, Chip, Grid, Heading, Input, Kbd, Link, Meter, Pagination, Paragraph, Progress, Select, Separator, Skeleton, Slider, Spinner, Stack, Table, Text, Textarea, and the fieldset classes                                             |
+| **Client** | Accordion, Avatar, Calendar, RangeCalendar, Checkbox, Combobox, DatePicker, DateRangePicker, Dialog, Drawer, Field, HoverCard, Menu, Menubar, OtpInput, Popover, RadioGroup, RangeSlider, Stepper, Switch, Tabs, Toast, Toggle, ToggleGroup, Toolbar, Tooltip, TreeView |
+
+A **server** component renders to HTML and sends no JavaScript of its own: a page of Cards,
+Headings and Links ships none for them. Server is not static, though — Input, Select and Textarea
+are native elements, so they take input and submit with a form like any other.
+
+A **client** component hydrates: its JavaScript loads, and it runs in the browser. The
+`@arun-dev/headless` components are all client components, apart from `Button`, and `useRender`
+and `mergeProps` can be called from server code.
+
+## Using them from a server component
+
+Every component, server or client, can be **rendered** from a server component. What crosses
+from the server to a client component has to be data — strings, numbers, arrays, objects, JSX —
+not functions. So:
+
+| From a server component                                                           | Works?                             |
+| --------------------------------------------------------------------------------- | ---------------------------------- |
+| Any server component, with any props                                              | ✅                                 |
+| A client component, uncontrolled: `defaultValue`, `defaultOpen`, `name`           | ✅                                 |
+| Namespaced parts: `<Dialog.Root>`, `<Tabs.Tab>`                                   | ✅                                 |
+| A callback: `onValueChange`, `onOpenChange`, `onClick`                            | ❌ — move it to a client component |
+| Controlled state: `value` with `onValueChange`, `open` with `onOpenChange`        | ❌ — move it to a client component |
+| A function as children or a prop: `Combobox.List`'s `{(item) => …}`, `getDayInfo` | ❌ — move it to a client component |
+| `useToastManager()`                                                               | ❌ — a hook: a client component    |
+
+```tsx
+// app/settings/page.tsx — a server component: no 'use client', and none needed.
+import { Card, Heading, Tabs } from '@arun-dev/ui';
+
+export default function SettingsPage() {
+  return (
+    <Card>
+      <Heading level={1}>Settings</Heading>
+      <Tabs.Root defaultValue="profile">
+        <Tabs.List aria-label="Settings">
+          <Tabs.Tab value="profile">Profile</Tabs.Tab>
+          <Tabs.Tab value="billing">Billing</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel value="profile">…</Tabs.Panel>
+        <Tabs.Panel value="billing">…</Tabs.Panel>
+      </Tabs.Root>
+    </Card>
+  );
+}
+```
+
+When a component needs a callback or controlled state, put that part in a client component of
+your own, and keep the page on the server:
+
+```tsx
+// app/settings/PlanPicker.tsx
+'use client';
+
+import { useState } from 'react';
+import { RadioGroup } from '@arun-dev/ui';
+
+export function PlanPicker() {
+  const [plan, setPlan] = useState<string | null>('free');
+  return (
+    <RadioGroup.Root aria-label="Plan" value={plan} onValueChange={setPlan}>
+      {/* … */}
+    </RadioGroup.Root>
+  );
+}
+```
+
+<Aside type="tip" title="Forms without a client component">
+  Input, Select, Textarea, Slider, and the uncontrolled Checkbox, RadioGroup, Switch and DatePicker
+  all submit their values natively. A form of them posted to a Server Action needs no `'use client'`
+  of your own.
+</Aside>
+
+## Kept in step
+
+The docs app's `server-components` spec loads every entry of both packages on React's server
+build and reads every namespace member, and it pins the list of server components above. A
+module that starts using client-only React without `'use client'`, or a component that moves
+between the two lists, fails it.

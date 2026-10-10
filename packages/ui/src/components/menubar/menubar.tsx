@@ -1,3 +1,5 @@
+'use client';
+
 import { Menubar as Headless } from '@arun-dev/headless/menubar';
 import type {
   MenubarRootProps,

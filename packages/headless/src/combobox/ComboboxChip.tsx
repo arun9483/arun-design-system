@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext, useLayoutEffect, useMemo, useRef } from 'react';
 import type {
   ComponentPropsWithRef,

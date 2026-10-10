@@ -1,3 +1,5 @@
+'use client';
+
 import { useRef } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import { useRender } from '../core/useRender';

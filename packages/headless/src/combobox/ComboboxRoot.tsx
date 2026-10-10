@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useLatest } from '../core/useLatest';
 import type { ReactNode, RefObject } from 'react';

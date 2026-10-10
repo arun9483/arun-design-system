@@ -1,3 +1,5 @@
+'use client';
+
 import type { ChangeEvent, ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';

@@ -1,3 +1,5 @@
+'use client';
+
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { mergeProps, type ComponentEvent } from '../core/mergeProps';
 import { MenuPopup, type MenuPopupProps } from '../menu/MenuPopup';

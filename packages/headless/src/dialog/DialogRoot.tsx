@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useId, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useControlled } from '../core/useControlled';

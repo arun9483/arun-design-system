@@ -1,3 +1,5 @@
+'use client';
+
 import type React from 'react';
 import { DatePicker as Headless } from '@arun-dev/headless/date-picker';
 import type {

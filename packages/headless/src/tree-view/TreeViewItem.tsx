@@ -1,3 +1,5 @@
+'use client';
+
 import { Children, useContext, useId, useLayoutEffect, useMemo, useRef } from 'react';
 import type {
   ComponentPropsWithRef,

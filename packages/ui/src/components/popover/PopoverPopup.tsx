@@ -1,3 +1,5 @@
+'use client';
+
 import { Popover as Headless } from '@arun-dev/headless/popover';
 import type { PopoverPopupProps } from '@arun-dev/headless/popover';
 import { cn } from '../../lib/cn';

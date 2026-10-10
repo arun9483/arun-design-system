@@ -1,3 +1,5 @@
+'use client';
+
 import { Toolbar as Headless } from '@arun-dev/headless/toolbar';
 import type {
   ToolbarRootProps,

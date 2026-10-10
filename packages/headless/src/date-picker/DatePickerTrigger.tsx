@@ -1,3 +1,5 @@
+'use client';
+
 import type { ComponentPropsWithRef } from 'react';
 import { PopoverTrigger } from '../popover/PopoverTrigger';
 import type { PopoverTriggerProps } from '../popover/PopoverTrigger';

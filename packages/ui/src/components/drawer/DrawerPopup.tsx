@@ -1,3 +1,5 @@
+'use client';
+
 import { Drawer as Headless } from '@arun-dev/headless/drawer';
 import type { DrawerPopupProps } from '@arun-dev/headless/drawer';
 import { cn } from '../../lib/cn';

@@ -1,3 +1,5 @@
+'use client';
+
 import { RangeSlider as Headless } from '@arun-dev/headless/range-slider';
 import type { RangeSliderRootProps } from '@arun-dev/headless/range-slider';
 import { cn } from '../../lib/cn';

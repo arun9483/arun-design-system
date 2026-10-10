@@ -63,6 +63,7 @@ export default defineConfig({
             { label: 'Lists', slug: 'guides/lists' },
             { label: 'Visually hidden', slug: 'guides/visually-hidden' },
             { label: 'react-hook-form', slug: 'guides/react-hook-form' },
+            { label: 'Server Components', slug: 'guides/server-components' },
             { label: 'Gallery', slug: 'guides/gallery' },
           ],
         },

@@ -1,3 +1,5 @@
+'use client';
+
 import { Tabs as Headless } from '@arun-dev/headless/tabs';
 import type { TabsRootProps as HeadlessTabsRootProps } from '@arun-dev/headless/tabs';
 import { cn } from '../../lib/cn';

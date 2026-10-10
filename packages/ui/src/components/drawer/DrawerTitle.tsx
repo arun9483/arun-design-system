@@ -1,3 +1,5 @@
+'use client';
+
 import type { ComponentProps } from 'react';
 import { Drawer as Headless } from '@arun-dev/headless/drawer';
 import { cn } from '../../lib/cn';

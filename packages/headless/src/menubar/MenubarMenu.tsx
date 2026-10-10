@@ -1,3 +1,5 @@
+'use client';
+
 import { useMenuRootValue, type MenuRootProps } from '../menu/MenuRoot';
 import { MenuRootContext } from '../menu/MenuRootContext';
 import { useMenubarContext } from './MenubarContext';

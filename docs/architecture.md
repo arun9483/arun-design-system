@@ -1618,3 +1618,44 @@ binds an input, and here there are two inputs and one value.
 
 **Rules out:** `role="slider"` thumbs in script; more than two thumbs; a minimum distance between
 the thumbs; dragging the filled stretch to move both ends at once.
+
+---
+
+## 32. Server Components: client modules marked, namespaces on the server
+
+A Next.js App Router page is a React Server Component unless a module says otherwise. On the
+server, React has no `createContext` and no state hooks, so a module that calls one while it
+loads — a component's context — fails the build there: `createContext is not a function`. The
+first app to adopt the packages found it; the docs site, rendered by Astro, never ran them that
+way.
+
+**`'use client'` on every module that needs the client.** A module that creates a context, calls
+a hook, or wraps a headless component that does starts with the directive, in its source, where
+it can be read. A module that does none of those stays a server module: `useRender` and
+`mergeProps`, headless `Button`, and in ui `Card`, `Chip`, `Badge`, `Heading`, `Paragraph`,
+`Text`, `Link`, `Stack`, `Grid`, `Separator`, `Table`, `Kbd`, `Alert`, `Progress`, `Meter`,
+`Spinner`, `Skeleton`, `Input`, `Textarea`, `Select`, `Slider`, `Breadcrumb`, `Pagination` and
+`Button`. Those render on the server and send no JavaScript of their own.
+
+**Built per module.** Both packages build with `unbundle`, one output file per source module, so
+a server module never shares a file with a client one and the directive stays where it was
+written. The build also puts it back on any file a bundler might drop it from.
+
+**Namespaces stay on the server.** `Dialog`, `Menu` and the rest are namespace objects. React
+does not allow reading a property of a client module's export on the server — `Dialog.Root` would
+throw — so the namespaces are built in server modules (`index.parts`), and their members are the
+client modules. `<Dialog.Root>` in a server component is then a client reference, as it should
+be.
+
+**Proved in CI.** The docs app's `server-components` spec imports every entry of
+`@arun-dev/ui` and `@arun-dev/headless` on React's server build, with each `'use client'`
+module standing as a client boundary that throws if read into, as a Server Components bundler
+treats it, and reads every namespace member. A module that touched client-only React while
+loading, or a namespace built in a client module, fails it. It also pins which ui components are server
+components, so moving one to the client — and adding its JavaScript to every page that uses it —
+is a deliberate change. The Server Components guide lists both, and what each needs from a
+server component: data props work from one, callbacks and controlled state need the consumer's own
+`'use client'` component.
+
+**Rules out:** one `'use client'` on the whole of ui, which would make every Card and Heading a
+client component; a separate server entry point.

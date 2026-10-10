@@ -1,3 +1,5 @@
+'use client';
+
 import { TreeView as Headless } from '@arun-dev/headless/tree-view';
 import type { TreeViewItemProps } from '@arun-dev/headless/tree-view';
 import { cn } from '../../lib/cn';

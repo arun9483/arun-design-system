@@ -1,3 +1,5 @@
+'use client';
+
 import { Switch as Headless } from '@arun-dev/headless/switch';
 import type { SwitchRootProps } from '@arun-dev/headless/switch';
 import { cn } from '../../lib/cn';

@@ -1,3 +1,5 @@
+'use client';
+
 import { Tooltip as Headless } from '@arun-dev/headless/tooltip';
 import type { TooltipPopupProps } from '@arun-dev/headless/tooltip';
 import { cn } from '../../lib/cn';

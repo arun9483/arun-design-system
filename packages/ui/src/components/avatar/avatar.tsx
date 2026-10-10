@@ -1,3 +1,5 @@
+'use client';
+
 import { Avatar as Headless } from '@arun-dev/headless/avatar';
 import type {
   AvatarRootProps,

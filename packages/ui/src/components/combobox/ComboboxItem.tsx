@@ -1,3 +1,5 @@
+'use client';
+
 import { Combobox as Headless } from '@arun-dev/headless/combobox';
 import type { ComboboxItemProps } from '@arun-dev/headless/combobox';
 import { cn } from '../../lib/cn';

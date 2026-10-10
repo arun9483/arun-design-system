@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useLayoutEffect, useMemo } from 'react';
 import type {
   ComponentPropsWithRef,

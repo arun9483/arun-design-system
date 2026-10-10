@@ -1,3 +1,5 @@
+'use client';
+
 import { Children, isValidElement, useCallback, useEffect, useRef } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
 import { fold } from './fold';

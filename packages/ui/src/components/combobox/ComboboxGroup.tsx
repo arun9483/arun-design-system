@@ -1,3 +1,5 @@
+'use client';
+
 import { Combobox as Headless } from '@arun-dev/headless/combobox';
 import type {
   ComboboxGroupProps,

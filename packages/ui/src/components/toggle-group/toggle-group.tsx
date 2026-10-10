@@ -1,3 +1,5 @@
+'use client';
+
 import { ToggleGroup as Headless } from '@arun-dev/headless/toggle-group';
 import type { ToggleGroupProps } from '@arun-dev/headless/toggle-group';
 import { cn } from '../../lib/cn';
