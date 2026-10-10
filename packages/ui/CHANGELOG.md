@@ -1,5 +1,12 @@
 # @arun-dev/ui
 
+## 5.14.2
+
+### Patch Changes
+
+- Updated dependencies [41bd932]
+  - @arun-dev/tokens@1.0.0
+
 ## 5.14.1
 
 ### Patch Changes
