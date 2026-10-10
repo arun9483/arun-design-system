@@ -28,6 +28,20 @@
     color: var(--color-text-on-accent);
   }
 
+  /* Danger — filled, the final step of a deletion. The status pair inverted: the error on its
+     tint is a required contrast pairing, so the tint on the error passes too. */
+  .btn-danger {
+    background-color: var(--btn-danger-bg);
+    color: var(--btn-danger-color);
+  }
+
+  /* Danger ghost — outline, a deletion that a confirmation follows */
+  .btn-danger-ghost {
+    background-color: var(--btn-danger-ghost-bg);
+    color: var(--btn-danger-ghost-color);
+    border: var(--space-px) solid var(--btn-danger-ghost-border);
+  }
+
   .btn:hover {
     opacity: 0.75;
   }
@@ -41,6 +55,37 @@
 
   .btn[data-disabled]:hover {
     opacity: var(--btn-disabled-opacity);
+  }
+
+  /* Pending: disabled, but busy rather than unavailable, so not faded. The label keeps its
+     place, unseen but still the button's name, and the Spinner turns over it. */
+  .btn[data-pending],
+  .btn[data-pending]:hover {
+    opacity: 1;
+    cursor: progress;
+  }
+
+  .btn[data-pending] {
+    display: inline-grid;
+  }
+
+  .btn-label,
+  .btn-spinner {
+    grid-area: 1 / 1;
+  }
+
+  .btn-label {
+    display: inline-flex;
+    align-items: center;
+    gap: inherit;
+    opacity: 0;
+  }
+
+  .btn-spinner {
+    place-self: center;
+    --spinner-size: 1em;
+    --spinner-color: currentColor;
+    --spinner-track-color: transparent;
   }
 
   .btn:focus-visible {

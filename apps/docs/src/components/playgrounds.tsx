@@ -29,8 +29,14 @@ import {
 import { Playground, type Control } from './Playground';
 
 const BUTTON_CONTROLS: Control[] = [
-  { name: 'variant', type: 'select', options: ['ghost', 'primary'], initial: 'ghost' },
+  {
+    name: 'variant',
+    type: 'select',
+    options: ['ghost', 'primary', 'danger', 'danger-ghost'],
+    initial: 'ghost',
+  },
   { name: 'disabled', type: 'boolean', initial: false },
+  { name: 'pending', type: 'boolean', initial: false },
 ];
 
 export function ButtonPlayground() {

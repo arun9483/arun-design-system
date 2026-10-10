@@ -23,6 +23,33 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveClass('btn', 'btn-primary');
   });
 
+  it.each(['danger', 'danger-ghost'] as const)('applies btn-%s for a deletion', (variant) => {
+    render(<Button variant={variant}>Delete</Button>);
+    expect(screen.getByRole('button')).toHaveClass('btn', `btn-${variant}`);
+  });
+
+  it('keeps its label, and so its name, while a Spinner shows it is pending', () => {
+    const { rerender } = render(
+      <Button type="submit" variant="primary" pending>
+        Save
+      </Button>,
+    );
+    const button = screen.getByRole('button', { name: 'Save' });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('data-pending');
+    expect(button.querySelector('.btn-label')).toHaveTextContent('Save');
+    // The Spinner is decoration here: the button is named by its label alone.
+    expect(button.querySelector('progress.btn-spinner')).toHaveAttribute('aria-hidden', 'true');
+    rerender(
+      <Button type="submit" variant="primary">
+        Save
+      </Button>,
+    );
+    expect(button).toBeEnabled();
+    expect(button.querySelector('.btn-spinner')).toBeNull();
+    expect(button).toHaveTextContent('Save');
+  });
+
   it('renders the element given to `render`', () => {
     render(
       <Button render={<span />} data-testid="btn">

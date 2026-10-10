@@ -358,8 +358,8 @@ export default function ReactHookFormSignup() {
       />
 
       <div style={{ display: 'flex', gap: 'var(--space-2xs)' }}>
-        <Button type="submit" variant="primary" disabled={isSubmitting}>
-          {isSubmitting ? 'Checking…' : 'Create account'}
+        <Button type="submit" variant="primary" pending={isSubmitting}>
+          Create account
         </Button>
         <Button
           type="button"

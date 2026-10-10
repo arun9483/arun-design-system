@@ -1542,3 +1542,34 @@ not moved, and that would take a menu the keyboard just opened.
 **Rules out:** Menu's parts changing behaviour inside a bar; a modal or scroll-locking bar; plain
 buttons in the bar, which are a Toolbar's (decision 17); collapsing to a single menu on narrow
 screens, which is the consumer's layout.
+
+---
+
+## 30. Button: pending and danger
+
+A form that saves to an API needs two things Button lacked: a way to show the save is under way,
+and a colour for deleting.
+
+**`pending` is native `disabled`.** The headless Button takes `pending`, sets `disabled` while it
+lasts and emits `data-pending`. A disabled `<button>` already refuses a second press, and the
+platform will not submit a form through a disabled default button, so Enter in a field cannot
+save twice either; nothing is synthesised (decision 7). The alternative kept the button focusable
+with `aria-disabled` and stopped the press in script, as React Aria's `isPending` does. It would
+keep focus on the button and let a screen reader find it while it waits, but a consumer's
+`onClick` runs before the component's (decision 8), so the component would also have to withhold
+the consumer's handlers, and stop the submit itself. The trade, chosen deliberately: while
+pending, focus leaves the button and assistive technology skips it. The outcome — a Toast saying
+"Saved", or the error — is what gets announced.
+
+**ui keeps the width.** While pending, the label stays in its grid cell at `opacity: 0`, so the
+button neither resizes nor loses its name, and a Spinner (`aria-hidden`) turns in the same cell.
+Pending is busy, not unavailable, so it is not faded as `disabled` is.
+
+**`danger` and `danger-ghost` reuse the error status pair.** `danger` fills with
+`--color-status-error` and writes in `--color-status-error-bg`; `danger-ghost` is the reverse,
+with an error border. Contrast is symmetric, and error on its tint is already a required pairing
+(`CONTRAST_REQUIREMENTS`, 4.5:1), so both meet it in light and dark for every brand without a
+new semantic token. White on the dark theme's error (`#f87171`) would not have: 2.8:1.
+
+**Rules out:** focusable pending; a `loading` prop that swaps the label for text; a semantic
+`--color-text-on-error` token.

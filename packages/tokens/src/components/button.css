@@ -2,4 +2,11 @@
    Override any of these to restyle buttons without moving other components. */
 :root {
   --btn-disabled-opacity: 0.5;
+
+  /* Danger — on the error status pair, so a brand's status colours move them too */
+  --btn-danger-bg: var(--color-status-error);
+  --btn-danger-color: var(--color-status-error-bg);
+  --btn-danger-ghost-bg: var(--color-status-error-bg);
+  --btn-danger-ghost-color: var(--color-status-error);
+  --btn-danger-ghost-border: var(--color-status-error);
 }
