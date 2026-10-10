@@ -1,6 +1,6 @@
 import { Combobox } from '@arun-dev/ui';
 
-const stack = { display: 'grid', gap: 'var(--space-s)', maxInlineSize: '24rem' };
+const stack = { display: 'grid', gap: 'var(--space-sm)', maxInlineSize: '24rem' };
 const field = { display: 'grid', gap: 'var(--space-3xs)' };
 
 // Booked rooms are listed but can't be picked, and the arrow keys skip them.

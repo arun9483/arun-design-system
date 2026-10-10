@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
+import { Checkbox, Input, Select } from '@arun-dev/ui';
 
 export type Control =
   | {
@@ -116,12 +117,13 @@ export function Playground<P>({ render, controls, component, children = 'Label' 
           if (control.type === 'boolean') {
             return (
               <label key={control.name} className="ds-control ds-control-inline" htmlFor={id}>
-                <input
+                <Checkbox.Root
                   id={id}
-                  type="checkbox"
                   checked={Boolean(values[control.name])}
-                  onChange={(e) => set(control.name, e.target.checked)}
-                />
+                  onCheckedChange={(checked) => set(control.name, checked === true)}
+                >
+                  <Checkbox.Indicator />
+                </Checkbox.Root>
                 <span>{control.name}</span>
               </label>
             );
@@ -131,9 +133,8 @@ export function Playground<P>({ render, controls, component, children = 'Label' 
             return (
               <label key={control.name} className="ds-control" htmlFor={id}>
                 <span>{control.name}</span>
-                <input
+                <Input
                   id={id}
-                  type="text"
                   value={String(values[control.name] ?? '')}
                   onChange={(e) => set(control.name, e.target.value)}
                 />
@@ -144,7 +145,7 @@ export function Playground<P>({ render, controls, component, children = 'Label' 
           return (
             <label key={control.name} className="ds-control" htmlFor={id}>
               <span>{control.name}</span>
-              <select
+              <Select
                 id={id}
                 value={String(values[control.name] ?? '')}
                 onChange={(e) => set(control.name, e.target.value)}
@@ -154,7 +155,7 @@ export function Playground<P>({ render, controls, component, children = 'Label' 
                     {option || '(none)'}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
           );
         })}

@@ -1,4 +1,4 @@
-import { Paragraph, Stack } from '@arun-dev/ui';
+import { Link, Paragraph, Stack } from '@arun-dev/ui';
 
 // Shown only while focused, so it can be styled as a visible pill when it appears.
 const pill = {
@@ -7,14 +7,15 @@ const pill = {
   borderRadius: 'var(--radius-md)',
   backgroundColor: 'var(--color-text-accent)',
   color: 'var(--color-text-on-accent)',
+  textDecorationLine: 'none',
 };
 
 export default function VisuallyHiddenSkipLink() {
   return (
     <Stack gap="sm">
-      <a className="sr-only-focusable" href="#skip-demo-content" style={pill}>
+      <Link className="sr-only-focusable" href="#skip-demo-content" style={pill}>
         Skip to the demo content
-      </a>
+      </Link>
       <Paragraph color="secondary">
         Click just above this text, then press Tab: the skip link appears while it has focus.
       </Paragraph>

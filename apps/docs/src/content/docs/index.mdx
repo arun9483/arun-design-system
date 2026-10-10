@@ -14,27 +14,34 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import CardLinks from '@/components/CardLinks';
 
-<CardGrid>
-  <Card title="Tokens, not themes">
-    Every colour, space and radius is a CSS custom property. No theme object, no runtime style
-    engine, no CSS-in-JS. `@arun-dev/tokens` ships zero JavaScript.
-  </Card>
-  <Card title="Brands from one colour">
-    `createBrand({seed})` generates a full palette and semantic layer at build time. Switch the
-    brand selector in the header — no component re-renders differently.
-  </Card>
-  <Card title="Render anything">
-    Every component takes a `render` prop, so a chip can be an `li`, a button can be a router link,
-    and a card can be a labelled `nav`.
-  </Card>
-  <Card title="Behaviour without styling">
-    `@arun-dev/headless` ships the behaviour, keyboard handling and accessibility with no CSS and no
-    class names. State reaches your stylesheet as `data-*` attributes.
-  </Card>
-  <Card title="Owns its contracts">
-    The packages meet by name, not by import — token names, and `data-*` attribute names. A
-    misspelling in either would fail silently, so a test guards each one.
-  </Card>
-</CardGrid>
+<CardLinks
+  items={[
+    {
+      title: 'Tokens, not themes',
+      description:
+        'Every colour, space and radius is a CSS custom property. No theme object, no runtime style engine, no CSS-in-JS. `@arun-dev/tokens` ships zero JavaScript.',
+    },
+    {
+      title: 'Brands from one colour',
+      description:
+        '`createBrand({ seed })` generates a full palette and semantic layer at build time. This site is one: its brand comes from its own seed colour, and no component knows it.',
+    },
+    {
+      title: 'Render anything',
+      description:
+        "Every component takes a `render` prop, so a chip can be an `li`, a link can be a router's link, and a card can be a labelled `nav`.",
+    },
+    {
+      title: 'Behaviour without styling',
+      description:
+        '`@arun-dev/headless` ships the behaviour, keyboard handling and accessibility with no CSS and no class names. State reaches your stylesheet as `data-*` attributes.',
+    },
+    {
+      title: 'Owns its contracts',
+      description:
+        'The packages meet by name, not by import — token names, and `data-*` attribute names. A misspelling in either would fail silently, so a test guards each one.',
+    },
+  ]}
+/>

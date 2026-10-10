@@ -1,22 +1,38 @@
 ---
 title: react-hook-form
-description: Why these controls need Controller rather than register, and what works once they have it.
+description: How each form control binds to react-hook-form — register() or Controller — with a form to copy for every kind of control.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Aside from '@/components/Aside';
 import Example from '@/components/Example.astro';
 import ReactHookFormSignup from '@/examples/react-hook-form-signup';
+import ReactHookFormRegister from '@/examples/react-hook-form-register';
+import ReactHookFormChoices from '@/examples/react-hook-form-choices';
+import ReactHookFormPickers from '@/examples/react-hook-form-pickers';
 
-Every control that carries a value — [Checkbox](/components/checkbox/),
-[Radio group](/components/radio-group/), [Switch](/components/switch/) and
-[OTP input](/components/otp-input/#forms) — works with react-hook-form through `Controller`.
+Every form control binds to react-hook-form one of two ways, and which one depends on where the
+control keeps its value:
 
-`register()` does not work for them, and fails quietly. That is the whole of what you need to
-know; the rest of this page explains why, and what you get once the binding is right.
+- **On a native element** — an `<input>`, `<textarea>` or `<select>` — bind it with `register()`,
+  as you would the element itself.
+- **In React** — a `<button role="checkbox">`, a list of options, a pair of thumbs — bind it with
+  `Controller`. `register()` [fails quietly](#use-controller) on these.
 
-[Input](/components/input/), [Textarea](/components/textarea/) and [Select](/components/select/)
-are the exceptions: each is a plain native element with no state of its own, so
-[`register()` is the binding](#input-textarea-and-select-use-register).
+| Control                                                        | Binding                                                             | Value                                                         |
+| -------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [Input](/components/input/), [Textarea](/components/textarea/) | `register()`                                                        | `string`                                                      |
+| [Select](/components/select/)                                  | `register()`                                                        | `string`, `''` for the "Choose…" option                       |
+| [Slider](/components/slider/)                                  | `register(name, { valueAsNumber: true })`                           | `number`                                                      |
+| [DatePicker](/components/date-picker/)                         | `register()`                                                        | `'YYYY-MM-DD'`, or `'YYYY-MM-DDTHH:mm'` with `withTime`; `''` |
+| [DateRangePicker](/components/date-picker/)                    | `register()` for each end, in `startInputProps` and `endInputProps` | two strings, as DatePicker's                                  |
+| [Checkbox](/components/checkbox/)                              | `Controller`                                                        | `boolean`, or `'indeterminate'`                               |
+| A group of Checkboxes                                          | `Controller`, one field                                             | `string[]`                                                    |
+| [Switch](/components/switch/)                                  | `Controller`                                                        | `boolean`                                                     |
+| [RadioGroup](/components/radio-group/)                         | `Controller`                                                        | `string \| null`                                              |
+| [Combobox](/components/combobox/)                              | `Controller`                                                        | the item or `null`; an array with `multiple`                  |
+| [RangeSlider](/components/range-slider/)                       | `Controller`, one field                                             | `[number, number]`                                            |
+| [Calendar](/components/calendar/), RangeCalendar               | `Controller`                                                        | `'YYYY-MM-DD'`; `{ start, end }` for a range                  |
+| [OTP input](/components/otp-input/#forms)                      | `Controller`                                                        | `string`                                                      |
 
 ## A whole form
 
@@ -41,8 +57,56 @@ Things to try:
 - **Reset.** `reset()` returns every control to its default, the Controller-bound ones included.
 
 Radio group and the interests are groups of controls, so they are a `<fieldset>` with a
-`<legend>` rather than a Field, which names one control. Their error is tied to the group with
-`aria-describedby`.
+`<legend>` rather than a Field, which names one control, styled with
+[the fieldset classes](/components/field/#a-group-of-controls). Their error is tied to the group
+with `aria-describedby`.
+
+## A form to copy, for each kind of control
+
+Each form below is complete: copy it, rename the fields, and keep the controls you need. Submit
+one to see exactly what `handleSubmit` receives.
+
+### Text, a list, a number and dates: register()
+
+Input, Textarea, Select, Slider, DatePicker and DateRangePicker. `Field.Control` renders the
+control and takes the spread, so the label, the description and the invalid state are tied to the
+native element itself.
+
+<Example name="react-hook-form-register" layout="stack">
+  <ReactHookFormRegister client:load />
+</Example>
+
+- A Slider's value is a string on the element; `valueAsNumber` makes it a number in the form.
+- A DateRangePicker is two native inputs, so it is two fields, `from` and `to`. A rule on one can
+  read the other through its second argument.
+
+### Yes or no, one of a few, several of a few: Controller
+
+Checkbox, a group of Checkboxes, Switch and RadioGroup. Pass `field.value` and `field.onChange`
+under the control's own names — `checked` and `onCheckedChange`, `value` and `onValueChange` — and
+`field.onBlur`.
+
+<Example name="react-hook-form-choices" layout="stack">
+  <ReactHookFormChoices client:load />
+</Example>
+
+- A group of Checkboxes is one array field: each box adds or removes its own value.
+- "Accept the terms" uses `validate`, not `required`, and stores `checked === true`, so the
+  field is a plain `boolean` (see [Checkbox's third state](#checkboxs-third-state)).
+
+### Search, a range, a calendar and a code: Controller
+
+Combobox, alone and with `multiple`, RangeSlider, Calendar and OtpInput.
+
+<Example name="react-hook-form-pickers" layout="stack">
+  <ReactHookFormPickers client:load />
+</Example>
+
+- Combobox's `Combobox.Input` is the Field's control, so pass it `field.ref` and `field.onBlur`;
+  the value goes on `Combobox.Root`.
+- RangeSlider's value is the pair, one field, and a rule reads both ends.
+- RangeSlider and Calendar are groups of controls rather than one, so their label and error are
+  tied to them by id, with Field's classes (`.field`, `.field-label`, `.field-error`) for the look.
 
 ## Use Controller
 
@@ -79,7 +143,7 @@ the user never chose.
 
 `register()` returns props for a native input:
 
-|            | goes to          | result                                            |
+| prop       | goes to          | result                                            |
 | ---------- | ---------------- | ------------------------------------------------- |
 | `ref`      | the `<button>`   | it has no `.checked`, so there is nothing to read |
 | `onChange` | the `<button>`   | a `<button>` never fires a `change` event         |
@@ -200,10 +264,28 @@ Set `aria-invalid` from `formState.errors` to turn the border to the error colou
 `<select>`, not its box. For a "Choose…" prompt, add an `<option value="">` and a `required`
 rule: react-hook-form treats the empty string as missing.
 
+`Slider`, `DatePicker` and `DateRangePicker` bind the same way, since each is native inputs too:
+a Slider with `valueAsNumber`, a DateRangePicker with one `register()` in each of
+`startInputProps` and `endInputProps`. The [first form to copy](#text-a-list-a-number-and-dates-register)
+has all of them.
+
 `Controller` works too, if a field needs a transformed value, but it isn't required.
 
 ## Buttons
 
 `Button` defaults to `type="button"`, so a button inside a form does nothing until told
-otherwise. Give the submit button `type="submit"` for `handleSubmit` to run, and a reset button
-`type="reset"`.
+otherwise. Give the submit button `type="submit"` for `handleSubmit` to run.
+
+While an async `onSubmit` runs, pass `formState.isSubmitting` to `pending`: the button is disabled,
+so a second press or Enter in a field cannot submit again, and a Spinner shows over its label.
+
+```tsx
+<Button type="submit" variant="primary" pending={formState.isSubmitting}>
+  Save
+</Button>
+```
+
+For a reset, call react-hook-form's `reset()` from a `type="button"`, as the forms above do, so the
+form state and every control return together. An error only the server can find goes back on its
+field with `setError(name, { message }, { shouldFocus: true })`, as the whole form does for the
+code.

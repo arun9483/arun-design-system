@@ -4,7 +4,7 @@ description: Unstyled React behaviour primitives — behaviour, keyboard handlin
 ---
 
 import Diagram from '@/components/Diagram.astro';
-import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import CardLinks from '@/components/CardLinks';
 import { docsUrl } from '@/lib/url';
 
 `@arun-dev/headless` ships behaviour, keyboard handling and accessibility, and nothing else — no
@@ -57,28 +57,31 @@ disagree about whether the switch is checked, and you cannot set one without the
 The word is used in that sense throughout these pages. A component with nothing to compose —
 `Button` — is a single part, and you write it as one element.
 
-<CardGrid>
-  <LinkCard
-    title="The render engine"
-    href={docsUrl('/headless/engine/')}
-    description="What happens on one render, and the five primitives it is built from."
-  />
-  <LinkCard
-    title="Prop merging"
-    href={docsUrl('/headless/merging/')}
-    description="Precedence, handler order, and how to cancel a component's own handler."
-  />
-  <LinkCard
-    title="State"
-    href={docsUrl('/headless/state/')}
-    description="Controlled versus uncontrolled, and how state becomes an attribute."
-  />
-  <LinkCard
-    title="Components"
-    href={docsUrl('/headless/components/')}
-    description="Button and Switch — what each provides and when you need it."
-  />
-</CardGrid>
+<CardLinks
+  items={[
+    {
+      title: 'The render engine',
+      href: docsUrl('/headless/engine/'),
+      description: 'What happens on one render, and the five primitives it is built from.',
+    },
+    {
+      title: 'Prop merging',
+      href: docsUrl('/headless/merging/'),
+      description: "Precedence, handler order, and how to cancel a component's own handler.",
+    },
+    {
+      title: 'State',
+      href: docsUrl('/headless/state/'),
+      description: 'Controlled versus uncontrolled, and how state becomes an attribute.',
+    },
+    {
+      title: 'Components',
+      href: docsUrl('/headless/components/'),
+      description:
+        'Button, Switch, Checkbox, Dialog, Menu, Combobox and the rest — what each provides and when you need it.',
+    },
+  ]}
+/>
 
 ## Already-styled components
 

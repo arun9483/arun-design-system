@@ -1,6 +1,6 @@
 ---
 title: Components
-description: Button, Switch, Checkbox, RadioGroup, Dialog, Popover, Tooltip and Tabs — what each provides, and when you need them.
+description: Button, Switch, Checkbox, RadioGroup, Dialog, Popover, Menu, Combobox, Tooltip and Tabs — what each provides, and when you need them.
 ---
 
 import Diagram from '@/components/Diagram.astro';
@@ -16,10 +16,11 @@ import { Button } from '@arun-dev/headless/button';
 <Button onClick={save}>Save</Button>;
 ```
 
-|            | element             | what it adds                          |
-| ---------- | ------------------- | ------------------------------------- |
-| default    | `<button>`          | `type="button"`, so it never submits  |
-| `disabled` | `<button disabled>` | the platform's own disabled semantics |
+|            | element             | what it adds                            |
+| ---------- | ------------------- | --------------------------------------- |
+| default    | `<button>`          | `type="button"`, so it never submits    |
+| `disabled` | `<button disabled>` | the platform's own disabled semantics   |
+| `pending`  | `<button disabled>` | disabled while it lasts, `data-pending` |
 
 `Button` does not navigate — a link is a separate `Link` component. Use `render` for a component
 that wraps a button — an animation wrapper, a tooltip trigger. It is merged into, not replaced.

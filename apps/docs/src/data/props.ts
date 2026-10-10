@@ -232,6 +232,12 @@ export const PROPS = {
       description: "Accessible name of each toast's close button, in the default rendering.",
     },
     {
+      name: 'position',
+      type: "'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'",
+      default: "'bottom-right'",
+      description: 'Where toasts show, unless a toast sets its own `position` when added.',
+    },
+    {
       name: 'children',
       type: '(toasts) => ReactNode',
       description:
@@ -1692,6 +1698,12 @@ export const PROPS = {
       description: 'Controlled: whether the calendar is open. Provide `onOpenChange` alongside it.',
     },
     {
+      name: 'defaultOpen',
+      type: 'boolean',
+      default: 'false',
+      description: 'Initially open when uncontrolled. Read once, at mount.',
+    },
+    {
       name: 'onOpenChange',
       type: '(open: boolean) => void',
       description: 'Called when the calendar opens or closes.',
@@ -1810,6 +1822,21 @@ export const PROPS = {
       description: 'Both inputs must be filled.',
     },
     {
+      name: 'id',
+      type: 'string',
+      description: "The start input's id — what a Field's label points at.",
+    },
+    {
+      name: 'aria-describedby',
+      type: 'string',
+      description: 'Set on both inputs, so a Field’s description and error describe each end.',
+    },
+    {
+      name: 'aria-invalid',
+      type: "boolean | 'true' | 'false'",
+      description: 'Set on both inputs, so a Field marks each end invalid.',
+    },
+    {
       name: 'withTime',
       type: 'boolean',
       default: 'false',
@@ -1860,6 +1887,12 @@ export const PROPS = {
       name: 'open',
       type: 'boolean',
       description: 'Controlled: whether the calendar is open. Provide `onOpenChange` alongside it.',
+    },
+    {
+      name: 'defaultOpen',
+      type: 'boolean',
+      default: 'false',
+      description: 'Initially open when uncontrolled. Read once, at mount.',
     },
     {
       name: 'onOpenChange',

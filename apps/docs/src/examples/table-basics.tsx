@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Button } from '@arun-dev/headless/button';
 import { Table } from '@arun-dev/ui';
 
 const invoices = [
@@ -33,9 +34,8 @@ export default function TableBasics() {
           <Table.Head>Status</Table.Head>
           {/* No aria-sort while unsorted, so no arrow. */}
           <Table.Head aria-sort={sort === 'none' ? undefined : sort}>
-            <button type="button" onClick={() => setSort(next[sort])}>
-              Amount
-            </button>
+            {/* Unstyled: the Head styles the button that fills it. */}
+            <Button onClick={() => setSort(next[sort])}>Amount</Button>
           </Table.Head>
         </Table.Row>
       </Table.Header>

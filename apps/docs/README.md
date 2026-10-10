@@ -10,8 +10,8 @@ pnpm --filter @arun-dev/docs build
 pnpm --filter @arun-dev/docs typecheck # astro check
 ```
 
-It consumes `@arun-dev/tokens` and `@arun-dev/ui` through `workspace:*`, so it always reflects
-the local packages rather than what is on npm.
+It consumes `@arun-dev/tokens`, `@arun-dev/headless` and `@arun-dev/ui` through `workspace:*`, so
+it always reflects the local packages rather than what is on npm.
 
 ## Examples have one source
 
