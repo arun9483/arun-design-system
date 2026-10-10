@@ -26,15 +26,22 @@ import { Switch } from '@arun-dev/headless/switch';
 </Switch.Root>;
 ```
 
+Each component has its own subpath, `@arun-dev/headless/<name>`: `avatar`, `button`, `calendar`,
+`checkbox`, `combobox`, `date-picker`, `dialog`, `drawer`, `field`, `hover-card`, `menu`,
+`menubar`, `otp-input`, `popover`, `radio-group`, `range-slider`, `switch`, `tabs`, `toast`,
+`toggle`, `toggle-group`, `toolbar`, `tooltip` and `tree-view`. Every part and prop is on the
+[documentation site](https://arun9483.github.io/arun-design-system/). Two of them, as examples:
+
 | Component | Parts                   | Props                                                                       |
 | --------- | ----------------------- | --------------------------------------------------------------------------- |
-| `Button`  | —                       | `disabled`, `type`                                                          |
+| `Button`  | —                       | `disabled`, `pending`, `type`                                               |
 | `Switch`  | `Switch.Root`, `.Thumb` | `checked`, `defaultChecked`, `onCheckedChange`, `disabled`, `name`, `value` |
 
 `Button` renders a `<button>` and defaults `type="button"` so it never submits a form by accident.
 It does not navigate — a link is a separate `Link` component. A `render` component cannot be
 inspected, so a disabled Button gives it `aria-disabled` and `data-disabled` rather than
-`disabled` — actually disabling itself is up to the component.
+`disabled` — actually disabling itself is up to the component. `pending` marks it busy with the
+action it started: disabled while it lasts, and `data-pending`.
 
 ```tsx
 import { Button } from '@arun-dev/headless/button';

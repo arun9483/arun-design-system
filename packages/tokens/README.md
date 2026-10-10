@@ -18,6 +18,9 @@ Tokens are layered — never skip a layer:
 2. **Palette** — brand colors (`--color-brand-50…950`) and neutrals (`--color-neutral-0…950`)
 3. **Semantic** — intent-named tokens consumed by components (`--color-bg-primary`,
    `--color-text-accent`, `--color-border-default`, …)
+4. **Component** — one set per `@arun-dev/ui` component, mapping semantic tokens onto its
+   surfaces (`--btn-danger-bg`, `--slider-accent-color`, …). Override one to restyle that
+   component alone
 
 ## Usage
 
@@ -99,12 +102,14 @@ import type { BrandSemanticContract } from '@arun-dev/tokens/createBrand';
 
 ## Exports
 
-| Specifier                                  | Content                                             |
-| ------------------------------------------ | --------------------------------------------------- |
-| `@arun-dev/tokens/base`                    | All primitives + default brand                      |
-| `@arun-dev/tokens/brands/default`          | Default brand (palette+semantic)                    |
-| `@arun-dev/tokens/brands/default/palette`  | Default palette only                                |
-| `@arun-dev/tokens/brands/default/semantic` | Default semantic layer only                         |
-| `@arun-dev/tokens/primitives/*`            | Individual primitive scales                         |
-| `@arun-dev/tokens/primitives/fonts`        | Inter variable font (`@font-face`)                  |
-| `@arun-dev/tokens/createBrand`             | `createBrand()`, `generatePaletteFromSeed()`, types |
+| Specifier                                  | Content                                                                                         |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `@arun-dev/tokens/base`                    | All primitives + default brand                                                                  |
+| `@arun-dev/tokens/brands/default`          | Default brand (palette+semantic)                                                                |
+| `@arun-dev/tokens/brands/default/palette`  | Default palette only                                                                            |
+| `@arun-dev/tokens/brands/default/semantic` | Default semantic layer only                                                                     |
+| `@arun-dev/tokens/primitives/*`            | Individual primitive scales                                                                     |
+| `@arun-dev/tokens/primitives/fonts`        | Inter variable font (`@font-face`)                                                              |
+| `@arun-dev/tokens/components`              | Every component token set                                                                       |
+| `@arun-dev/tokens/components/*`            | `chip`, `badge`, `button` and `switch` on their own                                             |
+| `@arun-dev/tokens/createBrand`             | `createBrand()`, `generatePaletteFromSeed()`, `contrastRatio()`, `CONTRAST_REQUIREMENTS`, types |

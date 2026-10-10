@@ -9,22 +9,22 @@ Everything visual resolves through a four-tier chain of CSS custom properties. C
 the top of the chain and know nothing about what is beneath.
 
 ```
-primitives      --space-sm, --radius-full, --duration-fast     brand-independent
-brand palette   --color-brand-700: #4338ca                     per brand
-semantic        --color-text-accent: var(--color-brand-700)     per brand, per theme
-component       --btn-bg: var(--color-text-accent)              per component
+primitives      --space-sm, --radius-full, --duration-fast            brand-independent
+brand palette   --color-brand-700: #4338ca                            per brand
+semantic        --color-text-accent: var(--color-brand-700)            per brand, per theme
+component       --slider-accent-color: var(--color-text-accent)        per component
 ```
 
-So a single rule in `btn.css` —
+So a single rule in `slider.css` —
 
 ```css
-.btn-primary {
-  background-color: var(--btn-bg);
+.slider {
+  accent-color: var(--slider-accent-color);
 }
 ```
 
 — produces a different colour in dark mode, and a different colour again under another brand,
-without that rule or `Button.tsx` changing at all.
+without that rule or `slider.tsx` changing at all.
 
 ## Light, dark and system
 
