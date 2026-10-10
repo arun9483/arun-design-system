@@ -1,6 +1,6 @@
 {
   "name": "@arun-dev/ui",
-  "version": "5.14.1",
+  "version": "5.14.2",
   "description": "Brand-agnostic React component library styled entirely via @arun-dev/tokens semantic CSS custom properties",
   "license": "MIT",
   "type": "module",
