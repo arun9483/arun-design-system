@@ -10,6 +10,12 @@
     cursor: pointer;
   }
 
+  /* A page already seen, as a native link marks it. Before :hover, so a hover still wins. Only
+     colours may change on :visited — the browser ignores anything else there, for privacy. */
+  .link:visited {
+    color: var(--link-color-visited);
+  }
+
   .link:hover {
     color: var(--link-color-hover);
     text-decoration-color: currentColor;

@@ -818,7 +818,10 @@ a headless half.
 `Button`; this is that half. A disabled link has no platform meaning — the attribute is inert
 on `<a>` — and synthesising one was what `useButton` did wrong, so there is no `disabled`.
 `render` takes a router's link (`<NextLink />`) and keeps the styling. No automatic
-`target="_blank"` or external icon: those are the consumer's choice, per link.
+`target="_blank"` or external icon: those are the consumer's choice, per link. A visited link takes
+its own colour, as a native one does: `--link-color-visited`, the accent mixed toward the body
+text in oklab, which keeps the required contrast for any brand because both ends meet it.
+Navigation parts — Breadcrumb, Pagination, a link Card — do not mark visited pages.
 
 **`Separator` is an `<hr>`.** `orientation="vertical"` sets `aria-orientation` and
 `data-orientation`, for a divider in a toolbar or between inline items; the element stays an
