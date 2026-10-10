@@ -4,6 +4,7 @@ import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 import { rehypeBaseUrl } from './plugins/rehype-base-url.mjs';
 import { rehypeFocusableTables } from './plugins/rehype-focusable-tables.mjs';
+import { componentSidebar } from './src/sidebar-components.mjs';
 
 export default defineConfig({
   site: 'https://arun9483.github.io',
@@ -50,9 +51,9 @@ export default defineConfig({
         },
         {
           label: 'Components',
-          // Every page in the folder, alphabetical by file name, so a new component lands in
-          // order without an edit here.
-          items: [{ autogenerate: { directory: 'components' } }],
+          // Grouped by what a component is for, A–Z inside each group: see
+          // src/sidebar-components.mjs, which a test keeps in step with the folder.
+          items: componentSidebar(),
         },
         {
           label: 'Guides',
