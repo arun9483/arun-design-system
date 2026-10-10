@@ -5,6 +5,7 @@ description: A label, a description and an error, tied to one control.
 
 import Example from '@/components/Example.astro';
 import FieldBasics from '@/examples/field-basics';
+import FieldGroup from '@/examples/field-group';
 import PropTable from '@/components/PropTable.astro';
 
 ## When to use
@@ -13,7 +14,8 @@ import PropTable from '@/components/PropTable.astro';
 - Validation errors that should be read out with the control
 - Keeping label, description and error wired up without managing ids by hand
 
-Not for a group of controls under one caption — use a native `<fieldset>` and `<legend>`.
+Not for a group of controls under one caption — use a native `<fieldset>` and `<legend>`, styled
+with [the fieldset classes](#a-group-of-controls).
 
 **Choosing between entering text:**
 
@@ -76,8 +78,27 @@ Field checks nothing. Set `invalid` from wherever you validate:
 - **The browser:** `required` on the Root makes the control `required`, so the browser stops
   the form and shows its own message.
 
-A group of controls under one label, such as radios or checkboxes, is a native `<fieldset>`
-with a `<legend>`.
+## A group of controls
+
+A group of controls under one caption, such as radios or checkboxes, is a native `<fieldset>`
+with a `<legend>`. The browser names the group by its legend, and `disabled` on the fieldset
+disables every control in it. Field ties a label to one control, so it is not used here; four
+classes draw the group as a Field is drawn, from the same `--field-*` tokens:
+
+| Class                   | On                | Drawn as            |
+| ----------------------- | ----------------- | ------------------- |
+| `.fieldset`             | the `<fieldset>`  | a Field, unframed   |
+| `.fieldset-legend`      | its `<legend>`    | `Field.Label`       |
+| `.fieldset-description` | a `<p>` inside it | `Field.Description` |
+| `.fieldset-error`       | a `<p>` inside it | `Field.Error`       |
+
+<Example name="field-group" layout="stack">
+  <FieldGroup client:load />
+</Example>
+
+Tie the description and the error to the group yourself, with `aria-describedby` on the
+fieldset, naming only what is shown. A RadioGroup can be the fieldset itself:
+`<RadioGroup.Root render={<fieldset />} className="fieldset">`.
 
 ## Props
 

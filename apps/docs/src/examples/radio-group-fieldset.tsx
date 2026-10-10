@@ -16,13 +16,8 @@ export default function RadioGroupFieldset() {
     <form onSubmit={onSubmit} style={{ display: 'grid', gap: 'var(--space-sm)' }}>
       {/* A fieldset through `render`, so the legend names the group natively. `required`
           is the platform's: submit is blocked until something is chosen. */}
-      <RadioGroup.Root
-        render={<fieldset />}
-        name="delivery"
-        required
-        style={{ border: 0, padding: 0, margin: 0 }}
-      >
-        <legend className="text-size-sm text-color-secondary">Delivery</legend>
+      <RadioGroup.Root render={<fieldset />} name="delivery" required className="fieldset">
+        <legend className="fieldset-legend">Delivery</legend>
         <label style={row}>
           <RadioGroup.Item value="standard" />
           Standard

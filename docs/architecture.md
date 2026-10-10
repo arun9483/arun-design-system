@@ -861,7 +861,10 @@ Validity is the consumer's: `invalid` comes from react-hook-form's `fieldState`,
 browser's own bubble and `:user-invalid` stay the platform's. Base UI's Field also validates
 (`validate`, `validationMode`); that is a form library's job, and react-hook-form already does
 it for every consumer here. A group of controls under one label is a `<fieldset>` with a
-`<legend>`, native, so there is no `Fieldset` part.
+`<legend>`, native, so there is no `Fieldset` part. ui draws one as a Field is drawn, with classes
+on the native elements — `.fieldset`, `.fieldset-legend`, `.fieldset-description`,
+`.fieldset-error` — reading the same `--field-*` tokens; the platform already names the group by
+its legend, and the consumer ties a description or an error to it with `aria-describedby`.
 
 **Rules out:** `disabled` on `Link`; a filled track drawn by script on `Slider`; a second thumb on
 `Slider`; validation inside `Field`; a `Fieldset` part.

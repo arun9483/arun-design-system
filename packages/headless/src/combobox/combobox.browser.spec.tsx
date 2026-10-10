@@ -509,12 +509,13 @@ describe('Combobox (browser)', () => {
 
     it('filters inside each group, and leaves out a group with no match', async () => {
       render(<Grouped />);
+      // The list follows the query through useDeferredValue, a render after the keystroke.
       await userEvent.type(input(), 'an');
-      expect(groupNames()).toEqual(['Asia', 'Europe']);
+      await expect.poll(groupNames).toEqual(['Asia', 'Europe']);
       expect(options()).toEqual(['Japan', 'France', 'Germany']);
       await userEvent.clear(input());
       await userEvent.type(input(), 'zz');
-      expect(groups()).toEqual([]);
+      await expect.poll(groups).toEqual([]);
       expect(screen.getByText('No countries')).toBeInTheDocument();
     });
 
