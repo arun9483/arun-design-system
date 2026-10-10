@@ -23,7 +23,7 @@ Live examples, interactive playgrounds and a prop reference — an Astro Starlig
 [`apps/docs`](apps/docs), deployed from `main`. Run it locally with
 `pnpm --filter @arun-dev/docs dev`.
 
-Two controls in the header demonstrate the architecture rather than the components:
+The site demonstrates the architecture as well as the components.
 
 The site is itself a consumer, following the documented path exactly: one `createBrand()` call
 from a single seed colour, written to a file, imported in place of

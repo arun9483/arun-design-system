@@ -1,4 +1,5 @@
 ---
+import { Table } from '@arun-dev/ui';
 import { COMMON, PROPS, type PropDoc } from '../data/props';
 
 interface Props {
@@ -35,24 +36,32 @@ const rows: readonly PropDoc[] = [
 ];
 ---
 
-<!-- The wrapper is the scroll box, so it is the Tab stop and the named region: a wide table
-     can then be scrolled from the keyboard. -->
-<div class="ds-props" tabindex="0" role="region" aria-label={`${component} props`}>
-  <table>
-    <thead>
-      <tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr>
-    </thead>
-    <tbody>
+<!-- The design system's Table, inside a wrapper that is the scroll box, so the wrapper is the Tab
+     stop and the named region: a wide table can then be scrolled from the keyboard. -->
+<div class="ds-props not-content" tabindex="0" role="region" aria-label={`${component} props`}>
+  <Table.Root containerClassName="ds-props-table">
+    <Table.Caption className="sr-only">{component} props</Table.Caption>
+    <Table.Header>
+      <Table.Row>
+        <Table.Head scope="col">Prop</Table.Head>
+        <Table.Head scope="col">Type</Table.Head>
+        <Table.Head scope="col">Default</Table.Head>
+        <Table.Head scope="col">Description</Table.Head>
+      </Table.Row>
+    </Table.Header>
+    <Table.Body>
       {
         rows.map((prop) => (
-          <tr>
-            <td><code>{prop.name}</code></td>
-            <td><code>{prop.type}</code></td>
-            <td>{prop.default ? <code>{prop.default}</code> : <span aria-hidden="true">—</span>}</td>
-            <td set:html={format(prop.description)} />
-          </tr>
+          <Table.Row>
+            <Table.Cell><code>{prop.name}</code></Table.Cell>
+            <Table.Cell><code>{prop.type}</code></Table.Cell>
+            <Table.Cell>
+              {prop.default ? <code>{prop.default}</code> : <span aria-hidden="true">—</span>}
+            </Table.Cell>
+            <Table.Cell dangerouslySetInnerHTML={{ __html: format(prop.description) }} />
+          </Table.Row>
         ))
       }
-    </tbody>
-  </table>
+    </Table.Body>
+  </Table.Root>
 </div>

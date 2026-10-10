@@ -3,7 +3,7 @@ title: react-hook-form
 description: How each form control binds to react-hook-form — register() or Controller — with a form to copy for every kind of control.
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Aside from '@/components/Aside';
 import Example from '@/components/Example.astro';
 import ReactHookFormSignup from '@/examples/react-hook-form-signup';
 import ReactHookFormRegister from '@/examples/react-hook-form-register';
@@ -143,7 +143,7 @@ the user never chose.
 
 `register()` returns props for a native input:
 
-|            | goes to          | result                                            |
+| prop       | goes to          | result                                            |
 | ---------- | ---------------- | ------------------------------------------------- |
 | `ref`      | the `<button>`   | it has no `.checked`, so there is nothing to read |
 | `onChange` | the `<button>`   | a `<button>` never fires a `change` event         |

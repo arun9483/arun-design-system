@@ -73,16 +73,6 @@
   font-family: var(--sl-font-mono);
 }
 
-.ds-control select,
-.ds-control input[type='text'] {
-  font-size: var(--sl-text-xs);
-  padding: 0.3rem 0.4rem;
-  border-radius: 0.35rem;
-  border: 1px solid var(--sl-color-gray-5);
-  background-color: var(--sl-color-black);
-  color: var(--sl-color-white);
-}
-
 .ds-control-inline {
   flex-direction: row;
   align-items: center;
@@ -93,6 +83,13 @@
    scroll box, which nothing could focus. The wrapper carries the Tab stop and the name. */
 .ds-props {
   overflow-x: auto;
+  /* Four columns in the content column: tighter cells than a data table's. */
+  --table-cell-padding-inline: var(--space-2xs);
+}
+
+/* The wrapper scrolls, so the Table's own scrolling container does not. */
+.ds-props .ds-props-table {
+  overflow: visible;
 }
 
 .ds-props table {
@@ -119,7 +116,7 @@
 }
 
 .ds-props td:last-child {
-  min-width: 16rem;
+  min-width: 13rem;
 }
 
 /* Diagrams — mermaid renders client-side into these, so reserve the space and keep
@@ -195,4 +192,31 @@
 .ds-diagram pre:focus-visible {
   outline: 2px solid var(--sl-color-text-accent);
   outline-offset: 2px;
+}
+
+/* CardLinks: the design system's Card holds no padding of its own, and as a link it should read
+   as a card, not as underlined text. */
+.ds-card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2xs);
+  padding: var(--space-md);
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Aside: an Alert holding prose — paragraphs, code and tables — spaced as the page's own. */
+.ds-aside .alert-description > * + * {
+  margin-block-start: var(--space-xs);
+}
+
+/* InstallCommands: a command in a Tabs panel, drawn as a code block. */
+.tabs .ds-playground-output {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: var(--radius-md);
+  background-color: var(--sl-color-gray-6, var(--color-bg-secondary));
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-sm);
 }

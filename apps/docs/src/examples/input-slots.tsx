@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Input } from '@arun-dev/ui';
+import { Input, Kbd } from '@arun-dev/ui';
 
 const field = { display: 'grid', gap: 'var(--space-3xs)', maxInlineSize: '20rem' };
 
@@ -27,7 +27,7 @@ export default function InputSlots() {
           type="search"
           placeholder="Components…"
           startSlot={<SearchIcon />}
-          endSlot={<kbd>⌘K</kbd>}
+          endSlot={<Kbd>⌘K</Kbd>}
         />
       </div>
 
