@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -63,5 +63,53 @@ describe('server components', () => {
   it('keeps useRender importable from server code, for Card and the other server components', () => {
     const root = readFileSync(require.resolve('@arun-dev/headless'), 'utf8');
     expect(root).not.toMatch(/^\s*(['"])use client\1/);
+  });
+
+  it('keeps exactly the agreed ui components on the server', () => {
+    // Server components render on the server and send no JavaScript; client components hydrate.
+    // A change to this list changes what every consumer's page ships, so it is made here, on
+    // purpose (decision 32), not as a side effect of an edit.
+    const SERVER = [
+      'alert',
+      'badge',
+      'breadcrumb',
+      'button',
+      'card',
+      'chip',
+      'grid',
+      'heading',
+      'input',
+      'kbd',
+      'link',
+      'meter',
+      'pagination',
+      'paragraph',
+      'progress',
+      'select',
+      'separator',
+      'skeleton',
+      'slider',
+      'spinner',
+      'stack',
+      'table',
+      'text',
+      'textarea',
+    ];
+    const components = join(here, '../../../../packages/ui/src/components');
+    const server = readdirSync(components)
+      .filter((name) => {
+        const modules = readdirSync(join(components, name)).filter(
+          (file) => /\.tsx$/.test(file) && !file.includes('.spec.'),
+        );
+        return (
+          modules.length > 0 &&
+          modules.every(
+            (file) =>
+              !/^\s*(['"])use client\1/.test(readFileSync(join(components, name, file), 'utf8')),
+          )
+        );
+      })
+      .sort();
+    expect(server).toEqual(SERVER);
   });
 });

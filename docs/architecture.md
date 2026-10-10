@@ -1651,7 +1651,11 @@ be.
 `@arun-dev/ui` and `@arun-dev/headless` on React's server build, with each `'use client'`
 module standing as a client boundary that throws if read into, as a Server Components bundler
 treats it, and reads every namespace member. A module that touched client-only React while
-loading, or a namespace built in a client module, fails it.
+loading, or a namespace built in a client module, fails it. It also pins which ui components are server
+components, so moving one to the client — and adding its JavaScript to every page that uses it —
+is a deliberate change. The Server Components guide lists both, and what each needs from a
+server component: data props work from one, callbacks and controlled state need the consumer's own
+`'use client'` component.
 
 **Rules out:** one `'use client'` on the whole of ui, which would make every Card and Heading a
 client component; a separate server entry point.
