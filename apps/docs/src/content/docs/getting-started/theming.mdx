@@ -81,13 +81,27 @@ import { contrastRatio, CONTRAST_REQUIREMENTS } from '@arun-dev/tokens/createBra
 ```
 
 :::note[This site is that consumer]
-Everything you see here renders in a brand generated exactly this way — one
-`createBrand()` call from the seed `#7c3aed`, written to a file, imported in place of
+Everything you see here renders in a brand generated exactly this way — the arun brand, one
+`createBrand(ARUN_BRAND)` call from the seed `#7c3aed`, written to a file, imported in place of
 `@arun-dev/tokens/brands/default`. See `apps/docs/scripts/generate-brand.mjs`.
 
 So the component examples are **not** the default indigo brand. That is the point: no
 component knows a brand exists, and swapping the token layer is the only change needed.
 :::
+
+## A published brand: arun
+
+The arun brand is also published, generated from the same input, so an app can use it without
+running `createBrand()` itself:
+
+```css
+@import '@arun-dev/tokens/base';
+@import '@arun-dev/tokens/brands/arun'; /* in place of brands/default */
+```
+
+It is `createBrand(ARUN_BRAND)` byte for byte — a test fails if the two ever differ — so an app
+importing it and this site, which generates it, look the same. `ARUN_BRAND` is exported from
+`@arun-dev/tokens/createBrand` for a build that wants to generate it, or start from it.
 
 ## One brand per document
 

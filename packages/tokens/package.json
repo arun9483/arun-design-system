@@ -27,6 +27,7 @@
   "exports": {
     "./base": "./src/base.css",
     "./brands/default": "./src/brands/default.css",
+    "./brands/arun": "./src/brands/arun.css",
     "./brands/default/palette": "./src/brands/default/palette.css",
     "./brands/default/semantic": "./src/brands/default/semantic.css",
     "./components": "./src/components.css",
@@ -59,6 +60,7 @@
   },
   "scripts": {
     "build": "tsdown",
+    "generate:brands": "tsdown && node scripts/generate-brands.mjs",
     "clean": "rm -rf dist .turbo",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

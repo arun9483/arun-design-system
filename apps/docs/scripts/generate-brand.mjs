@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { createBrand } from '@arun-dev/tokens/createBrand';
+import { ARUN_BRAND, createBrand } from '@arun-dev/tokens/createBrand';
 
 /**
  * Generates this site's brand — the documented consumer path, followed exactly.
@@ -20,9 +20,10 @@ import { createBrand } from '@arun-dev/tokens/createBrand';
  */
 const OUT = join(import.meta.dirname, '..', 'src', 'generated');
 
-const NAME = 'arun-docs';
-const BRAND = { name: NAME, seed: '#7c3aed' };
-const FILE = `brand-${NAME}.css`;
+// The arun brand, from the same input as the published @arun-dev/tokens/brands/arun, so this
+// site and every app importing that stylesheet look the same.
+const BRAND = ARUN_BRAND;
+const FILE = `brand-${BRAND.name}.css`;
 
 await mkdir(OUT, { recursive: true });
 await writeFile(join(OUT, FILE), createBrand(BRAND), 'utf8');
