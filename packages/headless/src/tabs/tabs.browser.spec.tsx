@@ -4,7 +4,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { Tabs } from './index';
 import type { TabsRootProps } from './TabsRoot';
 
-/** Runs in Chromium: real focus, real Tab order and real key handling. */
+/** Runs in a real browser: real focus, real Tab order and real key handling. */
 
 function Basic(props: TabsRootProps) {
   return (

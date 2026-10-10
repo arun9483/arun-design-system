@@ -6,7 +6,7 @@ import { Toast, useToastManager } from './index';
 import type { ToastManager, ToastProviderProps } from './index';
 import { Dialog } from '../dialog';
 
-/** Runs in Chromium: the popover top layer, real focus and real timers. */
+/** Runs in a real browser: the popover top layer, real focus and real timers. */
 
 let manager: ToastManager;
 function Capture() {

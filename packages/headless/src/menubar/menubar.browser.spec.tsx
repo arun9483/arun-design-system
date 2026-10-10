@@ -4,7 +4,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { Menubar } from './index';
 import type { MenubarRootProps } from './MenubarRoot';
 
-/** Runs in Chromium: jsdom has no popover API, top layer, light dismiss or real focus. */
+/** Runs in a real browser: jsdom has no popover API, top layer, light dismiss or real focus. */
 
 function Editor({ onNew, ...props }: MenubarRootProps & { onNew?: () => void }) {
   return (

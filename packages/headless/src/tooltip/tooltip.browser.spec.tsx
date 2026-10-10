@@ -7,7 +7,7 @@ import { Dialog } from '../dialog';
 import { Popover } from '../popover';
 
 /**
- * Runs in Chromium: hover, :focus-visible, the popover API and anchor positioning are all
+ * Runs in a real browser: hover, :focus-visible, the popover API and anchor positioning are all
  * real here. Delays are short so the suite stays fast.
  */
 

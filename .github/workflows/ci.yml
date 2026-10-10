@@ -22,8 +22,8 @@ jobs:
     uses: arun9483/frontend-platform-kit/.github/workflows/security.yml@v1
 
   # Behaviour jsdom cannot run — <dialog>, the top layer, real focus and keys — in
-  # Chromium. Kept out of the shared quality job, whose `pnpm test` stays jsdom-only; the
-  # Playwright image ships the browser, so nothing is downloaded per run. The image tag
+  # Chromium, Firefox and WebKit. Kept out of the shared quality job, whose `pnpm test` stays
+  # jsdom-only; the Playwright image ships the browsers, so nothing is downloaded per run. The image tag
   # must match the `playwright` devDependency in packages/headless.
   browser-tests:
     name: Browser tests

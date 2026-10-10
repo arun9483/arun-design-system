@@ -7,7 +7,7 @@ import { Toggle } from '../toggle';
 import { ToggleGroup } from '../toggle-group';
 import { Avatar } from '../avatar';
 
-/** Runs in Chromium: real focus, keys and image loading. */
+/** Runs in a real browser: real focus, keys and image loading. */
 
 const focused = () => document.activeElement;
 const button = (name: string) => screen.getByRole('button', { name });
