@@ -5,6 +5,7 @@ description: Where the page sits, as a trail of links.
 
 import Example from '@/components/Example.astro';
 import BreadcrumbBasics from '@/examples/breadcrumb-basics';
+import BreadcrumbSeparator from '@/examples/breadcrumb-separator';
 import PropTable from '@/components/PropTable.astro';
 
 ## When to use
@@ -46,6 +47,39 @@ are on comes last, as `Breadcrumb.Current`: not a link, and marked `aria-current
 
 Pass your router's link to `Breadcrumb.Link` through `render`, as with [Link](/components/link/).
 
+## Your own separator
+
+The `/` is the `::before` of every step but the first, so a separator of your own is one CSS rule
+on a class you give `Breadcrumb.Root`: a character in `content`, or an icon as a mask painted with
+`currentColor`, which keeps `--breadcrumb-separator-color` in light and dark. Keep the `/ ''` after
+the content — that empty alternative text is what keeps the separator from being read out.
+
+<Example name="breadcrumb-separator">
+  <BreadcrumbSeparator client:load />
+</Example>
+
+```css
+.my-trail .breadcrumb-item + .breadcrumb-item::before {
+  content: '›' / '';
+}
+```
+
+An icon from an `.svg` file of your own works the same way, as a mask. Point at the file from your
+stylesheet, or, as the third trail does, import its address and pass it in a custom property:
+
+```css
+.my-trail .breadcrumb-item + .breadcrumb-item::before {
+  content: '' / '';
+  inline-size: 1em;
+  block-size: 1em;
+  background-color: currentColor;
+  mask: url('/icons/arrow.svg') center / contain no-repeat;
+}
+```
+
+As a mask the icon takes the separator's colour, whatever colour the file draws in. To keep the
+file's own colours instead, put it in `content`: `content: url('/icons/arrow.svg') / ''`.
+
 ## Props
 
 <PropTable component="Breadcrumb.Root" />
@@ -53,4 +87,4 @@ Pass your router's link to `Breadcrumb.Link` through `render`, as with [Link](/c
 ## Notes
 
 - With two breadcrumbs on a page, give each its own `aria-label`.
-- Restyle with the `--breadcrumb-*` tokens.
+- Restyle with the `--breadcrumb-*` tokens, and the separator with a rule of your own (above).
