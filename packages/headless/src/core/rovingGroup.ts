@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useState } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, RefObject } from 'react';
 import { byDocumentOrder, rovingIndex } from './rovingFocus';

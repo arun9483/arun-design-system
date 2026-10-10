@@ -1,3 +1,5 @@
+'use client';
+
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { PopoverRoot } from '../popover/PopoverRoot';

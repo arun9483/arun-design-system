@@ -1,3 +1,5 @@
+'use client';
+
 import { Dialog as Headless } from '@arun-dev/headless/dialog';
 import type { DialogPopupProps } from '@arun-dev/headless/dialog';
 import { cn } from '../../lib/cn';

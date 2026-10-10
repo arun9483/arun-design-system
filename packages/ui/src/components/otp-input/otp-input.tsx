@@ -1,3 +1,5 @@
+'use client';
+
 import type React from 'react';
 import { OtpInput as Headless } from '@arun-dev/headless/otp-input';
 import type { OtpInputRootProps } from '@arun-dev/headless/otp-input';

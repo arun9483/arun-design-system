@@ -1,3 +1,5 @@
+'use client';
+
 import { Menu as Headless } from '@arun-dev/headless/menu';
 import type { MenuRadioItemProps } from '@arun-dev/headless/menu';
 import { cn } from '../../lib/cn';

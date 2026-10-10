@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import type { UnknownProps } from '../core/mergeProps';

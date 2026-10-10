@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext } from 'react';
 
 /** The state Field.Root shares with its parts, and projects as `data-*` attributes. */

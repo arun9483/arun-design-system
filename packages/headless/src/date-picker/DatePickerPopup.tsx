@@ -1,3 +1,5 @@
+'use client';
+
 import { PopoverPopup, type PopoverPopupProps } from '../popover/PopoverPopup';
 import { useDatePickerRootContext } from './DatePickerRootContext';
 

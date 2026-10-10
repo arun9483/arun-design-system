@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useId, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { anchorNameFor } from '../core/anchoring';

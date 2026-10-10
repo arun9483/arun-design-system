@@ -1,3 +1,5 @@
+'use client';
+
 import type React from 'react';
 import { Combobox as Headless } from '@arun-dev/headless/combobox';
 import type { ComboboxInputProps as HeadlessInputProps } from '@arun-dev/headless/combobox';

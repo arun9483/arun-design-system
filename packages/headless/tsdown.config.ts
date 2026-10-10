@@ -1,4 +1,31 @@
+import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { defineConfig } from 'tsdown';
+
+/**
+ * React Server Components (decision 32): a module that starts with 'use client' is a client
+ * boundary. The bundler drops the directive, so put it back on the built file of every source
+ * module that has it. Output is per module (`unbundle`), so a server module — useRender, Card —
+ * never shares a file with a client one.
+ */
+async function restoreUseClient() {
+  const sources = await readdir('src', { recursive: true });
+  await Promise.all(
+    sources
+      .filter((file) => /\.tsx?$/.test(file) && !file.includes('.spec.'))
+      .map(async (file) => {
+        if (!/^\s*(['"])use client\1/.test(await readFile(join('src', file), 'utf8'))) return;
+        await Promise.all(
+          ['.js', '.cjs'].map(async (extension) => {
+            const built = join('dist', file.replace(/\.tsx?$/, extension));
+            const code = await readFile(built, 'utf8');
+            if (!/^\s*(['"])use client\1/.test(code))
+              await writeFile(built, `'use client';\n${code}`);
+          }),
+        );
+      }),
+  );
+}
 
 export default defineConfig({
   // One entry per public subpath. Components are exported individually so a
@@ -40,4 +67,6 @@ export default defineConfig({
   fixedExtension: false,
   outDir: 'dist',
   deps: { neverBundle: ['react', 'react-dom'] },
+  unbundle: true,
+  onSuccess: restoreUseClient,
 });

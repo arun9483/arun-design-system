@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useCallback, useContext, useMemo } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import { useControlled } from '../core/useControlled';

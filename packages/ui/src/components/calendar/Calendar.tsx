@@ -1,3 +1,5 @@
+'use client';
+
 import { Calendar as Headless } from '@arun-dev/headless/calendar';
 import type {
   CalendarDayPropsGetter,

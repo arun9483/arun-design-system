@@ -1,3 +1,5 @@
+'use client';
+
 import { HoverCard as Headless } from '@arun-dev/headless/hover-card';
 import type { HoverCardPopupProps } from '@arun-dev/headless/hover-card';
 import { cn } from '../../lib/cn';

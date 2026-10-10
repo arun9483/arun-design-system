@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef } from 'react';
 import type { ComponentPropsWithRef, ReactElement, Ref } from 'react';
 import {

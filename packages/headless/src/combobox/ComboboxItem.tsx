@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 import type {
   ComponentPropsWithRef,

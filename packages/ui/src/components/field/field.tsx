@@ -1,3 +1,5 @@
+'use client';
+
 import { Field as Headless } from '@arun-dev/headless/field';
 import type {
   FieldRootProps,

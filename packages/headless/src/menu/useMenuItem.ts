@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext, useLayoutEffect, useRef } from 'react';
 import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 import { isPointInPolygon, type Point } from '../core/pointerIntent';

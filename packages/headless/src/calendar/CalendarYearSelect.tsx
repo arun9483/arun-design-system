@@ -1,3 +1,5 @@
+'use client';
+
 import { useRender } from '../core/useRender';
 import type { UnknownProps } from '../core/mergeProps';
 import { clamp, startOfMonth } from './dates';
