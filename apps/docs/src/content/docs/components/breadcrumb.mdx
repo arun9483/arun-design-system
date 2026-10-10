@@ -64,6 +64,22 @@ the content — that empty alternative text is what keeps the separator from bei
 }
 ```
 
+An icon from an `.svg` file of your own works the same way, as a mask. Point at the file from your
+stylesheet, or, as the third trail does, import its address and pass it in a custom property:
+
+```css
+.my-trail .breadcrumb-item + .breadcrumb-item::before {
+  content: '' / '';
+  inline-size: 1em;
+  block-size: 1em;
+  background-color: currentColor;
+  mask: url('/icons/arrow.svg') center / contain no-repeat;
+}
+```
+
+As a mask the icon takes the separator's colour, whatever colour the file draws in. To keep the
+file's own colours instead, put it in `content`: `content: url('/icons/arrow.svg') / ''`.
+
 ## Props
 
 <PropTable component="Breadcrumb.Root" />
