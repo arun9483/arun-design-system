@@ -21,7 +21,7 @@ export type AlertRootProps = AlertRootOwnProps &
   Omit<React.HTMLAttributes<HTMLElement>, keyof AlertRootOwnProps>;
 
 /**
- * A message box (decision 16). No live role by default: one on the page from the start is
+ * A message box (decision 15). No live role by default: one on the page from the start is
  * content. Add `role="alert"` (urgent) or `role="status"` (polite) when it appears in response to
  * something.
  */

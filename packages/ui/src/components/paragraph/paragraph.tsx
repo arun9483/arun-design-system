@@ -19,7 +19,7 @@ export type ParagraphProps = ParagraphOwnProps &
   Omit<React.HTMLAttributes<HTMLParagraphElement>, keyof ParagraphOwnProps>;
 
 /**
- * A block of running text: a native `<p>`, kept to a readable line length (decision 22).
+ * A block of running text: a native `<p>`, kept to a readable line length (decision 15).
  */
 export function Paragraph({ size, color, className, render, ...rest }: ParagraphProps) {
   return useRender({

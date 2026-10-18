@@ -56,12 +56,12 @@ function idPart(value: string): string {
 /**
  * Tabs, by the WAI-ARIA pattern: a tablist of tabs, one panel each, one selected.
  *
- * There is no native element to lean on (decision 7), so the behaviour is built here: the
+ * There is no native element to lean on (decision 3), so the behaviour is built here: the
  * selection, arrow-key focus with a single Tab stop (roving tabindex, `core/rovingFocus`),
  * and the ids that wire each tab to its panel.
  *
  * Each Tab registers its own `value` and `disabled` from its props; the Root never reads
- * them back from the DOM (decision 10). Elements are kept only to move focus to.
+ * them back from the DOM (decision 4). Elements are kept only to move focus to.
  */
 export function TabsRoot({
   value: valueProp,

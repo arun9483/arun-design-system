@@ -29,7 +29,7 @@ export type TextProps = TextOwnProps & Omit<React.HTMLAttributes<HTMLElement>, k
 
 /**
  * A run of text with a size, colour or weight from the tokens: a `<span>`, which carries no
- * meaning of its own (decision 22).
+ * meaning of its own (decision 15).
  */
 export function Text({ size, color, weight, className, render, ...rest }: TextProps) {
   return useRender({

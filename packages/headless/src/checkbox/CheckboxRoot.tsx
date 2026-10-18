@@ -59,7 +59,7 @@ export type CheckboxRootProps = CheckboxRootOwnProps &
  * switch in that it does not take effect at once.
  *
  * A `<button role="checkbox">` rather than an `<input type="checkbox">`, because an
- * input is void and cannot hold an indicator — the content test in decision 7, the same
+ * input is void and cannot hold an indicator — the content test in decision 3, the same
  * one Switch.Root fails. Everything the input was still good for, the hidden one below
  * keeps doing. The platform supplies focusability, Space and Enter activation and
  * `disabled`, so none of it is synthesised here.

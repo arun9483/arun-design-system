@@ -9,7 +9,7 @@ import { useMenubarContext } from './MenubarContext';
 export type MenubarPopupProps = MenuPopupProps;
 
 /**
- * A menu of the bar, or a submenu in one: Menu's Popup (decision 29), with the bar's keys in
+ * A menu of the bar, or a submenu in one: Menu's Popup (decision 9), with the bar's keys in
  * front of its own. In a horizontal bar → and ← move to the next and previous menu and open it
  * — after a SubmenuTrigger's →, and a submenu's ←, which come first. In a vertical bar the menus
  * open to the side (`side="right"` by default), and ← (→ right-to-left) closes one back to its

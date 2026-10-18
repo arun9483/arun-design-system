@@ -1,7 +1,7 @@
 /**
  * Calendar dates as ISO strings, `YYYY-MM-DD`: a day on the calendar, in no time zone. They
  * compare as strings, so `a < b` orders them. Arithmetic goes through a `Date` at UTC midnight,
- * where every day is 24 hours long. Internal (decision 9): shared by Calendar and DatePicker.
+ * where every day is 24 hours long. Internal (decision 5): shared by Calendar and DatePicker.
  */
 
 const MS_PER_DAY = 86_400_000;

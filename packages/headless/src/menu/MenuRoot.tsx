@@ -40,12 +40,12 @@ export type MenuRootProps = {
  * A menu button, by the WAI-ARIA pattern: a Trigger that opens a list of actions. Holds the
  * state and shares it with its parts. Renders no element of its own.
  *
- * The popup is a native `popover`, anchored like Popover (decision 12): the platform supplies
+ * The popup is a native `popover`, anchored like Popover (decision 7): the platform supplies
  * the top layer, light dismiss, Esc and focus return. This component adds state, one setter
  * every close goes through, and the arrow-key focus a menu needs (`core/rovingFocus`).
  *
  * Each Item registers its own `disabled` from its props; the Root never reads it back from
- * the DOM (decision 10). Elements are kept only to move focus to.
+ * the DOM (decision 4). Elements are kept only to move focus to.
  */
 export function MenuRoot({ children, ...props }: MenuRootProps) {
   const context = useMenuRootValue('Menu.Root', props, null);

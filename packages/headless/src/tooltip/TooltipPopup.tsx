@@ -32,7 +32,7 @@ export type TooltipPopupProps = TooltipPopupOwnProps &
 
 /**
  * The tooltip: a native `popover="manual"` with `role="tooltip"`, anchored to the trigger
- * as Popover is (decision 12). State drives the element, never the reverse.
+ * as Popover is (decision 7). State drives the element, never the reverse.
  *
  * It stays open while the pointer is on it, so its text can be read and selected, and
  * closes on Esc — which closes only the tooltip, not a Dialog or Popover beneath it.

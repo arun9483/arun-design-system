@@ -91,7 +91,7 @@ export function useCalendarRoot({
   const [anchor, setAnchor] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
 
-  // Elements only to move focus to, never read (decision 10).
+  // Elements only to move focus to, never read (decision 4).
   const days = useRef(new Map<string, HTMLElement>());
   const registerDay = useCallback((iso: string, element: HTMLElement | null) => {
     if (element) days.current.set(iso, element);

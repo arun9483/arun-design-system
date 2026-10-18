@@ -12,7 +12,7 @@ type KbdOwnProps = {
 
 export type KbdProps = KbdOwnProps & Omit<React.HTMLAttributes<HTMLElement>, keyof KbdOwnProps>;
 
-/** A key: a styled `<kbd>` (decision 17). Write a combination as keys side by side. */
+/** A key: a styled `<kbd>` (decision 15). Write a combination as keys side by side. */
 export function Kbd({ className, render, ...rest }: KbdProps) {
   return useRender({
     render,

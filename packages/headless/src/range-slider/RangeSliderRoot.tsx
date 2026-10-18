@@ -54,7 +54,7 @@ function snap(n: number, min: number, max: number, step: number) {
 
 /**
  * A range picked along one track: two native `<input type="range">`s, the start and the end,
- * over the same track (decision 30). The platform supplies each thumb's keys, steps, slider
+ * over the same track (decision 11). The platform supplies each thumb's keys, steps, slider
  * semantics and value; the Root keeps the start at or below the end, places the stretch
  * between them through `--range-slider-start` and `--range-slider-end` (fractions of the track,
  * 0 to 1), and moves the nearer

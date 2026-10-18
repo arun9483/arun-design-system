@@ -37,7 +37,7 @@ export type HeadingProps = HeadingOwnProps &
 /**
  * A section heading: a native `<h1>`–`<h6>`, so the outline assistive technology navigates by
  * is the platform's. The level is structure and `size` is appearance, kept apart so a heading
- * never has to skip a level to look smaller (decision 22).
+ * never has to skip a level to look smaller (decision 15).
  */
 export function Heading({ level = 2, size, className, render, ...rest }: HeadingProps) {
   return useRender({

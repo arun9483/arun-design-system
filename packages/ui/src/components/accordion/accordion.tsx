@@ -54,7 +54,7 @@ export type AccordionItemProps = AccordionItemOwnProps &
   Omit<React.DetailsHTMLAttributes<HTMLDetailsElement>, keyof AccordionItemOwnProps>;
 
 /**
- * One section that opens and closes: a native `<details>` (decision 16). Control it with `open`
+ * One section that opens and closes: a native `<details>` (decision 15). Control it with `open`
  * and `onToggle` — the event's `newState` is `"open"` or `"closed"`. Items sharing a `name`, or
  * under an `exclusive` Root, open one at a time.
  */

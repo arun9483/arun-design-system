@@ -27,7 +27,7 @@ export type CalendarRangeRootProps = CalendarRangeRootOwnProps &
   Omit<ComponentPropsWithRef<'div'>, keyof CalendarRangeRootOwnProps | 'defaultValue' | 'onChange'>;
 
 /**
- * A calendar to pick a range of days from (decision 27): the first pick starts it, the second
+ * A calendar to pick a range of days from (decision 12): the first pick starts it, the second
  * completes it, in either order. In between, the range follows the pointer or focus, and the days
  * it cannot reach — past `maxDays`, or across a day that cannot be picked — are disabled.
  */

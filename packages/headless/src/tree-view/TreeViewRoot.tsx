@@ -49,11 +49,11 @@ export type TreeViewRootProps = TreeViewRootOwnProps &
   Omit<ComponentPropsWithRef<'ul'>, keyof TreeViewRootOwnProps | 'defaultValue' | 'onChange'>;
 
 /**
- * A tree, by the WAI-ARIA pattern (decision 26): `role="tree"`, Items nested in Items, one Tab
+ * A tree, by the WAI-ARIA pattern (decision 14): `role="tree"`, Items nested in Items, one Tab
  * stop, and the arrow keys to move, open and close. Name it with `aria-label`.
  *
  * Items register their value, parent and `disabled` from their props; the Root never reads them
- * back from the DOM (decision 10). An Item's children render only while it is open, so the
+ * back from the DOM (decision 4). An Item's children render only while it is open, so the
  * registered Items are exactly the ones shown, in document order.
  */
 export function TreeViewRoot({
@@ -124,7 +124,7 @@ export function TreeViewRoot({
     return () => setItems((current) => current.filter((i) => i !== entry));
   }, []);
 
-  // Disabled Items are skipped, as in every roving group (decision 13).
+  // Disabled Items are skipped, as in every roving group (decision 8).
   const navigable = useMemo(() => items.filter((i) => !i.disabled), [items]);
 
   // The Item last focused holds the Tab stop; until one has been, or if it is gone, the first

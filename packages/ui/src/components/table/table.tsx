@@ -26,7 +26,7 @@ export type TableCaptionProps = Part<
 >;
 
 /**
- * A native `<table>`, styled (decision 17), in a container that scrolls sideways when the table
+ * A native `<table>`, styled (decision 15), in a container that scrolls sideways when the table
  * is wider than the page. Rows, headers and `scope` are the platform's.
  */
 export function TableRoot({ className, containerClassName, ...rest }: TableRootProps) {

@@ -231,7 +231,7 @@ const groupNames = () =>
     .queryAllByRole('group', { hidden: true })
     .map((g) => document.getElementById(g.getAttribute('aria-labelledby') ?? '')?.textContent);
 
-// Creating an item is a pattern, not an API (decision 14): a "Create" item joins `items` while
+// Creating an item is a pattern, not an API (decision 10): a "Create" item joins `items` while
 // nothing matches exactly, and `onValueChange` swaps it for the real one.
 type Label = { id: string; label: string; create?: string };
 

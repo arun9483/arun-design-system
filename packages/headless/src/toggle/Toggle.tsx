@@ -32,7 +32,7 @@ export type ToggleProps = ToggleOwnProps &
   Omit<ComponentPropsWithRef<'button'>, keyof ToggleOwnProps>;
 
 /**
- * A button that stays pressed: `<button aria-pressed>` (decision 17), as APG's toggle button.
+ * A button that stays pressed: `<button aria-pressed>` (decision 14), as APG's toggle button.
  * Inside a ToggleGroup its state is the group's, by `value`; inside a Toolbar or a ToggleGroup it
  * is one of the arrow-key items. `data-pressed` while pressed.
  */
@@ -75,7 +75,7 @@ export function Toggle({
       ref: elementRef,
       onFocus: roving.onFocus,
       onClick(event: ReactMouseEvent) {
-        // Guarded on state, not an attribute a `render` element might drop (decision 10).
+        // Guarded on state, not an attribute a `render` element might drop (decision 4).
         if (disabled || event.defaultPrevented) return;
         if (group && value !== undefined) {
           group.toggle(value);

@@ -8,7 +8,7 @@ import { useMenuRootContext, type MenuRootContextValue } from './MenuRootContext
 
 /**
  * What every kind of item shares — Item, CheckboxItem, RadioItem: registering with the Root from
- * its props (decision 10), and the attributes that make it a menu item. Each kind adds its role
+ * its props (decision 4), and the attributes that make it a menu item. Each kind adds its role
  * and what activating it does.
  *
  * `tabIndex={-1}`: the menu moves focus between items itself, and Tab leaves the menu. Disabled,

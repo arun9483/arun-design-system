@@ -4,7 +4,7 @@
    The brand is this site's own — generated from a single seed colour by
    createBrand() and imported in place of @arun-dev/tokens/brands/default, which is
    the documented procedure in full. One brand per document, declared at :root; see
-   docs/architecture.md §3.
+   docs/architecture.md §2.
 
    Starlight sets data-theme="dark" | "light" on <html>, the same hook the generated
    brand's variants use, so its theme toggle drives the token layer with no glue. */

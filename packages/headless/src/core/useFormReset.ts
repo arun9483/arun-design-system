@@ -9,7 +9,7 @@ import { afterReset, useLatest } from './useLatest';
  *
  * Every component here that participates in a form does so the same way: a custom
  * element carrying the state, and a hidden native input carrying the form value
- * (decision 7 — the custom element fails the content test, the input is kept for what
+ * (decision 3 — the custom element fails the content test, the input is kept for what
  * the platform still does well). The platform resets that hidden input by itself, but
  * knows nothing of the React state behind `aria-checked` and the `data-*` attributes —
  * without this, a reset form shows one value and submits another.

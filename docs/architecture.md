@@ -1,9 +1,31 @@
 # Architecture decisions
 
-Recorded decisions for `arun-design-system`. Each entry states the decision, the reasoning, and what
-it rules out.
+The design decisions for `arun-design-system`. Each section says what is built, why, and what is ruled
+out. Decisions 1–6 are rules for every component. Decisions 7–16 apply those rules to groups of
+components. Code comments refer to these numbers.
+
+| #   | Decision                                                    | Summary                                                                                                |
+| --- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| 1   | [Layering](#decision-1)                                     | Three packages: `tokens` (CSS), `headless` (behaviour), `ui` (styling). They share names, not code.    |
+| 2   | [Tokens](#decision-2)                                       | Four token tiers. Brand and theme are set on `:root`. `ui` reads only variables that `tokens` defines. |
+| 3   | [Behaviour in headless, native elements first](#decision-3) | Code that needs JavaScript goes in `headless`. Use the native element unless it cannot do the job.     |
+| 4   | [`render`, merging and state](#decision-4)                  | `render` changes the element. Consumer props win. State comes only from the component's props.         |
+| 5   | [Public API](#decision-5)                                   | Export only what a consumer needs. A package exports only the props types it defines.                  |
+| 6   | [When a component has parts](#decision-6)                   | Split into parts only when the consumer must place an element that needs the Root.                     |
+| 7   | [Anchored popups](#decision-7)                              | Native `popover`, placed with CSS anchor positioning. Covers Popover, Tooltip and HoverCard.           |
+| 8   | [Disabled items in roving groups](#decision-8)              | Arrow keys skip disabled items. `focusableWhenDisabled` keeps them focusable.                          |
+| 9   | [Menu and Menubar](#decision-9)                             | Menu items, typeahead, checkable items, submenus, and a Menubar built on Menu.                         |
+| 10  | [Combobox](#decision-10)                                    | Items are data and `value` holds items. Behaviour follows Base UI.                                     |
+| 11  | [Form controls](#decision-11)                               | Field, OtpInput, RangeSlider, and Button's `pending` and `danger`.                                     |
+| 12  | [Calendar and DatePicker](#decision-12)                     | The native date input is the field. A calendar, ranges and day information are added next to it.       |
+| 13  | [Dialog, Drawer and Toast](#decision-13)                    | Dialog uses `showModal()`. Drawer is a Dialog closed by a swipe. Toast is a queue in a popover.        |
+| 14  | [Toggles, Toolbar, Avatar and TreeView](#decision-14)       | Small components with state, and a tree view with two parts.                                           |
+| 15  | [Styled native components](#decision-15)                    | Components without a headless part: a native element with classes.                                     |
+| 16  | [Server Components](#decision-16)                           | `'use client'` only on modules that need it. Namespace objects stay on the server.                     |
 
 ---
+
+<a id="decision-1"></a>
 
 ## 1. Layering
 
@@ -19,1649 +41,823 @@ only. Zero runtime JS.  No CSS, no class names.
               Class names + component CSS + styled components.
 ```
 
-The two arrows are the only couplings, and both are **name contracts** rather than
-imports:
+The packages connect only through **names**. Two tests check those names:
 
-| Seam                | Contract                 | Enforced by                             |
-| ------------------- | ------------------------ | --------------------------------------- |
-| tokens → ui         | custom property names    | `token-contract.unit.spec.ts`           |
-| headless → ui's CSS | `data-*` attribute names | `state-attribute-contract.unit.spec.ts` |
+| Connection          | Shared names              | Checked by                              |
+| ------------------- | ------------------------- | --------------------------------------- |
+| tokens → ui         | CSS custom property names | `token-contract.unit.spec.ts`           |
+| headless → ui's CSS | `data-*` attribute names  | `state-attribute-contract.unit.spec.ts` |
 
-`@arun-dev/ui` never imports from `@arun-dev/tokens` in JS or CSS — it references custom properties
-by name and relies on the consumer having loaded a token layer. It _does_ import from
-`@arun-dev/headless` in JS (a peer dependency), but its **CSS** knows headless only through
-attribute names. Both packages stand alone: `@arun-dev/tokens` needs no React, and
-`@arun-dev/headless` needs no stylesheet.
+- `ui` does not import `tokens`. It uses CSS variables by name, and the consumer loads the token CSS.
+- `ui` imports `headless` in JavaScript (peer dependency). `ui`'s CSS uses only the `data-*`
+  attributes that headless sets, so `data-*` is reserved for headless.
+- `tokens` works without React. `headless` works without a stylesheet.
 
-**Rules out:** a JS theme object, CSS-in-JS, or any runtime style generation. Also rules out
-`@arun-dev/headless` depending on `@arun-dev/ui` in any direction, including in its prose.
+**Rules out:** a JavaScript theme object, CSS-in-JS, styles generated at runtime, and any dependency
+from `headless` on `ui`, including in its documentation.
 
 ---
 
-## 2. Tokens are a four-tier chain
+<a id="decision-2"></a>
 
-| Tier          | Example                                        | Brand-specific? |
-| ------------- | ---------------------------------------------- | --------------- |
-| primitives    | `--space-sm: 0.75rem`, `--radius-full: 9999px` | no              |
-| brand palette | `--color-brand-700: #4338ca`                   | yes             |
-| semantic      | `--color-text-accent: var(--color-brand-700)`  | yes             |
-| component     | `--chip-bg: var(--color-bg-surface)`           | no (maps only)  |
+## 2. Tokens
 
-Component CSS reads the **component** tier where one exists, and the **semantic** tier otherwise.
-It must never read the palette tier directly.
+**Four tiers:**
 
-This gives two override granularities:
+| Tier          | Example                                        | Changes per brand? |
+| ------------- | ---------------------------------------------- | ------------------ |
+| primitives    | `--space-sm: 0.75rem`, `--radius-full: 9999px` | no                 |
+| brand palette | `--color-brand-700: #4338ca`                   | yes                |
+| semantic      | `--color-text-accent: var(--color-brand-700)`  | yes                |
+| component     | `--chip-bg: var(--color-bg-surface)`           | no (only maps)     |
 
-```css
---color-text-accent: #7c3aed; /* moves every accent surface in the system */
---chip-bg: #f4f4f5; /* moves only chips */
-```
+- Component CSS reads the component tier if it exists, otherwise the semantic tier. It never reads
+  the palette. Overriding `--color-text-accent` changes every accent; overriding `--chip-bg` changes
+  only chips.
+- `@arun-dev/tokens/base` contains the primitives and the component tier, but no brand. The consumer
+  adds one brand: `default`, `arun`, or one made with `createBrand()` that satisfies
+  `BrandSemanticContract`.
+- **All token names are public API.** Since `tokens` 1.0.0, renaming or removing a token, or adding a
+  `BrandSemanticContract` entry, is a major release. Adding a token is a minor release.
 
-**Every tier is public, so the names are versioned.** Consumers override component tokens to
-restyle one component and hand-write brands against `BrandSemanticContract`, so from
-`@arun-dev/tokens` 1.0.0 a renamed or removed token, or a new contract entry, is a major release;
-a new token is a minor. The 0.x series ran until the first app, arun-dev-platform, adopted the
-current set: every token it reads had kept its name through 0.41.0.
+**Brand and theme are set on `:root`.** CSS variables are inherited through the DOM tree. Popups in a
+portal or in the top layer are not inside the app's wrapper element, so tokens on a wrapper would not
+reach them. Each brand stylesheet has three theme modes:
 
----
+| Mode   | Selector                                                                |
+| ------ | ----------------------------------------------------------------------- |
+| system | `@media (prefers-color-scheme: dark) { :root:not([data-theme=light]) }` |
+| dark   | `[data-theme="dark"]` on `<html>`                                       |
+| light  | `[data-theme="light"]` on `<html>`                                      |
 
-## 3. Brand and theme live on `:root`
+**`ui` reads only variables that `tokens` defines.** If a variable is missing, `var()` is invalid and
+the browser silently uses a fallback, with no error. `token-contract.unit.spec.ts` fails when `ui`
+reads a name that `tokens` does not define. A variable that `ui` or headless sets at runtime, such as
+`--drawer-swipe`, must also be defined in `tokens` with a default value.
 
-One brand per document. Brand and theme tokens are declared on `:root` / `<html>`, never scoped to
-a subtree.
+Because of this, app-specific words do not belong in `ui`. `ui` has generic tones (`success`,
+`warning`, `error`, `info`), and the app maps its own values to them in TypeScript.
 
-**Why:** custom properties inherit through the DOM tree, and React portals move nodes out of it. A
-popup portaled into `<body>` would not inherit tokens scoped to a wrapper element. Declaring at
-`:root` means portaled content inherits correctly with no extra machinery.
-
-**Rules out:** two brands rendered on the same page. If that is ever required it needs an explicit
-brand context and a portal container prop — deliberately not built.
-
-**Theme states** — all three supported, handled entirely in `semantic.css`:
-
-| Mode   | Selector                              |
-| ------ | ------------------------------------- |
-| system | `@media (prefers-color-scheme: dark)` |
-| dark   | `:root[data-theme="dark"]`            |
-| light  | `:root[data-theme="light"]`           |
-
-Because the attribute sits on `<html>`, portaled content follows the theme for free.
+**Rules out:** component CSS reading the palette; two brands on one page (this would need a brand
+context and a portal container prop); CSS variables that only the consumer defines.
 
 ---
 
-## 4. `@arun-dev/ui` owns every token it reads
+<a id="decision-3"></a>
 
-The library must not depend on custom properties that only a consumer defines. An undeclared
-dependency of that kind fails silently: the `var()` resolves as invalid, a fallback quietly takes
-over, and nothing warns.
+## 3. Behaviour in headless, native elements first
 
-Enforced by a CSS contract test that diffs every `var(--...)` used by `@arun-dev/ui` against every
-property defined by `@arun-dev/tokens`. The diff must be empty.
+**Rule: if it needs JavaScript, it goes in `@arun-dev/headless`.**
 
-**Consequence:** domain vocabulary belongs to the consuming app, not the design system. The library
-ships generic tones (`success`, `warning`, `error`, `info`); an app maps its own vocabulary onto
-them at the call site, where TypeScript can check it.
+| `@arun-dev/headless`                           | `@arun-dev/ui`      |
+| ---------------------------------------------- | ------------------- |
+| state that changes over time                   | class names, tokens |
+| keyboard handling the browser does not provide | choice of element   |
+| focus management                               | variants            |
+| ARIA values that must be calculated            |                     |
+| making a custom element act like a native one  |                     |
+
+**Use the native element unless it fails one of these tests:**
+
+| Test          | Fails when                                                                |
+| ------------- | ------------------------------------------------------------------------- |
+| **Content**   | it cannot contain what the design needs (`<input>` has no children)       |
+| **Styling**   | it cannot be styled to the design in every supported browser              |
+| **Behaviour** | its built-in behaviour is different from the pattern (a two-thumb slider) |
+
+A native element brings focus, keyboard, form and dismiss behaviour that we do not write or test.
+Browser support for new features, such as anchor positioning or `popover="hint"`, is checked for each
+component.
+
+**Even when a test fails, check what is lost.** Browsers, form libraries, autofill, `:checked`,
+constraint validation and testing tools all work with native elements. A custom element keeps only
+what we rebuild. So: leave the native element only if the gain is impossible natively **and** the
+loss can be rebuilt.
+
+Custom, because an indicator or thumb cannot go inside an `<input>`. Each is a `<button>` with a
+hidden `<input type="checkbox">` for the form:
+
+| Component  | Gain                                               | Loss         | Rebuilt with     |
+| ---------- | -------------------------------------------------- | ------------ | ---------------- |
+| `Checkbox` | indicator with JSX; three states in one typed prop | `register()` | one `Controller` |
+| `Switch`   | thumb with an icon or spinner                      | `register()` | one `Controller` |
+
+Native, because a custom element would gain little and lose what cannot be rebuilt:
+
+| Component    | A custom element would gain        | A custom element would lose                                                            |
+| ------------ | ---------------------------------- | -------------------------------------------------------------------------------------- |
+| `Button`     | nothing; `<button>` holds anything | focus, Enter/Space activation, `disabled`                                              |
+| `RadioGroup` | an indicator; `::before` does this | arrow-key selection, one Tab stop, `required`, form behaviour                          |
+| text fields  | nothing                            | autofill, IME, spellcheck, mobile keyboards, password managers (**cannot be rebuilt**) |
+
+**react-hook-form binding.** `register()` writes to a native input and listens for its `change`
+event. If the value is in React state, writing to the DOM does nothing, and reading state from the
+DOM is not allowed ([decision 4](#decision-4)). These components use `Controller` instead.
+`react-hook-form-contract.unit.spec.tsx` tests both cases.
+
+| Uses `register()`                                                  | Uses `Controller`                                                         |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `Input`, `Textarea`, `Select`, `Slider`, uncontrolled `DatePicker` | `Checkbox`, `Switch`, `RadioGroup`, `OtpInput`, `RangeSlider`, `Combobox` |
+
+**Form reset.** When the value is in React state, `form.reset()` resets the DOM but not React. The form
+would then show one value and submit another. The internal `core/useFormReset` fixes this. After the
+`reset` event finishes (and was not cancelled) and the page re-renders, it sets the value back to the
+mount-time value through the component's setter. It compares after the render, so a form library that
+calls `form.reset()` itself does not get a second change event. RadioGroup runs it once for the whole
+group, because one reset per radio would conflict. OtpInput and RangeSlider keep the input's default
+value equal to their value, which has the same effect.
+
+**Applied:** `Button` always renders a `<button>`; links are `Link`. `Switch.Root` and `Checkbox.Root`
+are `<button>`s; if `render` gives a different element, that is the consumer's choice
+([decision 4](#decision-4)). `RadioGroup.Item` is a real `<input type="radio">`, and `RadioGroup.Root`
+holds the value.
+
+**Rules out:** adding focus, activation or `disabled` in JavaScript to an element that does not have them.
 
 ---
 
-## 5. Composition via `render`, not element unions
+<a id="decision-4"></a>
 
-Components accept a `render` prop to change the rendered element:
+## 4. `render`, merging and state
+
+**`render` changes the element.** Every component accepts `render`. Unknown props (`id`, `aria-*`,
+`data-*`, event handlers) are passed to the element.
 
 ```tsx
 <Chip render={<li />}>React</Chip>
 ```
 
-**Rules out:** closed `as?: 'span' | 'button'` unions. They cannot express every element a consumer
-needs, and when they fall short the consumer abandons the component and writes the class names by
-hand — which is what happened before this decision.
-
-All components also spread unrecognised props onto the rendered element, so `id`, `aria-*`,
-`data-*` and event handlers pass through.
-
----
-
-## 6. Props types follow ownership
-
-A package exports the props types it **defines**, and never re-exports one it merely borrows.
-
-| Component                                                        | Props type defined in | Exported from `ui`? |
-| ---------------------------------------------------------------- | --------------------- | ------------------- |
-| `Button`, `Card`, `Chip`, `Badge`, `Input`, `Textarea`, `Select` | `@arun-dev/ui`        | yes                 |
-| `Switch.Root`, `Switch.Thumb`                                    | `@arun-dev/headless`  | no                  |
-
-Prop _value_ types are exported the same way — `BadgeTone`, `ButtonVariant`, `ChipVariant` — since
-a consumer must be able to construct those values and map their own vocabulary onto them, per
-decision 4.
-
-For `Switch`, consumers derive the type instead:
-
-```tsx
-function MySwitch(props: ComponentProps<typeof Switch.Root>) { … }
-```
-
-**Why not re-export the headless types:** an exported alias records where a type comes from
-_today_. `@arun-dev/ui`'s Switch is currently a pure pass-through, but it is allowed to stop being
-one. The moment it adds a prop of its own, a re-exported `SwitchRootProps` is wrong — and wrong
-silently, because it still compiles and merely under-reports. `ComponentProps<typeof X>` is a
-reference to the component rather than a snapshot of its type's origin, so it stays correct
-through that change. Re-exporting would also give one type two import paths and two version
-timelines.
-
-That risk does not exist for types `@arun-dev/ui` defines itself: they cannot fall out of step with
-components in the same package, so they are exported by name.
-
-**Rules out:** `export type { SwitchRootProps } from '@arun-dev/headless/switch'` in `ui`. If
-`@arun-dev/ui`'s Switch ever needs props of its own, it defines its own type — and at that point
-owns it, and exports it.
-
----
-
-## 7. Behaviour originates in `@arun-dev/headless`
-
-The test is not "does it have a state-like prop" but **does it require JavaScript?**
-
-| Originates in `@arun-dev/headless`                   | Originates in `@arun-dev/ui`   |
-| ---------------------------------------------------- | ------------------------------ |
-| state that changes over time                         | class names and tokens         |
-| keyboard handling beyond the platform's              | element choice and convenience |
-| focus management                                     | variants                       |
-| ARIA that has to be computed                         |                                |
-| making a non-native element behave like a native one |                                |
-
-**Worked example — `disabled` on Button.** A native `<button disabled>` needs no
-JavaScript: the platform removes it from the tab order, suppresses activation and
-exposes `:disabled`. An `<a href>` gets none of that, and a `disabled` attribute on it
-is inert — the link stays focusable, still fires handlers and still navigates.
-
-The first answer was to synthesise the missing half: `useButton` gave any element a
-`tabIndex`, `Enter`/`Space` handlers, a `role`, and — when disabled — stripped the
-consumer's activation handlers and retracted the `href`. It reached 172 lines, needed a
-`nativeButton` escape hatch because a `render` component cannot be inspected, and needed
-`retractActivationProps` because a `render` element's own props outrank everything.
-
-**That was the wrong layer to solve it at.** The second answer is to choose an element
-that already behaves. It went through `<button>` or `<a href>` chosen by an `href` prop;
-the final form is simpler still — `Button` always renders a `<button>`, which is natively
-focusable and activatable, so there is nothing left to synthesise. Navigation is not a
-button's job: a link is a separate `Link` component. `useButton`, `nativeButton`,
-`retractActivationProps` and `href` are all gone.
-
-`Switch.Root` is the same decision: its default is a native `<button>`. A `render`
-producing anything else is neither reported nor compensated for — it is the consumer's
-choice (decision 10). Radix makes the same element choice — its Switch is a
-`<button role="switch">` and `asChild` is for wrappers that forward to one.
-
-**Rules out:** behaviour in `@arun-dev/ui`; also synthesising platform behaviour for an
-element that was never going to be right. If a component needs the platform's focus and
-keyboard handling, it renders an element that has them.
-
-### Native first
-
-A component uses the native element unless that element fails one of three tests:
-
-| Test          | Fails when                                                                   |
-| ------------- | ---------------------------------------------------------------------------- |
-| **Content**   | it cannot hold what the design needs — `<input>` is void, `<option>` is text |
-| **Styling**   | it cannot be styled to the design in every supported browser                 |
-| **Behaviour** | its built-in behaviour differs from the pattern — a multi-thumb slider, say  |
-
-Passing all three means native: `Button` is a `<button>`, a link is an `<a href>`, a
-dialog is a `<dialog>` opened with `showModal()`. Failing one means a custom element that
-still leans on native pieces where it can — `Switch.Root` fails the content test (a thumb
-cannot go inside an `<input>`), so it is a `<button>` carrying a hidden
-`<input type="checkbox">` for the form. `Checkbox.Root` fails it the same way, for the
-same reason: an indicator cannot go inside an `<input>` either.
-
-**The seam that pattern opens.** The platform resets the hidden input on `form.reset()`
-but knows nothing of the React state behind `aria-checked` and the `data-*` attributes,
-so a reset form would show one value and submit another. `core/useFormReset` closes it
-for both components — it restores the state the component mounted with, through the same
-setter a click goes through, once the `reset` event has finished dispatching, no
-listener has cancelled it, and the page has re-rendered. That last part matters for form
-libraries: react-hook-form's `reset()` sets its own values and then calls `form.reset()`, so
-the component compares against the value on screen after that render, through the handler of
-that render, and reports nothing the library already did. It is internal: shared between
-components, not exported.
-
-Checkbox is what shows the cost of _not_ having that. Native `indeterminate` is a DOM
-property with no attribute behind it, so React cannot set it declaratively, the first
-click clears it behind React's back, and `form.reset()` leaves it untouched — three
-imperative fixes that a native `<input>` would have demanded anyway. Choosing the element
-that already behaves only pays off when the element actually behaves.
-
-Every native element used is focus, keyboard, form or dismissal code that is neither
-written nor tested here. Browser support for the newer candidates — customisable
-`<select>`, CSS anchor positioning, `popover="hint"` — moves fast, so each is checked when
-its component is designed rather than decided in advance.
-
-### Weighing the loss when a test fails
-
-The three tests say _whether_ the native element fits. They do not say what leaving it
-costs, and the cost is easy to underestimate, because a native element is not a bundle of
-features — it is a **protocol**. Everything that speaks it works for free: the browser,
-form libraries, autofill, `:checked`, the constraint-validation API, testing tools. Leave
-the protocol and you keep only the parts you re-implement by hand.
-
-The hidden input is exactly such a partial re-implementation, and it covers one direction:
-
-| Half of the protocol | What it means                                    | Restored by the hidden input                      |
-| -------------------- | ------------------------------------------------ | ------------------------------------------------- |
-| **Read**             | something asks the form what the value is        | yes — `FormData`, `form.elements`, `form.reset()` |
-| **Write**            | something sets the value and expects to be heard | no                                                |
-
-react-hook-form's `register()` needs the write half, so it cannot work here: it hands back
-a `ref` for a native input and an `onChange` for a `change` event, and a `<button>` has
-neither. Supporting it would mean reading state back out of the DOM, which decision 10
-rule 1 rules out for every component at once. `Controller` is the answer, and it is
-react-hook-form's own API for this case. `react-hook-form-contract.unit.spec.tsx` in
-`@arun-dev/ui` pins both halves — what works, and that `register()` does not.
-
-**The rule.** Leave the native element only when what you gain is impossible on the
-platform _and_ what you lose can be rebuilt in userland.
-
-| Component    | Gained                                                   | Lost                                                                       | Recoverable?                                                      |
-| ------------ | -------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `Checkbox`   | an indicator holding JSX; three states as one typed prop | `register()`                                                               | yes — one `Controller`                                            |
-| `Switch`     | a thumb holding an icon or a spinner                     | `register()`                                                               | yes — one `Controller`                                            |
-| `Button`     | —                                                        | focus, `Space`/`Enter`, `disabled`                                         | in principle; `useButton` reached 172 lines before being deleted  |
-| `Radio`      | an indicator holding JSX — a dot needs only `::before`   | arrow-key selection, roving Tab stop, `required`, the form protocol        | only by building roving tabindex, shipped with Tabs (decision 13) |
-| a text field | —                                                        | autofill, IME composition, spellcheck, mobile keyboards, password managers | **no, at any price**                                              |
-
-That asymmetry is what makes Checkbox and Switch defensible rather than merely convenient:
-an `<input>` is void, so an indicator that holds children is unobtainable natively, while
-the interop given up costs one wrapper. Invert the columns and the answer inverts with
-them — which is why `Button` stayed native, and why a text field must be a real `<input>`
-whatever else it needs.
-
-**Radio stayed native.** It passes all three tests. The gain column is close to empty,
-since a dot is a pseudo-element and not an element, and the loss column holds the one
-behaviour this library has deliberately not built yet. `RadioGroup.Item` is a real
-`<input type="radio">`, and `RadioGroup.Root` owns the value. Two things follow from that:
-
-- **The reset seam reappears, at the group.** The platform resets the real inputs, and
-  React's value does not follow. It is closed the way `useFormReset` closes it, but in the
-  group, because one reset spans several inputs. Per-radio resets would race each other.
-- **Being native does not restore `register()`'s write half.** The value lives in React
-  (decision 10), so `setValue` writing `.checked` on the DOM is exactly as unheard as it
-  is on a `<button>`. `register()` reads a radio group correctly and cannot drive it.
-  `Controller` remains the answer, and the contract spec pins both halves. The write half
-  is lost to React state, not to the element, so no element choice gets it back.
-
-**Input keeps no state at all, so it gets `register()` back.** A text field must be a real
-`<input>`, per the table. `Input` also leaves the value on that element and keeps none in
-React, so both halves of the protocol are intact and `register()` is the binding. With
-nothing that needs JavaScript, it has no headless half either: it is a styling wrapper in
-`@arun-dev/ui`, like `Chip`. The icons and units it holds go in a `<div>` box around the
-`<input>`, through `startSlot` / `endSlot` props rather than parts (decision 11). They need
-nothing from the input, and the box places them. `className` goes on the box, and every other
-prop goes on the `<input>`, so `ref`, `id` and `aria-*` land on the control whether or not
-there are slots. Focus, `aria-invalid` and `disabled` are styled with `:has()` on the native
-control, so no `data-*` attribute stands in for platform state.
-
-**Textarea follows Input, minus the box.** It is a real `<textarea>` with no React state, so
-it too has no headless half and `register()` binds it. It has no slots — a multi-line field has
-no natural place for an icon or unit — so it is one element, and per decision 11 one element
-is one component: `className` and every other prop land on the `<textarea>`. Growing with its
-content is `field-sizing: content` behind an `autoResize` class, not a measuring script, so a
-browser without it keeps the `rows` height, which is the platform default anyway.
-
-**Dialog leans on `showModal()` for everything but state.** The top layer, backdrop, inert
-page, focus trap and focus return are all the platform's, so `@arun-dev/headless` holds only
-`open` and the setter every close goes through. State drives the element — `showModal()` or
-`close()` after each render — and the platform's own closes (Esc's `cancel`, a backdrop click,
-`<form method="dialog">`) become requests, so a controlled parent can refuse any of them. It
-needs no portal, since the top layer is not a DOM position, and its scroll lock is CSS in
-`@arun-dev/ui` (`:root:has(.dialog:modal)`), not a script.
-
-**Select is Input's shape around a `<select>`, and does not search.** A native `<select>` keeps
-its value on the element, so it is a styling wrapper with `register()` as the binding. It
-brings the system picker on phones, typeahead, `required` and the form protocol, none of which
-is rebuilt. The box draws the chevron, since `appearance: none` removes the platform's, and
-`className` goes on the box as for Input. Filtering is deliberately out: a `<select>` cannot
-hold a text field, and adding one means a custom listbox that gives all of the above up. Type
-to filter is a **combobox** — an `<input role="combobox">` driving a popup listbox — with its
-own headless half. `<input list>` with `<datalist>` was weighed and rejected: its popup cannot
-be styled, it differs by browser, and it accepts free text rather than one of the options.
-
----
-
-## 8. `mergeProps` cannot retract or replace
-
-Two properties of `mergeProps` are load-bearing for ordinary composition and get in the
-way of "switch this element off":
-
-| Behaviour                                  | Why it exists                                       | What it costs                                                 |
-| ------------------------------------------ | --------------------------------------------------- | ------------------------------------------------------------- |
-| `undefined` values are skipped             | an absent prop must not clobber a present one       | nothing can **retract** a prop — `href: undefined` is a no-op |
-| event handlers are chained, never replaced | a consumer's `onClick` runs alongside internal ones | a handler could not be **suppressed** — resolved below        |
-
-Measured, not assumed: a prototype returning `href: undefined` and an `onClick` calling
-`preventDefault()` produced an anchor that still carried `href` and still ran the
-consumer's handler.
-
-**`children` is deliberately not a third case.** It merges as a plain value, so the last
-object to declare it wins — which makes both idioms fall out of one rule rather than a
-special case: `<Button render={<span />}>Docs</Button>` inherits the
-component's children because the element declares none and the key is skipped, and
-`<Button render={<span>Read the docs</span>}>` keeps its own because a declared
-value wins. Special-casing it either way would break one of the two.
-
-### Handlers run right to left, and the consumer can stop the component's
-
-Plain values merge left to right — later objects win, so a consumer's props override a
-component's. **Event handlers run the other way**: the last object's handler first, the
-first object's last. The consumer's props are merged last, so their handler runs first
-and can stop the component's:
-
-```tsx
-<Switch.Root onClick={(event) => event.preventComponentHandler()} />
-```
-
-**Why this direction.** The escape hatch belongs to the consumer. A component already
-decides which props reach the element and can simply decline to attach a handler — it
-never needs the chain to suppress anything. The consumer has no other lever, and without
-this cannot adapt a component's behaviour without forking it.
-
-This is the convention in both comparable libraries. Radix's `composeEventHandlers` calls
-the consumer's handler first and skips its own if the default was prevented. Base UI's
-`mergeProps` documents handlers as running "right-to-left (rightmost handler executes
-first)", cancellable by `preventBaseUIHandler()`.
-
-**Why a dedicated signal rather than `preventDefault()`.** `preventDefault()` already
-means "cancel the browser's default action", which is a different statement — a link
-inside a component may want one without the other. Radix overloads it; Base UI
-introduced a separate method, and that is the better call. Ours is
-`event.preventComponentHandler()`.
-
-The signal is only attached to real events, detected by `'nativeEvent' in event`. An
-`on*` prop called with something else — `onCheckedChange(boolean)` — always runs every
-handler, since there is nothing to attach it to.
-
-**The order is structural, not a convention.** `useRender` takes the component's props
-and the consumer's in _separate named arguments_ and merges them itself:
+**Merging.** `useRender` merges in a fixed order, so no component can change it:
 
 ```ts
 mergeProps(props, consumerProps); // then mergeProps(merged, render.props)
 ```
 
-An earlier design passed one array and left the arrangement to each component. That made
-the whole guarantee depend on every author writing the array in the right order, with
-nothing to catch an inversion — `preventComponentHandler()` would have silently stopped
-working for that component while every test still passed. There is now no position for a
-component to place a consumer's props in, so the three tiers cannot be reordered.
+| Prop kind                    | Rule                                                                  |
+| ---------------------------- | --------------------------------------------------------------------- |
+| values, including `children` | the last one wins; `undefined` is ignored                             |
+| event handlers               | all run; the consumer's handler runs first, the component's runs last |
 
-### Retraction: still not possible, and no longer needed
+- `undefined` is ignored, so a missing prop does not remove a set one. As a result, a prop cannot be
+  removed by merging. Components avoid this need by not adding props they must not have.
+- `children` follows the same rule: `<Chip render={<li />}>React</Chip>` keeps the component's
+  children, and `<Chip render={<li>Vue</li>} />` keeps the `render` element's children.
+- The consumer can stop the component's handler with `event.preventComponentHandler()`. Radix and
+  Base UI use the same order. It is a separate method because `preventDefault()` already means "stop
+  the browser's default action". It exists only on real events (`'nativeEvent' in event`); callbacks
+  such as `onCheckedChange(boolean)` always run every handler.
 
-`href: undefined` remains a no-op through `mergeProps`. Nothing depends on it any more:
-a component that must not carry a prop does not put it there in the first place.
-`Button` no longer renders links at all, so there is no URL to take back.
+**State belongs to the component.**
 
-A prop written directly on a `render` element outranks the component and no layer can
-retract it. That is the consumer's choice and is not reported (decision 10).
+| Layer                                              | Set by                             | Can `render` change it?  |
+| -------------------------------------------------- | ---------------------------------- | ------------------------ |
+| **State**: `checked`, `disabled`, `indeterminate`… | the component's own props          | no                       |
+| **Attributes**: ARIA, `data-*`, `disabled`…        | calculated from state, then merged | yes, `render.props` wins |
 
-**Rules out:** a sentinel value meaning "delete this key" in `useRender`. The two components
-that once needed one no longer do.
-
----
-
-## 9. Only export what a consumer building their own component needs
-
-Every exported name is a compatibility promise, and the surface grows by accident. A
-primitive is public only if someone building their own component against
-`@arun-dev/headless` needs it. Anything this library uses to implement itself stays out.
-
-| Public (root entry)                                                | Not public                          |
-| ------------------------------------------------------------------ | ----------------------------------- |
-| `useRender`, `mergeProps`, `useControlled`                         | `switchDataAttributes` and the like |
-| `ComponentEvent`, `UnknownProps`, and each component's props types |                                     |
-
-`useButton` was the worked example, and it ended differently than expected: rather than
-growing into a stable private API, it was deleted. Keeping it private is what made that
-possible — 172 lines could be removed in one commit without a single consumer noticing,
-because nobody could import it.
-
-**A separate package cannot reach into internals.** `@arun-dev/ui` is published
-independently, so anything it imports has to be exported. The answer is not to publish
-the primitive with a disclaimer — it is to put the behaviour where it belongs. `Button`
-moved into `@arun-dev/headless` for exactly this reason, which is also what decision 7
-required all along; `@arun-dev/ui`'s Button is now a styling wrapper.
-
-**Rules out:** exporting a primitive "because it might be useful". It becomes useful the
-day someone asks for it, and adding an export later is not a breaking change; removing
-one is.
-
----
-
-## 10. State is owned by the component; `render` only shapes the element
-
-Ground rules for every stateful component from Checkbox on — form controls first.
-
-There are two layers, and `render` reaches only the second:
-
-| Layer                                                | Set by                          | Can `render` change it?   |
-| ---------------------------------------------------- | ------------------------------- | ------------------------- |
-| **State** — `checked`, `disabled`, `indeterminate`…  | the component's own props       | no                        |
-| **Element attributes** — ARIA, `data-*`, `disabled`… | derived from state, then merged | yes — `render.props` wins |
-
-1. **The component is the only source of state.** It comes from the component's props,
-   through `useControlled`. Nothing is read back from `render` or the DOM.
-2. **Everything is derived from that one state object** — attributes, ARIA, `data-*`,
-   the hidden form input and the context sub-parts read.
-3. **`render` is unrestricted.** Merge precedence is unchanged (decision 8): the
-   component proposes attributes, and `render.props` has the final say on the element.
-   No warnings, no protected keys, no tag enforcement.
-4. **Behaviour reads state, never the element.** Handlers guard on the component's own
-   `disabled` / `readOnly` rather than relying on the native attribute; the hidden input
-   and sub-part context use the same state.
-5. **Every change goes through one setter** — click, keyboard and `form.reset()` alike —
-   which then calls `onChange`-style callbacks.
+1. State comes only from the component's props, through `useControlled`. It is never read from
+   `render` or the DOM.
+2. Attributes, ARIA, `data-*`, the hidden form input and the context that parts read are all
+   calculated from that state.
+3. `render` has no restrictions: no warnings, no protected props, no required tag.
+4. Behaviour checks state, not the element. Handlers check the component's own `disabled`.
+5. Every change (click, keyboard, `form.reset()`) goes through one setter, which calls `on…Change`.
 
 ```tsx
 <Checkbox.Root disabled render={<MyCheckbox disabled={false} />} />
 ```
 
-The element renders enabled, because `render` wins. The checkbox is still disabled:
-clicks are ignored, the form input stays disabled and `Checkbox.Indicator` reads
-`disabled: true`. An override on `render` changes what the element shows, never what the
-component knows or does. Set state on the component, not on the `render` element.
+The element looks enabled because `render` wins. The checkbox is still disabled: clicks are ignored
+and the form input stays disabled. The library cannot inspect a `render` component, so it does not try
+to control it. The worst result is markup that does not match the state, in markup the consumer chose
+to override.
 
-**Why.** What a consumer writes in `render` is theirs; the library cannot inspect a
-`render` component, so it does not police one. Keeping behaviour on the component's own
-state is what makes that safe — the worst a `render` override can do is desync the markup
-it chose to override.
-
-**Rules out:** dev warnings or errors about `render` content, a protected final merge
-tier for state keys, and reading state back from the rendered element.
+**Rules out:** `as?: 'span' | 'button'` props, which cannot list every element; a special value that removes a prop during merge.
 
 ---
 
-## 11. Parts are earned, case by case
+<a id="decision-5"></a>
 
-A component is split into parts only when an element passes all three:
+## 5. Public API
 
-1. **It is a separate DOM element** the consumer styles, places or replaces.
-2. **It needs something from the root** — state, ids for ARIA wiring, or behaviour.
-3. **The consumer decides where it goes.** If the component can place it unaided, it is
-   internal rather than a part.
+**Export only what a consumer needs to build their own component.** Every export must stay compatible.
+Adding an export later is not a breaking change; removing one is.
 
-One element means one component: `Button`, `Link` and text inputs have no parts, and a
-`<label>` is the consumer's own element linked by `id`. `Switch` has `Root` + `Thumb`
-because the thumb is a separate element that reads `checked` from context.
+| Public in `@arun-dev/headless`                                                                        | Internal                                                                                                      |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| root: `useRender`, `mergeProps`, `useControlled`, `ComponentEvent`, `UnknownProps`, `UseRenderParams` | `core/useFormReset`, `rovingFocus`, `typeahead`, `anchoring`, `pointerIntent`, `selectedDataAttributes`, etc. |
+| each component's subpath, with its props types                                                        |                                                                                                               |
 
-Parts are independent of decision 7's native-first rule. A native `<dialog>` still needs
-`Trigger`, `Title` and `Close` parts — they are separate elements the consumer places, and
-`Title` supplies the id for `aria-labelledby` — while a custom-built single element would
-still be one component.
+`ui` is a separate package, so it can only import what headless exports. When `ui` needs behaviour,
+the behaviour moves into headless (as it did for Button) instead of exporting an internal.
 
-**Start with the fewest parts.** Adding one later is not a breaking change; removing or
-merging one is. Same reasoning as decision 9.
+**Props types: a package exports only the types it defines.**
 
-**Rules out:** splitting a component into parts for symmetry with other components, or
-exposing an element the component can place itself.
+| Component                                                                      | Props type defined in | Exported from `ui`? |
+| ------------------------------------------------------------------------------ | --------------------- | ------------------- |
+| `Button`, `Chip`, `Input`, `Select`, `Link`, `Stack`, `Heading`, `Calendar`, … | `@arun-dev/ui`        | yes                 |
+| `Switch`, `Checkbox`, `RadioGroup`, `Dialog`, `Menu`, `Popover`, `Tabs`, …     | `@arun-dev/headless`  | no                  |
+
+`ui` also exports the value types it defines, such as `ButtonVariant`, `BadgeTone`, `Space` and
+`StepperStatus`. For a component built on headless, derive the type:
+
+```tsx
+function MySwitch(props: ComponentProps<typeof Switch.Root>) { … }
+```
+
+Why: `ui`'s `Switch.Root` uses headless's props today, but it may add its own later. A re-exported
+`SwitchRootProps` would then be wrong without any error, and the same type would have two import
+paths. `ComponentProps<typeof X>` always matches the component.
+
+**Rules out:** exporting something "in case it is useful"; re-exporting headless props types from `ui`.
 
 ---
 
-## 12. Anchored popups: native `popover`, positioned by CSS
+<a id="decision-6"></a>
 
-Decided before Popover's code existed. It covers every popup that
-opens next to the element that opened it — Popover first, then Tooltip, Menu and Combobox.
+## 6. When a component has parts
 
-**The element is a native `popover`, shown with `showPopover({ source })`.** `popover="auto"`
-supplies the top layer, light dismiss, Esc, and closing sibling popups when another opens. The
-`source` option makes the trigger the popup's invoker, so Tab moves from the trigger into the
-popup and focus returns to it on close. None of that is written here.
+An element becomes a separate part only if all three are true:
 
-**Placement is CSS anchor positioning, with no JavaScript engine.** Headless links the two
-elements with inline styles — `anchor-name` on the trigger, `position-anchor` on the popup —
-and turns `side` and `align` props into `position-area`, with `position-try-fallbacks` flipping
-it when there is no room. The browser keeps it attached through scroll, resize and layout
-changes. There is no measuring, no `autoUpdate`, and no dependency.
+1. **It is a separate DOM element** that the consumer styles, places or replaces.
+2. **It needs something from the Root**: state, ids for ARIA, or behaviour.
+3. **The consumer decides where it goes.** If the component can place it, it stays internal.
 
-Support checked against MDN's compatibility data (8.1.3, September 2026):
+- One element means one component: `Button`, `Link`, `Input` and `Textarea` have no parts. A `<label>`
+  is the consumer's own element, linked by `id`.
+- `Switch` has `Root` and `Thumb`, because the thumb reads `checked` from context.
+- This is separate from [decision 3](#decision-3): a native `<dialog>` still needs `Trigger`, `Title` (it provides the
+  `aria-labelledby` id) and `Close`.
+- Start with as few parts as possible. Adding a part later is not breaking; removing one is.
+
+**Rules out:** parts added only to match other components; parts for elements the component can place
+itself.
+
+---
+
+<a id="decision-7"></a>
+
+## 7. Anchored popups
+
+Popover, Tooltip, HoverCard, Menu, Combobox, DatePicker and Calendar's day details all open next to a
+trigger. Each one is a native `popover` element, placed with CSS.
+
+**Opening.** `showPopover({ source })` sets the trigger as the popup's invoker. Tab moves from the
+trigger into the popup, and focus returns to the trigger when it closes.
+
+**Placement uses CSS anchor positioning, not JavaScript.**
+
+- Headless sets `anchor-name` on the trigger and `position-anchor` on the popup as inline styles
+  (`core/anchoring`). Anchor names are `--hl-anchor-<id>`, so they do not clash with the consumer's.
+- `side` and `align` become `position-area`. `position-try-fallbacks` flips the popup when there is
+  not enough room. `side` is physical (`top`, `right`, `bottom`, `left`).
+- The trigger's width is `anchor-size(width)`. The available height is `max-block-size: 100%`.
+
+Browser support (MDN, September 2026):
 
 | Feature                                                  | Chrome | Firefox | Safari |
 | -------------------------------------------------------- | ------ | ------- | ------ |
-| `popover` attribute — Baseline since January 2025        | 114    | 125     | 17     |
+| `popover` attribute (Baseline since January 2025)        | 114    | 125     | 17     |
 | `showPopover({ source })`                                | 137    | 144     | 26     |
 | `anchor-name`, `position-area`, `position-try-fallbacks` | 125    | 147     | 26     |
 | `position-anchor` with an explicit name                  | 125    | 147     | 26     |
-| `popover="hint"` — Tooltip's concern, not Popover's      | 151    | 153     | no     |
+| `popover="hint"`                                         | 151    | 153     | no     |
 
-Every current engine has what Popover needs. Anchor positioning as a whole is not yet
-Baseline: engines still differ on details this design does not touch. `position-anchor`'s
-initial value changed until Chrome 151, Firefox 151 and Safari 27, which is why it is always
-set explicitly rather than left to default.
+`position-anchor` is always set, because its default value was different between browsers until
+Chrome 151, Firefox 151 and Safari 27. In a browser without anchor positioning, the popup appears in
+the centre. It still works: top layer, dismiss and Tab all function.
 
-**Below that support, the popup degrades rather than breaks.** A browser without anchor
-positioning ignores those properties and shows the popover where the UA stylesheet puts it —
-centred in the viewport — still in the top layer, still dismissable, still reachable by Tab.
-Unanchored, but usable. A browser without the `source` option opens it without the invoker
-link, so focus does not return by itself.
+**Closing.** The browser closes the popup on Esc or an outside click before any code can stop it. The
+popup then calls `onOpenChange(false)`. If a controlled parent keeps `open` true, it opens again.
 
-**Closing is the platform's, reported through one setter.** Light dismiss and Esc close the
-element before anyone is asked — only opening is cancellable in `beforetoggle` — so the popup
-reports the close through `onOpenChange(false)`, and reopens if a controlled parent keeps it
-open. This is Dialog's `<form method="dialog">` path, not a new mechanism.
+**Popover mode.** An `auto` popover closes on an outside click and closes other `auto` popovers. A
+`manual` popover does neither, and works the same in every browser. `hint` is the browser's tooltip
+mode, but Safari does not support it.
 
-**No runtime layout variables.** `--hl-*` layout vars would be for a JavaScript engine to
-publish measurements to CSS. Anchor positioning makes them unnecessary: the trigger's
-width is `anchor-size(width)`, and inside a `position-area` the available height is
-`max-block-size: 100%`. The `--hl-` prefix survives for one thing: generated anchor names are
-`--hl-anchor-<id>`, so they cannot collide with a consumer's own.
+| Popup                   | Mode     | Why                                                    |
+| ----------------------- | -------- | ------------------------------------------------------ |
+| Popover, Menu, submenus | `auto`   | outside click, Esc and closing other popups are wanted |
+| Tooltip, HoverCard      | `manual` | must not close an open Popover; they manage timing     |
+| Combobox                | `manual` | see [decision 10](#decision-10)                        |
+| Calendar day details    | `manual` | see [decision 12](#decision-12)                        |
+| Toast viewport          | `manual` | see [decision 13](#decision-13)                        |
 
-**Parts, fewest first (decision 11):** `Root`, `Trigger`, `Popup`, `Close`. No Portal, since
-the top layer needs none; no Arrow yet, since which side a fallback flipped to is not
-observable from script; no Title until a consumer needs the popup named by its heading —
-`aria-label` or `aria-labelledby` do that meanwhile.
+**Popover** parts: `Root`, `Trigger`, `Popup`, `Close`.
 
-**Rules out:** Floating UI or any measuring engine as a dependency; a Portal part; runtime
-layout variables; and `popover="manual"` as the default, which would mean rebuilding light
-dismiss. If a consumer needs anchoring in browsers without anchor positioning, a JavaScript
-engine can be added behind the same `side` / `align` props — the props describe intent, not
-the mechanism — but not before someone needs it.
+**Tooltip** parts: `Root`, `Trigger`, `Popup`. It has `role="tooltip"` and no `source`, because it never
+gets focus. It handles its own hover delay, the delay that lets the pointer reach it, focus, blur and Esc.
 
-**Tooltip uses `popover="manual"`, not `hint`.** `hint` is the platform's tooltip mode — it
-does not close an open `auto` popover, and brings Esc and light dismiss — but Safari does not
-ship it (Chrome 151, Firefox 153). `manual` shares the property that matters most, not
-disturbing an open Popover, and behaves the same in every engine. What it leaves out is the
-tooltip's timing — hover delay, a grace period so the pointer can reach it, focus, blur, Esc —
-which is small, and is the component's to own anyway: `hint` has no delay either. Anchoring is
-the same inline CSS as Popover's, from one internal module.
+**HoverCard** parts: `Root`, `Trigger`, `Popup`. It previews a link and can contain links and buttons,
+so it uses `source` and keyboard users can Tab into it.
 
-**Menu is Popover's popup with `role="menu"`.** Same `popover="auto"`, same `source`, same
-anchoring; what it adds is focus. Opening moves focus to the first item (the last, from Up on
-the Trigger), items move with Up and Down through `core/rovingFocus`, and Tab closes the menu.
-Items are native `<button role="menuitem">`s, so Enter, Space and a click activate them with no
-key handling, and activating one closes the menu through the Root's setter. Parts, fewest
-first: `Root`, `Trigger`, `Popup`, `Item`. A separator is the consumer's own
-`role="separator"` element, since it needs nothing from the Root (decision 11).
+- The Trigger is an `<a>` and works without the card. A router link is passed through `render`.
+- Mouse or pen: opens after `delay` (600 ms). Closes `closeDelay` (300 ms) after the pointer leaves both
+  the Trigger and the card.
+- Keyboard: `:focus-visible` opens it at once. Focus leaving both closes it. Esc closes it and returns
+  focus to the Trigger. Pressing the Trigger closes it.
+- **Touch never opens it.** There is no hover to close it, and a tap should follow the link. Its content
+  must never be the only way to reach something.
+- No role and no ARIA on the Trigger: `aria-describedby` would read the whole card as the link's
+  description.
 
-**Testing.** Browser tests run in Chromium, Firefox and WebKit (WebKit on Linux, as in CI). Placement differs by engine in detail, so
-Popover's specs assert the wiring — the anchor names, `position-area`, open and close — and
-leave pixel positions to a check in each engine before release.
+**Tests** run in Chromium, Firefox and WebKit. They check anchor names, `position-area`, opening and
+closing. Exact pixel positions are checked by hand in each browser before a release.
+
+**Rules out:** Floating UI or any JavaScript positioning; Portal and Arrow parts; a Popover `Title` part (use `aria-label` or `aria-labelledby`). If older browsers ever need anchoring, a JavaScript engine can be added behind the same `side` and `align` props.
 
 ---
 
-## 13. Disabled items in roving groups
+<a id="decision-8"></a>
 
-**Disabled items in a roving group are skipped by default, in every component.** APG allows
-disabled tabs, menu items, options and tree items to stay focusable — so a screen reader can
-announce an action that exists but is unavailable — but frames it as "can be helpful", not a
-requirement. No established library splits the answer by widget; each picks one rule for Tabs
-and Menu alike (checked in source, September 2026):
+## 8. Disabled items in roving groups
 
-| Library    | Tabs           | Menu      | Opt-in                                    |
-| ---------- | -------------- | --------- | ----------------------------------------- |
-| Radix      | skips          | skips     | none — `focusable={!disabled}` on both    |
-| React Aria | skips          | skips     | `disabledBehavior: 'selection'` on lists  |
-| MUI        | skips (native) | skips     | `disabledItemsFocusable` on `MenuList`    |
-| Base UI    | focusable      | focusable | always on — `focusableWhenDisabled: true` |
+**Arrow keys skip disabled items in every component.** React Aria, MUI and Radix do the same. APG
+allows disabled items to stay focusable but does not require it.
 
-This library follows React Aria and MUI: Tabs keeps skipping, as it does today, and Menu skips
-too. `focusableWhenDisabled` landed with Menu as an opt-in on both Roots. When set, a disabled item
-stays in the arrow-key sequence, is marked `aria-disabled` rather than `disabled` — which
-would take it out of focus — and the component blocks its activation, including the
-consumer's `onClick`, which a native `disabled` would have blocked too.
+`focusableWhenDisabled` on the Root of Tabs, Menu and Menubar changes this:
 
-**On Tabs, `focusableWhenDisabled` works only with `activationMode="manual"`.** With
-`"automatic"`, moving focus to a tab also selects it, and a disabled tab must never be
-selected. So the arrow keys always skip disabled tabs, and `focusableWhenDisabled` has no
-effect.
+- the disabled item stays in the arrow-key order;
+- it gets `aria-disabled`, not `disabled` (native `disabled` removes focus);
+- activating it does nothing, and the consumer's `onClick` does not run.
+
+On Tabs, it only works with `activationMode="manual"`. With `"automatic"`, focusing a tab selects it,
+and a disabled tab must never be selected.
+
+Calendar days are the only exception ([decision 12](#decision-12)).
+
+**Rules out:** a different default for each component.
 
 ---
 
-## 14. Combobox: driven by data, Base UI's behaviour
+<a id="decision-9"></a>
 
-Decided before Combobox's code existed. A text input that filters a
-list of options, with single or multiple selection. Behaviour follows Base UI's Combobox;
-structure follows this library's decisions.
+## 9. Menu and Menubar
 
-**Items are data, not children.** The Root takes `items: T[]`, and `Combobox.List` takes a
-function that renders one item. Menu's items register themselves as JSX children; that cannot
-work here, because the filter runs over data the list has not rendered, and a lazily loaded or
-virtualized list never mounts most of it. `itemToString` gives an item's label and `itemToKey`
-its identity.
+**Menu** is a Popover popup ([decision 7](#decision-7)) with `role="menu"`.
 
-**`value` holds items, not keys.** `value` is `T | null`, or `T[]` with `multiple`, through
-`useControlled`. Selected state, the input's label and the hidden form inputs all come from
-`value` and `itemToKey` — never from `items` (decision 10). So a selection survives a search
-that no longer returns it: pick books, search for pens, and the books stay selected, labelled
-and submitted.
+- Opening focuses the first item (the last item when opened with Up). Up and Down move between items
+  (`core/rovingFocus`). Tab closes the menu.
+- Items are `<button role="menuitem">`, so Enter, Space and click work natively. Activating an item
+  closes all menu levels.
+- A separator is the consumer's own `role="separator"` element.
 
-**Search.** `filter?: (items, query, itemToString) => T[]`, or `null`.
+**Typeahead.** Typing focuses the next item whose text starts with the typed letters. Case and accents
+are ignored (`core/fold`).
 
-| `filter`   | Filtering                                                               |
-| ---------- | ----------------------------------------------------------------------- |
-| omitted    | the default: case- and accent-insensitive "contains"                    |
-| a function | the consumer's — it takes the whole list, so a fuzzy search can rank it |
-| `null`     | none: `items` are shown as given — server search fills them per query   |
+- Keys typed within 500 ms form one search. Repeating one letter cycles through matching items. A
+  longer search stays on the current item if it matches ("de" stays on "Delete" and does not jump to
+  "Deploy").
+- Disabled items are skipped. After a search starts, Space adds a space instead of activating.
+- An item's text is `textValue`, or the strings in its `children`. `textContent` is not used, because
+  that reads the DOM ([decision 4](#decision-4)).
 
-It takes the whole list rather than one item at a time, as Base UI's `filter` does, because
-ranking needs every candidate at once. The default is exported, so a consumer's filter can wrap
-it (decision 9). The default folds case and accents (`normalize('NFD')`, marks dropped) rather
-than comparing with `Intl.Collator`, which cannot test containment without a comparison per
-substring. Filtering is memoised on `items` and the query, and the query is read through
-`useDeferredValue`, so typing stays responsive over a long list.
+**Parts:**
 
-**Behaviour, from Base UI** (checked in its source, October 2026):
+| Part             | Element                            | Holds                                          |
+| ---------------- | ---------------------------------- | ---------------------------------------------- |
+| `Root`           | none                               | open state                                     |
+| `Trigger`        | `<button>`                         | —                                              |
+| `Popup`          | `popover="auto"`, `role="menu"`    | —                                              |
+| `Item`           | `<button role="menuitem">`         | —                                              |
+| `CheckboxItem`   | `<button role="menuitemcheckbox">` | its own `checked`, through `useControlled`     |
+| `RadioGroup`     | `<div role="group">`               | one `value`; `disabled` disables all its items |
+| `RadioItem`      | `<button role="menuitemradio">`    | nothing; checked when the group value matches  |
+| `ItemIndicator`  | `<span aria-hidden>`               | nothing; reads `checked` from its item         |
+| `Group`          | `<div role="group">`               | nothing; named by its `GroupLabel`             |
+| `GroupLabel`     | `<div>`                            | the id used by the group's `aria-labelledby`   |
+| `SubmenuRoot`    | none                               | the submenu's open state                       |
+| `SubmenuTrigger` | `<button role="menuitem">`         | —                                              |
 
-| Interaction              | Single                                        | Multiple                           |
-| ------------------------ | --------------------------------------------- | ---------------------------------- |
-| Pick an item             | input shows its label; popup closes           | added; query cleared; popup closes |
-| Pick the selected item   | stays selected                                | removed                            |
-| Empty the input          | value becomes `null`                          | value unchanged                    |
-| Esc, or press outside    | closes; input goes back to the selected label | closes; query cleared              |
-| `Clear`                  | query and value cleared                       | query cleared; value becomes `[]`  |
-| Backspace on empty input | —                                             | removes the last item              |
+- Checkbox and radio items keep the menu open when activated, so the user can change several options.
+  `closeOnClick` closes it. The consumer's `onClick` runs first, and `preventComponentHandler()` stops
+  the change.
+- One `ItemIndicator` works for both item types. It is always rendered, so labels stay aligned.
+- Arrow keys and typeahead treat all groups as one list.
 
-`Clear` is present only while there is something to clear — a selection — and marks it with
-`data-visible`; the styled component hides it otherwise.
+**Submenus.** A submenu is a `Popup` inside a `SubmenuRoot`. It is `popover="auto"` with its trigger as
+`source`. Because the trigger is inside the parent popover, the browser nests them:
 
-**There is no locked selection: every selected item can be removed.** `disabled` on an `Item`
-stops a pick only, in either mode, as `disabled` on a native `<option>` does — in Chromium a
-plain click in a `<select multiple>` deselects a selected disabled option. An `isLocked` on
-`Item` was built and dropped: native `<select>` has no such state, none of Base UI, MUI or
-Ark/Zag locks a selection itself (October 2026), and knowing a lock before a server search
-returns the item meant List rendering every selected Item, hidden, outside the listbox. An app
-that needs a fixed item controls `value` and puts it back in `onValueChange`; a single
-selection is fixed with `disabled` on the Root.
+- the parent stays open; Esc closes one level; a click elsewhere in the parent closes only the submenu;
+- the browser returns focus only when the outermost popover closes, so the submenu moves focus back to
+  its trigger itself, in `beforetoggle`;
+- the trigger has `aria-haspopup="menu"`, `aria-expanded` and `aria-controls`.
 
-**`required` is the platform's, on the input.** The hidden inputs cannot carry it — a hidden
-input is barred from constraint validation — so the visible input is `required` while the
-selection is empty: the browser's message, `:invalid` and `checkValidity()` all come with it.
-With chips it would fail on an empty text, hence "while the selection is empty", with
-`aria-required` kept throughout. Typed text that picked nothing would pass `required`, so the
-input then sets `valueMissing`'s own message through `setCustomValidity`, and clears only a
-message it set. Focus stays in the input throughout:
-the highlighted option is `aria-activedescendant`, not focused, so `core/rovingFocus` does not
-apply to the list. Up and Down move the highlight, Home and End jump, Enter picks, Alt+Down
-opens. With `multiple`, Left Arrow at the start of the input moves into the chips; Left and
-Right move between them, and Backspace or Delete on a chip removes it. Tab, or any other move
-of focus out of the input, closes the list as a press outside does.
+Keyboard: Enter, Space and → open the submenu at its first item; ← closes it. The arrows swap in
+right-to-left layouts. `side` stays physical (default `'right'`), so an RTL menu passes `side="left"`.
 
-**Callbacks report a reason.** `onValueChange`, `onInputValueChange` and `onOpenChange` take a
-second argument, `{ reason }`: `'input'`, `'input-press'`, `'trigger-press'`, `'item-press'`,
-`'keyboard'`, `'clear'`, `'chip-remove'`, `'escape'`, `'outside-press'`, `'blur'`,
-`'form-reset'` or `'value-change'`. The last is the input following a new single `value` — set
-by the parent, or swapped in `onValueChange` for the item just picked. It was silent at first
-("no one typed"), which broke the promise of a call on every change of the text: a consumer
-tracking the query through `onInputValueChange` went stale. A server search tells typing from a clear; a consumer who wants
-to keep the query after a pick controls `inputValue` and ignores `'item-press'`. There is no
-`cancel()` as in Base UI: the controlled props already give that control, and a cancellable
-event is a convention for every component, not one — decided when a consumer needs it. The
-argument is new to this library and is additive; other components gain it when they need it.
+Pointer: resting 100 ms on a trigger opens its submenu without moving focus. When the pointer leaves
+the trigger, the triangle between the pointer and the submenu is recorded. For 300 ms, moving inside
+that triangle does not close the submenu (`core/pointerIntent`, as in Radix). Touch and pen open
+submenus with a tap.
 
-**Lazy loading.** `onLoadMore` fires when a sentinel at the end of the list scrolls into view
-(`IntersectionObserver`), and `loading` sets `aria-busy` on it. Base UI has
-neither. `Status` is the live region for "Searching…" or a result count; `Empty` shows when
-the filtered list is empty and nothing is `loading`.
+**Menubar** has its own namespace: `Root` (`role="menubar"`), `Menu` (state for one menu, no element),
+`Trigger`, `Popup`.
 
-**Virtualization is the consumer's.** `List`'s render function lets a virtualizer such as
-TanStack Virtual decide which items mount. `onItemHighlighted(item, { index, reason })`, as in
-Base UI, tells it which row to scroll to, since the highlighted option has to be rendered for
-`aria-activedescendant` to point at it. No virtualizer ships here.
+- `Menubar.Menu` provides Menu's context through `useMenuRootValue`. `Menubar.Item`, `CheckboxItem`,
+  `RadioGroup`, `RadioItem`, `ItemIndicator`, `Group`, `GroupLabel`, `SubmenuRoot` and `SubmenuTrigger`
+  are Menu's parts with new names. Menu's code does not know about the bar.
+- `Menubar.Popup` is Menu's Popup. The bar's key handler runs before Menu's, like a consumer handler
+  ([decision 4](#decision-4)).
+- Keyboard: one Tab stop. ← → move along the bar (↑ ↓ with `orientation="vertical"`), with wrapping,
+  swapped in RTL. Home, End and typeahead work on the Triggers. ↓, Enter and Space open a menu at its
+  first item; ↑ opens it at its last. In an open menu, → and ← move to the next or previous menu,
+  unless a submenu uses the key.
+- Pointer: a click opens or closes a menu. While a menu is open, moving to another Trigger opens that
+  menu and focuses it. The bar listens to `pointermove`, because `pointerenter` also fires when the
+  layout changes under a pointer that did not move.
 
-**The popup is decision 12's, but `popover="manual"`.** Anchored to the input with CSS anchor
-positioning through `core/anchoring`, sized with `anchor-size(width)`, in the top layer. Base
-UI's `Portal`, `Positioner`, `Backdrop` and `Arrow` have no counterpart.
-
-`auto` was the plan, and failed in Chromium: its light dismiss closes the list on a press of the
-input itself, though the input is the popup's `source`, and on the Trigger and Clear beside it.
-Focus never enters the list, so `auto`'s Esc and focus return bring nothing either. So the
-popup is `manual`, as Tooltip's is, and the component does the rest: a `pointerdown` outside
-the input, popup, Trigger, Clear and chips closes it as `'outside-press'`, and Esc is handled
-on the input. A press inside an open Popover's Combobox still does not light-dismiss the
-Popover, since the list is that Popover's descendant in the DOM.
-
-**Parts, fewest first (decision 11):** `Root`, `Input`, `Trigger`, `Clear`, `Popup`, `List`,
-`Item`, `Empty`, `Status`, `Chip`, `ChipRemove` — and `Group` and `GroupLabel`, below. `Chip` and `ChipRemove` are parts because
-removing an item needs the Root's setter and chip navigation needs the Root's focus handling.
-Two more landed with `@arun-dev/ui`'s Combobox, which earned them: `InputGroup`, the box around
-the input, chips and buttons, which takes over as the popup's anchor so the list lines up with
-the whole field; and `Value`, which renders the selection through a function and no element of
-its own, so a separate package can draw chips without keeping a copy of the value (decision 9).
-Base UI has both. The selected check is `data-selected` on `Item` and CSS, so there is no
-`ItemIndicator` yet;
-nor `Label`, since a `<label>` is the consumer's element linked by `id`. `@arun-dev/ui`'s
-Combobox renders the chips itself, styled as `Chip`.
-
-**Groups, as `<optgroup>`.** Items stay data (decision 10's "from props, never the DOM"
-holds), so a group is data too: `items` is either items or groups, where a group is any object
-with an `items` array — its label, id or anything else is the consumer's. The filter runs inside
-each group and a group it empties is left out; `List`'s function is then called once per group
-left, with the group narrowed to its matches, and renders a `Group` holding a `GroupLabel` and
-an `Item` per item. The arrow keys, the highlight index, `onItemHighlighted` and `Empty` see one
-flat list in group order, so keyboard handling does not change.
-
-Two parts are earned (decision 11). `Group` is `role="group"`, named by its label through
-`aria-labelledby` — the listbox → group → option structure APG allows. Its `disabled` disables
-every `Item` inside, as `<optgroup disabled>` does; an Item reads it from context, like its own
-prop, so the arrow keys skip them. `GroupLabel` is `<optgroup>`'s `label`: shown, never an
-option, never reached by the arrow keys.
-
-Measured against the platform and Base UI (October 2026): `<optgroup>` has `label` and
-`disabled` and does not nest — this matches all three. Base UI also has `Group`, `GroupLabel`,
-plus a `Collection` that renders a group's items from context and a `Separator`. `Collection`
-is not needed here: the consumer maps the group's already-filtered `items` directly. A group is
-recognised by its shape, as in Base UI, so an item type that itself has an `items` array cannot
-be listed ungrouped; none has asked for it.
-
-**Creating an item is a pattern, not an API.** A "Create "x"" row, as GitHub's label picker
-shows when nothing matches, is an item like any other: while the text matches no item exactly
-(case- and accent-insensitive), the consumer adds one to `items` — labelled with the text itself,
-drawn as "Create" by its `Item` — and in `onValueChange` swaps it for the real item it makes.
-Everything else is already there: the filter keeps it (its label is the text), the arrow keys and
-Enter reach it, with `multiple` the query clears, and without it the input shows the new label.
-The browser tests drive this pattern in both modes, with no change to the library.
-
-Measured against the platform and others (October 2026): `<select>` cannot create; `<input
-list>` accepts free text, which is why it was rejected above. Base UI has no API either — its
-"creatable" demo is this same pattern, confirming in a Dialog. React Aria
-(`allowsCustomValue`) and Ark (`allowCustomValue`) accept free text as the value instead, which
-`value` holding items rules out here. An `onCreate(text)` on the Root was weighed and declined:
-the pattern needs no new API, keeps creation (async, a Dialog for colour and description, a
-server-assigned id) wholly the consumer's, and adds nothing to every combobox that never
-creates.
-
-**`Separator` is visual only.** A line between items or groups, as an `<hr>` in a `<select>`,
-which Chromium exposes as a separator inside the listbox. Measured with axe (October 2026): a
-`role="separator"` inside `role="listbox"` fails `aria-required-children` — a listbox may own
-only options and groups — and Base UI's Separator has that role. So ours is `aria-hidden` with
-no role: it passes, and Groups, named by their labels, already tell a screen reader where one
-set ends. The arrow keys pass it, as they pass a GroupLabel.
-
-**Groups in a virtualized list are a pattern.** Virtualization is the consumer's (above), and
-groups add nothing the library must do: the consumer filters the groups, passes them with
-`filter={null}`, flattens them into rows — labels and items — for the virtualizer, and wraps the
-rows in view in their `Group`. A group whose label has scrolled out keeps a `hidden` GroupLabel,
-so it stays named. `onItemHighlighted` reports the index among items, which the consumer maps to
-its row. The browser tests drive this with a window of rows. The limit is virtualization's, not
-grouping's: a disabled item, or a disabled Group's items, are skipped by the arrow keys only once
-rendered (decision 10 — from props).
-
-**Clear hides while the Root is `disabled`.** It can clear nothing then, so `data-visible` is
-absent though there is a selection, as a disabled `<select>` offers no reset.
-
-**Rules out:** items registered as children; selection read from `items` or the DOM; a
-JavaScript positioning engine or a Portal (decision 12); `cancel()` on change events; and six
-features weighed in October 2026 and judged not needed:
-
-- **Nested groups** — `<optgroup>` cannot nest.
-- **The input inside the popup** — a button opening a panel that holds the search, GitHub's
-  label picker. The field is always the visible input.
-- **Action rows** that are not options, such as GitHub's "Edit labels" — a listbox holds only
-  options and groups. An action belongs beside the Combobox, in a Menu or a link.
-- **An inline list**, always shown rather than in a popup — the Combobox is built on the popup's
-  open and close; an always-visible list is `<select size>`'s job.
-- **Grid navigation**, two-dimensional arrow keys over `grid` cells — an emoji or swatch picker
-  is a different widget, with no native counterpart.
-- **A built-in virtualizer** — virtualization stays the consumer's, as above; below about a
-  thousand items rendering everything is fast enough, and a virtualizer in every combobox costs
-  the many to serve the few.
+**Rules out:** typeahead that activates an item; menus that submit forms; a separate submenu content part; logical `side` values; submenus that use only a delay; Base UI's Menubar, where Menu's parts change behaviour inside a bar; plain buttons in a bar (use Toolbar); a modal bar.
 
 ---
 
-## 15. Form basics: native elements, one headless part
+<a id="decision-10"></a>
 
-Phase one of completing the component set: `Field`, `Link`, `Separator`, `Progress`, `Meter` and
-`Slider`. Five of the six are a native element with styling — decision 7's test, "does it require
-JavaScript?", answers no — so they live in `@arun-dev/ui` alone, as `Input` and `Select` do.
-`Field` is the exception: tying a label, a description and an error to a control means generated
-ids and an `aria-describedby` that changes with what is shown, which is computed ARIA, so it has
-a headless half.
+## 10. Combobox
 
-| Component   | Element                   | Headless | Why                                                    |
-| ----------- | ------------------------- | -------- | ------------------------------------------------------ |
-| `Link`      | `<a href>`                | no       | focus, activation and navigation are the platform's    |
-| `Separator` | `<hr>`                    | no       | the platform exposes `role="separator"`                |
-| `Progress`  | `<progress>`              | no       | value, max and indeterminate are native, and styleable |
-| `Meter`     | `<meter>`                 | no       | low, high and optimum colour the bar natively          |
-| `Slider`    | `<input type="range">`    | no       | keys, steps and the form value are native              |
-| `Field`     | `<div>`, `<label>`, `<p>` | yes      | ids and a changing `aria-describedby` are computed     |
+A text input that filters a list, with single or multiple selection. Behaviour follows Base UI's
+Combobox.
 
-**`Link` is always an `<a href>`, and cannot be disabled.** Decision 7 split navigation out of
-`Button`; this is that half. A disabled link has no platform meaning — the attribute is inert
-on `<a>` — and synthesising one was what `useButton` did wrong, so there is no `disabled`.
-`render` takes a router's link (`<NextLink />`) and keeps the styling. No automatic
-`target="_blank"` or external icon: those are the consumer's choice, per link. A visited link takes
-its own colour, as a native one does: `--link-color-visited`, the accent mixed toward the body
-text in oklab, which keeps the required contrast for any brand because both ends meet it.
-Navigation parts — Breadcrumb, Pagination, a link Card — do not mark visited pages.
+**Items are data.** The Root gets `items: T[]`. `List` gets a function that renders one item. The filter
+must run on items that are not rendered yet (lazy or virtualized lists), so items cannot be JSX
+children. `itemToString` gives an item's label, and `itemToKey` its identity.
 
-**`Separator` is an `<hr>`.** `orientation="vertical"` sets `aria-orientation` and
-`data-orientation`, for a divider in a toolbar or between inline items; the element stays an
-`<hr>`, so it is still a separator to assistive technology. A purely decorative line is the
-consumer's `aria-hidden`. It draws the line and no margin: the space around it is the layout's `gap`.
-Measured on the docs site, a reset's `* { margin: 0 }` in a cascade layer declared after ours
-zeroed a margin here, as any consumer's later or unlayered reset would.
+**`value` holds items, not keys:** `T | null`, or `T[]` with `multiple`. The selected state, the input
+label and the hidden form inputs come from `value`, not from `items`. So a selected item stays selected
+when a new search does not return it.
 
-**`Progress` and `Meter` are styled native elements.** `appearance: none` and the engines'
-pseudo-elements (`::-webkit-progress-value`, `::-moz-progress-bar`, `::-webkit-meter-*`,
-`:-moz-meter-*`) style them in every supported browser, so the styling test passes. Omitting
-`value` on `<progress>` is native indeterminate, styled from `:indeterminate`. `Meter` keeps the
-platform's three regions — `optimum`, `suboptimum`, `even-less-good` from `low`, `high` and
-`optimum` — mapped onto the success, warning and error status tokens. Progress is "how far
-along"; Meter is "how much of a known range": a disk's usage, a password's strength.
+**Filtering:**
 
-**`Slider` is a native range input, coloured with `accent-color`.** A filled track — the part
-before the thumb — is the one thing the native range cannot draw from CSS alone in Chromium and
-WebKit: there is no `::-webkit-slider-progress`, so a fill needs the value in a custom property,
-updated on every input by script. That is behaviour, which decision 7 keeps out of
-`@arun-dev/ui`, for a visual. `accent-color` draws the native, filled slider in all three
-engines, in the brand's accent, with the platform's thumb, keyboard, `step`, form value and
-`form.reset()`. Size is the platform's. A multi-thumb range slider fails the behaviour test, so it
-is not `Slider`: it is `RangeSlider`, two native inputs on one track (decision 31).
+| `filter`   | Result                                                                 |
+| ---------- | ---------------------------------------------------------------------- |
+| not set    | default: "contains", ignoring case and accents (`core/fold`); exported |
+| a function | the consumer's filter; it gets the whole list, so it can sort results  |
+| `null`     | no filtering; `items` are shown as given (for server search)           |
 
-**`Field` ties a label, a description and an error to one control.** Parts, fewest first
-(decision 11): `Root`, `Label`, `Control`, `Description`, `Error`.
+Filtering is memoized, and the query is read with `useDeferredValue`.
 
-- `Root` generates the ids and holds `invalid`, `disabled` and `required`.
-- `Label` is a `<label htmlFor>` the control's id.
-- `Control` renders its `render` — `<Input />`, `<Select />`, `<Checkbox.Root />`,
-  `<Combobox.Input />` — and merges `id`, `aria-describedby`, `aria-invalid`, `disabled` and
-  `required` onto it. Field does not reach into each control; `render` is the seam (decision 10).
-- `Description` and `Error` register when rendered, so `aria-describedby` names exactly what is
-  on screen — the description, then the error.
-- `Error` renders only while the Root is `invalid`.
+**Behaviour:**
 
-Validity is the consumer's: `invalid` comes from react-hook-form's `fieldState`, or from a
-`required` the browser reported. Field reads no `ValidityState` and writes no message — the
-browser's own bubble and `:user-invalid` stay the platform's. Base UI's Field also validates
-(`validate`, `validationMode`); that is a form library's job, and react-hook-form already does
-it for every consumer here. A group of controls under one label is a `<fieldset>` with a
-`<legend>`, native, so there is no `Fieldset` part. ui draws one as a Field is drawn, with classes
-on the native elements — `.fieldset`, `.fieldset-legend`, `.fieldset-description`,
-`.fieldset-error` — reading the same `--field-*` tokens; the platform already names the group by
-its legend, and the consumer ties a description or an error to it with `aria-describedby`.
+| Action                   | Single                                 | Multiple                           |
+| ------------------------ | -------------------------------------- | ---------------------------------- |
+| Pick an item             | input shows its label; popup closes    | added; query cleared; popup closes |
+| Pick the selected item   | stays selected                         | removed                            |
+| Clear the input text     | value becomes `null`                   | value unchanged                    |
+| Esc or outside press     | closes; input shows the selected label | closes; query cleared              |
+| `Clear` button           | query and value cleared                | query cleared; value becomes `[]`  |
+| Backspace on empty input | —                                      | removes the last item              |
 
-**Rules out:** `disabled` on `Link`; a filled track drawn by script on `Slider`; a second thumb on
-`Slider`; validation inside `Field`; a `Fieldset` part.
+**Keyboard.** Focus stays in the input. The highlighted option is set with `aria-activedescendant`.
+Up and Down move the highlight, Home and End jump, Enter picks, Alt+Down opens. With `multiple`, Left
+at the start of the input moves to the chips; Left and Right move between chips; Backspace or Delete
+removes one. Moving focus out of the input closes the list.
 
----
+**`required`** is set on the visible input while nothing is selected, because hidden inputs are not
+validated by the browser. If the user typed text but picked nothing, the input sets the
+`valueMissing` message with `setCustomValidity`.
 
-## 16. Disclosure and feedback: native where the platform has it
+**Callbacks give a reason.** `onValueChange`, `onInputValueChange` and `onOpenChange` receive
+`{ reason }`: `'input'`, `'input-press'`, `'trigger-press'`, `'item-press'`, `'keyboard'`, `'clear'`,
+`'chip-remove'`, `'escape'`, `'outside-press'`, `'blur'`, `'form-reset'` or `'value-change'`.
 
-Phase two: `Accordion`, `Alert`, `Spinner`, `Skeleton` and `Toast`. The first four need no
-script, so they are `@arun-dev/ui` alone (decision 7). `Toast` holds a queue and timers, so its
-behaviour is in `@arun-dev/headless`.
+**Long lists.** `onLoadMore` fires when an element at the end of the list scrolls into view. `loading`
+sets `aria-busy` on it. `Status` is a live region; `Empty` shows when nothing matches and nothing is
+loading. Virtualization is the consumer's job: `List`'s function lets a virtualizer choose what to
+render, and `onItemHighlighted(item, { index, reason })` tells it which row to scroll to.
 
-| Component   | Element                      | Headless | Why                                                             |
-| ----------- | ---------------------------- | -------- | --------------------------------------------------------------- |
-| `Accordion` | `<details>` / `<summary>`    | no       | toggling, keyboard, "only one open" and find-in-page are native |
-| `Alert`     | `<div>`                      | no       | a styled message; its live role is the consumer's choice        |
-| `Spinner`   | `<progress>`, no value       | no       | an indeterminate progress bar is "busy", natively               |
-| `Skeleton`  | `<div aria-hidden>`          | no       | a placeholder shape, hidden from assistive technology           |
-| `Toast`     | `<section popover="manual">` | yes      | a queue, timers that pause, and a live region                   |
+**The popup is `manual`.** In Chromium, `auto` closes the list when the user presses the input, the
+Trigger or Clear. Focus never moves into the list, so `auto` gives no benefit. The component closes the
+list on a `pointerdown` outside its elements, and handles Esc in the input.
 
-**`Accordion` is `<details>`, not buttons.** Base UI builds it from a heading and a `<button>`
-with `aria-expanded`, as APG does. The native element passes all three tests of decision 7:
-`<summary>` toggles on a press, Enter and Space; `name` on each `<details>` makes them
-exclusive — one open at a time — in every engine since 2024; and Chromium opens a closed one when
-find-in-page matches inside it, which a scripted panel cannot do. What is lost is the
-heading: `<summary>` is a button to assistive technology, so a heading inside it is not reached
-by heading navigation. That is accepted for the native behaviour. Arrow keys between triggers,
-optional in APG, are not added. Parts: `Root` (optional — its `exclusive` gives every Item one
-generated `name`), `Item` (`<details>`), `Trigger` (`<summary>`), `Panel`. `defaultOpen` sets
-`open` at mount; `open` with `onToggle` controls it. Opening animates where
-`::details-content` and `interpolate-size` are supported, and snaps elsewhere and under reduced
-motion.
+**Parts:** `Root`, `Input`, `InputGroup`, `Trigger`, `Clear`, `Popup`, `List`, `Item`, `Group`,
+`GroupLabel`, `Separator`, `Empty`, `Status`, `Chip`, `ChipRemove`, `Value`.
 
-**`Alert` has no live role by default.** A callout on the page from the start is content, not
-an announcement, and `role="alert"` on it is read out at load. When it appears in response to
-something — a failed save — the consumer adds `role="alert"` (urgent) or `role="status"`
-(polite). Parts: `Root` with `tone` (`neutral`, `info`, `success`, `warning`, `error`, on the
-status tokens) and an optional `icon`, `Title`, `Description`.
+- `InputGroup` wraps the input, chips and buttons. The popup is anchored to it, so the list is as wide
+  as the whole field.
+- `Value` renders the selection through a function and has no element, so `ui` can draw chips without a
+  copy of the value.
+- `Chip` and `ChipRemove` need the Root's setter and focus handling.
+- `Clear` has `data-visible` only when something is selected and the Root is not disabled.
+- A selected item has `data-selected`.
 
-**`Spinner` is a `<progress>` without a value.** An indeterminate progress bar is exactly
-"working, no end known", exposed as `role="progressbar"` and named by `aria-label`, which
-defaults to "Loading". `appearance: none` turns the element into a rotating ring and hides the
-bar's pseudo-elements. A `role="status"` with hidden text was the alternative; a status region
-inserted with its content is announced unreliably, and the native element needs no hidden text.
-Under reduced motion the ring turns slowly rather than stopping, so it still reads as busy.
+**Groups work like `<optgroup>`.** A group is any object with an `items` array. The filter runs inside
+each group and removes empty groups. Keyboard and `Empty` treat all groups as one list. `Group` is
+`role="group"`, named by `GroupLabel`; `disabled` on a Group disables its items. `Separator` is
+`aria-hidden` with no role, because `role="separator"` inside a listbox fails axe.
 
-**`Skeleton` is `aria-hidden`.** It is a shape, not content. The region it stands in for is
-what tells assistive technology it is loading: `aria-busy="true"` on it, the consumer's. The
-shimmer stops under reduced motion. Size and shape are the consumer's `className` or `style`.
+**Patterns without a new API** (both covered by browser tests):
 
-**`Toast`.** Parts: `Provider` (the queue: `limit`, default `timeout`), `useToastManager()`
-(`add`, `update`, `close`, and the toasts to render), `Viewport`, `Root`, `Title`, `Description`,
-`Action`, `Close`.
+- **Create an item:** when the text matches no item, the consumer adds an item labelled with the text,
+  and replaces it with the real item in `onValueChange`.
+- **Groups in a virtualized list:** the consumer filters with `filter={null}`, flattens groups into rows
+  and wraps visible rows in their `Group`.
 
-- The `Viewport` is a `<section aria-label="Notifications">` with `popover="manual"`, shown while
-  any toast is, so it sits in the top layer above a modal Dialog — decision 12's mechanism — with
-  no portal. It stays open while empty, so the live region exists before the first toast
-  arrives, and is shown again as each arrives, to move above anything opened since. Measured in
-  Chromium: over a modal Dialog it draws on top but is inert, as everything outside a modal
-  `<dialog>` is — readable, not clickable — until the Dialog closes, so a toast that may appear
-  then should keep a `timeout`.
-- It is `aria-live="polite"`; a toast added with `priority: 'high'` is `role="alert"` instead.
-- Timers pause while the pointer is over the Viewport or focus is in it, and while the page is
-  hidden, and resume with the time that was left.
-- Esc on a focused toast closes it; `Close` and `Action` are buttons.
-- Ruled out: swipe to dismiss (a pointer gesture with `Close` already there), and Base UI's
-  global F6 shortcut to reach the Viewport (a key the page may want). `Positioner` and `Arrow`,
-  for a toast anchored to an element, are not built.
-
-**Rules out:** scripted Accordion triggers and their arrow keys; a live role on every Alert;
-swipe and a global shortcut on Toast.
+**Rules out:** a cancellable change event; locked items (an app can put an item back in `onValueChange`); `onCreate`; free-text values; nested groups; the input inside the popup; action rows; an always-visible list (use `<select size>`); grid navigation; a built-in virtualizer; `<input list>` with `<datalist>` (cannot be styled).
 
 ---
 
-## 17. Navigation and layout: markup first, state where it changes
+<a id="decision-11"></a>
 
-Phase three: `Breadcrumb`, `Pagination`, `Table`, `Kbd`, `Avatar`, `Toggle`, `ToggleGroup` and
-`Toolbar`. Decision 7's test splits them: the first four are native markup with styling, in
-`@arun-dev/ui` alone; the last four hold state or move focus with the arrow keys, so their
-behaviour is in `@arun-dev/headless`.
+## 11. Form controls
 
-| Component     | Element                              | Headless | Why                                                       |
-| ------------- | ------------------------------------ | -------- | --------------------------------------------------------- |
-| `Breadcrumb`  | `<nav>`, `<ol>`, `<a>`               | no       | links in order; the current page is `aria-current="page"` |
-| `Pagination`  | `<nav>`, `<ul>`, `<a>` or `<button>` | no       | the page is the consumer's — usually the URL's            |
-| `Table`       | `<table>` and its sections           | no       | rows, headers and `scope` are the platform's              |
-| `Kbd`         | `<kbd>`                              | no       | a key, styled                                             |
-| `Avatar`      | `<span>`, `<img>`                    | yes      | whether the image loaded is state                         |
-| `Toggle`      | `<button aria-pressed>`              | yes      | pressed is state                                          |
-| `ToggleGroup` | `role="group"` of Toggles            | yes      | a shared value, and arrow keys between them               |
-| `Toolbar`     | `role="toolbar"`                     | yes      | one Tab stop, arrow keys inside (`core/rovingFocus`)      |
+**Field** connects a label, description and error to one control. The ids and the changing
+`aria-describedby` are calculated, so Field is in headless.
 
-**`Breadcrumb` separators are CSS.** A `/` drawn by `::before` with empty alternative text
-(`content: "/" / ""`), so it is not read out between links, and no separator part exists.
-Parts: `Root` (`<nav aria-label="Breadcrumb">` around an `<ol>`), `Item` (`<li>`), `Link` (an
-`<a>`, a router's through `render`), `Current` (`aria-current="page"`, not a link).
+- `Root` creates the ids and holds `invalid`, `disabled` and `required`.
+- `Label` is a `<label htmlFor>` pointing at the control.
+- `Control` renders its `render` element (`<Input />`, `<Select />`, `<Checkbox.Root />`,
+  `<Combobox.Input />`) and adds `id`, `aria-describedby`, `aria-invalid`, `disabled` and `required`.
+- `Description` and `Error` register when rendered, so `aria-describedby` lists only what is visible.
+  `Error` renders only when `invalid` is true.
+- Field does not validate. `invalid` comes from the consumer (react-hook-form's `fieldState`, or the
+  browser).
+- A group of controls is a native `<fieldset>` with `<legend>`, styled with `.fieldset` classes and the
+  same `--field-*` tokens.
 
-**`Pagination` holds no page.** The current page is the URL's, or the consumer's state, so
-`page` and `count` are required props and there is nothing to be uncontrolled. With
-`getHref(page)` each page is a link — the right element when pages are addresses; without it,
-buttons calling `onPageChange(page)`. Unavailable Previous or Next is a disabled button, or plain
-text for links, since a link cannot be disabled (decision 15). The range is the exported
-`paginationRange()`, a pure function a custom layout can reuse: every page when they fit in
-`2 × siblings + 5` slots, otherwise the same number of slots — first, last, the current page's
-neighbours — so the row does not change width as the page moves, with an ellipsis only where it
-stands for two pages or more.
-
-**`Table` is the native table, styled.** Parts map onto its elements: `Root` (`<table>`, inside a
-scrolling container), `Caption`, `Header`, `Body`, `Footer`, `Row`, `Head` (`<th>`, `scope="col"`
-by default) and `Cell`. Sorting is the consumer's: a `<button>` in the `Head`, and `aria-sort` on
-it, which the styling shows. A data grid — cell focus and arrow keys — is a different widget,
-ruled out here.
-
-**`Avatar`** is Base UI's three parts: `Root`, `Image` (rendered, and shown only once loaded) and
-`Fallback` (initials or an icon, shown until then, or for good if it fails; `delay` avoids a
-flash when the image is quick).
-
-**`Toggle`, `ToggleGroup` and `Toolbar`** follow Base UI and APG. A `Toggle` is a `<button>` with
-`aria-pressed`, through `useControlled`. A `ToggleGroup` holds a `value` array — one entry, or any
-number with `multiple` — and is one Tab stop with arrow keys between its Toggles. A `Toolbar` is
-`role="toolbar"`, one Tab stop, arrow keys across its `Button`s, `Link`s, `Input`s and groups, with
-`Separator`s between. Roving focus is `core/rovingFocus`, already Tabs' and Menu's.
-
-**Rules out:** a separator part in Breadcrumb; an uncontrolled Pagination; a data grid; a
-`checkbox` styled as a toggle, which says "checked", not "pressed".
-
----
-
-## 18. Menu: typeahead, and items that hold state
-
-Phase four, part one: typeahead and checkable items for Menu; submenus are decision 19.
-Measured against APG's menu pattern and Base UI's Menu (October 2026).
-
-**Typeahead matches text from props.** Typing moves focus to the next item whose text starts
-with what was typed, ignoring case and accents (`core/fold`, shared with Combobox's filter).
-Keys typed within 500 ms build one search; one character, or the same one repeated, moves past
-the current item, so it cycles, as native menus and `<select>` do. A longer search may stay on
-the current item, so "de" does not leave "Delete" for "Deploy". Disabled items are skipped, as
-by the arrow keys. The logic is `core/typeahead`, internal, beside `core/rovingFocus`.
-
-An item's text is `textValue`, or else the strings in its `children`, collected through
-elements' own `children`. Radix and Base UI read the rendered `textContent` instead; reading it
-here would break decision 10's "nothing is read back from the DOM", and the props cover every
-item whose text the consumer writes inline. A component that renders its own text is opaque, so
-that item needs `textValue`, named as Radix names it.
-
-**A Space inside a search is part of it.** On a button, Space activates. Once a search has
-started, a Space continues it — "New f" reaches "New folder" — and its default is prevented, so
-nothing is clicked, even when the search matches no item.
-
-**Checkable items, in Base UI's shape, with fewer parts.**
-
-| Part            | Element                            | Holds                                               |
-| --------------- | ---------------------------------- | --------------------------------------------------- |
-| `CheckboxItem`  | `<button role="menuitemcheckbox">` | its own `checked`, through `useControlled`          |
-| `RadioGroup`    | `<div role="group">`               | one `value`; `disabled` disables every item         |
-| `RadioItem`     | `<button role="menuitemradio">`    | nothing: checked while the group's value is its own |
-| `ItemIndicator` | `<span aria-hidden>`               | nothing: reads `checked` from either kind of item   |
-| `Group`         | `<div role="group">`               | nothing: named by its `GroupLabel`                  |
-| `GroupLabel`    | `<div>`                            | the id the group's `aria-labelledby` points at      |
-
-Base UI has a `CheckboxItemIndicator` and a `RadioItemIndicator`; one `ItemIndicator` reads the
-same `checked` from either item, so decision 11's "fewest parts" keeps one. It is always
-rendered, as `Checkbox.Indicator` is, so an unchecked item keeps the check's space and labels
-line up. `@arun-dev/ui` draws a checkmark in it; children replace it.
-
-Both checkable items stay open when activated — APG lets Space change a checkbox item "without
-closing the menu", and Base UI's `closeOnClick` defaults to `false` for both — so several
-settings can change in one visit. `closeOnClick` closes it. The consumer's `onClick` runs first,
-and `preventComponentHandler()` stops the change, as on `Item`. Checking the checked radio item
-again changes nothing, as with a native radio. There is no hidden input: a menu is not a form
-control.
-
-Groups follow Combobox's (decision 14): `role="group"`, named once a `GroupLabel` is there, and
-the arrow keys and typeahead run through every group's items as one list. `RadioGroup` is a
-group too, so a `GroupLabel` names it the same way. A separator stays the consumer's own
-`role="separator"` element, which `role="menu"` may own (decision 12).
-
-**Rules out:** reading item text from the DOM; a typeahead that activates the item it reaches;
-a form-submitting menu.
-
----
-
-## 19. Menu: submenus, nested native popovers
-
-Phase four, part two: submenus for Menu. Measured against APG's menu pattern, the
-HTML popover algorithms and Base UI's Menu (October 2026).
-
-**Two parts, and the Popup again.** `SubmenuRoot` holds a submenu's state, as `Root` does, and
-renders nothing; `SubmenuTrigger` is the item that opens it; the submenu itself is a `Popup`,
-which knows it is one from context. Base UI has the same pair (`SubmenuRoot`,
-`SubmenuTrigger`); Radix's `Sub`, `SubTrigger`, `SubContent` adds a content part this design
-does not need. Submenus nest to any depth.
-
-**The trigger belongs to two menus.** It is a `menuitem` of the parent — registered there, so the
-parent's arrow keys and typeahead reach it — with `aria-haspopup="menu"`, `aria-expanded` and
-`aria-controls` for the submenu, which it anchors and names: each SubmenuRoot has its own anchor
-name, carried by its trigger.
-
-**Nesting is the platform's.** The submenu is `popover="auto"` shown with its trigger as
-`source`; the trigger sits inside the parent's popover, so the submenu nests in it. The parent
-stays open while it is, Esc closes one level at a time, and a click elsewhere in the parent
-closes only the submenu. One thing the platform does not do: it returns focus only when the
-outermost auto popover closes. So a submenu closing with focus inside moves focus to its trigger
-itself, in `beforetoggle`, before the element hides.
-
-**Keyboard, by APG.** Enter, Space and → open the submenu at its first item; ← closes it. The
-arrows follow the writing direction, swapping in a right-to-left menu. Placement does not: `side`
-stays physical (decision 12), so a right-to-left menu passes `side="left"` to the submenu's
-Popup. The default is `'right'`, a Root's `'bottom'`. Activating an item closes every level, as
-Tab does; moving to another parent item with the arrow keys closes the open submenu.
-
-**Pointer intent.** Resting on a trigger for 100 ms opens its submenu, without moving focus: the
-keyboard user's focus is not taken by a passing pointer. Moving onto another item of the parent
-closes it — but a pointer on its way to the submenu crosses other items. When it leaves the
-trigger, the trigger measures the submenu and records the triangle from the exit point to the
-submenu's near edge; for 300 ms, movement inside that triangle closes nothing. This is Radix's
-approach. The measurement is geometry the pointer moves through, never state (decision 10), and
-positions nothing (decision 12). The logic is `core/pointerIntent`, internal. Touch and pen do
-not hover, so they open submenus by tapping the trigger.
-
-**Rules out:** a separate content part for submenus; logical `side` values, which would change
-decision 12 for every popup; moving focus on hover; and delay-only intent, which closes a
-submenu under a slow diagonal move or keeps the wrong one open under a fast one.
-
----
-
-## 20. OTP input: one native input, boxes drawn over it
-
-`OtpInput` collects a one-time code: one box per character, `length` of them. The common build
-is one `<input>` per box, and it is ruled out by decision 7's table: a text field loses
-autofill, IME, mobile keyboards and password managers at any price. SMS autofill
-(`autocomplete="one-time-code"`) fills one input, paste lands in one input, and a password
-manager offers one input. So the code is a **single native `<input>`**, and the boxes are
-pictures of it.
+**OtpInput** is **one native `<input>`**, transparent, on top of the drawn boxes. This keeps SMS
+autofill (`autocomplete="one-time-code"`), paste and password managers working.
 
 | Part    | Element   | Does                                                                                |
 | ------- | --------- | ----------------------------------------------------------------------------------- |
-| `Root`  | `<div>`   | holds `value`, `length`, `validationType` and `disabled`; `data-complete` when full |
-| `Input` | `<input>` | the control: typing, paste, autofill, the form and every native prop                |
+| `Root`  | `<div>`   | holds `value`, `length`, `validationType`, `disabled`; `data-complete` when full    |
+| `Input` | `<input>` | typing, paste, autofill, the form, and all native props                             |
 | `Slot`  | `<div>`   | draws character `index`; `data-active`, `data-filled`, `data-disabled`; aria-hidden |
 
-**Input is a part, though CSS places it.** It is the element a consumer addresses — `name`,
-`required`, `autoFocus`, a `ref`, a Field's attributes — so it needs to be reachable, as
-`Combobox.Input` is. Slots are parts by decision 11 (separate elements, needing the value, placed
-by the consumer, with a separator between groups being the consumer's own element). In
-`@arun-dev/ui` it is one component, `<OtpInput length={6} />`: `className` on the row and every
-other prop on the `<input>`, as for `Input`.
+- The caret position is read from input events and kept over one character, so typing replaces the
+  active box. A press goes to the box under the pointer.
+- Delete or Backspace in the middle leaves a gap (a space: `"123 56"`), and `pattern` rejects it. A gap
+  at the end is removed. Deletion is read from `beforeinput`, because phone keyboards often do not send
+  a Backspace key event. `onComplete` fires when all boxes are filled.
+- `maxLength` and a `pattern` of exactly `length` characters keep native validation. The component
+  handles paste itself, because `maxLength` would cut the text before spaces are removed.
+- In `ui` it is one component, `<OtpInput length={6} />`: `className` goes on the row, all other props
+  on the `<input>`.
 
-**The value lives in React, so `register()` is lost — as for Radio group.** The boxes draw the
-value, and `setValue` writing `.value` on the DOM would be unheard (decision 10, rule 1).
-`Controller` is the binding. `form.reset()` is closed the same way as the other controls: React
-keeps the input's default equal to its value, so the Root returns to its mount-time value itself,
-through the one setter.
+**RangeSlider** is two `<input type="range">` elements on one track. Keys, `step`, the slider role and
+form submission are native. Parts: `Root`, `StartInput`, `EndInput`. Each input has its own `name`
+(`priceMin=200&priceMax=800`). The Root adds:
 
-**The caret is the platform's, read from the input's events.** The Input reads
-`selectionStart` and `selectionEnd` in its handlers, as `onChange` reads the value, and keeps
-the caret over one character so typing replaces the character in the active box. A press is
-mapped to the box under the pointer from the boxes' geometry at the press, as
-`core/pointerIntent` does — measured, never stored as state. The input is drawn over the boxes,
-transparent, so presses land on it: a long press still opens the phone's paste menu.
+- **Order:** one thumb cannot pass the other. The inputs are controlled, so React moves a thumb back if
+  the browser moved it too far. `onValueChange` gives the whole range.
+- **Fill:** `--range-slider-start` and `--range-slider-end` are set as fractions of the track.
+  `accent-color` cannot fill between two thumbs, so `ui` draws the track, fill and thumbs.
+- **Top thumb:** `data-raised` marks the input that gets the press where the thumbs overlap.
+- **Track press:** inputs accept presses only on their thumbs. A press on the track moves and focuses
+  the nearest thumb.
 
-**Deleting empties a box in place.** Boxes read as separate fields, so Delete or Backspace on
-a character before the end leaves a gap rather than shifting the rest left: delete the 4 in
-`123456` and the value is `"123 56"`, with the caret still on the empty box. The gap is a space,
-stored in the value, so the input stays the one source of truth and the `pattern` rejects it by
-itself — no custom validation. A gap at the end is dropped, so the last box emptied is just a
-shorter code. Backspace on an empty box moves back and empties the one before. Deletion is read
-from the platform's `beforeinput`, not `keydown`, because a phone keyboard often sends no
-Backspace key. The cost would land on consumers — a complete code is a pattern, `/^\d{6}$/`,
-not `value.length === length` — so the Root reports it: `onComplete` fires after any change
-that leaves every slot filled, the same test as `data-complete`.
+**Button: `pending` and `danger`.**
 
-**Native validation stays on.** The Input carries `maxLength` and a `pattern` of exactly
-`length` allowed characters, so with `required` the browser blocks a short code and
-`:invalid` matches it. Paste is handled by the component, because `maxLength` would cut
-"123 456" to "123 45" before the spaces could be dropped. Pasted and typed spaces are dropped;
-only a deletion makes a gap.
+- `pending` sets native `disabled` and `data-pending`. A disabled `<button>` ignores a second press,
+  and the browser does not submit a form through a disabled default button. Trade-off: focus leaves the
+  button while pending. The result (a Toast or an error) is what users hear.
+- In `ui`, the label stays in place with `opacity: 0` and an `aria-hidden` Spinner on top, so the button
+  keeps its width and accessible name.
+- `danger` and `danger-ghost` use the error colours (`--color-status-error` on
+  `--color-status-error-bg`, and the reverse). That pair already must meet 4.5:1 contrast, so both
+  variants pass in every theme and brand.
 
-**Rules out:** one input per box; a hidden input beside the boxes for the form (the Input is the
-form field); validation of the code itself, which is the server's.
+**Rules out:** a `Fieldset` part; a hidden input next to the OTP boxes; checking the OTP code itself; slider thumbs built with `role="slider"`; more than two thumbs, a minimum gap, or dragging the fill; a focusable pending Button with `aria-disabled` (it would have to block the consumer's handlers); a `loading` prop that replaces the label; a `--color-text-on-error` token.
 
 ---
 
-## 21. Layout: Stack and Grid, class names over a gap scale
+<a id="decision-12"></a>
 
-`Stack` is a flex container: children in one line, down or across. `Grid` is a CSS grid of
-equal columns. Neither needs JavaScript, so both are `@arun-dev/ui` alone (decision 7), render a
-`<div>` by default, and take `render` for the element the content needs — a `<ul>`, a `<form>`.
+## 12. Calendar and DatePicker
 
-**Space is the layout's.** `gap` takes a step on the spacing scale — `0`, `3xs` up to `3xl`, the
-`Space` type exported for it — never a margin on the children. A reset cannot collapse a gap,
-two margins cannot add up, and a child placed elsewhere carries no stray spacing with it. Free
-lengths are ruled out so spacing stays on the scale; `className` is the escape hatch.
+**The input is native.** A text field cannot be rebuilt ([decision 3](#decision-3)), and
+`<input type="date">` / `datetime-local` already has segments, locale typing, the phone picker, `min`,
+`max`, `required` and form support. Its value is ISO in every locale. A range and a styled calendar are
+added next to it. Chrome's own picker is hidden with CSS.
 
-**Props become class names, not inline styles.** Each step is a class — `layout-stack-gap-md` —
-so the `var(--space-*)` reads sit in CSS, where the token contract checks them (decision 4).
-Classes, not `data-*`, because the state-attribute contract reserves `data-*` for what headless
-emits. The prefix is `layout-`: `.stack` is already a utility class, in the last layer, and would
-override every modifier; `.grid` is Tailwind's. The `stack` and `grid` layers come right after
-`reset`, so a component's own styles win on an element that is both.
+**Uncontrolled, the input holds the value,** so `register()` works. The Root copies the value from input
+events. It reads the input again when the picker opens and after `form.reset()`, because the input is
+the state. A calendar pick sets the value through the value setter and fires an `input` event, so form
+libraries see it like typing.
 
-**Grid's counts are custom properties on the element.** A column count or a minimum width is
-data, not a step on a scale, so `--grid-columns` and `--grid-min-item-size` are set inline, as
-OtpInput sets `--otp-input-length`. Every Grid sets the ones its mode reads: a nested grid would
-otherwise inherit the outer grid's count. `minItemSize` fits as many columns as there is room
-for — `repeat(auto-fill, minmax(min(100%, size), 1fr))` — so a grid is responsive with no
-breakpoints, which CSS cannot read from a token. With `columns` as well, a column is also never
-narrower than a full row's share, which caps the count. `auto-fill`, not `auto-fit`, so a short
-row keeps the column width instead of stretching.
+**Dates are ISO strings without a time zone.** A value with `Z` or an offset is converted to local time.
+Seconds are removed. Date maths uses a `Date` at UTC midnight, so daylight saving changes nothing. There
+is no date library: `Intl.DateTimeFormat` gives month and weekday names, and `Intl.Locale#getWeekInfo`
+(with a fallback table) gives the first day of the week. Only the Gregorian calendar.
 
-**Rules out:** responsive props (`{ sm: 'column', md: 'row' }`), which need breakpoints a custom
-property cannot carry into a media query; arbitrary gap lengths; a `Box` or `Flex` primitive
-carrying every CSS property as a prop.
+**Ranges are separate components:** DatePicker / DateRangePicker and Calendar / RangeCalendar. A range
+value is always `{ start, end }`.
 
----
+| Headless part                                            | Element                                        |
+| -------------------------------------------------------- | ---------------------------------------------- |
+| `Calendar.Root`, `RangeRoot`                             | `<div>`: selection, visible month, focused day |
+| `Calendar.Heading`                                       | the month name, a polite live region           |
+| `Calendar.PrevButton`, `NextButton`                      | `<button>`, disabled at `min` and `max`        |
+| `Calendar.Grid`                                          | one month, `<table role="grid">`, `offset`     |
+| `Calendar.MonthSelect`, `YearSelect`                     | native `<select>`                              |
+| `Calendar.DayDetails`                                    | the details card (below)                       |
+| `DatePicker.Root`, `RangeRoot`                           | none: value, open state, limits                |
+| `DatePicker.Input`, `StartInput`, `EndInput`             | native date inputs                             |
+| `DatePicker.TimeInput`, `StartTimeInput`, `EndTimeInput` | native `<input type="time">`                   |
+| `DatePicker.Trigger`, `Popup`, `Close`                   | Popover trigger, popup and close               |
 
-## 22. Typography: native elements, the utility classes as props
+A Calendar inside the picker's Popup gets the value and limits from context; its own props win. `ui`
+combines the parts into one component.
 
-`Heading`, `Paragraph` and `Text` render `<h1>`–`<h6>`, `<p>` and `<span>`. None needs
-JavaScript, so all three are `@arun-dev/ui` alone (decision 7), and each takes `render` for a
-more precise element — `<strong>`, `<time>`, `<legend>`.
+**The grid follows APG.** One Tab stop. Arrows move by day and week, Home and End go to the week's
+ends, Page Up and Page Down move by month (with Shift, by year). **Disabled days stay focusable.** This
+is the exception to [decision 8](#decision-8): if ↓ skipped a day, it would not land one week later.
+Disabled days have `aria-disabled` and cannot be picked. Focus stays between `min` and `max`. The popup
+is a non-modal Popover. It takes focus when it opens and returns focus to the Trigger after a pick or
+Esc.
 
-**A heading's level and its size are separate props.** `level` is structure — the element, and
-so the outline screen reader users move through — and `size` is appearance, a step on the type
-scale. Each level has a default size, `4xl` down to `base`, so the common case is one prop. Tying
-them would push authors to skip a level to get a smaller look.
+**Ranges.** Two presses, in any order, with a preview between them. `maxDays` counts days including
+both ends. After the first press, days out of reach are disabled, and a range cannot cross an
+unavailable day. The end input's `max` follows the start. With `withTime`, new ends get 00:00 and
+23:59. `maxHours` limits the time between start and end (40 hours from 14:00 ends at 06:00 on the third
+day). If the start moves past either limit, the end is moved back.
 
-**Props map onto the existing utility classes.** `.text-size-*` (size with its paired leading),
-`.text-color-*` and `.font-weight-*` were already public in the `utilities` layer, so the
-components add those classes rather than restating the same declarations in a layer of their
-own; `.font-weight-normal` joined them. Only what a utility does not cover has a layer:
-`heading` (font family, weight, letter spacing and colour from `--heading-*` tokens, and
-`text-wrap: balance`) and `paragraph` (a `max-inline-size` of `--paragraph-max-inline-size`,
-`65ch`, and `text-wrap: pretty`). `Text` has no stylesheet.
+**Time** is chosen in the Popup with a native time input. After a day is picked, the Popup stays open
+for the time, and `Close` is the Done button.
 
-**What is left out is inherited.** A Paragraph or Text without `size` or `color` takes the text
-around it, so it reads right inside an Alert, a Card or a Field. A Heading always sets a size: a
-heading is not part of the text around it.
+**Distant months:** `MonthSelect` and `YearSelect` cover `min` to `max`, or 100 years back and 10 years
+ahead. In `ui`, `captionLayout="dropdown"` shows them instead of the Heading. The Heading stays as a
+hidden live region.
 
-**Rules out:** an element chosen from `size` or `variant` (`<Text variant="h2">`); a Text that
-renders a `<p>`, which is Paragraph's job; colours beyond the `--color-text-*` roles — status
-colours belong to Alert, Badge and Field.Error.
+**Day information (optional).** `getDayInfo(date)` returns `tags`, a `description` and `details`. It
+runs for every visible day during render, so it must be a lookup, not a fetch. `onVisibleRangeChange`
+reports the visible days so the consumer can fetch data. `loading` sets `aria-busy` on the grids.
 
----
+- Tags go in one attribute, `data-tags="weekend holiday"`, matched in CSS with `~=`.
+- Each day shows one mark: the tag that is highest in `tagPriority` (default: booked, holiday, festival,
+  birthday), set in `data-mark`. It is a prop because CSS cannot change priority at runtime.
+- `ui` gives each built-in tag a colour and a shape (dot, star, diamond, strike), so meaning does not
+  depend on colour only. `tagStyles` overrides them per tag, through the Root's `dayProps(date, info)`.
+- `DayDetails` is one `popover="manual"` with `role="tooltip"`, anchored to the day and linked by that
+  day's `aria-describedby`. Mouse rest opens it after 400 ms; focus (key, click or tap) opens it at
+  once. Esc closes it without closing the DatePicker. It has no links or buttons, because the grid
+  uses the arrow keys and Tab.
 
-## 23. Drawer: a Dialog at an edge, closed by a swipe
-
-A drawer is a modal dialog that slides in from one edge. Everything Dialog leans on the platform
-for (decision 7's `showModal()`: top layer, backdrop, inert page, focus trap and return, Esc) is
-the same, so `@arun-dev/headless/drawer` re-exports Dialog's `Root`, `Trigger`, `Title` and
-`Close`, and its `Popup` is Dialog's popup with props merged on, not a second implementation. A
-fix to Dialog is a fix to Drawer.
-
-**`side` is physical** — `bottom` (the default, where a phone's thumb is), `top`, `left`,
-`right` — and is emitted as `data-side`, the attribute anchored popups already use. Physical
-rather than logical because the swipe direction is physical too.
-
-**Swipe to close is behaviour, so it is headless** (decision 7). It is read from pointer events,
-so finger, pen and mouse all work. Past a small slop the press becomes a swipe only if it set off
-along the drawer's axis toward closing; the distance is written as `--drawer-swipe` on the
-element, with `data-swiping`, imperatively — transient geometry, like `core/pointerIntent`'s, not
-React state. On release, a quarter of the drawer's size or a flick faster than 0.5 px/ms asks the
-Root to close through the one setter, so a controlled parent can refuse and the drawer slides
-back. The click a swipe ends with is swallowed.
-
-**Content scrolls first.** Pointer events stop with `pointercancel` once the browser starts
-scrolling, and `touch-action` cannot change mid-gesture. So the drawer keeps the default
-`touch-action`, and a native non-passive `touchmove` listener cancels the page's scroll only once
-a press has become a swipe — and a press becomes one only when no content between it and the
-drawer can scroll the other way. A list scrolled halfway scrolls; at its top, the drawer moves.
-Presses in text fields are never swipes.
-
-**`@arun-dev/ui` draws it with CSS.** Closed, it sits just past its edge (`translate: 0 100%`);
-open, at its edge less `--drawer-swipe`; `@starting-style` and discrete `display`/`overlay`
-transitions slide it both ways, and `[data-swiping]` turns the transition off so it follows the
-finger. The bottom drawer's grab bar is a `::before`, not a part: it needs nothing from the
-Root (decision 11). It never covers the whole viewport — `--drawer-viewport-gap` of backdrop
-stays visible, to press and to read it as a layer.
-
-**Rules out:** snap points, a non-modal drawer, a drawer that stays mounted in the page flow, and
-a Handle part — all deferred until a use needs them; swiping as the only way to close.
+**Rules out:** a custom segmented field; a date library; time zones in values; custom hour and minute columns; a year grid; one mark per tag; one popup per day; HoverCard for day details (it never opens on touch).
 
 ---
 
-## 24. HoverCard: a link's preview, on hover and keyboard focus
+<a id="decision-13"></a>
 
-A hover card shows more about where a link goes. It follows Tooltip's timing and Popover's
-anchoring (decision 12), and differs from a Tooltip in one way that shapes everything else:
-**it may hold links and buttons**, so it must be reachable by keyboard.
+## 13. Dialog, Drawer and Toast
 
-**The Trigger is an `<a>`.** The card previews a destination, and the link must work without
-it — a tap follows it, a screen reader reads its text. A Link or a router's link is passed
-through `render`.
+**Dialog** uses `showModal()`. The browser provides the top layer, backdrop, inert page, focus trap and
+focus return. Headless holds only `open` and its setter.
 
-**The card is `popover="manual"`, opened with the Trigger as its `source`.** `manual`, as for
-Tooltip: it does not close an open Popover, and it must not light-dismiss on a click elsewhere
-while the pointer is still on it. `source` makes the Trigger its invoker, so Tab moves from the
-Trigger into the card wherever it sits in the DOM — the reason Tooltip leaves `source` out (a
-tooltip is never focused) is the reason HoverCard puts it in.
+- State controls the element: after each render it calls `showModal()` or `close()`.
+- The browser's own close actions (Esc, backdrop click, `<form method="dialog">`) become requests. A
+  controlled parent can refuse them.
+- No portal is needed. Scroll lock is CSS: `:root:has(.dialog:modal)`.
+- Parts: `Root`, `Trigger`, `Popup`, `Title`, `Close`.
 
-**Opening and closing.** A mouse or pen opens it after `delay` (600ms) and closes it
-`closeDelay` (300ms, three times Tooltip's) after leaving both the Trigger and the card — long
-enough to cross the `--hover-card-offset` gap. Keyboard focus (`:focus-visible` only) opens it
-at once; focus leaving both closes it; Esc closes it and returns focus from the card to the
-Trigger. Pressing the Trigger closes it. **Touch never opens it**: there is no hover to end
-it, and a tap is for the link.
+**Drawer** is a Dialog that slides in from an edge. `headless/drawer` re-exports Dialog's `Root`,
+`Trigger`, `Title` and `Close`. Its `Popup` is Dialog's Popup with extra props, so Dialog fixes also
+fix Drawer.
 
-**No grace polygon.** `core/pointerIntent`'s triangle exists for submenus, where the pointer
-crosses other items on its way. The card sits next to its Trigger with nothing between them,
-so the close delay alone covers the crossing.
+- `side` is physical: `bottom` (default), `top`, `left`, `right`. It is set as `data-side`, because the
+  swipe direction is physical too.
+- **Swipe to close** uses pointer events, so finger, pen and mouse all work. After a small distance, a
+  press that moves toward the edge becomes a swipe. The distance is written to `--drawer-swipe` with
+  `data-swiping`, directly on the element (not React state). On release, if the swipe is a quarter of
+  the drawer's size, or faster than 0.5 px/ms, the drawer asks to close through its setter. A
+  controlled parent can refuse. The click at the end of a swipe is ignored.
+- **Scrolling has priority.** A press becomes a swipe only if no content under it can scroll the other
+  way. Then a non-passive `touchmove` listener stops the page from scrolling. Presses in text fields
+  never become swipes.
+- `ui` animates it with `@starting-style` and `display`/`overlay` transitions. Transitions are off
+  while `[data-swiping]` is set. The grab bar is a `::before`. Some backdrop (`--drawer-viewport-gap`)
+  always stays visible.
 
-**No role, no ARIA on the Trigger.** It is not a dialog, and `aria-describedby` would read the
-whole card as the link's description. Its content is supplementary by contract: never the only
-way to reach anything, because touch users never see it.
+**Toast** holds a queue and timers. Parts: `Provider` (`limit`, default `timeout`), `useToastManager()`
+(`add`, `update`, `close`, and the list of toasts), `Viewport`, `Root`, `Title`, `Description`,
+`Action`, `Close`.
 
-**Parts, fewest first (decision 11):** `Root`, `Trigger`, `Popup`. No warm window between
-cards, as Tooltip has: cards are not read one after another along a toolbar.
+- `Viewport` is a `<section aria-label="Notifications">` with `popover="manual"`, so it shows above a
+  modal Dialog without a portal.
+- It stays open when empty, so the live region exists before the first toast. It is shown again for
+  each new toast, to stay on top.
+- Above a modal Dialog it is visible but cannot be clicked, so a toast that may appear then should have
+  a `timeout`.
+- `aria-live="polite"`. A toast with `priority: 'high'` gets `role="alert"`.
+- Timers pause on hover, while focus is inside, and while the page is hidden. Esc closes a focused
+  toast.
 
-**Rules out:** opening on touch (long press included); a HoverCard whose content is the only
-path to an action; `popover="hint"`, for Tooltip's reason — Safari lacks it.
-
----
-
-## 25. Stepper: an ordered list, the step is yours
-
-A stepper shows the steps of a multi-step flow and how far along it is. By decision 7's test it
-needs no JavaScript — which step is current changes only when the consumer moves on — so it is
-`@arun-dev/ui` alone, like Breadcrumb and Pagination (decision 17).
-
-**`Root` is an `<ol role="list">`, `Item` an `<li>`.** The list gives the position ("2 of 4")
-for free. `role="list"` because the markers are drawn, not the list's own, and Safari can drop
-list semantics from a list without `list-style`.
-
-**Status is a prop on each Item, not an index on the Root.** `complete`, `current` or
-`upcoming`. The consumer already knows each step's state — usually from the URL — and a status
-per item allows what an index cannot: a step completed out of order, or a skipped optional one.
-`current` sets `aria-current="step"`.
-
-**The indicator is drawn and hidden.** The number is a CSS counter, the tick generated content,
-both in an `aria-hidden` span; the connector is an `::after` line. What they say visually is
-said in words: the list position, `aria-current`, and for a complete step a visually hidden
-"(completed)", translatable through the Root's `labels`, as Pagination's are. Classes
-(`stepper-item-complete`) carry the status to CSS, since `data-*` is reserved for what headless
-emits.
-
-**Parts, fewest first (decision 11):** `Root`, `Item`. A step's label, description or link back
-is the consumer's content inside the Item.
-
-**Rules out:** a Stepper that holds the current step, or moves focus between steps; an error
-status (a step's errors are its form's — Field and Alert); a step-content part that shows the
-current panel, which is the consumer's routing.
+**Rules out:** a Portal part; snap points; a non-modal or inline drawer; a Handle part; swipe as the only
+way to close; swipe to dismiss a toast; a global F6 shortcut; toasts anchored to an element.
 
 ---
 
-## 26. TreeView: nested Items, a label prop, children shown only when open
+<a id="decision-14"></a>
 
-A tree view lets people move through a hierarchy, open and close branches, and select items —
-files and folders, nested categories. Measured against APG's tree view pattern, MUI's
-`SimpleTreeView` and React Aria's `Tree` (October 2026).
+## 14. Toggles, Toolbar, Avatar and TreeView
 
-**No native element passes.** Nested `<details>` gives open and closed branches, but every
-`<summary>` is its own Tab stop, with no tree semantics and no arrow keys, and selection is
-not a concept at all. So the behaviour is in `@arun-dev/headless`, by APG: `role="tree"`, one
-Tab stop, the arrow keys to move, open and close. A tree is not a site's navigation: APG warns
-that its keyboard model is unexpected there, and nested lists of links with a disclosure are the
-right shape for that.
+| Component     | Element                 | State and behaviour                                                                                  |
+| ------------- | ----------------------- | ---------------------------------------------------------------------------------------------------- |
+| `Toggle`      | `<button aria-pressed>` | pressed, through `useControlled`                                                                     |
+| `ToggleGroup` | `role="group"`          | a `value` array (one item, or many with `multiple`); one Tab stop                                    |
+| `Toolbar`     | `role="toolbar"`        | one Tab stop, arrow keys (`core/rovingFocus`); parts `Button`, `Link`, `Input`, `Group`, `Separator` |
+| `Avatar`      | `<span>`, `<img>`       | image loaded or not: `Image` shows when loaded, `Fallback` until then (`delay` prevents a flash)     |
 
-**Two parts: `Root` and `Item`, with the label as a prop.** An Item is an `<li role="treeitem">`
-holding its row — a `<div>` with the `label` — and, while open, its children in a
-`<ul role="group">`. By decision 11 the row and the group are not parts: the Item can place both
-unaided, the row first and the group after. Nesting Items in Items is the whole API, as in MUI's
-`TreeItem`; Ark's six parts (Branch, BranchControl, BranchContent…) would be the symmetry decision
-11 rules out. The row is styled as the Item's first child.
+**TreeView.** Nested `<details>` gives one Tab stop per `<summary>`, no tree semantics and no selection.
+So TreeView is built in headless, following APG: `role="tree"`, one Tab stop.
 
-- **The treeitem is focused, the row is drawn.** The `<li>` holds its subtree, so a focus ring
-  on it would surround every child. `@arun-dev/ui` draws the ring and the selection on the row.
-- **Named by `aria-labelledby` to the row**, not from content, which would read every nested
-  label as part of the parent's name.
-- **A parent is decided from props:** an Item with any children. It is known on the first
-  render, the server's included, so `aria-expanded` is never added late.
+- **Two parts, `Root` and `Item`; the label is a prop.** An Item is an `<li role="treeitem">` with a
+  row (`<div>` with the `label`) and, when open, its children in a `<ul role="group">`. The Item places
+  both, so they are not parts.
+- The `<li>` gets focus, but `ui` draws focus and selection on the row, so they do not surround the
+  children. The `<li>` is named by `aria-labelledby` pointing to the row.
+- **An Item with children is a parent.** This is known on the first render, including on the server.
+- **Children render only when open.** The tree costs only what is visible, and the registered Items
+  are the visible ones. Open branches are stored in the Root's `expanded` list, so a closed branch
+  remembers its children's state. Lazy children are added in `onExpandedChange`.
+- **Selection is `value: string[]`**, with `multiple` for more than one. It does not follow focus:
+  Enter, Space or click selects. With `multiple`: Space toggles, Shift+arrow moves and toggles,
+  Ctrl/⌘+A selects all visible Items. Selecting a parent does not select its children.
+- **Keyboard:** ↓ ↑ move without wrapping. → opens a parent, then moves to its first child. ← closes a
+  parent, or moves to the parent. Both swap in RTL. Home, End, `*` (opens sibling parents), and
+  typeahead as in Menu ([decision 9](#decision-9)). Enter also opens or closes a parent. Disabled Items
+  cannot get focus.
 
-**Children render only while open.** A large tree costs what is shown, and the registered
-Items are exactly the visible ones, in document order, so the arrow keys, typeahead and
-Ctrl+A need no visibility check. Expansion lives in the Root's `expanded` list, so a closed
-branch keeps its nested branches' state. To load children lazily, the consumer sets them from
-`onExpandedChange`, with a placeholder child keeping the folder a parent meanwhile.
-
-**Selection is a list of values, in every mode,** as ToggleGroup's is: `value: string[]`,
-`multiple` to allow more than one. It does not follow focus: Enter, Space or a click selects, so
-moving through a tree to reach an item selects nothing on the way. Selecting the selected Item
-again keeps it, as a click on a selected file does. With `multiple`, APG's recommended keys:
-Space toggles, Shift with an arrow moves and toggles, Ctrl or ⌘ with A selects every Item
-shown. Selection does not cascade: a parent and its children are independent, and a
-partly-selected parent state is ruled out.
-
-**Keyboard, by APG.** ↓ and ↑ move through the Items shown, without wrapping. → opens a closed
-parent, then moves to its first child; ← closes an open parent, else moves to its parent. The
-two swap in a right-to-left tree, as Menu's submenu keys do (decision 19). Home and End, `*` to
-open every sibling parent, and typeahead from `core/typeahead` with `textValue` as Menu's
-(decision 18). Enter also opens or closes a parent, as a click does; Space only selects. Disabled
-Items are skipped (decision 13) and are not focusable at all, so a click on one cannot focus the
-Item around it.
-
-**Rules out:** a tree for site navigation; a separate content or label part; selection that
-follows focus; cascading or indeterminate selection; a `selectionMode="none"` before someone
-needs it (adding it later is not breaking, decision 9).
+**Rules out:** a checkbox styled as a toggle (it says "checked", not "pressed"); a tree for site navigation (use nested lists of links); content or label parts; partly-selected parents; `selectionMode="none"` before it is needed.
 
 ---
 
-## 27. Calendar and DatePicker: native date inputs, a calendar beside them
+<a id="decision-15"></a>
 
-A date picker lets people type a date or pick it from a calendar: one date, or a range, with an
-optional time. Measured against APG's date picker dialog, React Aria's DatePicker and
-DateRangePicker, MUI X, react-day-picker and the native date inputs (October 2026). Base UI has
-none yet.
+## 15. Styled native components
 
-**The field is the platform's.** React Aria and MUI build a field of segments — day, month,
-year — by hand. By decision 7's table a text field is unrecoverable once left, and a native
-`<input type="date">` or `datetime-local` already is a segmented field: typing in the locale's
-format, the phone's own picker, `min`, `max`, `required` and the form. Its value is ISO
-(`YYYY-MM-DD`, `YYYY-MM-DDTHH:mm`) in every locale, which is the value this design uses. What the
-platform lacks — a range, and a calendar that can be styled — is added beside it. The cost:
-desktop Firefox and Safari also open their own picker from the field, and Chrome's is hidden by
-CSS.
+These components need no JavaScript, so they exist only in `@arun-dev/ui`. Each is a native element
+with classes. Variants are classes, never `data-*` ([decision 1](#decision-1)). Most accept `render`.
 
-**Uncontrolled, the input holds the value, as Input's does,** so react-hook-form's `register()`
-binds it both ways. The Root keeps a copy from the input's own events, and reads the input at the
-two moments something may have set it without one: when the picker opens (a `setValue`), and
-after `form.reset()`. A calendar pick goes through the input — the prototype's value setter and
-an `input` event — so the input's listeners, a form library's included, hear it as typing.
-Reading the input at those moments is decision 20's rule, "read from the input's events", not
-decision 10's state read back from the DOM: the input is the state. Controlled, React sets the
-input from `value`, as for any input.
+| Component                      | Element                              | Notes                                                                                        |
+| ------------------------------ | ------------------------------------ | -------------------------------------------------------------------------------------------- |
+| `Card`, `Chip`, `Badge`, `Kbd` | `<div>`, `<span>`, `<kbd>`           | styling only                                                                                 |
+| `Input`                        | `<input>` inside a `<div>`           | `startSlot` / `endSlot` in the `<div>`; `className` on the `<div>`, other props on `<input>` |
+| `Textarea`                     | `<textarea>`                         | `autoResize` uses `field-sizing: content`                                                    |
+| `Select`                       | `<select>` inside a `<div>`          | the `<div>` draws the arrow; no search (use [Combobox](#decision-10))                        |
+| `Link`                         | `<a href>`                           | no `disabled`; visited colour `--link-color-visited`; no automatic `target`                  |
+| `Separator`                    | `<hr>`                               | `orientation="vertical"`; no margin (spacing comes from the layout's `gap`)                  |
+| `Progress`, `Meter`            | `<progress>`, `<meter>`              | styled with browser pseudo-elements; Meter's ranges use success, warning, error              |
+| `Slider`                       | `<input type="range">`               | `accent-color` draws the fill; two thumbs: [RangeSlider](#decision-11)                       |
+| `Spinner`                      | `<progress>` without `value`         | native `role="progressbar"`; `aria-label` "Loading"; slower with reduced motion              |
+| `Skeleton`                     | `<div aria-hidden>`                  | the consumer sets `aria-busy` on the loading region                                          |
+| `Alert`                        | `<div>`                              | no live role by default; `tone`, `icon`, `Title`, `Description`                              |
+| `Accordion`                    | `<details>`, `<summary>`             | native toggle, keyboard, find-in-page; `Root`'s `exclusive` shares one `name`                |
+| `Breadcrumb`                   | `<nav>`, `<ol>`, `<a>`               | `Current` has `aria-current="page"`; separators are CSS `content: "/" / ""`                  |
+| `Pagination`                   | `<nav>`, `<ul>`, `<a>` or `<button>` | no page state; links with `getHref`, buttons without; exports `paginationRange()`            |
+| `Table`                        | `<table>` and its sections           | `Head` is `<th scope="col">`; sorting is the consumer's button with `aria-sort`              |
+| `Stepper`                      | `<ol role="list">`, `<li>`           | `status` on each Item; `current` sets `aria-current="step"`                                  |
+| `Stack`, `Grid`                | `<div>`                              | `gap` is a spacing-scale step, applied as a class (`layout-stack-gap-md`)                    |
+| `Heading`, `Paragraph`, `Text` | `<h1>`–`<h6>`, `<p>`, `<span>`       | Heading's `level` and `size` are separate; props use the utility classes                     |
 
-**Dates are ISO strings in no time zone.** A value is the user's local calendar date, or
-date-time: what the input holds. A value with `Z` or an offset — an instant from an API — is
-converted to local time on the way in; seconds are dropped. Arithmetic goes through a `Date` at
-UTC midnight, where every day is 24 hours, so daylight saving moves nothing. There is no date
-library: `Intl.DateTimeFormat` names months and weekdays, `Intl.Locale#getWeekInfo` gives the
-week's first day, with a region table where it is missing. Only the Gregorian calendar.
+Reasons for the less obvious choices:
 
-**Two components, two Roots.** DatePicker and DateRangePicker, Calendar and RangeCalendar: a
-range's value is always `{ start, end }`, never a type that depends on a `mode` prop.
+- **Input, Textarea, Select:** the value stays on the element, so `register()` works
+  ([decision 3](#decision-3)). Input's focus, invalid and disabled styles use `:has()` on the native
+  control.
+- **Slider:** a custom fill would need JavaScript on every input, only for a visual effect.
+- **Accordion:** accepted cost: a heading inside `<summary>` is not found by heading navigation. The
+  open animation uses `::details-content` and `interpolate-size` where supported.
+- **Alert:** an alert that is on the page from the start is content. `role="alert"` would read it on
+  page load. The consumer adds `role="alert"` or `role="status"` when it appears after an action.
+- **Pagination:** the page usually comes from the URL, so `page` and `count` are required.
+  `paginationRange()` always shows the same number of slots (`2 × siblings + 5`), so the row width does
+  not change.
+- **Stepper:** status is per Item, so steps can complete in any order. The number is a CSS counter in an
+  `aria-hidden` span. A visually hidden "(completed)" text, set through the Root's `labels`, gives the
+  same information to screen readers.
+- **Stack and Grid:** a reset cannot remove a `gap`, and gap classes keep `var(--space-*)` in CSS where
+  the token test checks it. Grid sets `--grid-columns` and `--grid-min-item-size` inline. `minItemSize`
+  uses `repeat(auto-fill, minmax(min(100%, size), 1fr))`, so it adapts without breakpoints.
+- **Typography:** if a heading's size depended on its level, authors would skip levels to get a smaller
+  size. Paragraph and Text without `size` or `color` inherit them. A Heading always sets a size.
 
-| Headless part                           | Element                                      |
-| --------------------------------------- | -------------------------------------------- |
-| `Calendar.Root`, `Calendar.RangeRoot`   | `<div>`: selection, month shown, focused day |
-| `Calendar.Heading`                      | the month, a polite live region              |
-| `Calendar.PrevButton`, `NextButton`     | `<button>`, disabled at `min` and `max`      |
-| `Calendar.Grid`                         | one month, `<table role="grid">`, `offset`   |
-| `DatePicker.Root`, `RangeRoot`          | none: value, open state, constraints         |
-| `DatePicker.Input`, `StartInput`, `End` | the native inputs                            |
-| `DatePicker.Trigger`, `Popup`           | a Popover's trigger and popup (decision 12)  |
-
-The Grid places the weekday headers and the day buttons itself (decision 11); a Calendar inside
-a picker's Popup takes the picker's value and constraints through context, and its own props
-win. `@arun-dev/ui` composes each into one component.
-
-**The calendar, by APG's grid.** One Tab stop; arrows by day and week, Home and End to the week's
-ends, Page Up and Down by month, with Shift by year, a missing day becoming the month's last.
-**Disabled days stay focusable** — an exception to decision 13: in a grid the arrows move by
-the calendar, and skipping a day would make ↓ land somewhere other than a week later. They are
-`aria-disabled` and cannot be picked; focus is clamped to `min` and `max`. The popup is
-non-modal, a Popover, as React Aria's is; APG's dialog is modal. It takes focus on open, and
-returns it to the Trigger on a pick or Esc.
-
-**A range is picked in two presses**, in either order, previewing toward the pointer or focus in
-between; `onValueChange` waits for the second. **`maxDays` counts days, both ends included** —
-react-day-picker counts nights — and after the first press disables the days out of reach, as
-does any unavailable day in the way: a range never spans one. Typed, the end input's `max`
-follows the start, so the browser enforces `maxDays` too. With times, each end keeps its own;
-new ends get 00:00 and 23:59, so a picked range covers whole days.
-
-**A limit in hours, for bookings.** With `withTime`, `maxHours` caps elapsed time from start to
-end, which no number of days can say: 40 hours from 14:00 ends at 06:00 on the third day. The
-calendar gets the days it spans as its `maxDays`, the shorter of the two when both are set; a
-pick's end past the cap is pulled back to it; and the end input's `max` is start + `maxHours`, to
-the minute, so the browser rejects a typed end. A start that moves the limit past the end — typed, or a time
-set in the Popup — pulls the end back to it, for `maxDays` as for `maxHours`, so the range keeps
-its limit however either end changes. Arithmetic on local date-times is elapsed time,
-through `Date`, so a daylight-saving night counts its real hours. Without a time it is ignored
-(not ruled out by the types), as a day has no hours to count.
-
-**The time is set in the Popup too, with the platform's time input.** With `withTime`, the Popup
-adds an `<input type="time">` — `TimeInput`, or `StartTimeInput` and `EndTimeInput` — that
-writes the time part through the date input, as a pick writes the date, and a Close part for
-Done. A pick then leaves the Popup open, so the time can follow; without a time it still closes.
-A time chosen before any date waits in the Root for the first pick. Building hour and minute
-columns was weighed and ruled out: the native time input brings them in Chrome, with typing, the
-locale's 12- or 24-hour clock and a phone's wheel, as the date input does.
-
-**Far-off months are a select away.** Paging by month cannot reach a date of birth. `MonthSelect`
-and `YearSelect` are native `<select>`s over the first month shown, as react-day-picker's
-dropdown caption; MUI's year grid was weighed, and a `<select>` brings typeahead and a phone's
-wheel for nothing. The years span `min` to `max`, or 100 back and 10 ahead. In `@arun-dev/ui`,
-`captionLayout="dropdown"` puts them in place of the Heading, which stays as a live region out of
-sight.
-
-**Rules out:** a hand-built segmented field; a date library or time zones in values; a `mode`
-prop on one component; ranges across unavailable days; a modal popup.
+**Rules out:** scripted Accordion triggers; a data grid; a Stepper that stores the current step or has an error status; responsive layout props; any gap value outside the scale; a `Box` primitive; an element chosen by a variant (`<Text variant="h2">`); text colours other than the `--color-text-*` roles.
 
 ---
 
-## 28. Calendar day information: tags, one mark, a details card
+<a id="decision-16"></a>
 
-A calendar often has to say what its days are — holidays, festivals, birthdays, bookings — and
-show more about a day on demand. Measured against react-day-picker's modifiers, React Aria's
-cell render props and MUI's day slots (October 2026). All of it is optional: without
-`getDayInfo` the calendar is decision 27's.
+## 16. Server Components
 
-**One function says what a day is.** `getDayInfo(date)` returns `tags`, a `description` and
-`details`. It is called for every day shown, during render, so it is a lookup, never a fetch.
-Fetching is the consumer's: `onVisibleRangeChange` reports the days shown on mount and on every
-change of month — one request per view — and `loading` marks the grids `aria-busy`. Caching,
-races and errors stay in the consumer's data layer; the calendar holds none of it.
+In the Next.js App Router, a module is a Server Component unless it says `'use client'`. On the server,
+React has no `createContext` and no state hooks, so a module that calls them when it loads breaks the
+build.
 
-**Tags are data, marks are a priority.** A day's tags are emitted as one static attribute,
-`data-tags="weekend holiday"`, matched with `~=`: any number, any overlap, the consumer's own
-names included, and the state-attribute contract still holds, since the attribute's name is
-fixed. A day draws at most one mark, for its tag highest in `tagPriority` (default booked,
-holiday, festival, birthday), named in `data-mark`. One mark keeps a dense month readable; the
-rest is the card's. The priority is a prop because CSS cannot reorder a cascade at runtime.
+**`'use client'` only on modules that need it**: modules that create a context, call a hook, or wrap a
+headless component that does. All other modules stay on the server and send no JavaScript. Server
+modules: `useRender`, `mergeProps` and headless `Button`; in `ui`: `Alert`, `Badge`, `Breadcrumb`,
+`Button`, `Card`, `Chip`, `Grid`, `Heading`, `Input`, `Kbd`, `Link`, `Meter`, `Pagination`,
+`Paragraph`, `Progress`, `Select`, `Separator`, `Skeleton`, `Slider`, `Spinner`, `Stack`, `Table`,
+`Text`, `Textarea`.
 
-**Colour and shape are `@arun-dev/ui`'s.** Built-in tags get a token colour and a shape — dot,
-star, diamond, strike — so no mark rests on colour alone (WCAG 1.4.1), and the colour pairs are
-in the contrast requirements. `tagStyles` overrides either per tag; ui applies it through a
-generic `dayProps(date, info)` on the Root, which headless merges onto each day's button: the
-colour as a per-day `--calendar-day-mark-color`, the shape as a class.
+**One output file per module.** Both packages build with `unbundle`, so server and client code never
+share a file. The build adds the directive back if a bundler removes it.
 
-**One details card, read-only.** `Calendar.DayDetails` is a single `popover="manual"` anchored
-to the day it shows, rather than a popup per day: a resting mouse opens it after 400 ms, focus
-at once — a key, a click, and so a tap, since phones have no hover — and Esc hides it, its
-keydown cancelled so a DatePicker's popup stays open. It is `role="tooltip"`, the day's
-`aria-describedby`. It holds no links or buttons: the grid owns the arrow keys and Tab, so they
-could not be reached. HoverCard (decision 24) was weighed and left alone: it previews a link,
-and never opens on touch.
+**Namespace objects are server modules.** On the server, reading a property of a client module's export
+throws an error, so `Dialog.Root` would fail. The namespace objects are built in server modules
+(`index.parts`), and their members are the client modules. `<Dialog.Root>` in a server component is
+then a valid client reference.
 
-**Rules out:** an async `getDayInfo`; a mark per tag; a popup per day; interactive content in
-the card; a fixed CSS priority.
+**Tested in CI.** The docs app's `server-components` test imports every entry of both packages with
+React's server build. Each `'use client'` module acts as a boundary that throws if read. The test also
+lists which `ui` components are server components, so moving one to the client must be done on purpose.
 
----
-
-## 29. Menubar: its own namespace over Menu's internals
-
-Measured against APG's menubar pattern, Radix's Menubar and Base UI's Menubar (October 2026).
-
-**A namespace of its own, Radix's shape.** `Menubar.Root` is `role="menubar"`; `Menubar.Menu`
-holds one menu's state and renders nothing, as `Menu.Root` does; `Menubar.Trigger` is a bar item;
-`Menubar.Popup` is its menu. Base UI instead puts `Menu.Root`s inside a `Menubar`, and Menu's
-Trigger and Popup change behaviour when they find a bar above them. That was built and reverted:
-Menu's parts would answer to two patterns, and a Menu's behaviour would depend on where it is
-placed. Here Menu's files do not know the bar exists.
-
-**Menu's internals, not a copy.** `Menubar.Menu` provides Menu's root context through
-`useMenuRootValue`, so the items inside are Menu's own: `Menubar.Item`, `CheckboxItem`,
-`RadioGroup`, `RadioItem`, `ItemIndicator`, `Group`, `GroupLabel`, `SubmenuRoot` and
-`SubmenuTrigger` are Menu's parts under the bar's name. `Menubar.Popup` is Menu's Popup with the
-bar's keys passed in front of its own, as a consumer's handler is (decision 8): when the bar takes
-a key it stops the Popup's handler. Decision 11's "fewest parts" counts elements and what they
-need; the item names are aliases, not new parts, so a bar reads as one namespace.
-
-**Keyboard, by APG.** One Tab stop. ← and → move along the bar (↑ and ↓ when
-`orientation="vertical"`), wrapping, swapped right-to-left; Home and End go to its ends;
-typeahead matches the Triggers' text (decision 18). ↓, Enter and Space open a menu at its first
-item and ↑ at its last; a vertical bar opens with → and its menus default to `side="right"`. Inside
-an open menu → and ← move to the next and previous menu and open it — after a SubmenuTrigger's →
-and a submenu's ←, which keep their meaning (decision 19). In a vertical bar ← closes a menu back to
-its Trigger. Disabled Triggers follow decision 13: skipped, or `aria-disabled` and unopenable with
-the Root's `focusableWhenDisabled`.
-
-**Pointer.** A click toggles a menu. While one menu is open, the pointer moving onto another
-Trigger opens that one in its place, and focus follows, so the keyboard carries on from it; with no
-menu open, hovering opens nothing. It is a `pointermove`, as for SubmenuTrigger, not a
-`pointerenter`: the browser also reports an enter when the bar is laid out under a pointer that has
-not moved, and that would take a menu the keyboard just opened.
-
-**Rules out:** Menu's parts changing behaviour inside a bar; a modal or scroll-locking bar; plain
-buttons in the bar, which are a Toolbar's (decision 17); collapsing to a single menu on narrow
-screens, which is the consumer's layout.
-
----
-
-## 30. Button: pending and danger
-
-A form that saves to an API needs two things Button lacked: a way to show the save is under way,
-and a colour for deleting.
-
-**`pending` is native `disabled`.** The headless Button takes `pending`, sets `disabled` while it
-lasts and emits `data-pending`. A disabled `<button>` already refuses a second press, and the
-platform will not submit a form through a disabled default button, so Enter in a field cannot
-save twice either; nothing is synthesised (decision 7). The alternative kept the button focusable
-with `aria-disabled` and stopped the press in script, as React Aria's `isPending` does. It would
-keep focus on the button and let a screen reader find it while it waits, but a consumer's
-`onClick` runs before the component's (decision 8), so the component would also have to withhold
-the consumer's handlers, and stop the submit itself. The trade, chosen deliberately: while
-pending, focus leaves the button and assistive technology skips it. The outcome — a Toast saying
-"Saved", or the error — is what gets announced.
-
-**ui keeps the width.** While pending, the label stays in its grid cell at `opacity: 0`, so the
-button neither resizes nor loses its name, and a Spinner (`aria-hidden`) turns in the same cell.
-Pending is busy, not unavailable, so it is not faded as `disabled` is.
-
-**`danger` and `danger-ghost` reuse the error status pair.** `danger` fills with
-`--color-status-error` and writes in `--color-status-error-bg`; `danger-ghost` is the reverse,
-with an error border. Contrast is symmetric, and error on its tint is already a required pairing
-(`CONTRAST_REQUIREMENTS`, 4.5:1), so both meet it in light and dark for every brand without a
-new semantic token. White on the dark theme's error (`#f87171`) would not have: 2.8:1.
-
-**Rules out:** focusable pending; a `loading` prop that swaps the label for text; a semantic
-`--color-text-on-error` token.
-
----
-
-## 31. RangeSlider: two native range inputs on one track
-
-A from–to range — a price filter, a salary band on a job post — needs two thumbs on one track.
-Decision 15 kept that out of `Slider`, whose one native input is the whole component. Here the
-two-input pattern it left to consumers becomes a component, because what the two inputs cannot
-do alone is behaviour: keeping the ends in order, and drawing the stretch between them.
-
-**Two native inputs, not `role="slider"` thumbs.** Base UI and Radix draw each thumb as a
-`<span role="slider">` and write the keys, the dragging, `aria-value*` and a hidden input for the
-form. Here each thumb is an `<input type="range">`, stacked over the same track: the arrows, Page
-Up and Down, Home and End, `step`, the slider role, the value and its submission are the
-platform's, in every engine (decision 7's native first). Parts, fewest first: `Root`,
-`StartInput`, `EndInput` — DatePicker's range names (decision 27). Each input carries its own
-`name`, so a form submits `priceMin=200&priceMax=800`.
-
-**What the Root adds.**
-
-- **Order.** A thumb stops where the other stands. The inputs are controlled, so React puts one
-  back if the platform moved it past the other; `onValueChange` reports the whole range.
-- **The fill.** `--range-slider-start` and `--range-slider-end`, set inline as fractions of the
-  track. A fill between two thumbs is what `accent-color` cannot draw, so ui draws the track, the
-  fill and the thumbs itself, from `--range-slider-*` tokens.
-- **The thumb on top.** Stacked inputs overlap where the thumbs meet, and the top one takes the
-  press. `data-raised` marks the one that can still move: the end below the middle, the start
-  past it, so two thumbs at the top can still be pulled apart.
-- **A press on the track.** Only the thumbs take a press (`pointer-events: none` on each input,
-  `auto` on its thumb — the styling's job), so a press elsewhere reaches the Root, which moves the
-  nearer thumb there and focuses it, as a press on a native range's track moves its thumb.
-- **`form.reset()`.** React keeps each input's default equal to its value, so the Root returns to
-  the range it mounted with, as OtpInput does (decision 20).
-
-**react-hook-form binds it with `Controller`.** The value is a pair, one field — `register()`
-binds an input, and here there are two inputs and one value.
-
-**Rules out:** `role="slider"` thumbs in script; more than two thumbs; a minimum distance between
-the thumbs; dragging the filled stretch to move both ends at once.
-
----
-
-## 32. Server Components: client modules marked, namespaces on the server
-
-A Next.js App Router page is a React Server Component unless a module says otherwise. On the
-server, React has no `createContext` and no state hooks, so a module that calls one while it
-loads — a component's context — fails the build there: `createContext is not a function`. The
-first app to adopt the packages found it; the docs site, rendered by Astro, never ran them that
-way.
-
-**`'use client'` on every module that needs the client.** A module that creates a context, calls
-a hook, or wraps a headless component that does starts with the directive, in its source, where
-it can be read. A module that does none of those stays a server module: `useRender` and
-`mergeProps`, headless `Button`, and in ui `Card`, `Chip`, `Badge`, `Heading`, `Paragraph`,
-`Text`, `Link`, `Stack`, `Grid`, `Separator`, `Table`, `Kbd`, `Alert`, `Progress`, `Meter`,
-`Spinner`, `Skeleton`, `Input`, `Textarea`, `Select`, `Slider`, `Breadcrumb`, `Pagination` and
-`Button`. Those render on the server and send no JavaScript of their own.
-
-**Built per module.** Both packages build with `unbundle`, one output file per source module, so
-a server module never shares a file with a client one and the directive stays where it was
-written. The build also puts it back on any file a bundler might drop it from.
-
-**Namespaces stay on the server.** `Dialog`, `Menu` and the rest are namespace objects. React
-does not allow reading a property of a client module's export on the server — `Dialog.Root` would
-throw — so the namespaces are built in server modules (`index.parts`), and their members are the
-client modules. `<Dialog.Root>` in a server component is then a client reference, as it should
-be.
-
-**Proved in CI.** The docs app's `server-components` spec imports every entry of
-`@arun-dev/ui` and `@arun-dev/headless` on React's server build, with each `'use client'`
-module standing as a client boundary that throws if read into, as a Server Components bundler
-treats it, and reads every namespace member. A module that touched client-only React while
-loading, or a namespace built in a client module, fails it. It also pins which ui components are server
-components, so moving one to the client — and adding its JavaScript to every page that uses it —
-is a deliberate change. The Server Components guide lists both, and what each needs from a
-server component: data props work from one, callbacks and controlled state need the consumer's own
-`'use client'` component.
-
-**Rules out:** one `'use client'` on the whole of ui, which would make every Card and Heading a
-client component; a separate server entry point.
+**Rules out:** one `'use client'` for all of `ui`; a separate server entry point.

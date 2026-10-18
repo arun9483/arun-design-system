@@ -64,7 +64,7 @@ export type CalendarRootProps = CalendarRootOwnProps &
   Omit<ComponentPropsWithRef<'div'>, keyof CalendarRootOwnProps | 'defaultValue' | 'onChange'>;
 
 /**
- * A calendar to pick one day from (decision 27). Holds the selection, the month shown and the
+ * A calendar to pick one day from (decision 12). Holds the selection, the month shown and the
  * day with the Tab stop, and shares them with Heading, PrevButton, NextButton and Grid.
  *
  * Inside a DatePicker's Popup it takes the picker's value and constraints, and a pick goes to

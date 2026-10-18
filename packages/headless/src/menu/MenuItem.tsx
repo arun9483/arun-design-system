@@ -53,7 +53,7 @@ export function MenuItem({
       className,
       children,
       onClick() {
-        // Guarded on state, not the attribute a `render` element might drop (decision 10).
+        // Guarded on state, not the attribute a `render` element might drop (decision 4).
         if (!disabled) closeAll();
       },
     },

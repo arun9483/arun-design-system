@@ -14,7 +14,7 @@ export type ToastProviderProps = {
 };
 
 /**
- * Holds the toasts (decision 16). Put it near the root, with one `Toast.Viewport` inside, and
+ * Holds the toasts (decision 13). Put it near the root, with one `Toast.Viewport` inside, and
  * call `useToastManager()` anywhere below to show one.
  */
 export function ToastProvider({ limit = 3, timeout = 5000, children }: ToastProviderProps) {

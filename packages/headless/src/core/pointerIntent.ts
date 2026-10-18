@@ -1,10 +1,10 @@
 /**
  * Pointer intent for nested popups: the area a pointer crosses on its way from a trigger to the
  * popup it opened, so the popup does not close while the pointer passes over other items on
- * the way. Menu's submenus first; internal (decision 9).
+ * the way. Menu's submenus first; internal (decision 5).
  *
  * Measures the popup's box when the pointer leaves the trigger. That is geometry the pointer
- * moves through, never state (decision 10), and nothing is positioned from it (decision 12).
+ * moves through, never state (decision 4), and nothing is positioned from it (decision 7).
  */
 
 export type Point = { x: number; y: number };

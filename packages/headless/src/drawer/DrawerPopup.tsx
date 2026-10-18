@@ -76,7 +76,7 @@ function isForText(target: Element): boolean {
 /**
  * A drawer: a Dialog.Popup — the same native `<dialog>` opened with `showModal()`, with the
  * same top layer, focus trap, Esc and backdrop handling — attached to one edge of the
- * viewport, and closed by swiping it back toward that edge (decision 23).
+ * viewport, and closed by swiping it back toward that edge (decision 13).
  *
  * The swipe is read from pointer events, so it works with a finger, a pen or a mouse. While
  * it moves, the distance is `--drawer-swipe` on the element, in px toward closing, and the
@@ -216,7 +216,7 @@ export function DrawerPopup({ side = 'bottom', ...rest }: DrawerPopupProps) {
   }
 
   // The drawer's props first and the consumer's last, as everywhere: refs are merged, and the
-  // consumer's handlers run first and can stop these (decision 8).
+  // consumer's handlers run first and can stop these (decision 4).
   const props = useMergedProps(
     {
       ref: elementRef,

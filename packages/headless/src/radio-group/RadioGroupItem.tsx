@@ -43,7 +43,7 @@ export type RadioGroupItemProps = RadioGroupItemOwnProps &
  * One radio — a native `<input type="radio">`.
  *
  * Void, so it has no parts: there is no indicator to hold, and the dot is drawn by CSS
- * off `:checked` or the `data-*` attributes. Decision 11 — one element, one component.
+ * off `:checked` or the `data-*` attributes. Decision 6 — one element, one component.
  *
  * It has no accessible name of its own — wrap it in a `<label>`, pair it with one by
  * `id`, or pass `aria-label`. A wrapping label names it natively, but

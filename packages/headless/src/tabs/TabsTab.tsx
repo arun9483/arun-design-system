@@ -54,7 +54,7 @@ export function TabsTab({
   const elementRef = useRef<HTMLElement | null>(null);
   const selected = value === selectedValue;
 
-  // Registered from props, so the Root knows the tabs without reading the DOM (decision 10).
+  // Registered from props, so the Root knows the tabs without reading the DOM (decision 4).
   useLayoutEffect(
     () => register({ value, disabled, ref: elementRef }),
     [register, value, disabled],
@@ -79,7 +79,7 @@ export function TabsTab({
       children,
       ref: elementRef,
       onClick() {
-        // Guarded on state, not the attribute a `render` element might drop (decision 10).
+        // Guarded on state, not the attribute a `render` element might drop (decision 4).
         if (!disabled) setValue(value);
       },
       onFocus() {

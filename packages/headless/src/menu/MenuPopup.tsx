@@ -44,7 +44,7 @@ export type MenuPopupProps = MenuPopupOwnProps &
 
 /**
  * The menu: a native `popover="auto"` with `role="menu"`, anchored to the Trigger as
- * Popover's popup is (decision 12), and labelled by it.
+ * Popover's popup is (decision 7), and labelled by it.
  *
  * Opening moves focus to the first item — the last, when Up on the Trigger opened it. Up
  * and Down then move between items, wrapping, with Home and End; typing moves to the next item

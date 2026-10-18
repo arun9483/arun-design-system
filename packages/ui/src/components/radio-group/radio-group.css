@@ -9,7 +9,7 @@
     gap: var(--radio-group-gap);
   }
 
-  /* The native input, restyled rather than replaced — see decision 7. `appearance: none`
+  /* The native input, restyled rather than replaced — see decision 3. `appearance: none`
      drops the platform's drawing and keeps everything else it does. */
   .radio {
     appearance: none;

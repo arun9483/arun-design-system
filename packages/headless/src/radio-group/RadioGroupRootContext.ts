@@ -16,7 +16,7 @@ export type RadioGroupState = {
   /** Always set — the consumer's, or one generated so the radios still form a group. */
   name: string;
   form: string | undefined;
-  /** The group's single setter. Every change goes through it (decision 10, rule 5). */
+  /** The group's single setter. Every change goes through it (decision 4, rule 5). */
   select: (value: string) => void;
 };
 

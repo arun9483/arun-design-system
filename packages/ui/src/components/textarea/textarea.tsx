@@ -23,9 +23,9 @@ export type TextareaProps = TextareaOwnProps &
 
 /**
  * A native multi-line `<textarea>`. No behaviour of its own: typing, validation and form
- * participation are the platform's, so there is no headless half — decision 7.
+ * participation are the platform's, so there is no headless half — decision 3.
  *
- * One element, so every prop, `className` included, lands on the `<textarea>` — decision 11.
+ * One element, so every prop, `className` included, lands on the `<textarea>` — decision 6.
  */
 export function Textarea({ autoResize = false, className, render, ...rest }: TextareaProps) {
   return useRender({

@@ -324,7 +324,7 @@ describe.each(CONTROLS)('$label with react-hook-form', (control) => {
  * a string, not a boolean, and it has no `aria-checked` to assert on.
  *
  * Being native does not buy `register()`, though. The group owns the value in React and
- * every radio's `checked` derives from it (decision 10), while `register` expects inputs
+ * every radio's `checked` derives from it (decision 4), while `register` expects inputs
  * whose DOM is the value. Its reads work; its writes land on the DOM behind React's back.
  * `Controller` is the answer here too — see the last case.
  */

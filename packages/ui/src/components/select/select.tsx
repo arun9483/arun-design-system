@@ -25,7 +25,7 @@ export type SelectProps = SelectOwnProps &
 /**
  * A native `<select>` inside a styled box. No behaviour of its own: the picker, typeahead,
  * keyboard, validation and form participation are the platform's, so there is no headless
- * half — decision 7. It does not filter; searching a long list is a combobox's job.
+ * half — decision 3. It does not filter; searching a long list is a combobox's job.
  *
  * The box always renders, so `className` and every other prop land on the same element
  * whichever way the select is used. The chevron is drawn by the box, not the platform, so it

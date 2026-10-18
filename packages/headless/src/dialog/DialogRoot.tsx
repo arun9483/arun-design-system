@@ -30,7 +30,7 @@ export type DialogRootProps = {
 /**
  * Holds a dialog's state and shares it with its parts. Renders no element of its own.
  *
- * The dialog itself is a native `<dialog>` opened with `showModal()` (decision 7), so
+ * The dialog itself is a native `<dialog>` opened with `showModal()` (decision 3), so
  * the platform supplies the top layer, the backdrop, the inert page behind it, the focus
  * trap and focus return. What this component adds is state: one `open` value, one setter
  * every close path goes through, and the ids that wire up ARIA.

@@ -30,7 +30,7 @@ export type StackProps = StackOwnProps &
 /**
  * Children in a line, down or across, with a gap from the spacing scale between them: a
  * flex container. The space belongs to the layout, not to margins on the children, so a
- * reset cannot collapse it and a child's own margin is never doubled (decision 21).
+ * reset cannot collapse it and a child's own margin is never doubled (decision 15).
  */
 export function Stack({
   direction = 'column',

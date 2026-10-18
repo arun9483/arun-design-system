@@ -9,7 +9,7 @@ import type { PopoverPopupProps } from './PopoverPopup';
 /**
  * Runs in a real browser: jsdom has no popover API, top layer, light dismiss or anchor
  * positioning. Placement is asserted as wiring and as geometry relative to the trigger,
- * not as pixel positions (decision 12).
+ * not as pixel positions (decision 7).
  */
 
 function Basic({

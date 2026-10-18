@@ -14,7 +14,7 @@ export type SpinnerProps = SpinnerOwnProps &
   Omit<React.ProgressHTMLAttributes<HTMLProgressElement>, keyof SpinnerOwnProps | 'value' | 'max'>;
 
 /**
- * Working, with no end known: a `<progress>` without a value (decision 16), drawn as a turning
+ * Working, with no end known: a `<progress>` without a value (decision 15), drawn as a turning
  * ring. A `progressbar` to assistive technology, named "Loading" unless `aria-label` says more.
  */
 export function Spinner({ className, render, ...rest }: SpinnerProps) {
