@@ -64,7 +64,7 @@ export function ComboboxItem<T = unknown>({
   );
   const elementRef = useRef<HTMLElement | null>(null);
 
-  // Registered from props, so the arrow keys skip it without reading the DOM (decision 10).
+  // Registered from props, so the arrow keys skip it without reading the DOM (decision 4).
   useLayoutEffect(() => {
     if (!disabled) return;
     disabledKeys.add(key);
@@ -99,7 +99,7 @@ export function ComboboxItem<T = unknown>({
         if (!disabled && !highlighted && index >= 0) setHighlight(index, 'pointer');
       },
       onClick() {
-        // Guarded on state, not an attribute a `render` element might drop (decision 10).
+        // Guarded on state, not an attribute a `render` element might drop (decision 4).
         if (!disabled) select(value);
       },
     },

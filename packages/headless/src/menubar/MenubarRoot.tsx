@@ -36,7 +36,7 @@ export type MenubarRootProps = MenubarRootOwnProps &
   Omit<ComponentPropsWithRef<'div'>, keyof MenubarRootOwnProps>;
 
 /**
- * A bar of menus, by the WAI-ARIA menubar pattern (decision 29): `role="menubar"` around
+ * A bar of menus, by the WAI-ARIA menubar pattern (decision 9): `role="menubar"` around
  * `Menubar.Menu`s, whose Triggers are its items. One Tab stop; the arrow keys move along the
  * bar, Home and End go to its ends, and typing moves to the Trigger whose text starts with it.
  *

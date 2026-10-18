@@ -50,7 +50,7 @@ export type PaginationProps = PaginationOwnProps &
   Omit<React.HTMLAttributes<HTMLElement>, keyof PaginationOwnProps | 'children'>;
 
 /**
- * Page links, or buttons, in a `<nav aria-label="Pagination">` (decision 17). The page is
+ * Page links, or buttons, in a `<nav aria-label="Pagination">` (decision 15). The page is
  * yours — usually the URL's — so `page` and `count` are required. The current page is
  * `aria-current="page"`.
  */

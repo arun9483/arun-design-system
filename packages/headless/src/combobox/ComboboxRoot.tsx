@@ -128,9 +128,9 @@ function defaultItemToString(item: unknown): string {
  * state and shares it with its parts. Renders no element of its own, apart from the hidden
  * inputs a form submits.
  *
- * Items are data (decision 14): the Root filters `items`, and `Combobox.List` renders what is
+ * Items are data (decision 10): the Root filters `items`, and `Combobox.List` renders what is
  * left. The selection holds items, not keys, and everything about it — the input's label,
- * `aria-selected`, the form value — comes from `value`, never from `items` (decision 10). A
+ * `aria-selected`, the form value — comes from `value`, never from `items` (decision 4). A
  * selected item stays selected, labelled and submitted after a search stops returning it.
  *
  * Focus stays in the input; the highlighted option is its `aria-activedescendant`.

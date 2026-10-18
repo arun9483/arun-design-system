@@ -44,7 +44,7 @@ export type TreeViewItemProps = TreeViewItemOwnProps &
 /**
  * One node: an `<li role="treeitem">`, focused as a whole, holding its row — a `<div>` with the
  * `label`, which names it — and, while open, its child Items in a `<ul role="group">`. The row
- * and the group are placed by the Item, so they are not parts (decision 11); style them as the
+ * and the group are placed by the Item, so they are not parts (decision 6); style them as the
  * Item's first child and its `[role='group']`.
  *
  * A click on the Item, outside its children, selects it and opens or closes a parent, as Enter
@@ -104,7 +104,7 @@ export function TreeViewItem({
         if (disabled && !groupRef.current?.contains(event.target as Node)) event.preventDefault();
       },
       onClick(event: ReactMouseEvent) {
-        // Guarded on state, not an attribute (decision 10).
+        // Guarded on state, not an attribute (decision 4).
         if (disabled || groupRef.current?.contains(event.target as Node)) return;
         root.select(value);
         if (parentItem) root.setOpen(value, !expanded);

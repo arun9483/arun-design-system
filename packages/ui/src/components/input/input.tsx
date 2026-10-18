@@ -32,7 +32,7 @@ export type InputProps = InputOwnProps &
 /**
  * A native text `<input>` inside a styled box. No behaviour of its own: focus, typing,
  * validation and form participation are the platform's, so there is no headless half —
- * decision 7.
+ * decision 3.
  *
  * The box always renders, with or without slots, so `className` and every other prop
  * land on the same element whichever way the input is used.

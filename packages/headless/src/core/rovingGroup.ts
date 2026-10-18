@@ -7,8 +7,8 @@ import type { Orientation } from './rovingFocus';
 
 /**
  * A roving group: one Tab stop, the arrow keys between its items. Toolbar and ToggleGroup;
- * internal, not exported (decision 9). Items register from their props — `disabled` included —
- * never read back from the DOM (decision 10). A ToggleGroup inside a Toolbar joins the
+ * internal, not exported (decision 5). Items register from their props — `disabled` included —
+ * never read back from the DOM (decision 4). A ToggleGroup inside a Toolbar joins the
  * Toolbar's group rather than starting its own, so the whole toolbar is one Tab stop.
  */
 

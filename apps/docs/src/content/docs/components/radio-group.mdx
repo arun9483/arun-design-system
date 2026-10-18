@@ -59,7 +59,7 @@ its own. Under that rule, either pair each label by `id` as well (`<label htmlFo
 Each `RadioGroup.Item` renders a real `<input type="radio">`. Checkbox and Switch render a `<button>`
 with a hidden input, because an input cannot hold an indicator. A radio needs no indicator: its dot
 is a `::before` drawn in CSS. So the native element passes all three tests in
-[decision 7](/headless/components/), and everything it does comes from the platform:
+[decision 3](/headless/components/), and everything it does comes from the platform:
 
 - **Arrow keys** move the selection, and wrap at the ends.
 - **Tab** enters the group once, at the checked radio (or the first, when none is checked), and
@@ -146,7 +146,7 @@ import { RadioGroup } from '@arun-dev/ui';
 ```
 
 Two parts, and no indicator. `RadioGroup.Item` is a void `<input>`, so there is nothing for an
-indicator part to wrap. [Decision 11](/headless/components/) gives one element one component.
+indicator part to wrap. [Decision 6](/headless/components/) gives one element one component.
 
 ## Props
 

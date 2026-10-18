@@ -72,7 +72,7 @@ function radiosIn(root: HTMLElement | null, name: string): HTMLInputElement[] {
  * A set of radios, of which at most one is selected.
  *
  * The radios are native `<input type="radio">` elements — the native element passes all
- * three of decision 7's tests, so nothing here rebuilds what the platform already does.
+ * three of decision 3's tests, so nothing here rebuilds what the platform already does.
  * Arrow keys move the selection, Tab enters the group at the checked radio, `required`
  * blocks submission and the form submits the checked value, all without JavaScript.
  *

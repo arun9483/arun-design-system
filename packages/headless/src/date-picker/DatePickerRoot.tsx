@@ -59,7 +59,7 @@ const DEFAULT_LABELS: DatePickerLabels = {
 };
 
 /**
- * A date field and a calendar to pick it from (decision 27). The field is a native
+ * A date field and a calendar to pick it from (decision 12). The field is a native
  * `<input type="date">` — or `datetime-local` — so typing, the phone's picker, the locale's
  * format and the form are the platform's. Renders no element: Input, Trigger and Popup are its
  * parts, and a Calendar in the Popup picks for it.

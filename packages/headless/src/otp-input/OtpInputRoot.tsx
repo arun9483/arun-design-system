@@ -57,10 +57,10 @@ export type OtpInputRootProps = OtpInputRootOwnProps &
 
 /**
  * A one-time code: a single native `<input>` that holds the whole code, with one Slot per
- * character drawn beside it (decision 20).
+ * character drawn beside it (decision 11).
  *
  * One real input rather than one per character, because a text field cannot leave the native
- * element (decision 7): SMS autofill (`autocomplete="one-time-code"`), paste, the numeric
+ * element (decision 3): SMS autofill (`autocomplete="one-time-code"`), paste, the numeric
  * keypad, IME and password managers all target one input. The Slots are pictures of it.
  *
  * Holds the value through `useControlled`. The input reports changes, and the Root keeps only
@@ -109,7 +109,7 @@ export function OtpInputRoot({
   }, []);
 
   // The slot under the pointer, or the nearest one: geometry the pointer pressed on, read at
-  // the press, never state (decision 10).
+  // the press, never state (decision 4).
   const slotAt = useCallback((clientX: number) => {
     let nearest: number | null = null;
     let distance = Infinity;

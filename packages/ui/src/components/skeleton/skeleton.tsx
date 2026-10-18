@@ -14,7 +14,7 @@ export type SkeletonProps = SkeletonOwnProps &
   Omit<React.HTMLAttributes<HTMLElement>, keyof SkeletonOwnProps | 'children'>;
 
 /**
- * A placeholder shape while content loads (decision 16). Hidden from assistive technology: put
+ * A placeholder shape while content loads (decision 15). Hidden from assistive technology: put
  * `aria-busy="true"` on the region it stands in for. Size and shape are yours — `style` or a class.
  */
 export function Skeleton({ className, render, ...rest }: SkeletonProps) {

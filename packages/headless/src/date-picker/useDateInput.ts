@@ -18,7 +18,7 @@ export function inputBound(
 }
 
 /**
- * One native date input, run as Input is (decision 27). Uncontrolled, the input holds the value,
+ * One native date input, run as Input is (decision 12). Uncontrolled, the input holds the value,
  * so react-hook-form's `register()` reads and writes it; the Root keeps a copy from the input's
  * own events, and reads the input when the picker opens and after `form.reset()`, the moments
  * something may have set it without an event. Controlled, React sets it from `value`.

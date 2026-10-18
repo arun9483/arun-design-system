@@ -1,6 +1,6 @@
 /**
  * CSS anchor positioning for popups placed beside a trigger — Popover and Tooltip
- * (decision 12). Internal: shared between components, not exported (decision 9).
+ * (decision 7). Internal: shared between components, not exported (decision 5).
  *
  * The trigger carries a generated `anchor-name`; the popup names it in `position-anchor`
  * and is placed by `position-area`, flipping across the axis it opens along when there is

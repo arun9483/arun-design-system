@@ -8,7 +8,7 @@ import type { RefObject } from 'react';
  * render that scheduled it — a form's `reset` listener, which must see the state and the
  * setter of the render on screen when it runs, not of the render that subscribed it.
  *
- * Internal (decision 9).
+ * Internal (decision 5).
  */
 export function useLatest<T>(value: T): RefObject<T> {
   const ref = useRef(value);

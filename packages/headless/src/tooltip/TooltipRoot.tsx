@@ -44,7 +44,7 @@ function isWarm(): boolean {
 /**
  * Holds a tooltip's state and timers, and shares them with its parts. Renders no element.
  *
- * The popup is a native `popover="manual"`, anchored like Popover (decision 12). `hint`
+ * The popup is a native `popover="manual"`, anchored like Popover (decision 7). `hint`
  * would be the natural fit, but Safari lacks it; `manual` behaves the same everywhere and,
  * like `hint`, does not close an open Popover when it shows. What `manual` leaves out —
  * opening on hover and focus, closing on leave, blur and Esc — is the timing below.

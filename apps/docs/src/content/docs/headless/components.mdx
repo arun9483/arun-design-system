@@ -141,7 +141,7 @@ checked radio, `required` validation, and the form protocol.
 
 `RadioGroup.Root` is a separate element the consumer places, and its radios need something from
 it: the shared `name`, the value, `disabled`, `required` and `form`. So it earns a part. An
-indicator would not. The input is void, so there is nothing for one to wrap, and decision 11
+indicator would not. The input is void, so there is nothing for one to wrap, and decision 6
 gives one element one component.
 
 ### Where the value lives
@@ -194,7 +194,7 @@ tree, though not the DOM's, so each popup acts only on events whose target is it
 
 ### Why five parts
 
-Each one is an element the consumer places that needs something from the Root (decision 11).
+Each one is an element the consumer places that needs something from the Root (decision 6).
 `Trigger` and `Close` need the setter, `Popup` the state and the title's id, and `Title` supplies
 that id for `aria-labelledby`. There is no Portal, because the top layer needs none, and no
 Backdrop, because `::backdrop` is not an element anyone places.
@@ -218,7 +218,7 @@ import { Popover } from '@arun-dev/headless/popover';
 becomes its invoker: Tab moves from the Trigger into it, and focus returns on close. Light
 dismiss, Esc and one-open-at-a-time are the platform's.
 
-Placement is CSS anchor positioning, set inline (decision 12). The Trigger carries a generated
+Placement is CSS anchor positioning, set inline (decision 7). The Trigger carries a generated
 `anchor-name` (`--hl-anchor-<id>`), and the Popup gets `position-anchor` naming it,
 `position-area` from `side` and `align`, and `position-try-fallbacks` to flip across the axis it
 opens along. Nothing is measured, so nothing needs updating on scroll or resize. Your own `style`
@@ -250,7 +250,7 @@ import { Menu } from '@arun-dev/headless/menu';
 ```
 
 A menu button, by the WAI-ARIA pattern. `Menu.Popup` is a native `popover="auto"` with
-`role="menu"`, labelled by the Trigger and anchored to it exactly as Popover is (decision 12), so
+`role="menu"`, labelled by the Trigger and anchored to it exactly as Popover is (decision 7), so
 light dismiss, Esc, one-open-at-a-time and focus return are the platform's.
 
 **Focus moves into the menu.** A click, Enter, Space or Down on the Trigger opens it at the first
@@ -303,7 +303,7 @@ import { Combobox } from '@arun-dev/headless/combobox';
 ```
 
 A text input that filters a list, by the WAI-ARIA combobox pattern, with Base UI's behaviour
-(decision 14). **Items are data:** the Root takes `items` and filters them with `filter`, and
+(decision 10). **Items are data:** the Root takes `items` and filters them with `filter`, and
 `List` renders what is left through a function. `value` holds the items themselves, so a
 selection survives a search that no longer returns it.
 
@@ -343,7 +343,7 @@ import { Tooltip } from '@arun-dev/headless/tooltip';
 ```
 
 `Tooltip.Popup` is a native `popover="manual"` with `role="tooltip"`, anchored exactly as Popover
-is (decision 12). `popover="hint"` is the platform's tooltip mode, but Safari lacks it; `manual`
+is (decision 7). `popover="hint"` is the platform's tooltip mode, but Safari lacks it; `manual`
 behaves the same everywhere and, like `hint`, does not close an open Popover when it shows.
 
 What `manual` leaves to the component is timing: a mouse or pen opens it after `delay`, leaving
@@ -392,7 +392,7 @@ The key logic is an internal `core/rovingFocus` module, shared with Menu.
 
 **Tabs register from their props.** Each Tab tells the Root its `value` and `disabled` when it
 mounts, and the Root orders them by document position; nothing is read back from the DOM
-(decision 10). Elements are kept only to move focus to, so tabs can be added, removed or reordered.
+(decision 4). Elements are kept only to move focus to, so tabs can be added, removed or reordered.
 
 **Activation belongs to the Tab.** With `activationMode="automatic"`, a Tab selects itself when
 focused; with `"manual"`, Enter, Space or a click do — the button's own activation.

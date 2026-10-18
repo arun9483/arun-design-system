@@ -16,7 +16,7 @@ export type ComboboxValueProps<T = unknown> = {
  * no element of its own.
  *
  * It exists so that a separate styling package can show the selection without owning a copy
- * of it (decision 9): the value stays the Root's.
+ * of it (decision 5): the value stays the Root's.
  */
 export function ComboboxValue<T = unknown>({ children }: ComboboxValueProps<T>) {
   const { multiple, selectedItems, itemToString } = useComboboxRootContext('Value');

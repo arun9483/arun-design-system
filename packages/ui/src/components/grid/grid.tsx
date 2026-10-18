@@ -28,7 +28,7 @@ export type GridProps = GridOwnProps & Omit<React.HTMLAttributes<HTMLElement>, k
 
 /**
  * Children in equal columns: a CSS grid. A fixed count of columns, or as many as fit at
- * `minItemSize` each, at most `columns` (decision 21).
+ * `minItemSize` each, at most `columns` (decision 15).
  *
  * The counts reach the CSS as custom properties on the element, set on every Grid so a
  * grid nested in another never inherits the outer one's.

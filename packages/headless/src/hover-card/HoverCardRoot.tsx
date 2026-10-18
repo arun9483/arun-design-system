@@ -31,9 +31,9 @@ export type HoverCardRootProps = {
 /**
  * Holds a hover card's state and timers, and shares them with its parts. Renders no element.
  *
- * The card is a native `popover="manual"`, anchored like Popover and Tooltip (decision 12):
+ * The card is a native `popover="manual"`, anchored like Popover and Tooltip (decision 7):
  * `manual`, so it does not close an open Popover, and so it does not light-dismiss — it opens
- * and closes with the pointer and focus instead, on the timing below (decision 24).
+ * and closes with the pointer and focus instead, on the timing below (decision 7).
  */
 export function HoverCardRoot({
   open: openProp,

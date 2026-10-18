@@ -37,7 +37,7 @@ export type PopoverPopupProps = PopoverPopupOwnProps &
  *
  * Placement is CSS anchor positioning, set inline: `position-anchor` names the trigger,
  * `position-area` comes from `side` and `align`, and `position-try-fallbacks` flips it
- * when there is no room (decision 12). `data-side` and `data-align` repeat the request —
+ * when there is no room (decision 7). `data-side` and `data-align` repeat the request —
  * not where a fallback moved it, which script cannot observe.
  *
  * Light dismiss and Esc close the element before anyone is asked; the `toggle` event

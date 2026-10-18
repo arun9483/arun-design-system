@@ -6,7 +6,7 @@ import { useDatePickerRootContext } from './DatePickerRootContext';
 export type DatePickerPopupProps = PopoverPopupProps;
 
 /**
- * The popup holding the Calendar: a Popover popup (decision 12), named "Choose date". A
+ * The popup holding the Calendar: a Popover popup (decision 7), named "Choose date". A
  * Calendar.Root or Calendar.RangeRoot inside it picks for the picker, takes focus when it
  * opens, and closes it once a date or a range is picked.
  */

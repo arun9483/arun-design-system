@@ -16,7 +16,7 @@ export type BreadcrumbLinkProps = PartProps<React.AnchorHTMLAttributes<HTMLAncho
 export type BreadcrumbCurrentProps = PartProps<React.HTMLAttributes<HTMLElement>>;
 
 /**
- * Where the page sits (decision 17): a `<nav aria-label="Breadcrumb">` around an ordered list.
+ * Where the page sits (decision 15): a `<nav aria-label="Breadcrumb">` around an ordered list.
  * Separators are drawn by CSS and not read out. Rename it with `aria-label` if a page has two.
  */
 export function BreadcrumbRoot({ className, children, render, ...rest }: BreadcrumbRootProps) {

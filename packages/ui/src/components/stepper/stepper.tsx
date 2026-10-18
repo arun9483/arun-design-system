@@ -31,7 +31,7 @@ export type StepperRootProps = StepperRootOwnProps &
   Omit<React.OlHTMLAttributes<HTMLOListElement>, keyof StepperRootOwnProps>;
 
 /**
- * The steps of a multi-step flow, and how far along it is (decision 25): an ordered list, so a
+ * The steps of a multi-step flow, and how far along it is (decision 15): an ordered list, so a
  * screen reader announces "2 of 4". Which step is current is yours — your state or your URL —
  * as the page is for Pagination, so there is nothing for the Stepper to hold.
  *

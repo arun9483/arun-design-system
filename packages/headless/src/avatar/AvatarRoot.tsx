@@ -32,7 +32,7 @@ export type AvatarRootProps = AvatarRootOwnProps &
   Omit<ComponentPropsWithRef<'span'>, keyof AvatarRootOwnProps>;
 
 /**
- * A person's picture, or their initials until it loads (decision 17). Holds whether the Image
+ * A person's picture, or their initials until it loads (decision 14). Holds whether the Image
  * has loaded; `data-image-status` carries it for styling.
  */
 export function AvatarRoot({ className, children, render, ...rest }: AvatarRootProps) {

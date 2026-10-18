@@ -7,7 +7,7 @@ import { createContext, useContext } from 'react';
  *
  * `'indeterminate'` is a state of the checkbox itself, not a separate flag beside
  * `checked` — a single union makes `checked && indeterminate` unrepresentable, and
- * keeps one source of state to derive everything else from (decision 10).
+ * keeps one source of state to derive everything else from (decision 4).
  *
  * Native HTML splits them, but only because `.indeterminate` is a DOM property with no
  * attribute behind it: it is purely visual there, is cleared by the first click, and

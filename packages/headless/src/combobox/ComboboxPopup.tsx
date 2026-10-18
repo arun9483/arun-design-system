@@ -39,11 +39,11 @@ export type ComboboxPopupProps = ComboboxPopupOwnProps &
 
 /**
  * The box the list opens in: a native `popover="manual"` in the top layer, anchored to the
- * Input as Popover's popup is to its Trigger (decision 12). Holds `List`, and `Empty` and
+ * Input as Popover's popup is to its Trigger (decision 7). Holds `List`, and `Empty` and
  * `Status` if used.
  *
  * `manual`, not `auto`: the platform's light dismiss would close the list on a press of the
- * input itself, and of the Trigger and Clear beside it (decision 14). A press anywhere else
+ * input itself, and of the Trigger and Clear beside it (decision 10). A press anywhere else
  * closes it here instead, reported as `'outside-press'`; Esc is the Input's. A press inside
  * keeps focus in the input.
  */

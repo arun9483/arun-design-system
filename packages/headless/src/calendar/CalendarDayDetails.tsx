@@ -27,7 +27,7 @@ export type CalendarDayDetailsProps = CalendarDayDetailsOwnProps &
   Omit<ComponentPropsWithRef<'div'>, keyof CalendarDayDetailsOwnProps | 'children'>;
 
 /**
- * The details card (decision 28): one for the calendar, showing the `details` of the day under
+ * The details card (decision 12): one for the calendar, showing the `details` of the day under
  * a resting mouse, or with focus — so a key, a click or a tap opens it. A `popover="manual"`,
  * anchored to that day, so it opens above a DatePicker's popup without closing it. Read-only, a
  * `role="tooltip"` describing its day: the grid keeps the arrow keys and Tab. Esc hides it.

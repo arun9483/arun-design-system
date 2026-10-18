@@ -34,7 +34,7 @@ export type ToggleGroupProps = ToggleGroupOwnProps &
   Omit<ComponentPropsWithRef<'div'>, keyof ToggleGroupOwnProps>;
 
 /**
- * Toggles that share one value (decision 17): `role="group"`, one Tab stop — the pressed Toggle,
+ * Toggles that share one value (decision 14): `role="group"`, one Tab stop — the pressed Toggle,
  * or the first — and the arrow keys between them. Pressing the pressed Toggle releases it, so the
  * value may be empty. Inside a Toolbar its Toggles join the Toolbar's arrow keys instead. Name it
  * with `aria-label`.

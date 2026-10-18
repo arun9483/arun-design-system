@@ -10,7 +10,7 @@ import { ARUN_BRAND, createBrand } from '@arun-dev/tokens/createBrand';
  * colour. It is written to a file and imported in place of
  * @arun-dev/tokens/brands/default, which is the whole of the documented procedure.
  *
- * One brand per document, declared at :root — see docs/architecture.md §3. The
+ * One brand per document, declared at :root — see docs/architecture.md §2. The
  * output is not post-processed or rescoped: what this writes is byte-for-byte what
  * a consumer would ship.
  *

@@ -33,7 +33,7 @@ function usePresence(): [boolean, () => () => void] {
 }
 
 /**
- * One control with its label, description and error (decision 15). Generates their ids and
+ * One control with its label, description and error (decision 11). Generates their ids and
  * holds `invalid`, `disabled` and `required`; `Control` puts them on the control.
  *
  * Validity is yours: set `invalid` from react-hook-form's `fieldState`, or from what the

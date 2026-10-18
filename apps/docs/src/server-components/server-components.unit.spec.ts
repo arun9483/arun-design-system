@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 
 /**
- * Contract: the packages import in a React Server Component (decision 32). Each entry is loaded
+ * Contract: the packages import in a React Server Component (decision 16). Each entry is loaded
  * on React's server build, where createContext and the hooks do not exist, with every
  * "use client" module standing as a client boundary, as a Server Components bundler treats it.
  * A module that touched client-only React while loading would fail here, as it fails a Next.js
@@ -68,7 +68,7 @@ describe('server components', () => {
   it('keeps exactly the agreed ui components on the server', () => {
     // Server components render on the server and send no JavaScript; client components hydrate.
     // A change to this list changes what every consumer's page ships, so it is made here, on
-    // purpose (decision 32), not as a side effect of an edit.
+    // purpose (decision 16), not as a side effect of an edit.
     const SERVER = [
       'alert',
       'badge',

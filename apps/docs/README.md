@@ -60,7 +60,7 @@ a consumer would ship. Regenerate it, never edit it.
 Consequently the examples render in the docs' brand, not the package default — which is the
 point, since no component knows a brand exists.
 
-One brand per document, declared at `:root`; see `docs/architecture.md` §3. An earlier version of
+One brand per document, declared at `:root`; see `docs/architecture.md` §2. An earlier version of
 this site switched between several brands at runtime, which required rescoping `createBrand()`'s
 output under `[data-brand]` — a shape no consumer would produce, and one the architecture
 deliberately rules out.

@@ -37,7 +37,7 @@ export type HoverCardPopupProps = HoverCardPopupOwnProps &
   Omit<ComponentPropsWithRef<'div'>, keyof HoverCardPopupOwnProps | 'popover'>;
 
 /**
- * The card: a native `popover="manual"`, anchored to the trigger as Popover is (decision 12).
+ * The card: a native `popover="manual"`, anchored to the trigger as Popover is (decision 7).
  * State drives the element, never the reverse.
  *
  * Opened with the trigger as its `source`, so Tab moves from the trigger into the card and

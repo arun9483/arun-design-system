@@ -1,10 +1,10 @@
 /**
  * Roving focus for composite widgets — one Tab stop for the group, arrow keys within it.
  * Tabs first; Menu and Toolbar reuse it. Internal: shared between components, not exported
- * (decision 9).
+ * (decision 5).
  *
  * The caller owns the list of items and which are enabled — from component props, never
- * read back from the DOM (decision 10). This only answers "where does this key go".
+ * read back from the DOM (decision 4). This only answers "where does this key go".
  */
 
 export type Orientation = 'horizontal' | 'vertical';

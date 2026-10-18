@@ -6,7 +6,7 @@ import { fold } from './fold';
 
 /**
  * Typeahead for a list of items: typing moves focus to the next item whose text starts with
- * what was typed. Menu first; internal (decision 9). Like `rovingFocus`, it only answers
+ * what was typed. Menu first; internal (decision 5). Like `rovingFocus`, it only answers
  * "where does this go" — the caller owns the items, their text, and focus.
  */
 
@@ -14,7 +14,7 @@ import { fold } from './fold';
 export const TYPEAHEAD_TIMEOUT = 500;
 
 /**
- * An item's text, from its props (decision 10): the strings in its children, depth first,
+ * An item's text, from its props (decision 4): the strings in its children, depth first,
  * through elements' own `children`. A component that renders its text itself is opaque here,
  * so such an item needs `textValue`.
  */

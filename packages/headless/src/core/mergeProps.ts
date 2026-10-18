@@ -149,7 +149,7 @@ function chainHandlers(earlier: Handler, value: Handler): Handler {
  * That is the opposite direction to plain values, where later objects win. The escape
  * hatch belongs to the consumer: a component already decides which props reach the
  * element, so it never needs the chain to suppress anything — it declines to attach the
- * handler instead. See docs/architecture.md decision 8.
+ * handler instead. See docs/architecture.md decision 4.
  */
 export function mergeProps(...objects: (UnknownProps | undefined)[]): UnknownProps {
   const merged: UnknownProps = {};

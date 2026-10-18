@@ -26,7 +26,7 @@ export type PopoverRootProps = {
 /**
  * Holds a popover's state and shares it with its parts. Renders no element of its own.
  *
- * The popup is a native `popover`, placed by CSS anchor positioning (decision 12): the
+ * The popup is a native `popover`, placed by CSS anchor positioning (decision 7): the
  * platform supplies the top layer, light dismiss, Esc, the Tab order from the trigger and
  * focus return; the browser keeps it attached. This component adds state, one setter every
  * close goes through, and the anchor wiring.

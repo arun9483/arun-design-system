@@ -15,7 +15,7 @@ type TabsRootProps = HeadlessTabsRootProps & {
 
 /**
  * Styling only: selection, keyboard and ARIA all come from @arun-dev/headless. `position` is
- * layout, which needs no JavaScript (decision 7), so it is a class here and headless never
+ * layout, which needs no JavaScript (decision 3), so it is a class here and headless never
  * hears of it. The list stays first in the DOM either way.
  */
 export function TabsRoot({ position = 'start', className, ...props }: TabsRootProps) {

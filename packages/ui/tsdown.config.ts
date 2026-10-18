@@ -81,7 +81,7 @@ function componentsEntrypoint(): string {
 }
 
 /**
- * React Server Components (decision 32): a module that starts with 'use client' is a client
+ * React Server Components (decision 16): a module that starts with 'use client' is a client
  * boundary. The bundler drops the directive, so put it back on the built file of every source
  * module that has it. Output is per module (`unbundle`), so a server module — useRender, Card —
  * never shares a file with a client one.

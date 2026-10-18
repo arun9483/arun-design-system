@@ -29,7 +29,7 @@ export type ToolbarRootProps = ToolbarRootOwnProps &
   Omit<ComponentPropsWithRef<'div'>, keyof ToolbarRootOwnProps>;
 
 /**
- * A row of controls (decision 17): `role="toolbar"`, one Tab stop, and the arrow keys across its
+ * A row of controls (decision 14): `role="toolbar"`, one Tab stop, and the arrow keys across its
  * Buttons, Links, Inputs and Toggles — a ToggleGroup inside joins in. A text Input keeps the arrow
  * keys for its caret until the caret reaches an end. Name it with `aria-label`.
  */

@@ -28,7 +28,7 @@ export type ToastViewportProps = ToastViewportOwnProps &
 /**
  * Where toasts show: a `<section aria-label="Notifications">`, `aria-live="polite"`, and a
  * `popover="manual"` kept open in the top layer — above a modal Dialog — with no portal
- * (decisions 12 and 16). It stays open while empty, so the live region already exists when the
+ * (decisions 7 and 13). It stays open while empty, so the live region already exists when the
  * first toast arrives, and moves back to the top of the top layer as each arrives.
  *
  * Timers pause while the pointer is over it or focus is in it.
